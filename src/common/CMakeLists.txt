@@ -1,0 +1,1 @@
+add_library(common Visitor.cpp Visitor.h Node.cpp Node.h  CodeGenerator.cpp CodeGenerator.h Optimizer.cpp Optimizer.h)
