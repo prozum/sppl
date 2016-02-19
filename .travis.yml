@@ -9,7 +9,8 @@ env:
   global:
    # The next declaration is the encrypted COVERITY_SCAN_TOKEN, created
    #   via the "travis encrypt" command using the project repo's public key
-   - secure: "Pw3YB2IfOpJpjTKsT2SMYhph3yKUxAvd2NwlKm39VCmkc3Jy4fAARuURA+QoZC9JaOIOOEzmD6xCIt49eBPVha5RRX1tawSh7UPVWWKs88dp8IEuGVUEdKOoWwtLTEhpw95BEEQ4EnwQH89lGt0zRi3/KBeSTZM9/062VupzjgA9vLbpJoshpaIZ8/osG23g2aojMtOMMAC7qxioa/iJJRQzURJY/Lmm2lKB00gap4CuYXC5Yc239r8YlRkFw7Ac2M8pI6aUTFCPP5gvVRSGnpV/bDJVMrReaA0RMOPRjg1wEw42xdCbBJEzU/WQO0Z7MwwLbHD/cXmeSTwLwCFhFOOeJPG/o3jc5u2xMz3h0MEf44iWBdvOhLXJbdUX2zLnWjDY7ulYMBWq/ebbhslS/XwS1jadNfwFMj2aChtwCCl92cb01Yag4Vuhksj4J1Mqi11ol1/o9ofl3pmn3g7BE+HK7dJRK1VjFmirTeoK27ZNOPV+h26rbKJfNlsrvlUL9prAGd4zjRr5Wh0Wgt0+QyiheWQjPO9RRQAkkypqo+t8ILvUDb9WvwaOQM0UPEak12rNtgJXvaEeUwWgH/skEU2OO2ato6H/RNbtOqa/FkNl3giKBFDBvi/jir8yZIQNf6omcQbCa2jQDzL6Yukt0RP5zaiRfEMZ8ulenyrUG1E="
+   - secure: "meodC/ecpzTzHH0PWOt1Oq0FEsZT3D+zLejtLhbBY9WemnArsF8DbQdXuYgxKx9OMfK6OF40y/2tH4Jsxm+zGjbhV2VDndbxT6MfYjUdfXBpudTzVFF+QUhZoLbK4alqwXdC3QyMEjIj3+ZDxw/Zh1lpVmzY/akDtOo16xPEAG/Ev3c6DZ6YDnapCUxwgSkujiMn7gB8pxUJgHEniGqh9FXXsbPdyBedkbZu6b9uyQGWSoFtCn7Be3vzgC1+3DlERWoe7yWD0lHLUOopG+t1dZv8UCcteGZg3aKVScPHcR5t3HrRRAI5m/hBIV1H6zWOInjYvqH9W5PPo8x4cup+Hme1F0dclPlSHFn/1Yn3fMSff6ep+llXBjdWot94B29TpPZCfhyihyFb+3K3o37NW3HF/KMWyNmSYntfxS6VmzZgO01RLuvvBi0xnUEsmKRO5vIg0QjcQAzCl6fRd7TkiFYkf5zNcMwYr17czWG7DXPRR9+Yp3MODR7w3I34PXHBKxNPgcKQJlLyCLPUsjMl2S4oJ2OL3vGV/z2gAHNJ3+7EzJEgkugWK1kvtjwCxvvwEMfy2+y/avaGHrD/DkHJkK14K2rUuZIwm385EdvdMqus+zC62PCjgfJzmUoE53WnggM73RfEMax9nzHLmEMFzN9AA6ZMXJrA9QtHu08XFAM="
+
 
 before_install:
   - echo "deb http://llvm.org/apt/trusty/ llvm-toolchain-trusty-3.7 main" | sudo tee --append /etc/apt/sources.list
@@ -37,7 +38,7 @@ script:
 addons:
   coverity_scan:
     project:
-      name: "nimoov/next-lang"
+      name: "prozum/sppl"
       description: "Build submitted via Travis CI"
     notification_email: nimoov@prozum.dk
     build_command_prepend: "make clean"
