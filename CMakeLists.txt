@@ -17,4 +17,5 @@ include_directories(
 
 add_subdirectory(src)
 add_subdirectory(samples)
+add_subdirectory(tools)
 add_subdirectory(tests)
