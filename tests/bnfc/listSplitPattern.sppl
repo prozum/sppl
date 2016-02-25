@@ -1,0 +1,3 @@
+def listSplitPattern : [Int] -> Int
+	| [] = 0
+	| (x : xs) = x

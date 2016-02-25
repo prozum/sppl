@@ -1,0 +1,6 @@
+def isPrime : Int -> Bool
+| n = isprimehelper(n, n - 1)
+
+def isPrimeHelper : Int -> Int -> Bool
+	| n 1 = True
+	| n d =  n % d > 0 && isPrimeHelper(n, d - 1)

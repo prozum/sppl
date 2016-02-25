@@ -1,0 +1,3 @@
+def power : Int -> Int -> Int
+| a 0 = 1
+| a b = power(a, b - 1) * a

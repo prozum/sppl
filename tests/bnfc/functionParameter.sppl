@@ -1,0 +1,3 @@
+def functionParameter (Int -> Int) -> Int
+	| f = f(3)
+
