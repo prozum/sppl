@@ -1,0 +1,23 @@
+def nopar : Int
+	| = 5
+
+def singlepar : Int -> Int
+	| n = n
+
+def listpar : [Int] -> [Int]
+	| n = n
+
+def listlistpar : [[Int]] -> [[Int]]
+	| n = n
+
+def sigpar : (Int -> Int) -> (Int -> Int)
+	| n = n
+
+def sigsigpar : ((Int -> Int) -> (Int -> Int)) -> ((Int -> Int) -> (Int -> Int))
+	| n = n
+
+def tuplepar : (Int, Int) -> (Int, Int)
+	| n = n
+
+def tupletuplepar : ((Int, Int), (Int, Int)) -> ((Int, Int), (Int, Int))
+	| n = n

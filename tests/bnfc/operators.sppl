@@ -1,0 +1,26 @@
+def operatorsInt : Int -> Int
+	| 0 = 4 + 4
+	| 1 = 4 - 4
+	| 2 = 4 * 4
+	| 3 = 4 / 4
+	| 4 = 4 % 4
+	| n = 1
+
+def operatorsBool : Int -> Bool
+	| 0 = 1 == 1
+	| 1 = 1 != 2
+	| 2 = 2 >= 1
+	| 3 = 1 <= 2
+	| 4 = 2 > 1
+	| 5 = 1 < 2
+	| 6 = True && True
+	| 7 = True || False
+	| 8 = !False
+	| n = True
+
+def operatorsList : Int -> [Int]
+	| 0 = 1 : []
+	| 1 = 1 : 1 : []
+	| n = []
+
+
