@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Prep work that creates and prepares the bnfc parser
+# Prep work that creates and prepares the bnfc parser for cpp
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
@@ -21,6 +21,9 @@ do
 	echo $?    $file >> $DIR/cpptest.result
 done
 
+echo CPP RESULT
+echo
+ 
 cat $DIR/cpptest.result
 
 # Clean-up
