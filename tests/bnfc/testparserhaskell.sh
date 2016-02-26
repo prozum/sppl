@@ -10,7 +10,7 @@ cd $DIR
 mkdir build
 cd build
 
-bnfc -m -haskell ../../../bnf/bnf.cf
+bnfc -m -haskell ../../../tools/bnf/bnf.cf
 make
 
 # Test Files
