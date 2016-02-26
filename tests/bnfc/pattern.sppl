@@ -1,4 +1,0 @@
-def pattern : Int -> Int
-	| 0 = 0
-	| 1 = 2
-	| n = n * n + 3

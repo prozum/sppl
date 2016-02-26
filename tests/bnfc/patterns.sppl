@@ -19,7 +19,7 @@ def listpartterns : [Int] -> Int
 	| (x : xs) = x
 
 def morelistpatters : [[Int]] -> Int
-	| ((y : ys) : xs) -> y
+	| ((y : ys) : xs) = y
 
 
 
