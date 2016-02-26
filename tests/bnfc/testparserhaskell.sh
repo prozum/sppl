@@ -4,27 +4,27 @@
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-echo "" > $DIR/cpptest.result
+echo "" > $DIR/haskelltest.result
 
 cd $DIR
 mkdir build
 cd build
 
-bnfc -m -cpp ../../../tools/bnf/bnf.cf
+bnfc -m -haskell ../../../tools/bnf/bnf.cf
 make
 
 # Test Files
 
 for file in $DIR/*.sppl
 do
-	$DIR/build/Testbnf $file
-	echo $?    $file >> $DIR/cpptest.result
+	$DIR/build/TestBnf $file
+	echo $?    $file >> $DIR/haskelltest.result
 done
 
-echo CPP RESULT
+echo HASKELL RESULT
 echo
  
-cat $DIR/cpptest.result
+cat $DIR/haskelltest.result
 
 # Clean-up
 
