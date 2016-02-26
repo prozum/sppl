@@ -1,0 +1,25 @@
+def patterns : Int -> Int -> Int
+	| n 1 = 5
+	| 1 n = 5
+	| n x = 5
+
+def funcpatterns : (Int -> Int) -> Int
+	| f = f(5)
+
+def tuplepatterns : (Int, Int) -> Int
+	| (n, 1) = n
+	| (1, n) = n
+	| (n, x) = n * x
+
+def listpartterns : [Int] -> Int
+	| [2, 3, 4] = listpartterns([1, 2, 3])
+	| [x, 4, n] = x * n
+	| (1 : xs) = 1
+	| (x : [1, 2, 3]) = x
+	| (x : xs) = x
+
+def morelistpatters : [[Int]] -> Int
+	| ((y : ys) : xs) -> y
+
+
+

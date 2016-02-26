@@ -4,6 +4,9 @@ def operatorsInt : Int -> Int
 	| 2 = 4 * 4
 	| 3 = 4 / 4
 	| 4 = 4 % 4
+	| 5 = (4)
+	| 6 = -(4)
+	| 7 = 4 --4
 	| n = 1
 
 def operatorsBool : Int -> Bool
