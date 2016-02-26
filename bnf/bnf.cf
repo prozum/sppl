@@ -2,15 +2,15 @@ entrypoints Program ;
 
 rules Program ::= [Func] ;
 rules Func ::= Decl [Case] ;
-rules Decl ::= "def" Id ":" Signature ;
+rules Decl ::= "def" Ident ":" Signature ;
 rules Signature ::= Type "->" Signature | Type ;
 rules Case ::= "|" [Pattern] "=" Expr ;
-rules Pattern ::= Id | Literal | List_Split | Tuple_Pattern | List_Pattern ;
+rules Pattern ::= Ident | Literal | List_Split | Tuple_Pattern | List_Pattern ;
 rules List_Split ::= "(" Pattern ":" Pattern ")" ;
 rules Tuple_Pattern ::= "(" Pattern "," Pattern_ListNE ")" ;
 rules List_Pattern ::= "[" Pattern_List "]" ;
 rules Type ::= "(" Signature ")" | "(" Type "," [Type] ")" | "[" Type "]" | TypeToken ;
-rules Literal ::= IntLiteral | FloatLiteral | CharLiteral | StringLiteral | BooleanLiteral ;
+rules Literal ::= Integer | FloatLiteral | Char | String | BooleanLiteral ;
 rules Struct_Instance ::= "[" Expr_List "]" | "(" Expr "," [Expr] ")" ;
 rules Expr ::= Expr "||" Expr1 ;
 rules Expr1 ::= Expr1 "&&" Expr2 ;
@@ -19,13 +19,14 @@ rules Expr3 ::= Expr3 LeGr Expr4 ;
 rules Expr4 ::= Expr4 AddSub Expr5 ;
 rules Expr5 ::= Expr5 MulDivRem Expr6 ;
 rules Expr6 ::= Expr7 ":" Expr6 ;
-rules Expr7 ::= Id | Struct_Instance | Expr "(" Expr_List ")" | "!" Expr | "-" Expr  | Literal ;
+rules Expr7 ::= Ident | Struct_Instance | Expr "(" Expr_List ")" | "!" Expr | Sub Expr  | Literal ;
 
 coercions Expr 7 ;
 
 rules Pattern_List ::= Pattern_ListNE | ;
 rules Pattern_ListNE ::= Pattern "," Pattern_ListNE | Pattern ;
 rules Expr_List ::= [Expr] | ;
+rules AddSub ::= Add | Sub ;
 
 separator nonempty Func "" ;
 separator nonempty Case "" ;
@@ -35,13 +36,10 @@ separator Pattern "" ;
 
 token EqNEq {"=="} | {"!="} ;
 token LeGr {"<="} | {">="} | '<' | '>' ;
-token AddSub '-' | '+' ;
+token Add '+' ;
+token Sub '-' ;
 token MulDivRem '*' | '/' | '%' ;
-token IntLiteral digit+ ;
 token FloatLiteral digit+ '.' digit+ ;
-token CharLiteral '\'' ((char - ["'\\"]) | ('\\' ["'\\nt"])) '\'' ;
-token StringLiteral '"' ((char - ["\"\\"]) | ('\\' ["\"\\nt"]))* '"' ;
 token BooleanLiteral ( {"True"} | {"False"} ) ;
 token TypeToken ( {"Int"} | {"Bool"} | {"Float"} | {"String"} | {"Char"} ) ;
-token Id letter (letter | digit | '_' | '\'')* ;
 
