@@ -19,7 +19,7 @@ rules Expr3 ::= Expr3 LeGr Expr4 ;
 rules Expr4 ::= Expr4 AddSub Expr5 ;
 rules Expr5 ::= Expr5 MulDivRem Expr6 ;
 rules Expr6 ::= Expr7 ":" Expr6 ;
-rules Expr7 ::= Id | Struct_Instance | Expr "(" Expr_List ")" | "!" Expr | Literal ;
+rules Expr7 ::= Id | Struct_Instance | Expr "(" Expr_List ")" | "!" Expr | "-" Expr  | Literal ;
 
 coercions Expr 7 ;
 
@@ -35,14 +35,13 @@ separator Pattern "" ;
 
 token EqNEq {"=="} | {"!="} ;
 token LeGr {"<="} | {">="} | '<' | '>' ;
-token AddSub '+' | '-' ;
+token AddSub '-' | '+' ;
 token MulDivRem '*' | '/' | '%' ;
-	
 token IntLiteral digit+ ;
 token FloatLiteral digit+ '.' digit+ ;
-token CharLiteral '\'' letter '\'' ;
-token StringLiteral '"' letter* '"' ;
+token CharLiteral '\'' ((char - ["'\\"]) | ('\\' ["'\\nt"])) '\'' ;
+token StringLiteral '"' ((char - ["\"\\"]) | ('\\' ["\"\\nt"]))* '"' ;
 token BooleanLiteral ( {"True"} | {"False"} ) ;
 token TypeToken ( {"Int"} | {"Bool"} | {"Float"} | {"String"} | {"Char"} ) ;
-token Id ( letter ( letter | digit | '_' )* ) ;
+token Id letter (letter | digit | '_' | '\'')* ;
 
