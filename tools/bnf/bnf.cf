@@ -5,7 +5,7 @@ rules Func ::= Decl [Case] ;
 rules Decl ::= "def" Ident ":" Signature ;
 rules Signature ::= Type "->" Signature | Type ;
 rules Case ::= "|" [Pattern] "=" Expr ;
-rules Pattern ::= Ident | Literal | List_Split | Tuple_Pattern | List_Pattern ;
+rules Pattern ::= Ident | Literal | Sub Integer | Sub FloatLiteral | List_Split | Tuple_Pattern | List_Pattern ;
 rules List_Split ::= "(" Pattern ":" Pattern ")" ;
 rules Tuple_Pattern ::= "(" Pattern "," Pattern_ListNE ")" ;
 rules List_Pattern ::= "[" Pattern_List "]" ;
