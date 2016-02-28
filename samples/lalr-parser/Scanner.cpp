@@ -1,167 +1,106 @@
 //
 // Created by Hejsil on 2/26/2016.
 //
-
-#include <ctype.h>
+#include <string>
+#include <unordered_map>
 #include "Scanner.h"
 
 std::vector<scanner::Token>* scanner::Scanner::scan(std::string str) {
     auto res = new std::vector<Token>();
     Token token;
+
+	string = str;
     eat();
 
-    while (string.length() != 0){
+    while (current != '\0'){
         if (isalpha(current) || current == '_'){
             token = scan_identifier();
         } else if (isdigit(current)){
             token = scan_number();
         } else {
-            switch (current){
-                case ':':
-                    token = eat(COLON, current);
-                    break;
-                case '-':
-                    token = eat(SUB, current);
-
-                    if (current == '>'){
-                        token.value += current;
-                        token.lex = ARROW;
-                        eat();
-                    }
-                case '|':
-                    token = eat(PIPE, current);
-
-                    if (current == '|'){
-                        token.value += current;
-                        token.lex = OR;
-                        eat();
-                    }
-                    break;
-                case '=':
-                    token = eat(ASSIGN, current);
-
-                    if (current == '=') {
-                        token.value += current;
-                        token.lex = EQUAL;
-                        eat();
-                    }
-                    break;
-                case '(':
-                    token = eat(PARSTART, current);
-                    break;
-                case ')':
-                    token = eat(PAREND, current);
-                    break;
-                case '[':
-                    token = eat(SQSTART, current);
-                    break;
-                case ']':
-                    token = eat(SQEND, current);
-                    break;
-                case '&':
-                    token = eat(UNKNOWN, current);
-
-                    if (current == '&') {
-                        token.value += current;
-                        token.lex = AND;
-                        eat();
-                    }
-                    break;
-                case '!':
-                    token = eat(EXMARK, current);
-
-                    if (current == '=') {
-                        token.value += current;
-                        token.lex = NOTEQUAL;
-                        eat();
-                    }
-                    break;
-                case '<':
-                    token = eat(LESSER, current);
-
-                    if (current == '=') {
-                        token.value += current;
-                        token.lex = LESSEREQUAL;
-                        eat();
-                    }
-                    break;
-                case '>':
-                    token = eat(GREATER, current);
-
-                    if (current == '=') {
-                        token.value += current;
-                        token.lex = GREATEREQUAL;
-                        eat();
-                    }
-                    break;
-                case '+':
-                    token = eat(ADD, current);
-                    break;
-                case '*':
-                    token = eat(MUL, current);
-                    break;
-                case '/':
-                    token = eat(DIV, current);
-                    break;
-                case '%':
-                    token = eat(MOD, current);
-                    break;
-                case ',':
-                    token = eat(COMMA, current);
-                    break;
-                case '"':
-                    token = scan_string();
-                    break;
-                case '\'':
-                    token = scan_char();
-                    break;
-                case '\t':
-                case '\n':
-                    token = eat(IGNORE, current);
-                    break;
-                case '#':
-                    token = scan_comment();
-                    break;
-                default:
-                    token = eat(UNKNOWN, current);
-                    break;
-            }
+			switch (current) {
+			case '"':
+				token = scan_string();
+			case '\'':
+				token = scan_char();
+			case '#':
+				token = scan_comment();
+			default:
+				token = scan_other();
+				break;
+			}
         }
 
         if (token.lex != IGNORE)
             res->push_back(token);
     }
+
+	return res;
 }
 
-void scanner::Scanner::eat() {
-    if (string.length() != 0){
-        current = string.front();
-        string.erase(0);
-    } else {
-        current = ' ';
-    }
+scanner::Token scanner::Scanner::scan_other() {
+	Token res;
+	std::string combined = "";
+	combined += current;
+	combined += next;
+	auto got_double = double_symbols.find(combined);
+
+	if (got_double != double_symbols.end()) {
+		res = Token(got_double->second, combined);
+		eat(2);
+	} else {
+		auto got_single = single_symbols.find(current);
+
+		if (got_single != single_symbols.end()) {
+			res = Token(got_single->second, current);
+		} else {
+			res = Token(UNKNOWN, current);
+		}
+
+		eat();
+	}
+
+	return res;
 }
 
-Token scanner::Scanner::eat(Lexeme token, char cha) {
-    Token res = Token(token, cha);
-    eat();
+void scanner::Scanner::eat(int n) {
+	int length = string.length();
+	
+	for (size_t i = 0; i < n; i++) {
+		if (length - i != 0) {
+			current = string.front();
+			string.erase(0, 1);
 
-    return res;
+			if (length - (i + 1) != 0)
+				next = string.front();
+			else
+				next = '\0';
+		} else {
+			current = '\0';
+			break;
+		}
+	}
 }
 
 scanner::Token scanner::Scanner::scan_identifier() {
-    Token res(ID, "");
+    Token res(ID);
 
     do {
         res.value += current;
         eat();
     } while (isdigit(current) || isalpha(current) || current == '_');
 
+	auto got_keyword = keywords.find(res.value);
+
+	if (got_keyword != keywords.end()) {
+		res.lex = got_keyword->second;
+	}
+
     return res;
 }
 
 scanner::Token scanner::Scanner::scan_string() {
-    Token res(STRINGLIT, "");
+    Token res(STRINGLIT);
     char prev;
 
     eat();
@@ -176,7 +115,7 @@ scanner::Token scanner::Scanner::scan_string() {
 }
 
 scanner::Token scanner::Scanner::scan_char() {
-    Token res(CHARLIT, "");
+    Token res(CHARLIT);
     char prev;
 
     eat();
@@ -193,7 +132,7 @@ scanner::Token scanner::Scanner::scan_char() {
 }
 
 scanner::Token scanner::Scanner::scan_number() {
-    Token res(INTEGERLIT, "");
+    Token res(INTEGERLIT);
 
     do {
         res.value += current;
@@ -217,7 +156,7 @@ scanner::Token scanner::Scanner::scan_number() {
 }
 
 scanner::Token scanner::Scanner::scan_comment() {
-    Token res(IGNORE, "");
+    Token res(IGNORE);
 
     do {
         res.value += current;

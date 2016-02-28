@@ -5,8 +5,8 @@
 #ifndef LALR_PARSER_TOKEN_H
 #define LALR_PARSER_TOKEN_H
 
-#include <bits/stringfwd.h>
-#include <bits/basic_string.h>
+#include <string>
+#include <unordered_map>
 
 namespace scanner {
     enum Lexeme {
@@ -51,7 +51,8 @@ namespace scanner {
 
     class Token {
     public:
-        Token();
+		Token() { };
+		Token(Lexeme l) : Token(l, "") { };
         Token(Lexeme l, std::string s) { lex = l; value = s; };
         Token(Lexeme l, char c) { lex = l; value = c; };
         Lexeme lex;

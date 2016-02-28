@@ -5,16 +5,14 @@
 #ifndef LALR_PARSER_SCANNER_H
 #define LALR_PARSER_SCANNER_H
 
-
-#include <bits/stl_bvector.h>
-#include <bits/stl_iterator.h>
-#include <bits/unordered_map.h>
+#include <vector>
 #include "Token.h"
 
 namespace scanner {
     class Scanner {
     private:
         char current;
+		char next;
         std::string string;
         std::unordered_map<std::string, Lexeme> keywords = {
                 {"True", BOOLEANLIT },
@@ -27,12 +25,45 @@ namespace scanner {
                 {"def", DEF }
         };
 
-        void eat();
-        Token eat(Lexeme, char);
+		std::unordered_map<char, Lexeme> single_symbols = {
+			{ '-' , SUB },
+			{ '|' , PIPE },
+			{ '"' , STRING },
+			{ '=' , ASSIGN },
+			{ '!' , EXMARK },
+			{ '<' , LESSER },
+			{ '>' , GREATER },
+			{ ':' , COLON },
+			{ '(' , PARSTART },
+			{ ')' , PAREND },
+			{ '[' , SQSTART },
+			{ ']' , SQEND },
+			{ '+' , ADD },
+			{ '*' , MUL },
+			{ '/' , DIV },
+			{ '%' , MOD },
+			{ ',' , COMMA },
+			{ ' ' , IGNORE },
+			{ '\t' , IGNORE },
+			{ '\n' , IGNORE }
+		};
+
+		std::unordered_map<std::string, Lexeme> double_symbols = {
+			{ "->" , ARROW },
+			{ "||" , OR },
+			{ "==" , EQUAL },
+			{ "&&" , AND },
+			{ "!=" , NOTEQUAL },
+			{ "<=" , LESSEREQUAL },
+			{ ">=" , GREATEREQUAL }
+		};
+
+        void eat(int n = 1);
         Token scan_identifier();
+		Token scan_number();
+		Token scan_other();
         Token scan_string();
         Token scan_char();
-        Token scan_number();
         Token scan_comment();
     public:
         std::vector<Token>* scan(std::string);

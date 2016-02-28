@@ -1,6 +1,7 @@
 #include <iostream>
+#include <string>
+#include <unordered_map>
 
-#include "Ast.H"
 #include "Scanner.h"
 
 using namespace std;
@@ -46,8 +47,9 @@ unordered_map<Lexeme, std::string> map = {
         { UNKNOWN, "unknown" }
 };
 
-int main() {
+int main(int argc, char** argv) {
     Scanner scanner;
+	int tmp;
     auto tokens = scanner.scan("def fac: Int -> Int\n"
                                     "\t| 0 = 1\n"
                                     "\t| n = fac(n-1) * n");
@@ -55,5 +57,7 @@ int main() {
     for (auto token : *tokens)
         cout << map[token.lex] << ": " << token.value << endl;
 
+	cin >> tmp;
+	delete tokens;
     return 0;
 }
