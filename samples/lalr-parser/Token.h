@@ -52,11 +52,13 @@ namespace scanner {
     class Token {
     public:
 		Token() { };
-		Token(Lexeme l) : Token(l, "") { };
-        Token(Lexeme l, std::string s) { lex = l; value = s; };
-        Token(Lexeme l, char c) { lex = l; value = c; };
+		Token(Lexeme l, int lnum) : Token(l, "", lnum) { };
+		Token(Lexeme l, std::string s, int lnum) { lex = l; value = s; line_number = lnum; };
+		Token(Lexeme l, char c, int lnum) { lex = l; value = c; line_number = lnum; };
+
         Lexeme lex;
         std::string value;
+		int line_number;
     };
 }
 

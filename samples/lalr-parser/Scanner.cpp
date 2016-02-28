@@ -8,6 +8,7 @@
 std::vector<scanner::Token>* scanner::Scanner::scan(std::string str) {
     auto res = new std::vector<Token>();
     Token token;
+	line_number = 1;
 
 	string = str;
     eat();
@@ -46,15 +47,15 @@ scanner::Token scanner::Scanner::scan_other() {
 	auto got_double = double_symbols.find(combined);
 
 	if (got_double != double_symbols.end()) {
-		res = Token(got_double->second, combined);
+		res = Token(got_double->second, combined, line_number);
 		eat(2);
 	} else {
 		auto got_single = single_symbols.find(current);
 
 		if (got_single != single_symbols.end()) {
-			res = Token(got_single->second, current);
+			res = Token(got_single->second, current, line_number);
 		} else {
-			res = Token(UNKNOWN, current);
+			res = Token(UNKNOWN, current, line_number);
 		}
 
 		eat();
@@ -68,6 +69,9 @@ void scanner::Scanner::eat(int n) {
 	
 	for (size_t i = 0; i < n; i++) {
 		if (length - i != 0) {
+			if (current == '\n')
+				line_number++;
+			
 			current = string.front();
 			string.erase(0, 1);
 
@@ -83,7 +87,7 @@ void scanner::Scanner::eat(int n) {
 }
 
 scanner::Token scanner::Scanner::scan_identifier() {
-    Token res(ID);
+    Token res(ID, line_number);
 
     do {
         res.value += current;
@@ -100,7 +104,7 @@ scanner::Token scanner::Scanner::scan_identifier() {
 }
 
 scanner::Token scanner::Scanner::scan_string() {
-    Token res(STRINGLIT);
+    Token res(STRINGLIT, line_number);
     char prev;
 
     eat();
@@ -115,7 +119,7 @@ scanner::Token scanner::Scanner::scan_string() {
 }
 
 scanner::Token scanner::Scanner::scan_char() {
-    Token res(CHARLIT);
+    Token res(CHARLIT, line_number);
     char prev;
 
     eat();
@@ -132,7 +136,7 @@ scanner::Token scanner::Scanner::scan_char() {
 }
 
 scanner::Token scanner::Scanner::scan_number() {
-    Token res(INTEGERLIT);
+    Token res(INTEGERLIT, line_number);
 
     do {
         res.value += current;
@@ -156,7 +160,7 @@ scanner::Token scanner::Scanner::scan_number() {
 }
 
 scanner::Token scanner::Scanner::scan_comment() {
-    Token res(IGNORE);
+    Token res(IGNORE, line_number);
 
     do {
         res.value += current;

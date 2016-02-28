@@ -13,6 +13,7 @@ namespace scanner {
     private:
         char current;
 		char next;
+		int line_number;
         std::string string;
         std::unordered_map<std::string, Lexeme> keywords = {
                 {"True", BOOLEANLIT },
