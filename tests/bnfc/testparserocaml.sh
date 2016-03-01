@@ -15,7 +15,7 @@ make
 
 # Test Files
 
-for file in $DIR/*.sppl
+for file in $DIR/../source/*.sppl
 do
 	$DIR/build/Testbnf $file
 	echo $?    $file >> $DIR/ocamltest.result

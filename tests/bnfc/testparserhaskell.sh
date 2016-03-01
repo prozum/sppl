@@ -15,7 +15,7 @@ make
 
 # Test Files
 
-for file in $DIR/*.sppl
+for file in $DIR/../source/*.sppl
 do
 	$DIR/build/TestBnf $file
 	echo $?    $file >> $DIR/haskelltest.result
