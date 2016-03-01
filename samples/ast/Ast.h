@@ -2,6 +2,7 @@
 #define AST_HEADER
 
 #include <vector>
+#include <string>
 
 namespace ast {
     class Visitor;
@@ -106,15 +107,15 @@ namespace ast {
 
     class BinaryOp : Node {
     public:
-        Expr &left;
-        Expr &right;
+        Expr *left;
+        Expr *right;
 
         virtual void accept(Visitor& v) = 0;
     };
 
     class UnaryOp : Node {
     public:
-        Expr &child;
+        Expr *child;
 
         virtual void accept(Visitor& v) = 0;
     };
@@ -128,7 +129,7 @@ namespace ast {
 
     class Program : Node {
     public:
-        std::vector<Function> funcs;
+        std::vector<Function*> funcs;
 
         virtual void accept(Visitor& v) { v.visit(*this); };
     };
@@ -136,16 +137,16 @@ namespace ast {
     class Function : Node {
     public:
         std::string id;
-        Signature &sig;
-        std::vector<Case> cases;
+        Signature *sig;
+        std::vector<Case*> cases;
 
         virtual void accept(Visitor& v) { v.visit(*this); };
     };
 
     class Case : Node {
     public:
-        std::vector<Expr> patterns;
-        Expr &expr;
+        std::vector<Expr*> patterns;
+        Expr *expr;
 
         virtual void accept(Visitor& v) { v.visit(*this); };
     };
@@ -280,14 +281,14 @@ namespace ast {
 
     class List : Expr {
     public:
-        std::vector<Expr> exprs;
+        std::vector<Expr*> exprs;
 
         virtual void accept(Visitor& v) { v.visit(*this); };
     };
 
     class Tuple : Expr {
     public:
-        std::vector<Expr> exprs;
+        std::vector<Expr*> exprs;
 
         virtual void accept(Visitor& v) { v.visit(*this); };
     };
@@ -300,8 +301,8 @@ namespace ast {
 
     class Call : Expr {
     public:
-        Expr &callee;
-        std::vector<Expr> exprs;
+        Expr *callee;
+        std::vector<Expr*> exprs;
 
         virtual void accept(Visitor& v) { v.visit(*this); };
     };
@@ -335,19 +336,20 @@ namespace ast {
 
     class ListType : Type {
     public:
+        Type *type;
         virtual void accept(Visitor& v) { v.visit(*this); };
     };
 
     class TupleType : Type {
     public:
-        std::vector<Type> types;
+        std::vector<Type*> types;
 
         virtual void accept(Visitor& v) { v.visit(*this); };
     };
 
     class Signature : Type {
     public:
-        std::vector<Type> types;
+        std::vector<Type*> types;
 
         virtual void accept(Visitor& v) { v.visit(*this); };
     };

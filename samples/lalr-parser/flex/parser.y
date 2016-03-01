@@ -34,10 +34,12 @@
 %%
 
 program:	funcs_ne ;
-funcs_ne:	funcs_ne func | func ;
+funcs_ne:	funcs_ne func 
+	| func ;
 func:		decl cases_ne ;
 decl:		T_DEF T_ID T_COLON signature ;
-signature:	type T_ARROR signature | type ;
+signature:	type T_ARROR signature 
+	| type ;
 type:		T_BOOLTYPE
 	|	T_INTTYPE
 	|	T_FLOATTYPE
@@ -48,16 +50,20 @@ type:		T_BOOLTYPE
 	|	T_PARSTART type T_COMMA types_comma_ne T_PAREND ;
 types_comma_ne: type T_COMMA types_comma_ne
 	|	type ;
-cases_ne:	case cases_ne | case ;
+cases_ne:	case cases_ne 
+	| case ;
 case: 		T_PIPE patterns T_ASSIGN expr ;
-patterns:	pattern patterns |  ;
+patterns:	pattern patterns 
+	|  ;
 pattern:	literal 
 	| 	T_ID 
 	| 	T_PARSTART pattern T_COLON pattern T_PAREND 
 	| 	T_PARSTART pattern T_COMMA patterns_comma_ne T_PAREND 
 	|	T_SQSTART patterns_comma T_SQEND ;
-patterns_comma: patterns_comma_ne | ;
-patterns_comma_ne: pattern patterns_comma_ne | pattern ;
+patterns_comma: patterns_comma_ne 
+	| ;
+patterns_comma_ne: pattern T_COMMA patterns_comma_ne 
+	| pattern ;
 literal:	T_INTLITERAL
 	|	T_SUB T_INTLITERAL
 	|	T_FLOATLITERAL
