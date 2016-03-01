@@ -1,8 +1,9 @@
 %{
+    #include <cstdio>
     #include <iostream>
     #include <string>
-    #include "parser.tab.h"
-    using namespace std; 
+    using namespace std;
+    #include "parser.tab.h" 
     void yyerror(char*);
     int yyparse();
 %}
@@ -21,7 +22,7 @@
 "'".+"'"			{ yylval.str_val = new string(yytext); return T_CHARLITERAL; }
 "\"".*"\""			{ yylval.str_val = new string(yytext); return T_STRINGLITERAL; }
 "True"|"False"			{ yylval.bool_val = (string(yytext) == "True")? true : false; return T_BOOLLITERAL; }
-"[a-zA-Z][a-zA-Z0-9]*"		{ yylval.str_val = new string(yytext); return T_ID; }
+[a-zA-Z][a-zA-Z0-9]*		{ yylval.str_val = new string(yytext); return T_ID; }
 "->"				{ return T_ARROR; }
 "=="				{ return T_EQUAL; }
 "!="				{ return T_NOTEQUAL; }
@@ -48,13 +49,15 @@
 
 %%
 
-void yyerror(char* str) { cout << "Parse Error: \n%s" << endl; }
+void yyerror(char* str) { printf("Parse Error: \n%s", str); }
 int yywrap(void) {  }
 int main(int argc, char** argv){
+    yydebug = 1;
     if (argc != 2) { cout << "usage: ./parser1 filename\n" << endl; return 0; }
     FILE* file = fopen(argv[1], "r");
     if (file == NULL) { cout << "couldn't open " << argv[1] << endl; return 0; }
     yyin = file;
     yyparse();
     fclose(file);
+    cout << endl << endl << "--- Tuturuu~. I done did it mom!" << endl;
 }

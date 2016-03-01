@@ -1,4 +1,6 @@
 %{
+    #define YYDEBUG 1
+    #include <cstdio>
     #include <string>
     #include <map>
     using namespace std;
@@ -8,10 +10,10 @@
 %}
 
 %union {
+    string*	str_val;
     long	long_val;
     long double	longdouble_val;
     bool	bool_val;
-    string *	str_val;
 }
 
 %token T_DEF T_INTTYPE T_BOOLTYPE T_FLOATTYPE T_STRINGTYPE T_CHARTYPE T_ARROR T_EQUAL T_NOTEQUAL T_AND T_OR T_LESSEREQUAL T_GREATEREQUAL T_LESSER T_GREATER T_MUL T_DIV T_MOD T_ADD T_SUB T_ASSIGN T_SQSTART T_SQEND T_PARSTART T_PAREND T_EXMARK T_COMMA T_PIPE T_ARROW T_COLON
