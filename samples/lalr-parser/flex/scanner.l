@@ -53,6 +53,10 @@
 void yyerror(char* str) { printf("Parse Error: \n%s", str); error = 1; }
 int yywrap(void) {  }
 int main(int argc, char** argv){
+    #if YYDEBUG
+	yydebug = 1;
+    #endif
+
     if (argc != 2) { cout << "usage: ./parser1 filename\n" << endl; return 1; }
     FILE* file = fopen(argv[1], "r");
     if (file == NULL) { cout << "couldn't open " << argv[1] << endl; return 1; }

@@ -1,5 +1,4 @@
-%{
-    #define YYDEBUG 1
+%{   
     #include <cstdio>
     #include <string>
     #include <map>
@@ -84,7 +83,7 @@ expr:		expr T_OR expr
 	|	literal
 	|	struct_inst
 	|	T_PARSTART expr T_PAREND
-	|	expr T_PARSTART expr T_PAREND
+	|	expr T_PARSTART exprs_comma T_PAREND
 	|	T_EXMARK expr ;
 struct_inst:	T_SQSTART exprs_comma T_SQEND
 	|	T_PARSTART expr T_COMMA exprs_comma_ne T_PAREND ;
