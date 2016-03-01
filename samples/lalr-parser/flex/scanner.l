@@ -6,6 +6,7 @@
     #include "parser.tab.h" 
     void yyerror(char*);
     int yyparse();
+    int error = 0;
 %}
 
 %%
@@ -49,15 +50,18 @@
 
 %%
 
-void yyerror(char* str) { printf("Parse Error: \n%s", str); }
+void yyerror(char* str) { printf("Parse Error: \n%s", str); error = 1; }
 int yywrap(void) {  }
 int main(int argc, char** argv){
-    yydebug = 1;
-    if (argc != 2) { cout << "usage: ./parser1 filename\n" << endl; return 0; }
+    if (argc != 2) { cout << "usage: ./parser1 filename\n" << endl; return 1; }
     FILE* file = fopen(argv[1], "r");
-    if (file == NULL) { cout << "couldn't open " << argv[1] << endl; return 0; }
+    if (file == NULL) { cout << "couldn't open " << argv[1] << endl; return 1; }
     yyin = file;
     yyparse();
     fclose(file);
-    cout << endl << endl << "--- Tuturuu~. I done did it mom!" << endl;
+
+    if (!error)
+	cout << "Tuturuu~ I done did it mom!" << endl;
+
+    return error;
 }
