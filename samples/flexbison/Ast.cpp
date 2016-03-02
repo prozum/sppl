@@ -1,4 +1,6 @@
-#include "Node.h"
+#include "Ast.h"
+#include <iostream>
+using namespace std;
 
 void ast::Program::accept(Visitor *v) { v->visit(this); }
 
@@ -38,8 +40,6 @@ void ast::Par::accept(Visitor *v) { v->visit(this); }
 
 void ast::Not::accept(Visitor *v) { v->visit(this); }
 
-void ast::Negative::accept(Visitor *v) { v->visit(this); }
-
 void ast::Int::accept(Visitor *v) { v->visit(this); }
 
 void ast::Float::accept(Visitor *v) { v->visit(this); }
@@ -73,3 +73,9 @@ void ast::ListType::accept(Visitor *v) { v->visit(this); }
 void ast::TupleType::accept(Visitor *v) { v->visit(this); }
 
 void ast::Signature::accept(Visitor *v) { v->visit(this); }
+
+void ast::ListPattern::accept(ast::Visitor *v) { v->visit(this); }
+
+void ast::TuplePattern::accept(ast::Visitor *v) { v->visit(this); }
+
+void ast::ListSplit::accept(ast::Visitor *v) { v->visit(this); }
