@@ -13,7 +13,7 @@ cd build
 flex ../../../samples/flexbison/scanner.l
 bison -t -d ../../../samples/flexbison/parser.y
 
-g++ lex.yy.c parser.tab.c -o parser
+c++ lex.yy.c parser.tab.c -o parser
 
 # test
 
