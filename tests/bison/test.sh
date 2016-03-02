@@ -10,8 +10,8 @@ cd $DIR
 mkdir build
 cd build
 
-flex ../../../samples/lalr-parser/flex/scanner.l
-bison -t -d ../../../samples/lalr-parser/flex/parser.y
+flex ../../../samples/flexbison/scanner.l
+bison -t -d ../../../samples/flexbison/parser.y
 
 g++ lex.yy.c parser.tab.c -o parser
 
