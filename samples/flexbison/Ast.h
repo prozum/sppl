@@ -146,11 +146,10 @@ namespace ast {
 	class Function : public Node {
 	public:
 		std::string id;
-		Signature *sig;
+		std::vector<Type*> types;
 		std::vector<Case*> cases;
 
 		Function() { }
-		Function(Signature *s) { sig = s; }
 		Function(std::string s) { id = s; }
 
 		virtual void accept(Visitor *v);

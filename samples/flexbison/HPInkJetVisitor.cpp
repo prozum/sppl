@@ -21,9 +21,16 @@ void HPInkJetVisitor::visit(Function *node) {
 
     res.append("def ");
     res.append(node->id);
-    res.append(" ");
+    res.append(" : ");
 
-    node->sig->accept(this);
+    if (node->types.size() != 0){
+        for (int i = 0; i < node->types.size() - 1; ++i) {
+            node->types[i]->accept(this);
+            res.append(" -> ");
+        }
+
+        node->types.back()->accept(this);
+    }
 
     res.append("\n");
 
@@ -41,13 +48,14 @@ void HPInkJetVisitor::visit(Case *node) {
 
     res.append("\t| ");
 
-    for (int i = 0; i < node->patterns.size() - 1; ++i) {
-        node->patterns[i]->accept(this);
-        res.append(" ");
-    }
+    if (node->patterns.size() != 0){
+        for (int i = 0; i < node->patterns.size() - 1; ++i) {
+            node->patterns[i]->accept(this);
+            res.append(" ");
+        }
 
-    if (node->patterns.size() != 0)
         node->patterns.back()->accept(this);
+    }
 
     res.append(" = ");
 
@@ -215,7 +223,7 @@ void HPInkJetVisitor::visit(Bool *node) {
 
     cout << "Bool" << endl;
 
-    res.append(to_string(node->value));
+    res.append((node->value)? "True" : "False");
 }
 
 void HPInkJetVisitor::visit(Char *node) {
@@ -242,13 +250,14 @@ void HPInkJetVisitor::visit(List *node) {
 
     res.append("[");
 
-    for (int i = 0; i < node->exprs.size() - 1; ++i) {
-        node->exprs[i]->accept(this);
-        res.append(", ");
-    }
+    if (node->exprs.size() != 0){
+        for (int i = 0; i < node->exprs.size() - 1; ++i) {
+            node->exprs[i]->accept(this);
+            res.append(", ");
+        }
 
-    if (node->exprs.size() != 0)
         node->exprs.back()->accept(this);
+    }
 
     res.append("]");
 }
@@ -259,13 +268,14 @@ void HPInkJetVisitor::visit(Tuple *node) {
 
     res.append("(");
 
-    for (int i = 0; i < node->exprs.size() - 1; ++i) {
-        node->exprs[i]->accept(this);
-        res.append(", ");
-    }
+    if (node->exprs.size() != 0){
+        for (int i = 0; i < node->exprs.size() - 1; ++i) {
+            node->exprs[i]->accept(this);
+            res.append(", ");
+        }
 
-    if (node->exprs.size() != 0)
         node->exprs.back()->accept(this);
+    }
 
     res.append(")");
 }
@@ -279,18 +289,19 @@ void HPInkJetVisitor::visit(Id *node) {
 
 void HPInkJetVisitor::visit(Call *node) {
 
-    cout << "Call" << endl;
+    cout << "Call " << node->exprs.size() << endl;
 
     node->callee->accept(this);
     res.append("(");
 
-    for (int i = 0; i < node->exprs.size() - 1; ++i) {
-        node->exprs[i]->accept(this);
-        res.append(", ");
-    }
+    if (node->exprs.size() != 0) {
+        for (int i = 0; i < node->exprs.size() - 1; ++i) {
+            node->exprs[i]->accept(this);
+            res.append(", ");
+        }
 
-    if (node->exprs.size() != 0)
         node->exprs.back()->accept(this);
+    }
 
     res.append(")");
 }
@@ -345,13 +356,14 @@ void HPInkJetVisitor::visit(TupleType *node) {
 
     res.append("(");
 
-    for (int i = 0; i < node->types.size() - 1; ++i) {
-        node->types[i]->accept(this);
-        res.append(", ");
-    }
+    if (node->types.size() != 0){
+        for (int i = 0; i < node->types.size() - 1; ++i) {
+            node->types[i]->accept(this);
+            res.append(", ");
+        }
 
-    if (node->types.size() != 0)
         node->types.back()->accept(this);
+    }
 
     res.append(")");
 }
@@ -362,13 +374,14 @@ void HPInkJetVisitor::visit(Signature *node) {
 
     res.append("(");
 
-    for (int i = 0; i < node->types.size() - 1; ++i) {
-        node->types[i]->accept(this);
-        res.append(" -> ");
-    }
+    if (node->types.size() != 0){
+        for (int i = 0; i < node->types.size() - 1; ++i) {
+            node->types[i]->accept(this);
+            res.append(" -> ");
+        }
 
-    if (node->types.size() != 0)
         node->types.back()->accept(this);
+    }
 
     res.append(")");
 }
@@ -379,13 +392,14 @@ void HPInkJetVisitor::visit(ListPattern *node) {
 
     res.append("[");
 
-    for (int i = 0; i < node->patterns.size() - 1; ++i) {
-        node->patterns[i]->accept(this);
-        res.append(", ");
-    }
+    if (node->patterns.size() != 0){
+        for (int i = 0; i < node->patterns.size() - 1; ++i) {
+            node->patterns[i]->accept(this);
+            res.append(", ");
+        }
 
-    if (node->patterns.size() != 0)
         node->patterns.back()->accept(this);
+    }
 
     res.append("]");
 }
@@ -396,13 +410,14 @@ void HPInkJetVisitor::visit(TuplePattern *node) {
 
     res.append("(");
 
-    for (int i = 0; i < node->patterns.size() - 1; ++i) {
-        node->patterns[i]->accept(this);
-        res.append(", ");
-    }
+    if (node->patterns.size() != 0){
+        for (int i = 0; i < node->patterns.size() - 1; ++i) {
+            node->patterns[i]->accept(this);
+            res.append(", ");
+        }
 
-    if (node->patterns.size() != 0)
         node->patterns.back()->accept(this);
+    }
 
     res.append(")");
 }

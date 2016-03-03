@@ -70,11 +70,11 @@
 
 %%
 
-program:	funcs_ne                                        { res = new Program(); res->funcs = * $1; delete $1; cout << "prog " << res->funcs.size() << endl; };
-funcs_ne:	funcs_ne func                                   { $$ = $1; $$->push_back($2); cout << "func more " << $$->size() << endl; }
-	| func                                                  { $$ = new vector<Function *>(); $$->push_back($1); cout << "func start " << $$->size() << endl; } ;
+program:	funcs_ne                                        { res = new Program(); res->funcs = * $1; delete $1; };
+funcs_ne:	funcs_ne func                                   { $$ = $1; $$->push_back($2); }
+	| func                                                  { $$ = new vector<Function *>(); $$->push_back($1); } ;
 func:		decl cases_ne                                   { $$ = $1; $$->cases = * $2; delete $2; }
-decl:		T_DEF T_ID T_COLON signature                    { $$ = new Function(* $2); $$->sig = $4; delete $2; }
+decl:		T_DEF T_ID T_COLON signature                    { $$ = new Function(* $2); $$->types = $4->types; delete $2; delete $4; }
 signature:	signature T_ARROR type                          { $$ = $1; $$->types.push_back($3); }
 	| type                                                  { $$ = new Signature(); $$->types.push_back($1); } ;
 type:		T_BOOLTYPE                                      { $$ = new BoolType(); }
@@ -129,8 +129,8 @@ struct_inst:	T_SQSTART exprs_comma T_SQEND               { List *t = new List();
 	|	T_PARSTART exprs_comma_ne T_COMMA expr T_PAREND     { Tuple *t = new Tuple(); t->exprs = * $2; delete $2; t->exprs.push_back($4); $$ = t; }  ;
 exprs_comma:	exprs_comma_ne                              { $$ = $1; }
 	|	                                                    { $$ = new vector<Expr *>(); } ;
-exprs_comma_ne:	exprs_comma_ne T_COMMA expr                 { $$ = $1; $$->push_back($3); }
-	|	expr                                                { $$ = new vector<Expr *>(); } ;
+exprs_comma_ne:	exprs_comma_ne T_COMMA expr                 { $$ = $1; $$->push_back($3);  }
+	|	expr                                                { $$ = new vector<Expr *>(); $$->push_back($1); } ;
 
 %%
 
