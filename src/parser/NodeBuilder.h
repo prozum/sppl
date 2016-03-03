@@ -2,10 +2,11 @@
 #include <string>
 #include "Node.h"
 
+
 class NodeBuilder {
 
 public:
-    virtual Node NewVariable(std::string variableName) const;
+    virtual ast::Node* NewVariable(std::string var) const;
 
-    virtual Node GetRootNode();
+    virtual ast::Node* GetRootNode();
 };

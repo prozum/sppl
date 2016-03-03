@@ -5,12 +5,11 @@
     #include <cstdio>
     #include <iostream>
     #include <string>
-    #include <vector>
-    #include "Ast.h"
-    #include "HPInkJetVisitor.h"
-    #include "parser.tab.h"
     using namespace std;
+    #include <vector>
+    #include "Node.h"
     using namespace ast;
+    #include "Parser.hpp"
     extern void yyerror(char*);
     int yyparse();
 %}

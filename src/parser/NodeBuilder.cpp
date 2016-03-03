@@ -1,13 +1,13 @@
 #include "NodeBuilder.h"
 
-Node NodeBuilder::GetRootNode()
+
+
+ast::Node* NodeBuilder::GetRootNode()
 {
-    Node node;
-    return node;
+    return new ast::Program();
 }
 
-Node NodeBuilder::NewVariable(std::string variableName) const
+ast::Node* NodeBuilder::NewVariable(std::string variableName) const
 {
-    Node node;
-    return node;
+    return new ast::Id();
 }

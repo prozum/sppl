@@ -4,8 +4,7 @@
     #include <vector>
     #include <stack>
     #include <iostream>
-    #include "Ast.h"
-    #include "HPInkJetVisitor.h"
+    #include "Node.h"
     using namespace std;
     using namespace ast;
     extern int yylex();
@@ -47,8 +46,8 @@
 %left T_AND
 %left T_EQUAL T_NOTEQUAL
 %left T_LESSER T_GREATER T_GREATEREQUAL T_LESSEREQUAL
-%left T_ADD T_SUB 
-%left T_MUL T_DIV T_MOD 
+%left T_ADD T_SUB
+%left T_MUL T_DIV T_MOD
 %right T_COLON
 %precedence T_EXMARK
 
@@ -132,37 +131,5 @@ exprs_comma_ne:	exprs_comma_ne T_COMMA expr                 { $$ = $1; $$->push_
 	|	expr                                                { $$ = new vector<Expr *>(); $$->push_back($1); } ;
 
 %%
-
-int main(int argc, char** argv){
-    #if YYDEBUG
-	    yydebug = 1;
-    #endif
-
-    if (argc != 2) {
-        cout << "usage: ./parser1 filename\n" << endl; return 1;
-    }
-
-    FILE* file = fopen(argv[1], "r");
-
-    if (file == NULL) {
-        cout << "couldn't open " << argv[1] << endl; return 1;
-    }
-
-    yyin = file;
-    error = yyparse();
-    fclose(file);
-
-    HPInkJetVisitor v;
-    cout << "Printing code:" << endl;
-    v.visit(res);
-    cout << v.res << endl;
-    int tmp;
-    cin >> tmp;
-
-    if (!error)
-        cout << "Tuturuu~ I done did it mom!" << endl;
-
-    return error;
-}
 
 void yyerror(char* str) { printf("Parse Error: \n%s", str); error = 1; }
