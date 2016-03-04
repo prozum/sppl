@@ -15,6 +15,7 @@ void CCodeGenerator::visit(Program *node)
     }
 }
 
+/*
 string CCodeGenerator::getType(types t)
 {
     switch (t) {
@@ -30,6 +31,7 @@ string CCodeGenerator::getType(types t)
         return "char*";
     }
 }
+*/
 
 void CCodeGenerator::visit(Function *node)
 {
@@ -137,11 +139,6 @@ void CCodeGenerator::visit(Not *node)
     
 }
 
-void CCodeGenerator::visit(Type *node)
-{
-
-}
-
 void CCodeGenerator::visit(ListPattern *node)
 {
     
@@ -155,6 +152,31 @@ void CCodeGenerator::visit(TuplePattern *node)
 void CCodeGenerator::visit(ListSplit *node)
 {
     
+}
+
+void CCodeGenerator::visit(Int *node)
+{
+
+}
+
+void CCodeGenerator::visit(Float *node)
+{
+
+}
+
+void CCodeGenerator::visit(Bool *node)
+{
+
+}
+
+void CCodeGenerator::visit(Char *node)
+{
+
+}
+
+void CCodeGenerator::visit(String *node)
+{
+
 }
 
 void CCodeGenerator::visit(List *node)
@@ -177,26 +199,7 @@ void CCodeGenerator::visit(Call *node)
     
 }
 
-void CCodeGenerator::visit(LiteralType *node)
-{
-
-}
-
-{
-    
-}
-
-void CCodeGenerator::visit(ListType *node)
-{
-    
-}
-
-void CCodeGenerator::visit(TupleType *node)
-{
-    
-}
-
-void CCodeGenerator::visit(Signature *node)
+void CCodeGenerator::visit(Type *node)
 {
 
 }

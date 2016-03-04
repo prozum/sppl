@@ -5,6 +5,7 @@
 int main()
 {
     parser::Driver driver;
+
     CCodeGenerator gen(std::cout);
 
     driver.parse_string("def f : Int | x = 5");

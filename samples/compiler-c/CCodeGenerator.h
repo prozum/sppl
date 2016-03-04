@@ -47,7 +47,7 @@ class CCodeGenerator: public visitor::CodeGenerator
         void visit(Par *node);
                                             
         void visit(Not *node);
-                                            
+
         void visit(Int *node);
                                             
         void visit(Float *node);
@@ -73,15 +73,9 @@ class CCodeGenerator: public visitor::CodeGenerator
         void visit(Call *node);
                                             
         void visit(Type *node);
-                                            
-        void visit(ListType *node);
-                                            
-        void visit(TupleType *node);
-                                            
-        void visit(Signature *node);
 
     private:
         std::ostream &os;
 
-        std::string getType(types);
+        std::string getType(TypeEnum);
 };
