@@ -59,18 +59,11 @@ namespace common {
 
     void Call::accept(Visitor *v) { v->visit(this); }
 
-    void LiteralType::accept(Visitor *v) { v->visit(this); }
-
-    void ListType::accept(Visitor *v) { v->visit(this); }
-
-    void TupleType::accept(Visitor *v) { v->visit(this); }
-
-    void Signature::accept(Visitor *v) { v->visit(this); }
-
     void ListPattern::accept(Visitor *v) { v->visit(this); }
 
     void TuplePattern::accept(Visitor *v) { v->visit(this); }
 
     void ListSplit::accept(Visitor *v) { v->visit(this); }
 
+    void Type::accept(Visitor *v) { v->visit(this); }
 }

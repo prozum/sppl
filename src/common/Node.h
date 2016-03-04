@@ -10,7 +10,11 @@ namespace common {
 		FLOAT,
 		BOOL,
 		CHAR,
-		STRING
+		STRING,
+		LIST,
+		TUPLE,
+		SIGNATURE,
+		UNKNOWN
 	};
 
 	class Scope;
@@ -41,11 +45,6 @@ namespace common {
 	public:
 		Expr *child;
 
-		virtual void accept(Visitor *v) = 0;
-	};
-
-	class Type : public Node {
-	public:
 		virtual void accept(Visitor *v) = 0;
 	};
 
@@ -351,38 +350,14 @@ namespace common {
 		virtual void accept(Visitor *v);
 	};
 
-	/* Types */
-
-	class LiteralType : public Type {
+	class Type : public Node {
 	public:
-		TypeEnum type;
+		TypeEnum type = UNKNOWN;
+		std::vector<Type *> types;
 
-		LiteralType() { }
-		LiteralType(TypeEnum t) { type = t; }
-
-		virtual void accept(Visitor *v);
-	};
-
-	class ListType : public Type {
-	public:
-		Type *type;
-
-		ListType() { }
-		ListType(Type *t) { type = t; }
-
-		virtual void accept(Visitor *v);
-	};
-
-	class TupleType : public Type {
-	public:
-		std::vector<Type*> types;
-
-		virtual void accept(Visitor *v);
-	};
-
-	class Signature : public Type {
-	public:
-		std::vector<Type*> types;
+		Type() { };
+		Type(TypeEnum t) { type = t; }
+		Type(TypeEnum t, std::vector<Type *> *ts) { type = t; types = *ts; }
 
 		virtual void accept(Visitor *v);
 	};

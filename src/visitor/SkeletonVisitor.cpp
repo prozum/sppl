@@ -482,48 +482,7 @@ void SkeletonVisitor::visit(Call *node) {
     /* Code stops here */
 }
 
-void SkeletonVisitor::visit(LiteralType *node) {
-    /* Code goes here */
-
-
-    /* Code stops here */
-}
-
-void SkeletonVisitor::visit(ListType *node) {
-    /* Code goes here */
-
-
-    /* Code stops here */
-
-    /* Visit children */
-    node->type->accept(this);
-    /* Visit stops here */
-
-    /* Code goes here */
-
-
-    /* Code stops here */
-}
-
-void SkeletonVisitor::visit(TupleType *node) {
-    /* Code goes here */
-
-
-    /* Code stops here */
-
-    /* Visit children */
-    for (auto type : node->types) {
-        type->accept(this);
-    }
-    /* Visit stops here */
-
-    /* Code goes here */
-
-
-    /* Code stops here */
-}
-
-void SkeletonVisitor::visit(Signature *node) {
+void SkeletonVisitor::visit(Type *node) {
     /* Code goes here */
 
 

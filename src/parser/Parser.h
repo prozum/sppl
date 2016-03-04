@@ -127,7 +127,6 @@ namespace parser {
 
     common::Program *                  prog_val;
     common::Function *                 func_val;
-    common::Signature *                sig_val;
     common::Type *                     type_val;
     common::Case *                     case_val;
     common::Pattern *                  pattern_val;
@@ -144,7 +143,7 @@ namespace parser {
     long double	                    longdouble_val;
     bool	                        bool_val;
 
-#line 148 "Parser.h" // lalr1.cc:372
+#line 147 "Parser.h" // lalr1.cc:372
     };
 #else
     typedef YYSTYPE semantic_type;
@@ -505,7 +504,7 @@ namespace parser {
 
 
 } // parser
-#line 509 "Parser.h" // lalr1.cc:372
+#line 508 "Parser.h" // lalr1.cc:372
 
 
 

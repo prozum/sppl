@@ -45,10 +45,7 @@ public:
     virtual void visit(Tuple *node);
     virtual void visit(Id *node);
     virtual void visit(Call *node);
-    virtual void visit(LiteralType *node);
-    virtual void visit(ListType *node);
-    virtual void visit(TupleType *node);
-    virtual void visit(Signature *node);
+    virtual void visit(Type *node);
 };
 
 

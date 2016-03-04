@@ -39,10 +39,6 @@ namespace common {
 	class Tuple;
 	class Id;
 	class Call;
-	class LiteralType;
-	class ListType;
-	class TupleType;
-	class Signature;
 
     class Visitor {
 	public:
@@ -108,12 +104,6 @@ namespace common {
 
 		virtual void visit(Call *node) = 0;
 
-		virtual void visit(LiteralType *node) = 0;
-
-		virtual void visit(ListType *node) = 0;
-
-		virtual void visit(TupleType *node) = 0;
-
-		virtual void visit(Signature *node) = 0;
+		virtual void visit(Type *node) = 0;
 	};
 }

@@ -2,11 +2,14 @@
 // Created by hejsil on 3/4/16.
 //
 
-#include <Scope.h>
-#include <typeinfo>
+#define PRINT(a) std::cout << a << std::endl;
+
+#include "Scope.h"
+#include <iostream>
 #include "ScopeGenerator.h"
 
 void ScopeGenerator::visit(Program *node) {
+    PRINT("Program")
     res = new Scope();
     current_scope = res;
 
@@ -18,6 +21,7 @@ void ScopeGenerator::visit(Program *node) {
 }
 
 void ScopeGenerator::visit(Function *node) {
+    PRINT("Function")
     current_func = node;
     current_scope->decls.insert({node->id, node->types.back()});
 
@@ -32,6 +36,7 @@ void ScopeGenerator::visit(Function *node) {
 }
 
 void ScopeGenerator::visit(Case *node) {
+    PRINT("Case")
     auto case_scope = new Scope(current_scope);
     current_scope->children.push_back(case_scope);
     current_scope = case_scope;
@@ -45,8 +50,9 @@ void ScopeGenerator::visit(Case *node) {
             type_stack.pop();
         }
 
+        /*
         node->expr->accept(this);
-
+        */
     } else {
         /* ERROR! Cases doesn't have the currect number of patterns */
         throw "Case doesn't have the currect number of patterns";
@@ -56,6 +62,7 @@ void ScopeGenerator::visit(Case *node) {
 }
 
 void ScopeGenerator::visit(Or *node) {
+    PRINT("Or")
     /* Visit children */
     node->left->accept(this);
     node->right->accept(this);
@@ -63,6 +70,7 @@ void ScopeGenerator::visit(Or *node) {
 }
 
 void ScopeGenerator::visit(And *node) {
+    PRINT("And")
     /* Visit children */
     node->left->accept(this);
     node->right->accept(this);
@@ -70,6 +78,7 @@ void ScopeGenerator::visit(And *node) {
 }
 
 void ScopeGenerator::visit(Equal *node) {
+    PRINT("Equal")
     /* Visit children */
     node->left->accept(this);
     node->right->accept(this);
@@ -77,6 +86,7 @@ void ScopeGenerator::visit(Equal *node) {
 }
 
 void ScopeGenerator::visit(NotEqual *node) {
+    PRINT("NotEqual")
     /* Visit children */
     node->left->accept(this);
     node->right->accept(this);
@@ -84,6 +94,7 @@ void ScopeGenerator::visit(NotEqual *node) {
 }
 
 void ScopeGenerator::visit(Lesser *node) {
+    PRINT("Lesser")
     /* Visit children */
     node->left->accept(this);
     node->right->accept(this);
@@ -91,6 +102,7 @@ void ScopeGenerator::visit(Lesser *node) {
 }
 
 void ScopeGenerator::visit(Greater *node) {
+    PRINT("Greater")
     /* Visit children */
     node->left->accept(this);
     node->right->accept(this);
@@ -98,6 +110,7 @@ void ScopeGenerator::visit(Greater *node) {
 }
 
 void ScopeGenerator::visit(LesserEq *node) {
+    PRINT("LesserEq")
     /* Visit children */
     node->left->accept(this);
     node->right->accept(this);
@@ -105,6 +118,7 @@ void ScopeGenerator::visit(LesserEq *node) {
 }
 
 void ScopeGenerator::visit(GreaterEq *node) {
+    PRINT("GreaterEq")
     /* Visit children */
     node->left->accept(this);
     node->right->accept(this);
@@ -112,6 +126,7 @@ void ScopeGenerator::visit(GreaterEq *node) {
 }
 
 void ScopeGenerator::visit(Add *node) {
+    PRINT("Add")
     /* Visit children */
     node->left->accept(this);
     node->right->accept(this);
@@ -119,6 +134,7 @@ void ScopeGenerator::visit(Add *node) {
 }
 
 void ScopeGenerator::visit(Sub *node) {
+    PRINT("Sub")
     /* Visit children */
     node->left->accept(this);
     node->right->accept(this);
@@ -126,6 +142,7 @@ void ScopeGenerator::visit(Sub *node) {
 }
 
 void ScopeGenerator::visit(Mul *node) {
+    PRINT("Mul")
     /* Visit children */
     node->left->accept(this);
     node->right->accept(this);
@@ -133,6 +150,7 @@ void ScopeGenerator::visit(Mul *node) {
 }
 
 void ScopeGenerator::visit(Div *node) {
+    PRINT("Div")
     /* Visit children */
     node->left->accept(this);
     node->right->accept(this);
@@ -140,6 +158,7 @@ void ScopeGenerator::visit(Div *node) {
 }
 
 void ScopeGenerator::visit(Mod *node) {
+    PRINT("Mod")
     /* Visit children */
     node->left->accept(this);
     node->right->accept(this);
@@ -147,6 +166,7 @@ void ScopeGenerator::visit(Mod *node) {
 }
 
 void ScopeGenerator::visit(ListAdd *node) {
+    PRINT("ListAdd")
     /* Visit children */
     node->left->accept(this);
     node->right->accept(this);
@@ -154,56 +174,70 @@ void ScopeGenerator::visit(ListAdd *node) {
 }
 
 void ScopeGenerator::visit(Par *node) {
+    PRINT("Par")
     /* Visit children */
     node->child->accept(this);
     /* Visit stops here */
 }
 
 void ScopeGenerator::visit(Not *node) {
+    PRINT("Not")
     /* Visit children */
     node->child->accept(this);
     /* Visit stops here */
 }
 
 void ScopeGenerator::visit(Int *node) {
+    PRINT("Int")
 
 }
 
 void ScopeGenerator::visit(Float *node) {
+    PRINT("Float")
 
 }
 
 void ScopeGenerator::visit(Bool *node) {
+    PRINT("Bool")
 
 }
 
 void ScopeGenerator::visit(Char *node) {
+    PRINT("Char")
 
 }
 
 void ScopeGenerator::visit(String *node) {
+    PRINT("String")
 }
 
 void ScopeGenerator::visit(ListPattern *node) {
+    PRINT("ListPattern")
 
-    type_stack.push(((ListType *)type_stack.top())->type);
+    if (type_stack.top()->type == TUPLE) {
+        type_stack.push(type_stack.top()->types[0]);
 
-    /* Visit children */
-    for (auto pattern : node->patterns) {
-        pattern->accept(this);
+        /* Visit children */
+        for (auto pattern : node->patterns) {
+            pattern->accept(this);
+        }
+        /* Visit stops here */
+
+        type_stack.pop();
+    } else {
+        /* ERROR! Cases doesn't have the currect number of patterns */
+        throw "TuplePattern doesn't have the currect number of patterns";
     }
-    /* Visit stops here */
-
-    type_stack.pop();
 
 }
 
 void ScopeGenerator::visit(TuplePattern *node) {
-     if (node->patterns.size() == ((TupleType *)type_stack.top())->types.size()) {
+    PRINT("TuplePattern")
+    if (node->patterns.size() == type_stack.top()->types.size() && type_stack.top()->type == TUPLE) {
 
         /* Visit children */
         for (int i = 0; i < node->patterns.size(); i++){
-            type_stack.push(((TupleType *)type_stack.top())->types[i]);
+            type_stack.push(type_stack.top()->types[i]);
             node->patterns[i]->accept(this);
             type_stack.pop();
         }
@@ -215,7 +249,8 @@ void ScopeGenerator::visit(TuplePattern *node) {
 }
 
 void ScopeGenerator::visit(ListSplit *node) {
-    type_stack.push(((ListType *)type_stack.top())->type);
+    PRINT("ListSplit")
+    type_stack.push(type_stack.top()->types[0]);
 
     /* Visit children */
     node->left->accept(this);
@@ -225,6 +260,7 @@ void ScopeGenerator::visit(ListSplit *node) {
 }
 
 void ScopeGenerator::visit(List *node) {
+    PRINT("List")
     /* Visit children */
     for (auto expr : node->exprs) {
         expr->accept(this);
@@ -233,6 +269,7 @@ void ScopeGenerator::visit(List *node) {
 }
 
 void ScopeGenerator::visit(Tuple *node) {
+    PRINT("Tuple")
     /* Visit children */
     for (auto expr : node->exprs) {
         expr->accept(this);
@@ -241,11 +278,16 @@ void ScopeGenerator::visit(Tuple *node) {
 }
 
 void ScopeGenerator::visit(Id *node) {
+    PRINT("Id")
+    std::cout << "1" << std::endl;
     node->scope = current_scope;
+    std::cout << "2" << std::endl;
     current_scope->decls.insert({node->id, type_stack.top()});
+    std::cout << "3" << std::endl;
 }
 
 void ScopeGenerator::visit(Call *node) {
+    PRINT("Call")
     /* Visit children */
     node->callee->accept(this);
     for (auto expr : node->exprs) {
@@ -254,28 +296,7 @@ void ScopeGenerator::visit(Call *node) {
     /* Visit stops here */
 }
 
-void ScopeGenerator::visit(LiteralType *node) {
+void ScopeGenerator::visit(Type *node) {
+    PRINT("LiteralType")
 
-}
-
-void ScopeGenerator::visit(ListType *node) {
-     /* Visit children */
-    node->type->accept(this);
-    /* Visit stops here */
-}
-
-void ScopeGenerator::visit(TupleType *node) {
-    /* Visit children */
-    for (auto type : node->types) {
-        type->accept(this);
-    }
-    /* Visit stops here */
-}
-
-void ScopeGenerator::visit(Signature *node) {
-    /* Visit children */
-    for (auto type : node->types) {
-        type->accept(this);
-    }
-    /* Visit stops here */
 }

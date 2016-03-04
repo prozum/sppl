@@ -305,58 +305,59 @@ namespace visitor {
         res.append(")");
     }
 
-    void HPInkJetVisitor::visit(LiteralType *node) {
+    void HPInkJetVisitor::visit(Type *node) {
 
-        cout << "IntType" << endl;
+        cout << "Type" << endl;
+
+        switch (node->type) {
+            case INT:
+                res.append("Int");
+                break;
+            case FLOAT:
+                res.append("Float");
+                break;
+            case BOOL:
+                res.append("Bool");
+                break;
+            case CHAR:
+                res.append("Char");
+                break;
+            case STRING:
+                res.append("String");
+                break;
+            case LIST:
+                res.append("[");
+                node->types[0]->accept(this);
+                res.append("]");
+                break;
+            case TUPLE:
+                res.append("(");
+                print_collection(node, ", ");
+                res.append(")");
+                break;
+            case SIGNATURE:
+                res.append("(");
+                print_collection(node, " -> ");
+                res.append(")");
+                break;
+            default:
+                break;
+        }
 
         res.append("Int");
     }
 
-    void HPInkJetVisitor::visit(ListType *node) {
-
-        cout << "ListType" << endl;
-
-        res.append("[");
-        node->type->accept(this);
-        res.append("]");
-    }
-
-    void HPInkJetVisitor::visit(TupleType *node) {
-
-        cout << "TupleType" << endl;
-
-        res.append("(");
+    void HPInkJetVisitor::print_collection(Type *node, const std::string split) {
 
         if (node->types.size() != 0) {
             for (int i = 0; i < node->types.size() - 1; ++i) {
                 node->types[i]->accept(this);
-                res.append(", ");
+                res.append(split);
             }
 
             node->types.back()->accept(this);
         }
-
-        res.append(")");
     }
-
-    void HPInkJetVisitor::visit(Signature *node) {
-
-        cout << "Signature" << endl;
-
-        res.append("(");
-
-        if (node->types.size() != 0) {
-            for (int i = 0; i < node->types.size() - 1; ++i) {
-                node->types[i]->accept(this);
-                res.append(" -> ");
-            }
-
-            node->types.back()->accept(this);
-        }
-
-        res.append(")");
-    }
-
     void HPInkJetVisitor::visit(ListPattern *node) {
 
         cout << "ListPattern" << endl;

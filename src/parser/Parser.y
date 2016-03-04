@@ -16,7 +16,6 @@
 %union {
     common::Program *                  prog_val;
     common::Function *                 func_val;
-    common::Signature *                sig_val;
     common::Type *                     type_val;
     common::Case *                     case_val;
     common::Pattern *                  pattern_val;
@@ -53,8 +52,7 @@
 %type <prog_val> program
 %type <func_vec> funcs_ne
 %type <func_val> func decl
-%type <sig_val> signature
-%type <type_val> type
+%type <type_val> type signature
 %type <type_vec> types_comma_ne
 %type <case_vec> cases_ne
 %type <case_val> case
@@ -89,15 +87,15 @@ funcs_ne:	funcs_ne func                                   { $$ = $1; $$->push_ba
 func:		decl cases_ne                                   { $$ = $1; $$->cases = * $2; delete $2; }
 decl:		T_DEF T_ID T_COLON signature                    { $$ = new Function(* $2); $$->types = $4->types; delete $2; delete $4; }
 signature:	signature T_ARROR type                          { $$ = $1; $$->types.push_back($3); }
-	| type                                                  { $$ = new Signature(); $$->types.push_back($1); } ;
-type:		T_BOOLTYPE                                      { $$ = new LiteralType(BOOL); }
-	|	T_INTTYPE                                           { $$ = new LiteralType(INT); }
-	|	T_FLOATTYPE                                         { $$ = new LiteralType(FLOAT); }
-	|	T_CHARTYPE                                          { $$ = new LiteralType(CHAR); }
-	|	T_STRINGTYPE                                        { $$ = new LiteralType(STRING); }
-	|	T_SQSTART type T_SQEND                              { $$ = new ListType($2); }
+	| type                                                  { $$ = new Type(SIGNATURE); $$->types.push_back($1); } ;
+type:		T_BOOLTYPE                                      { $$ = new Type(BOOL); }
+	|	T_INTTYPE                                           { $$ = new Type(INT); }
+	|	T_FLOATTYPE                                         { $$ = new Type(FLOAT); }
+	|	T_CHARTYPE                                          { $$ = new Type(CHAR); }
+	|	T_STRINGTYPE                                        { $$ = new Type(STRING); }
+	|	T_SQSTART type T_SQEND                              { $$ = new Type(LIST); $$->types.push_back($2); }
 	|	T_PARSTART signature T_PAREND                       { $$ = $2; }
-	|	T_PARSTART types_comma_ne T_COMMA type T_PAREND     { TupleType *t = new TupleType(); t->types = * $2; delete $2; t->types.push_back($4); $$ = t; }
+	|	T_PARSTART types_comma_ne T_COMMA type T_PAREND     { $$ = new Type(TUPLE, $2); delete $2; $$->types.push_back($4); }
 types_comma_ne: types_comma_ne T_COMMA type                 { $$ = $1; $$->push_back($3); }
 	|	type                                                { $$ = new vector<Type *>(); $$->push_back($1); };
 cases_ne:	cases_ne case                                   { $$ = $1; $$->push_back($2); }
