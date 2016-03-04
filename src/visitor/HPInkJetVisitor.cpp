@@ -305,39 +305,11 @@ namespace visitor {
         res.append(")");
     }
 
-    void HPInkJetVisitor::visit(IntType *node) {
+    void HPInkJetVisitor::visit(LiteralType *node) {
 
         cout << "IntType" << endl;
 
         res.append("Int");
-    }
-
-    void HPInkJetVisitor::visit(FloatType *node) {
-
-        cout << "FloatType" << endl;
-
-        res.append("Float");
-    }
-
-    void HPInkJetVisitor::visit(BoolType *node) {
-
-        cout << "BoolType" << endl;
-
-        res.append("Bool");
-    }
-
-    void HPInkJetVisitor::visit(CharType *node) {
-
-        cout << "CharType" << endl;
-
-        res.append("Char");
-    }
-
-    void HPInkJetVisitor::visit(StringType *node) {
-
-        cout << "StringType" << endl;
-
-        res.append("String");
     }
 
     void HPInkJetVisitor::visit(ListType *node) {

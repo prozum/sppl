@@ -5,6 +5,14 @@
 #include <string>
 
 namespace common {
+	enum TypeEnum {
+		INT,
+		FLOAT,
+		BOOL,
+		CHAR,
+		STRING
+	};
+
 	class Scope;
 
 	/* Abstract Nodes */
@@ -345,28 +353,13 @@ namespace common {
 
 	/* Types */
 
-	class IntType : public Type {
+	class LiteralType : public Type {
 	public:
-		virtual void accept(Visitor *v);
-	};
+		TypeEnum type;
 
-	class FloatType : public Type {
-	public:
-		virtual void accept(Visitor *v);
-	};
+		LiteralType() { }
+		LiteralType(TypeEnum t) { type = t; }
 
-	class BoolType : public Type {
-	public:
-		virtual void accept(Visitor *v);
-	};
-
-	class CharType : public Type {
-	public:
-		virtual void accept(Visitor *v);
-	};
-
-	class StringType : public Type {
-	public:
 		virtual void accept(Visitor *v);
 	};
 

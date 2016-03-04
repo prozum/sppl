@@ -254,19 +254,8 @@ void ScopeGenerator::visit(Call *node) {
     /* Visit stops here */
 }
 
-void ScopeGenerator::visit(IntType *node) {
-}
+void ScopeGenerator::visit(LiteralType *node) {
 
-void ScopeGenerator::visit(FloatType *node) {
-}
-
-void ScopeGenerator::visit(BoolType *node) {
-}
-
-void ScopeGenerator::visit(CharType *node) {
-}
-
-void ScopeGenerator::visit(StringType *node) {
 }
 
 void ScopeGenerator::visit(ListType *node) {

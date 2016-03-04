@@ -482,35 +482,7 @@ void SkeletonVisitor::visit(Call *node) {
     /* Code stops here */
 }
 
-void SkeletonVisitor::visit(IntType *node) {
-    /* Code goes here */
-
-
-    /* Code stops here */
-}
-
-void SkeletonVisitor::visit(FloatType *node) {
-    /* Code goes here */
-
-
-    /* Code stops here */
-}
-
-void SkeletonVisitor::visit(BoolType *node) {
-    /* Code goes here */
-
-
-    /* Code stops here */
-}
-
-void SkeletonVisitor::visit(CharType *node) {
-    /* Code goes here */
-
-
-    /* Code stops here */
-}
-
-void SkeletonVisitor::visit(StringType *node) {
+void SkeletonVisitor::visit(LiteralType *node) {
     /* Code goes here */
 
 

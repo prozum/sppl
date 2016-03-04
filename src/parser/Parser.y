@@ -90,11 +90,11 @@ func:		decl cases_ne                                   { $$ = $1; $$->cases = * 
 decl:		T_DEF T_ID T_COLON signature                    { $$ = new Function(* $2); $$->types = $4->types; delete $2; delete $4; }
 signature:	signature T_ARROR type                          { $$ = $1; $$->types.push_back($3); }
 	| type                                                  { $$ = new Signature(); $$->types.push_back($1); } ;
-type:		T_BOOLTYPE                                      { $$ = new BoolType(); }
-	|	T_INTTYPE                                           { $$ = new IntType(); }
-	|	T_FLOATTYPE                                         { $$ = new FloatType(); }
-	|	T_CHARTYPE                                          { $$ = new CharType(); }
-	|	T_STRINGTYPE                                        { $$ = new StringType(); }
+type:		T_BOOLTYPE                                      { $$ = new LiteralType(BOOL); }
+	|	T_INTTYPE                                           { $$ = new LiteralType(INT); }
+	|	T_FLOATTYPE                                         { $$ = new LiteralType(FLOAT); }
+	|	T_CHARTYPE                                          { $$ = new LiteralType(CHAR); }
+	|	T_STRINGTYPE                                        { $$ = new LiteralType(STRING); }
 	|	T_SQSTART type T_SQEND                              { $$ = new ListType($2); }
 	|	T_PARSTART signature T_PAREND                       { $$ = $2; }
 	|	T_PARSTART types_comma_ne T_COMMA type T_PAREND     { TupleType *t = new TupleType(); t->types = * $2; delete $2; t->types.push_back($4); $$ = t; }

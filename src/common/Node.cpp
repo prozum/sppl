@@ -59,15 +59,7 @@ namespace common {
 
     void Call::accept(Visitor *v) { v->visit(this); }
 
-    void IntType::accept(Visitor *v) { v->visit(this); }
-
-    void FloatType::accept(Visitor *v) { v->visit(this); }
-
-    void BoolType::accept(Visitor *v) { v->visit(this); }
-
-    void CharType::accept(Visitor *v) { v->visit(this); }
-
-    void StringType::accept(Visitor *v) { v->visit(this); }
+    void LiteralType::accept(Visitor *v) { v->visit(this); }
 
     void ListType::accept(Visitor *v) { v->visit(this); }
 

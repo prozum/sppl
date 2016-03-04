@@ -72,15 +72,7 @@ namespace visitor {
 
         virtual void visit(Call *node);
 
-        virtual void visit(IntType *node);
-
-        virtual void visit(FloatType *node);
-
-        virtual void visit(BoolType *node);
-
-        virtual void visit(CharType *node);
-
-        virtual void visit(StringType *node);
+        virtual void visit(LiteralType *node);
 
         virtual void visit(ListType *node);
 

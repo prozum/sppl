@@ -39,11 +39,7 @@ namespace common {
 	class Tuple;
 	class Id;
 	class Call;
-	class IntType;
-	class FloatType;
-	class BoolType;
-	class CharType;
-	class StringType;
+	class LiteralType;
 	class ListType;
 	class TupleType;
 	class Signature;
@@ -112,15 +108,7 @@ namespace common {
 
 		virtual void visit(Call *node) = 0;
 
-		virtual void visit(IntType *node) = 0;
-
-		virtual void visit(FloatType *node) = 0;
-
-		virtual void visit(BoolType *node) = 0;
-
-		virtual void visit(CharType *node) = 0;
-
-		virtual void visit(StringType *node) = 0;
+		virtual void visit(LiteralType *node) = 0;
 
 		virtual void visit(ListType *node) = 0;
 
