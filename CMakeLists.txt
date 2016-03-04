@@ -12,6 +12,7 @@ endif()
 include_directories(
         src/common
         src/parser
+        src/visitor
         src/compiler
 )
 
