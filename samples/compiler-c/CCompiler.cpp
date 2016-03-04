@@ -3,6 +3,7 @@
 void CCompiler::compile(std::istream &input,
                        std::ostream &output)
 {
+    /*
     Scanner scanner(input);
     NodeBuilder builder;
     Parser parser;
@@ -13,4 +14,5 @@ void CCompiler::compile(std::istream &input,
     auto rootNode = builder.GetRootNode();
 
     rootNode.Traverse(generator);
+    */
 }

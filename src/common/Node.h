@@ -1,109 +1,17 @@
-#ifndef AST_HEADER
-#define AST_HEADER
+#pragma once
+#include "Visitor.h"
+
 #include <vector>
 #include <string>
 
 namespace common {
-	class Visitor;
 	class Scope;
-	class Node;
-	class Expr;
-	class BinaryOp;
-	class UnaryOp;
-	class Type;
-	class Pattern;
-	class Program;
-	class Function;
-	class Case;
-	class Or;
-	class And;
-	class Equal;
-	class NotEqual;
-	class Lesser;
-	class Greater;
-	class LesserEq;
-	class GreaterEq;
-	class Add;
-	class Sub;
-	class Mul;
-	class Div;
-	class Mod;
-	class ListAdd;
-	class Par;
-	class Not;
-	class Int;
-	class Float;
-	class Bool;
-	class Char;
-	class String;
-	class ListPattern;
-	class TuplePattern;
-	class ListSplit;
-	class List;
-	class Tuple;
-	class Id;
-	class Call;
-	class IntType;
-	class FloatType;
-	class BoolType;
-	class CharType;
-	class StringType;
-	class ListType;
-	class TupleType;
-	class Signature;
-
-	class Visitor {
-	public:
-		virtual void visit(Program *node) = 0;
-		virtual void visit(Function *node) = 0;
-		virtual void visit(Case *node) = 0;
-
-		virtual void visit(Or *node) = 0;
-		virtual void visit(And *node) = 0;
-		virtual void visit(Equal *node) = 0;
-		virtual void visit(NotEqual *node) = 0;
-		virtual void visit(Lesser *node) = 0;
-		virtual void visit(Greater *node) = 0;
-		virtual void visit(LesserEq *node) = 0;
-		virtual void visit(GreaterEq *node) = 0;
-		virtual void visit(Add *node) = 0;
-		virtual void visit(Sub *node) = 0;
-		virtual void visit(Mul *node) = 0;
-		virtual void visit(Div *node) = 0;
-		virtual void visit(Mod *node) = 0;
-		virtual void visit(ListAdd *node) = 0;
-		virtual void visit(Par *node) = 0;
-		virtual void visit(Not *node) = 0;
-
-		virtual void visit(Int *node) = 0;
-		virtual void visit(Float *node) = 0;
-		virtual void visit(Bool *node) = 0;
-		virtual void visit(Char *node) = 0;
-		virtual void visit(String *node) = 0;
-		virtual void visit(ListPattern *node) = 0;
-		virtual void visit(TuplePattern *node) = 0;
-		virtual void visit(ListSplit *node) = 0;
-		virtual void visit(List *node) = 0;
-		virtual void visit(Tuple *node) = 0;
-		virtual void visit(Id *node) = 0;
-		virtual void visit(Call *node) = 0;
-
-		virtual void visit(IntType *node) = 0;
-		virtual void visit(FloatType *node) = 0;
-		virtual void visit(BoolType *node) = 0;
-		virtual void visit(CharType *node) = 0;
-		virtual void visit(StringType *node) = 0;
-		virtual void visit(ListType *node) = 0;
-		virtual void visit(TupleType *node) = 0;
-		virtual void visit(Signature *node) = 0;
-	};
 
 	/* Abstract Nodes */
 
 	class Node {
 	public:
 		Node *parent;
-		Scope *scope;
 
 		virtual void accept(Visitor *v) = 0;
 	};
@@ -416,6 +324,7 @@ namespace common {
 	class Id : public Pattern {
 	public:
 		std::string id;
+		Scope *scope;
 
 		Id() { }
 		Id(std::string i) { id = i; }
@@ -485,5 +394,3 @@ namespace common {
 		virtual void accept(Visitor *v);
 	};
 }
-
-#endif

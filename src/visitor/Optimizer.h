@@ -4,7 +4,7 @@
 
 namespace visitor {
 
-    class Optimizer : public Visitor {
+    class Optimizer : public common::Visitor {
     };
 
 }
