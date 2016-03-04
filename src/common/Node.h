@@ -5,6 +5,7 @@
 
 namespace common {
 	class Visitor;
+	class Scope;
 	class Node;
 	class Expr;
 	class BinaryOp;
@@ -101,6 +102,9 @@ namespace common {
 
 	class Node {
 	public:
+		Node *parent;
+		Scope *scope;
+
 		virtual void accept(Visitor *v) = 0;
 	};
 
