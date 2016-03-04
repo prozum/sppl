@@ -343,8 +343,6 @@ namespace visitor {
             default:
                 break;
         }
-
-        res.append("Int");
     }
 
     void HPInkJetVisitor::print_collection(Type *node, const std::string split) {
@@ -358,6 +356,7 @@ namespace visitor {
             node->types.back()->accept(this);
         }
     }
+
     void HPInkJetVisitor::visit(ListPattern *node) {
 
         cout << "ListPattern" << endl;

@@ -14,6 +14,7 @@ namespace common {
 		LIST,
 		TUPLE,
 		SIGNATURE,
+		EMPTYLIST,
 		UNKNOWN
 	};
 
