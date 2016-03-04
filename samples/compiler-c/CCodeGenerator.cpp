@@ -1,188 +1,203 @@
 #include "CCodeGenerator.h"
 
-using namespace ast;
+using namespace common;
 
-void CodeGenerator::visit(Program *node)
+CCodeGenerator::CCodeGenerator(std::ostream &os) : visitor::CodeGenerator::CodeGenerator(os)
+{
+
+}
+
+void CCodeGenerator::visit(Program *node)
 {
     
 }
 
-void CodeGenerator::visit(Function *node)
+void CCodeGenerator::visit(Function *node)
 {
     
 }
 
-void CodeGenerator::visit(Case *node)
+void CCodeGenerator::visit(Case *node)
 {
     
 }
 
-void CodeGenerator::visit(Or *node)
+void CCodeGenerator::visit(Or *node)
 {
     
 }
 
-void CodeGenerator::visit(And *node)
+void CCodeGenerator::visit(And *node)
 {
     
 }
 
-void CodeGenerator::visit(Equal *node)
+void CCodeGenerator::visit(Equal *node)
 {
     
 }
 
-void CodeGenerator::visit(NotEqual *node)
+void CCodeGenerator::visit(NotEqual *node)
 {
     
 }
 
-void CodeGenerator::visit(Lesser *node)
+void CCodeGenerator::visit(Lesser *node)
 {
     
 }
 
-void CodeGenerator::visit(GreaterEq *node)
+void CCodeGenerator::visit(LesserEq *node)
+{
+
+}
+
+void CCodeGenerator::visit(Greater *node)
+{
+
+}
+
+void CCodeGenerator::visit(GreaterEq *node)
 {
     
 }
 
-void CodeGenerator::visit(Add *node)
+void CCodeGenerator::visit(Add *node)
 {
     
 }
 
-void CodeGenerator::visit(Sub *node)
+void CCodeGenerator::visit(Sub *node)
 {
     
 }
 
-void CodeGenerator::visit(Mul *node)
+void CCodeGenerator::visit(Mul *node)
 {
     
 }
 
-void CodeGenerator::visit(Div *node)
+void CCodeGenerator::visit(Div *node)
 {
     
 }
 
-void CodeGenerator::visit(Mod *node)
+void CCodeGenerator::visit(Mod *node)
 {
     
 }
 
-void CodeGenerator::visit(ListAdd *node)
+void CCodeGenerator::visit(ListAdd *node)
 {
     
 }
 
-void CodeGenerator::visit(Par *node)
+void CCodeGenerator::visit(Par *node)
 {
     
 }
 
-void CodeGenerator::visit(Not *node)
+void CCodeGenerator::visit(Not *node)
 {
     
 }
 
-void CodeGenerator::visit(Int *node)
+void CCodeGenerator::visit(Int *node)
 {
     
 }
 
-void CodeGenerator::visit(Float *node)
+void CCodeGenerator::visit(Float *node)
 {
     
 }
 
-void CodeGenerator::visit(Bool *node)
+void CCodeGenerator::visit(Bool *node)
 {
     
 }
 
-void CodeGenerator::visit(Char *node)
+void CCodeGenerator::visit(Char *node)
 {
     
 }
 
-void CodeGenerator::visit(String *node)
+void CCodeGenerator::visit(String *node)
 {
     
 }
 
-void CodeGenerator::visit(ListPattern *node)
+void CCodeGenerator::visit(ListPattern *node)
 {
     
 }
 
-void CodeGenerator::visit(TuplePattern *node)
+void CCodeGenerator::visit(TuplePattern *node)
 {
     
 }
 
-void CodeGenerator::visit(ListSplit *node)
+void CCodeGenerator::visit(ListSplit *node)
 {
     
 }
 
-void CodeGenerator::visit(List *node)
+void CCodeGenerator::visit(List *node)
 {
     
 }
 
-void CodeGenerator::visit(Tuple *node)
+void CCodeGenerator::visit(Tuple *node)
 {
     
 }
 
-void CodeGenerator::visit(Id *node)
+void CCodeGenerator::visit(Id *node)
 {
     
 }
 
-void CodeGenerator::visit(Call *node)
+void CCodeGenerator::visit(Call *node)
 {
     
 }
 
-void CodeGenerator::visit(IntType *node)
+void CCodeGenerator::visit(IntType *node)
 {
     
 }
 
-void CodeGenerator::visit(FloatType *node)
+void CCodeGenerator::visit(FloatType *node)
 {
     
 }
 
-void CodeGenerator::visit(BoolType *node)
+void CCodeGenerator::visit(BoolType *node)
 {
     
 }
 
-void CodeGenerator::visit(CharType *node)
+void CCodeGenerator::visit(CharType *node)
 {
     
 }
 
-void CodeGenerator::visit(StringType *node)
+void CCodeGenerator::visit(StringType *node)
 {
     
 }
 
-void CodeGenerator::visit(ListType *node)
+void CCodeGenerator::visit(ListType *node)
 {
     
 }
 
-void CodeGenerator::visit(TupleType *node)
+void CCodeGenerator::visit(TupleType *node)
 {
     
 }
 
-void CodeGenerator::visit(Signature *node)
+void CCodeGenerator::visit(Signature *node)
 {
     
 }
