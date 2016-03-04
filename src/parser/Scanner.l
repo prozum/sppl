@@ -77,3 +77,14 @@ void Scanner::set_debug(bool b)
 }
 
 }
+
+#ifdef yylex
+#undef yylex
+#endif
+
+int SpplFlexLexer::yylex()
+{
+    std::cerr << "in SpplFlexLexer::yylex() !" << std::endl;
+    return 0;
+}
+
