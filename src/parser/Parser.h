@@ -1,8 +1,8 @@
-// A Bison parser, made by GNU Bison 3.0.2.
+// A Bison parser, made by GNU Bison 3.0.4.
 
 // Skeleton interface for Bison LALR(1) parsers in C++
 
-// Copyright (C) 2002-2013 Free Software Foundation, Inc.
+// Copyright (C) 2002-2015 Free Software Foundation, Inc.
 
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -41,10 +41,11 @@
 # define YY_PARSER_PARSER_H_INCLUDED
 
 
-# include <vector>
+# include <cstdlib> // std::abort
 # include <iostream>
 # include <stdexcept>
 # include <string>
+# include <vector>
 # include "stack.hh"
 # include "location.hh"
 
@@ -109,7 +110,7 @@
 
 
 namespace parser {
-#line 113 "Parser.h" // lalr1.cc:372
+#line 114 "Parser.h" // lalr1.cc:377
 
 
 
@@ -123,7 +124,7 @@ namespace parser {
     /// Symbol semantic values.
     union semantic_type
     {
-    #line 16 "Parser.y" // lalr1.cc:372
+    #line 18 "Parser.y" // lalr1.cc:377
 
     common::Program *                  prog_val;
     common::Function *                 func_val;
@@ -144,7 +145,7 @@ namespace parser {
     long double	                    longdouble_val;
     bool	                        bool_val;
 
-#line 148 "Parser.h" // lalr1.cc:372
+#line 149 "Parser.h" // lalr1.cc:377
     };
 #else
     typedef YYSTYPE semantic_type;
@@ -164,51 +165,55 @@ namespace parser {
     {
       enum yytokentype
       {
-        T_END = 0,
-        T_DEF = 258,
-        T_INTTYPE = 259,
-        T_BOOLTYPE = 260,
-        T_FLOATTYPE = 261,
-        T_STRINGTYPE = 262,
-        T_CHARTYPE = 263,
-        T_ARROR = 264,
-        T_EQUAL = 265,
-        T_NOTEQUAL = 266,
-        T_AND = 267,
-        T_OR = 268,
-        T_LESSEREQUAL = 269,
-        T_GREATEREQUAL = 270,
-        T_LESSER = 271,
-        T_GREATER = 272,
-        T_MUL = 273,
-        T_DIV = 274,
-        T_MOD = 275,
-        T_ADD = 276,
-        T_SUB = 277,
-        T_ASSIGN = 278,
-        T_SQSTART = 279,
-        T_SQEND = 280,
-        T_PARSTART = 281,
-        T_PAREND = 282,
-        T_EXMARK = 283,
-        T_COMMA = 284,
-        T_PIPE = 285,
-        T_ARROW = 286,
-        T_COLON = 287,
-        T_INTLITERAL = 288,
-        T_ID = 289,
-        T_STRINGLITERAL = 290,
-        T_CHARLITERAL = 291,
-        T_BOOLLITERAL = 292,
-        T_FLOATLITERAL = 293
+        END = 0,
+        EOL = 258,
+        DEF = 259,
+        INTTYPE = 260,
+        BOOLTYPE = 261,
+        FLOATTYPE = 262,
+        STRINGTYPE = 263,
+        CHARTYPE = 264,
+        ARROR = 265,
+        EQUAL = 266,
+        NOTEQUAL = 267,
+        AND = 268,
+        OR = 269,
+        LESSEREQUAL = 270,
+        GREATEREQUAL = 271,
+        LESSER = 272,
+        GREATER = 273,
+        MUL = 274,
+        DIV = 275,
+        MOD = 276,
+        ADD = 277,
+        SUB = 278,
+        ASSIGN = 279,
+        SQSTART = 280,
+        SQEND = 281,
+        PARSTART = 282,
+        PAREND = 283,
+        EXMARK = 284,
+        COMMA = 285,
+        PIPE = 286,
+        ARROW = 287,
+        COLON = 288,
+        INTLITERAL = 289,
+        ID = 290,
+        STRINGLITERAL = 291,
+        CHARLITERAL = 292,
+        BOOLLITERAL = 293,
+        FLOATLITERAL = 294
       };
     };
 
     /// (External) token type, as returned by yylex.
     typedef token::yytokentype token_type;
 
-    /// Internal symbol number.
+    /// Symbol type: an internal symbol number.
     typedef int symbol_number_type;
+
+    /// The symbol type number to denote an empty symbol.
+    enum { empty_symbol = -2 };
 
     /// Internal symbol number for tokens (subsumed by symbol_number_type).
     typedef unsigned char token_number_type;
@@ -240,7 +245,14 @@ namespace parser {
                     const semantic_type& v,
                     const location_type& l);
 
+      /// Destroy the symbol.
       ~basic_symbol ();
+
+      /// Destroy contents, and record that is empty.
+      void clear ();
+
+      /// Whether empty.
+      bool empty () const;
 
       /// Destructive move, \a s is emptied into this.
       void move (basic_symbol& s);
@@ -271,21 +283,23 @@ namespace parser {
       /// Constructor from (external) token numbers.
       by_type (kind_type t);
 
+      /// Record that this symbol is empty.
+      void clear ();
+
       /// Steal the symbol type from \a that.
       void move (by_type& that);
 
       /// The (internal) type number (corresponding to \a type).
-      /// -1 when this symbol is empty.
+      /// \a empty when empty.
       symbol_number_type type_get () const;
 
       /// The token.
       token_type token () const;
 
-      enum { empty = 0 };
-
       /// The symbol type.
-      /// -1 when this symbol is empty.
-      token_number_type type;
+      /// \a empty_symbol when empty.
+      /// An int, not token_number_type, to be able to store empty_symbol.
+      int type;
     };
 
     /// "External" symbols: returned by the scanner.
@@ -332,9 +346,9 @@ namespace parser {
 
     /// Generate an error message.
     /// \param yystate   the state where the error occurred.
-    /// \param yytoken   the lookahead token type, or yyempty_.
+    /// \param yyla      the lookahead token.
     virtual std::string yysyntax_error_ (state_type yystate,
-                                         symbol_number_type yytoken) const;
+                                         const symbol_type& yyla) const;
 
     /// Compute post-reduction state.
     /// \param yystate   the current state
@@ -389,10 +403,13 @@ namespace parser {
   static const unsigned char yyr2_[];
 
 
-#if YYDEBUG
+    /// Convert the symbol name \a n to a form suitable for a diagnostic.
+    static std::string yytnamerr_ (const char *n);
+
+
     /// For a symbol, its name in clear.
     static const char* const yytname_[];
-
+#if YYDEBUG
   // YYRLINE[YYN] -- Source line where rule number YYN was defined.
   static const unsigned char yyrline_[];
     /// Report on the debug stream that the rule \a r is going to be reduced.
@@ -434,16 +451,21 @@ namespace parser {
       /// Copy constructor.
       by_state (const by_state& other);
 
+      /// Record that this symbol is empty.
+      void clear ();
+
       /// Steal the symbol type from \a that.
       void move (by_state& that);
 
       /// The (internal) type number (corresponding to \a state).
-      /// "empty" when empty.
+      /// \a empty_symbol when empty.
       symbol_number_type type_get () const;
 
-      enum { empty = 0 };
+      /// The state number used to denote an empty symbol.
+      enum { empty_state = -1 };
 
       /// The state.
+      /// \a empty when empty.
       state_type state;
     };
 
@@ -484,17 +506,16 @@ namespace parser {
     /// Pop \a n symbols the three stacks.
     void yypop_ (unsigned int n = 1);
 
-    // Constants.
+    /// Constants.
     enum
     {
       yyeof_ = 0,
       yylast_ = 235,     ///< Last index in yytable_.
       yynnts_ = 18,  ///< Number of nonterminal symbols.
-      yyempty_ = -2,
       yyfinal_ = 7, ///< Termination state number.
       yyterror_ = 1,
       yyerrcode_ = 256,
-      yyntokens_ = 39  ///< Number of tokens.
+      yyntokens_ = 40  ///< Number of tokens.
     };
 
 
@@ -505,7 +526,7 @@ namespace parser {
 
 
 } // parser
-#line 509 "Parser.h" // lalr1.cc:372
+#line 530 "Parser.h" // lalr1.cc:377
 
 
 
