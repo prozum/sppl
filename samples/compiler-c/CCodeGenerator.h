@@ -1,5 +1,7 @@
 #pragma once
 #include "CodeGenerator.h"
+#include "Node.h"
+#include <string>
 
 using namespace common;
 
@@ -70,19 +72,16 @@ class CCodeGenerator: public visitor::CodeGenerator
                                             
         void visit(Call *node);
                                             
-        void visit(IntType *node);
-                                            
-        void visit(FloatType *node);
-                                            
-        void visit(BoolType *node);
-                                            
-        void visit(CharType *node);
-                                            
-        void visit(StringType *node);
+        void visit(Type *node);
                                             
         void visit(ListType *node);
                                             
         void visit(TupleType *node);
                                             
         void visit(Signature *node);
+
+    private:
+        std::ostream &os;
+
+        std::string getType(types);
 };
