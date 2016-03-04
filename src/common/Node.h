@@ -5,6 +5,18 @@
 #include <string>
 
 namespace common {
+    enum TypeEnum {
+        INT,
+        FLOAT,
+        BOOL,
+        CHAR,
+		STRING,
+		LIST,
+		TUPLE,
+		SIGNATURE,
+		UNKNOWN
+	};
+
 	class Scope;
 
 	/* Abstract Nodes */
@@ -33,11 +45,6 @@ namespace common {
 	public:
 		Expr *child;
 
-		virtual void accept(Visitor *v) = 0;
-	};
-
-	class Type : public Node {
-	public:
 		virtual void accept(Visitor *v) = 0;
 	};
 
@@ -343,53 +350,14 @@ namespace common {
 		virtual void accept(Visitor *v);
 	};
 
-	/* Types */
-
-	class IntType : public Type {
+	class Type : public Node {
 	public:
-		virtual void accept(Visitor *v);
-	};
+		TypeEnum type = UNKNOWN;
+		std::vector<Type *> types;
 
-	class FloatType : public Type {
-	public:
-		virtual void accept(Visitor *v);
-	};
-
-	class BoolType : public Type {
-	public:
-		virtual void accept(Visitor *v);
-	};
-
-	class CharType : public Type {
-	public:
-		virtual void accept(Visitor *v);
-	};
-
-	class StringType : public Type {
-	public:
-		virtual void accept(Visitor *v);
-	};
-
-	class ListType : public Type {
-	public:
-		Type *type;
-
-		ListType() { }
-		ListType(Type *t) { type = t; }
-
-		virtual void accept(Visitor *v);
-	};
-
-	class TupleType : public Type {
-	public:
-		std::vector<Type*> types;
-
-		virtual void accept(Visitor *v);
-	};
-
-	class Signature : public Type {
-	public:
-		std::vector<Type*> types;
+		Type() { };
+		Type(TypeEnum t) { type = t; }
+		Type(TypeEnum t, std::vector<Type *> *ts) { type = t; types = *ts; }
 
 		virtual void accept(Visitor *v);
 	};

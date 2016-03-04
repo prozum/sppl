@@ -72,21 +72,9 @@ namespace visitor {
 
         virtual void visit(Call *node);
 
-        virtual void visit(IntType *node);
-
-        virtual void visit(FloatType *node);
-
-        virtual void visit(BoolType *node);
-
-        virtual void visit(CharType *node);
-
-        virtual void visit(StringType *node);
-
-        virtual void visit(ListType *node);
-
-        virtual void visit(TupleType *node);
-
-        virtual void visit(Signature *node);
+        virtual void visit(Type *node);
+    private:
+        void print_collection(Type *node, std::string split);
     };
 
 }

@@ -18,7 +18,6 @@
 %union {
     common::Program *                  prog_val;
     common::Function *                 func_val;
-    common::Signature *                sig_val;
     common::Type *                     type_val;
     common::Case *                     case_val;
     common::Pattern *                  pattern_val;
@@ -56,8 +55,7 @@
 %type <prog_val> program
 %type <func_vec> funcs_ne
 %type <func_val> func decl
-%type <sig_val> signature
-%type <type_val> type
+%type <type_val> type signature
 %type <type_vec> types_comma_ne
 %type <case_vec> cases_ne
 %type <case_val> case
@@ -86,28 +84,22 @@ using namespace std;
 
 %%
 
-program:	funcs_ne 
-{ 
-    driver.main = new Program(); 
-    driver.main->funcs = * $1; 
-    delete $1; 
-}
-
-funcs_ne: funcs_ne func                                     { $$ = $1; $$->push_back($2); }
+program:	funcs_ne                                        { driver.main = new Program(); driver.main->funcs = * $1; delete $1; };
+funcs_ne:	funcs_ne func                                   { $$ = $1; $$->push_back($2); }
 	| func                                                  { $$ = new std::vector<Function *>(); $$->push_back($1); } ;
-func: decl cases_ne                                         { $$ = $1; $$->cases = * $2; delete $2; }
-decl:   DEF ID COLON signature                              { $$ = new Function(* $2); $$->types = $4->types; delete $2; delete $4; }
-signature:  signature ARROR type                            { $$ = $1; $$->types.push_back($3); }
-	|   type                                                { $$ = new Signature(); $$->types.push_back($1); } ;
-type:   BOOLTYPE                                            { $$ = new BoolType(); }
-	|   INTTYPE                                             { $$ = new IntType(); }
-	|   FLOATTYPE                                           { $$ = new FloatType(); }
-	|   CHARTYPE                                            { $$ = new CharType(); }
-	|   STRINGTYPE                                          { $$ = new StringType(); }
-	|   SQSTART type SQEND                                  { $$ = new ListType($2); }
-	|   PARSTART signature PAREND                           { $$ = $2; }
-	|   PARSTART types_comma_ne COMMA type PAREND           { TupleType *t = new TupleType(); t->types = * $2; delete $2; t->types.push_back($4); $$ = t; }
-types_comma_ne: types_comma_ne COMMA type                   { $$ = $1; $$->push_back($3); }
+func:		decl cases_ne                                   { $$ = $1; $$->cases = * $2; delete $2; }
+decl:		DEF ID COLON signature                    { $$ = new Function(* $2); $$->types = $4->types; delete $2; delete $4; }
+signature:	signature ARROR type                          { $$ = $1; $$->types.push_back($3); }
+	| type                                                  { $$ = new Type(SIGNATURE); $$->types.push_back($1); } ;
+type:		BOOLTYPE                                      { $$ = new Type(BOOL); }
+	|	INTTYPE                                           { $$ = new Type(INT); }
+	|	FLOATTYPE                                         { $$ = new Type(FLOAT); }
+	|	CHARTYPE                                          { $$ = new Type(CHAR); }
+	|	STRINGTYPE                                        { $$ = new Type(STRING); }
+	|	SQSTART type SQEND                              { $$ = new Type(LIST); $$->types.push_back($2); }
+	|	PARSTART signature PAREND                       { $$ = $2; }
+	|	PARSTART types_comma_ne COMMA type PAREND     { $$ = new Type(TUPLE, $2); delete $2; $$->types.push_back($4); }
+types_comma_ne: types_comma_ne COMMA type                 { $$ = $1; $$->push_back($3); }
 	|	type                                                { $$ = new vector<Type *>(); $$->push_back($1); };
 cases_ne:	cases_ne case                                   { $$ = $1; $$->push_back($2); }
 	|   case                                                  { $$ = new vector<Case *>(); $$->push_back($1); };

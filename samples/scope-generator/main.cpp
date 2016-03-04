@@ -34,6 +34,11 @@ std::string get_taps() {
     return res;
 }
 
+std::string get_type(Type *type) {
+    std::string res = "";
+    return res;
+}
+
 void print_scopes(Scope *scope) {
     std::cout << get_taps() << "-";
 

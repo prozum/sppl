@@ -1,7 +1,6 @@
 #include "CCompiler.h"
 
-void CCompiler::compile(std::istream &input,
-                       std::ostream &output)
+void CCompiler::compile(std::istream &input, std::ostream &output)
 {
     /*
     Scanner scanner(input);
