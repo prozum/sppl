@@ -5,7 +5,7 @@
 
 namespace visitor {
 
-    class CodeGenerator : public Visitor {
+    class CodeGenerator : public common::Visitor {
     public:
         CodeGenerator(std::ostream &);
 
