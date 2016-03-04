@@ -1,25 +1,60 @@
 #include "CCodeGenerator.h"
+#include <iostream>
 
 using namespace common;
+using namespace std;
 
-CCodeGenerator::CCodeGenerator(std::ostream &os) : visitor::CodeGenerator::CodeGenerator(os)
+CCodeGenerator::CCodeGenerator(std::ostream &os) : visitor::CodeGenerator::CodeGenerator(os), os(os)
 {
-
 }
 
 void CCodeGenerator::visit(Program *node)
 {
-    
+    for (auto f : node->funcs) {
+        f->accept(this);
+    }
+}
+
+string CCodeGenerator::getType(types t)
+{
+    switch (t) {
+    case INT:
+        return "int64_t";
+    case FLOAT:
+        return "double";
+    case BOOL:
+        return "char";
+    case CHAR:
+        return "char";
+    default:
+        return "char*";
+    }
 }
 
 void CCodeGenerator::visit(Function *node)
 {
-    
+    if (node->id == "main") {
+        os << "void" << " main() {" << endl;
+
+        for (auto c : node->cases) {
+            c->accept(this);
+        }
+
+        os << "}" << endl;
+    } else {
+        os << "INSERT WHATEVER TYPE HERE" << endl;
+
+        for (auto c : node->cases) {
+            c->accept(this);
+        }
+
+        os << "}" << endl;
+    }
 }
 
 void CCodeGenerator::visit(Case *node)
 {
-    
+
 }
 
 void CCodeGenerator::visit(Or *node)
@@ -102,29 +137,9 @@ void CCodeGenerator::visit(Not *node)
     
 }
 
-void CCodeGenerator::visit(Int *node)
+void CCodeGenerator::visit(Type *node)
 {
-    
-}
 
-void CCodeGenerator::visit(Float *node)
-{
-    
-}
-
-void CCodeGenerator::visit(Bool *node)
-{
-    
-}
-
-void CCodeGenerator::visit(Char *node)
-{
-    
-}
-
-void CCodeGenerator::visit(String *node)
-{
-    
 }
 
 void CCodeGenerator::visit(ListPattern *node)
@@ -162,27 +177,11 @@ void CCodeGenerator::visit(Call *node)
     
 }
 
-void CCodeGenerator::visit(IntType *node)
+void CCodeGenerator::visit(LiteralType *node)
 {
-    
+
 }
 
-void CCodeGenerator::visit(FloatType *node)
-{
-    
-}
-
-void CCodeGenerator::visit(BoolType *node)
-{
-    
-}
-
-void CCodeGenerator::visit(CharType *node)
-{
-    
-}
-
-void CCodeGenerator::visit(StringType *node)
 {
     
 }
@@ -199,5 +198,5 @@ void CCodeGenerator::visit(TupleType *node)
 
 void CCodeGenerator::visit(Signature *node)
 {
-    
+
 }

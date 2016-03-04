@@ -5,11 +5,11 @@
 #include <string>
 
 namespace common {
-	enum TypeEnum {
-		INT,
-		FLOAT,
-		BOOL,
-		CHAR,
+    enum TypeEnum {
+        INT,
+        FLOAT,
+        BOOL,
+        CHAR,
 		STRING,
 		LIST,
 		TUPLE,
