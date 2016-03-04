@@ -30,3 +30,12 @@
 build
 .idea
 CMakeLists.txt.user
+
+
+# Ignore flex/bison generated files
+Parser.cpp
+Parser.h
+Scanner.cpp
+location.hh
+stack.hh
+position.hh
