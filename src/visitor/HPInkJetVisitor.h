@@ -2,7 +2,7 @@
 
 #include <string>
 #include "Node.h"
-using namespace ast;
+using namespace common;
 using namespace std;
 
 namespace visitor {

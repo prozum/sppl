@@ -3,7 +3,7 @@
 #include <vector>
 #include <string>
 
-namespace ast {
+namespace common {
 	class Visitor;
 	class Node;
 	class Expr;

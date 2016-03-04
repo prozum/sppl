@@ -32,7 +32,7 @@ public:
 
     class Scanner* lexer;
 
-    ast::Program *main;
+    common::Program *main;
 };
 
 }

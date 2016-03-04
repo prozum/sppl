@@ -11,24 +11,22 @@
 
 #include "Node.h"
 
-using namespace ast;
-using namespace std;
 %}
 
 %union {
-    ast::Program *                  prog_val;
-    ast::Function *                 func_val;
-    ast::Signature *                sig_val;
-    ast::Type *                     type_val;
-    ast::Case *                     case_val;
-    ast::Pattern *                  pattern_val;
-    ast::Expr *                     expr_val;
+    common::Program *                  prog_val;
+    common::Function *                 func_val;
+    common::Signature *                sig_val;
+    common::Type *                     type_val;
+    common::Case *                     case_val;
+    common::Pattern *                  pattern_val;
+    common::Expr *                     expr_val;
 
-    std::vector<ast::Function *> *  func_vec;
-    std::vector<ast::Type *> *      type_vec;
-    std::vector<ast::Case *> *      case_vec;
-    std::vector<ast::Pattern *> *   pattern_vec;
-    std::vector<ast::Expr *> *      expr_vec;
+    std::vector<common::Function *> *  func_vec;
+    std::vector<common::Type *> *      type_vec;
+    std::vector<common::Case *> *      case_vec;
+    std::vector<common::Pattern *> *   pattern_vec;
+    std::vector<common::Expr *> *      expr_vec;
 
     std::string*	                str_val;
     long	                        long_val;
@@ -76,6 +74,8 @@ using namespace std;
 #undef yylex
 #define yylex driver.lexer->lex
 
+using namespace common;
+using namespace std;
 
 %}
 
