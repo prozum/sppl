@@ -1,23 +1,20 @@
 #include "Compiler.h"
 
-#include "Scanner.h"
-#include "NodeBuilder.h"
-#include "Parser.h"
-#include "CodeGenerator.h"
+#include "Driver.h"
+#include "HPInkJetVisitor.h"
 
 void Compiler::compile(std::istream &input,
                        std::ostream &output)
 {
-    Scanner scanner(input);
-    NodeBuilder builder;
-    Parser parser;
-    CodeGenerator generator(output);
+    parser::Driver driver;
 
-    parser.Parse(scanner, builder);
+    driver.parse_stream(input);
 
-    auto rootNode = builder.GetRootNode();
+    visitor::HPInkJetVisitor v;
 
-    rootNode.Traverse(generator);
+    v.visit(driver.main);
+
+    std::cout << v.res << std::endl;
 }
 
 Compiler::Compiler() {
