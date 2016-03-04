@@ -1,12 +1,18 @@
+%option c++
+%option noyywrap
+
 %{
     #include <cstdio>
     #include <iostream>
     #include <string>
+    #include <vector>
+    #include "Ast.h"
+    #include "HPInkJetVisitor.h"
+    #include "parser.tab.h"
     using namespace std;
-    #include "parser.tab.h" 
-    void yyerror(char*);
+    using namespace ast;
+    extern void yyerror(char*);
     int yyparse();
-    int error = 0;
 %}
 
 %%
@@ -19,7 +25,7 @@
 "String"			{ return T_STRINGTYPE; }
 "Char"				{ return T_CHARTYPE; }
 [0-9]+				{ yylval.long_val = atol(yytext); return T_INTLITERAL; }
-[0-9]+"."[0-9]+			{ yylval.str_val = new string(yytext); return T_FLOATLITERAL; }
+[0-9]+"."[0-9]+			{ yylval.longdouble_val = atof(yytext); return T_FLOATLITERAL; }
 "'".+"'"			{ yylval.str_val = new string(yytext); return T_CHARLITERAL; }
 "\"".*"\""			{ yylval.str_val = new string(yytext); return T_STRINGLITERAL; }
 "True"|"False"			{ yylval.bool_val = (string(yytext) == "True")? true : false; return T_BOOLLITERAL; }
@@ -49,23 +55,3 @@
 "|"				{ return T_PIPE; }
 
 %%
-
-void yyerror(char* str) { printf("Parse Error: \n%s", str); error = 1; }
-int yywrap(void) {  }
-int main(int argc, char** argv){
-    #if YYDEBUG
-	yydebug = 1;
-    #endif
-
-    if (argc != 2) { cout << "usage: ./parser1 filename\n" << endl; return 1; }
-    FILE* file = fopen(argv[1], "r");
-    if (file == NULL) { cout << "couldn't open " << argv[1] << endl; return 1; }
-    yyin = file;
-    yyparse();
-    fclose(file);
-
-    if (!error)
-	cout << "Tuturuu~ I done did it mom!" << endl;
-
-    return error;
-}

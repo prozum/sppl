@@ -1,19 +1,18 @@
-%{
-    #include <cstdio>
-    #include <string>
-    #include <vector>
-    #include <stack>
-    #include <iostream>
-    #include "Ast.h"
-    #include "HPInkJetVisitor.h"
-    using namespace std;
-    using namespace ast;
-    extern int yylex();
-    void yyerror(char*);
-    extern FILE* yyin;
+%skeleton "lalr1.cc"
+%name-prefix "parser"
+%define "parser_class_name" {Parser}
+%locations
+%debug
+%parse-param { class Driver& driver }
 
-    int error = 0;
-    Program *res;
+%{
+#include <string>
+#include <vector>
+
+#include "Node.h"
+
+using namespace ast;
+using namespace std;
 %}
 
 %union {
@@ -37,6 +36,7 @@
     bool	                        bool_val;
 }
 
+%token T_END 0 "end of file"
 %token T_DEF T_INTTYPE T_BOOLTYPE T_FLOATTYPE T_STRINGTYPE T_CHARTYPE T_ARROR T_EQUAL T_NOTEQUAL T_AND T_OR T_LESSEREQUAL T_GREATEREQUAL T_LESSER T_GREATER T_MUL T_DIV T_MOD T_ADD T_SUB T_ASSIGN T_SQSTART T_SQEND T_PARSTART T_PAREND T_EXMARK T_COMMA T_PIPE T_ARROW T_COLON
 %token <long_val> T_INTLITERAL
 %token <str_val> T_ID T_STRINGLITERAL T_CHARLITERAL
@@ -47,8 +47,8 @@
 %left T_AND
 %left T_EQUAL T_NOTEQUAL
 %left T_LESSER T_GREATER T_GREATEREQUAL T_LESSEREQUAL
-%left T_ADD T_SUB 
-%left T_MUL T_DIV T_MOD 
+%left T_ADD T_SUB
+%left T_MUL T_DIV T_MOD
 %right T_COLON
 %precedence T_EXMARK
 
@@ -65,13 +65,27 @@
 %type <expr_val> expr struct_inst
 %type <expr_vec> exprs_comma exprs_comma_ne
 
+%{
+
+#include "Driver.h"
+#include "Scanner.h"
+
+/* this "connects" the bison parser in the driver to the flex scanner class
+ * object. it defines the yylex() function call to pull the next token from the
+ * current lexer object of the driver context. */
+#undef yylex
+#define yylex driver.lexer->lex
+
+
+%}
+
 %start program
 
 %%
 
-program:	funcs_ne                                        { res = new Program(); res->funcs = * $1; delete $1; };
+program:	funcs_ne                                        { driver.main = new Program(); driver.main->funcs = * $1; delete $1; };
 funcs_ne:	funcs_ne func                                   { $$ = $1; $$->push_back($2); }
-	| func                                                  { $$ = new vector<Function *>(); $$->push_back($1); } ;
+	| func                                                  { $$ = new std::vector<Function *>(); $$->push_back($1); } ;
 func:		decl cases_ne                                   { $$ = $1; $$->cases = * $2; delete $2; }
 decl:		T_DEF T_ID T_COLON signature                    { $$ = new Function(* $2); $$->types = $4->types; delete $2; delete $4; }
 signature:	signature T_ARROR type                          { $$ = $1; $$->types.push_back($3); }
@@ -133,36 +147,8 @@ exprs_comma_ne:	exprs_comma_ne T_COMMA expr                 { $$ = $1; $$->push_
 
 %%
 
-int main(int argc, char** argv){
-    #if YYDEBUG
-	    yydebug = 1;
-    #endif
-
-    if (argc != 2) {
-        cout << "usage: ./parser1 filename\n" << endl; return 1;
-    }
-
-    FILE* file = fopen(argv[1], "r");
-
-    if (file == NULL) {
-        cout << "couldn't open " << argv[1] << endl; return 1;
-    }
-
-    yyin = file;
-    error = yyparse();
-    fclose(file);
-
-    HPInkJetVisitor v;
-    cout << "Printing code:" << endl;
-    v.visit(res);
-    cout << v.res << endl;
-    int tmp;
-    cin >> tmp;
-
-    if (!error)
-        cout << "Tuturuu~ I done did it mom!" << endl;
-
-    return error;
+void parser::Parser::error(const Parser::location_type& l,
+                            const std::string& m)
+{
+    driver.error(l, m);
 }
-
-void yyerror(char* str) { printf("Parse Error: \n%s", str); error = 1; }

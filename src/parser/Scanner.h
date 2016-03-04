@@ -1,71 +1,42 @@
 #pragma once
 
-#include <string>
-#include <iostream>
-#include <iostream>
-#include <memory>
-#include <map>
+// Flex expects the signature of yylex to be defined in the macro YY_DECL, and
+// the C++ parser expects it to be declared. We can factor both as follows.
 
-enum TokenType
-{
-    TYPE,
-    IDENTIFIER,
+#ifndef YY_DECL
 
-    BOOLEAN,
-    INTEGER,
-    DECIMAL,
-    STRING,
-    CHAR,
+#define YY_DECL                                         \
+    parser::Parser::token_type                         \
+    parser::Scanner::lex(                              \
+        parser::Parser::semantic_type* yylval,         \
+        parser::Parser::location_type* yylloc          \
+    )
+#endif
 
-    PAR_START,
-    PAR_END,
-    SQR_START,
-    SQR_END,
+#ifndef __FLEX_LEXER_H
+#define yyFlexLexer SpplFlexLexer
+#include <FlexLexer.h>
+#undef yyFlexLexer
+#endif
 
-    ASSIGN,
+#include "Parser.h"
 
-    SEMI,
-    COMMA,
-    DOT,
+namespace parser {
 
-    NEWLINE,
-
-    UNKNOWN
-};
-
-struct Token
-{
-    Token() {};
-    Token(TokenType type, std::string value)
+    class Scanner : public SpplFlexLexer
     {
-        Type = type;
-        Value = value;
-    }
+    public:
+        Scanner(std::istream* arg_yyin = 0,
+                std::ostream* arg_yyout = 0);
 
-    TokenType Type;
-    std::string Value;
-};
+        virtual ~Scanner();
 
-class Scanner
-{
-public:
-    Scanner(std::istream &istream);
-    virtual ~Scanner();
+        virtual Parser::token_type lex(
+                Parser::semantic_type* yylval,
+                Parser::location_type* yylloc
+        );
 
-    virtual Token Scan();
+        void set_debug(bool b);
+    };
 
-    Token CurToken;
-
-private:
-    void SkipWhiteSpace();
-    std::string NextChar();
-    void SetToken(TokenType type, std::string value = "");
-
-    void ParseNumber();
-    void ParseString();
-    void ParseIdentifier();
-
-    std::istream  &_istream;
-    std::string CurChar;
-    std::map<std::string,Token> KeywordMap;
-};
+}
