@@ -15,24 +15,6 @@ void CCodeGenerator::visit(Program *node)
     }
 }
 
-/*
-string CCodeGenerator::getType(types t)
-{
-    switch (t) {
-    case INT:
-        return "int64_t";
-    case FLOAT:
-        return "double";
-    case BOOL:
-        return "char";
-    case CHAR:
-        return "char";
-    default:
-        return "char*";
-    }
-}
-*/
-
 void CCodeGenerator::visit(Function *node)
 {
     if (node->id == "main") {
@@ -44,7 +26,7 @@ void CCodeGenerator::visit(Function *node)
 
         os << "}" << endl;
     } else {
-        os << "INSERT WHATEVER TYPE HERE" << endl;
+        (node->types.back())->accept(this);
 
         for (auto c : node->cases) {
             c->accept(this);

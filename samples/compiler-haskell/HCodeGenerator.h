@@ -5,10 +5,10 @@
 
 using namespace common;
 
-class CCodeGenerator: public visitor::CodeGenerator
+class HCodeGenerator: public visitor::CodeGenerator
 {
     public:
-        CCodeGenerator(std::ostream &);
+        HCodeGenerator(std::ostream &);
 
         void visit(Program *node);
                                     
