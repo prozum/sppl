@@ -2,6 +2,6 @@
 
 #include "Compiler.h"
 
-class HCompiler: public HCompiler {
+class HCompiler: public Compiler {
     static void compile(std::istream& input, std::ostream& output);
 };

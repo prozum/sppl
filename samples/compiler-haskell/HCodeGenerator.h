@@ -76,5 +76,6 @@ class HCodeGenerator: public visitor::CodeGenerator
 
     private:
         std::ostream &os;
+        Function *curr_fun;
         string get_type(Type *);
 };

@@ -8,7 +8,7 @@ int main()
 
     HCodeGenerator gen(std::cout);
 
-    driver.parse_string("def f : Int | x = 5");
+    driver.parse_string("def f : Int -> Int | x = 5 * x");
 
     gen.visit(driver.main);
 
