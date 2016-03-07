@@ -19,7 +19,8 @@ int main(int argc, char** argv) {
 
     driver.parse_file(argv[1]);
     generator.visit(driver.main);
-    print_scopes(generator.res);
+
+    //print_scopes(generator.res);
 
     return 0;
 }

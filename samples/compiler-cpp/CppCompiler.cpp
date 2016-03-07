@@ -1,4 +1,4 @@
-#include "CCompiler.h"
+#include "CppCompiler.h"
 
 void CCompiler::compile(std::istream &input, std::ostream &output)
 {

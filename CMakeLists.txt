@@ -9,6 +9,12 @@ else()
     set(CMAKE_BUILD_TYPE Release)
 endif()
 
+option(CC "C++ Compiler" OFF)
+option(CHASKELL "Haskell Compiler" OFF)
+option(CGNUASM "GNU Assembly Compiler" OFF)
+option(CLLVM "LLVM Intermediate Representation" OFF)
+option(SCOPE "Scope Generator Sample" OFF)
+
 include_directories(
         src/common
         src/parser
