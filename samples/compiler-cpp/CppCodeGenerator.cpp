@@ -1,4 +1,4 @@
-#include "CCodeGenerator.h"
+#include "CppCodeGenerator.h"
 #include <iostream>
 
 using namespace common;
