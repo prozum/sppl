@@ -3,6 +3,7 @@
 #include <fstream>
 
 using namespace std;
+using namespace compiler;
 
 int main(int argc, char *argv[])
 {

@@ -7,7 +7,7 @@ fmt:
 .globl fac
 
 main:
-	pushl $7		# target value (DONT CHANGE)
+	pushl $10		# target value (DONT CHANGE)
 	pushl (%esp)		# copy of target value, can be changed
 	pushl $0		# Return value goes here
 	

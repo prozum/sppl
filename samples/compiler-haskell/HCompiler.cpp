@@ -1,12 +1,12 @@
-#include "CCompiler.h"
+#include "HCompiler.h"
 
-void CCompiler::compile(std::istream &input, std::ostream &output)
+void HCompiler::compile(std::istream &input, std::ostream &output)
 {
     /*
     Scanner scanner(input);
     NodeBuilder builder;
     Parser parser;
-    CCodeGenerator generator(output);
+    HCodeGenerator generator(output);
 
     parser.Parse(scanner, builder);
 

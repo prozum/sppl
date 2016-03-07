@@ -1,5 +1,5 @@
-if(CC)
-    add_subdirectory(compiler-c)
+if(CPPC)
+    add_subdirectory(compiler-cpp)
 endif()
 if(CHASKELL)
     add_subdirectory(compiler-haskell)

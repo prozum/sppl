@@ -1,7 +1,12 @@
 #pragma once
 
 #include <ostream>
+#include <string>
 #include "Visitor.h"
+#include "Node.h"
+
+using namespace std;
+using namespace common;
 
 namespace visitor {
 
@@ -11,6 +16,7 @@ namespace visitor {
 
     private:
         std::ostream &ostream;
+        virtual string get_type(Type *) = 0;
     };
 
 }
