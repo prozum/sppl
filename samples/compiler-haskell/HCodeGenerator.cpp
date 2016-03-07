@@ -11,10 +11,16 @@ HCodeGenerator::HCodeGenerator(std::ostream &os) : visitor::CodeGenerator::CodeG
 
 void HCodeGenerator::visit(Program *node)
 {
-    os << "module PlaceHolder where" << endl;
+    //os << "module PlaceHolder where" << endl;
 
     for (auto f : node->funcs) {
-        f->accept(this);
+        if (f->id != "main") {
+            f->accept(this);
+        } else {
+            os << "main = putStrLn (";
+            f->cases->front()->expr->accept(this);
+            os << ")\n";
+        }
     }
 }
 
@@ -38,6 +44,8 @@ void HCodeGenerator::visit(Function *node)
     for (auto c : node->cases) {
         c->accept(this);
     }
+
+    os << endl;
 }
 
 void HCodeGenerator::visit(Case *node)
