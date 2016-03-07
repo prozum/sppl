@@ -379,8 +379,3 @@ void HCodeGenerator::visit(Type *node)
         }
     }
 }
-
-string HCodeGenerator::get_type(Type *t)
-{
-
-}
