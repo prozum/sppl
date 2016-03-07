@@ -17,7 +17,7 @@ namespace common {
         Scope *parent;
         std::vector<Scope *> children;
 
-        Scope() { }
+        Scope() : Scope(nullptr) { }
         Scope(Scope *p);
     };
 }

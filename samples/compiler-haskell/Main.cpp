@@ -5,11 +5,9 @@
 int main()
 {
     parser::Driver driver;
-
     HCodeGenerator gen(std::cout);
 
-    driver.parse_string("def f : Int -> Int | x = 5 * x");
-
+    driver.parse_stream(cin);
     gen.visit(driver.main);
 
     return 0;

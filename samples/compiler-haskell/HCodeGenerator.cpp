@@ -11,6 +11,8 @@ HCodeGenerator::HCodeGenerator(std::ostream &os) : visitor::CodeGenerator::CodeG
 
 void HCodeGenerator::visit(Program *node)
 {
+    os << "module PlaceHolder where" << endl;
+
     for (auto f : node->funcs) {
         f->accept(this);
     }
@@ -195,8 +197,13 @@ void HCodeGenerator::visit(ListPattern *node)
 {
     os << "[";
 
-    for (auto p : node->patterns) {
-        p->accept(this);
+    if (node->patterns.size() != 0) {
+        for (int i = 0; i < node->patterns.size() - 1; ++i) {
+            node->patterns[i]->accept(this);
+            os << ",";
+        }
+
+        node->patterns.back()->accept(this);
     }
 
     os << "]";
@@ -206,8 +213,13 @@ void HCodeGenerator::visit(TuplePattern *node)
 {
     os << "(";
 
-    for (auto p : node->patterns) {
-        p->accept(this);
+    if (node->patterns.size() != 0) {
+        for (int i = 0; i < node->patterns.size() - 1; ++i) {
+            node->patterns[i]->accept(this);
+            os << ",";
+        }
+
+        node->patterns.back()->accept(this);
     }
 
     os << ")";
@@ -332,7 +344,14 @@ void HCodeGenerator::visit(Type *node)
             break;
         case TUPLE:
             os << "(";
-            for (auto t : node->types) {t->accept(this);}
+            if (node->types.size() != 0) {
+                for (int i = 0; i < node->types.size() - 1; ++i) {
+                    node->types[i]->accept(this);
+                    os << ",";
+                }
+
+                node->types.back()->accept(this);
+            }
             os << ")";
             break;
         case SIGNATURE:
