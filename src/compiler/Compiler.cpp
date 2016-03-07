@@ -3,20 +3,22 @@
 #include "Driver.h"
 #include "HPInkJetVisitor.h"
 
-void Compiler::compile(std::istream &input,
-                       std::ostream &output)
-{
-    parser::Driver driver;
+namespace compiler {
 
-    driver.parse_stream(input);
+    void Compiler::compile(std::istream &input,
+                           std::ostream &output) {
+        parser::Driver driver;
 
-    visitor::HPInkJetVisitor v;
+        driver.parse_stream(input);
 
-    v.visit(driver.main);
+        visitor::HPInkJetVisitor v;
 
-    std::cout << v.res << std::endl;
-}
+        v.visit(driver.main);
 
-Compiler::Compiler() {
+        std::cout << v.res << std::endl;
+    }
 
+    Compiler::Compiler() {
+
+    }
 }
