@@ -17,9 +17,9 @@ void HCodeGenerator::visit(Program *node)
         if (f->id != "main") {
             f->accept(this);
         } else {
-            os << "main = putStrLn (";
-            f->cases->front()->expr->accept(this);
-            os << ")\n";
+            os << "main = putStrLn (show (";
+            f->cases.front()->expr->accept(this);
+            os << "))\n";
         }
     }
 }
