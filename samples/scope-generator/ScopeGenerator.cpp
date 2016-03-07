@@ -23,16 +23,22 @@ void ScopeGenerator::visit(Program *node) {
 void ScopeGenerator::visit(Function *node) {
     PRINT("Function")
     current_func = node;
-    current_scope->decls.insert({node->id, node->types.back()});
 
-    /* Visit children */
-    for (auto type : node->types) {
-        type->accept(this);
+    if (!exists_in_scope(node->id)) {
+        current_scope->decls.insert({node->id, new Type(SIGNATURE, &node->types)});
+
+        /* Visit children */
+        for (auto type : node->types) {
+            type->accept(this);
+        }
+        for (auto cse : node->cases) {
+            cse->accept(this);
+        }
+        /* Visit stops here */
+    } else {
+        /* ERROR! Id exists in scope */
+        throw "Id exists in scope";
     }
-    for (auto cse : node->cases) {
-        cse->accept(this);
-    }
-    /* Visit stops here */
 }
 
 void ScopeGenerator::visit(Case *node) {
@@ -44,15 +50,16 @@ void ScopeGenerator::visit(Case *node) {
     if (node->patterns.size() == current_func->types.size() - 1) {
 
         /* Visit children */
+        context = PATTERN;
+
         for (int i = 0; i < node->patterns.size(); i++){
             type_stack.push(current_func->types[i]);
             node->patterns[i]->accept(this);
             type_stack.pop();
         }
 
-        /*
+        context = EXPR;
         node->expr->accept(this);
-        */
     } else {
         /* ERROR! Cases doesn't have the currect number of patterns */
         throw "Case doesn't have the currect number of patterns";
@@ -214,7 +221,7 @@ void ScopeGenerator::visit(String *node) {
 void ScopeGenerator::visit(ListPattern *node) {
     PRINT("ListPattern")
 
-    if (type_stack.top()->type == TUPLE) {
+    if (type_stack.top()->type == LIST) {
         type_stack.push(type_stack.top()->types[0]);
 
         /* Visit children */
@@ -225,8 +232,8 @@ void ScopeGenerator::visit(ListPattern *node) {
 
         type_stack.pop();
     } else {
-        /* ERROR! Cases doesn't have the currect number of patterns */
-        throw "TuplePattern doesn't have the currect number of patterns";
+        /* ERROR! Expected list type, but was something else */
+        throw "Expected list type, but was something else";
     }
 
 }
@@ -243,20 +250,26 @@ void ScopeGenerator::visit(TuplePattern *node) {
         }
 
     } else {
-        /* ERROR! Cases doesn't have the currect number of patterns */
+        /* ERROR! TuplePattern doesn't have the currect number of patterns */
         throw "TuplePattern doesn't have the currect number of patterns";
     }
 }
 
 void ScopeGenerator::visit(ListSplit *node) {
     PRINT("ListSplit")
-    type_stack.push(type_stack.top()->types[0]);
 
-    /* Visit children */
-    node->left->accept(this);
-    type_stack.pop();
-    node->right->accept(this);
-    /* Visit stops here */
+    if (type_stack.top()->type == LIST) {
+        type_stack.push(type_stack.top()->types[0]);
+
+        /* Visit children */
+        node->left->accept(this);
+        type_stack.pop();
+        node->right->accept(this);
+        /* Visit stops here */
+    } else {
+        /* ERROR! Expected list type, but was something else */
+        throw "Expected list type, but was something else";
+    }
 }
 
 void ScopeGenerator::visit(List *node) {
@@ -279,11 +292,22 @@ void ScopeGenerator::visit(Tuple *node) {
 
 void ScopeGenerator::visit(Id *node) {
     PRINT("Id")
-    std::cout << "1" << std::endl;
     node->scope = current_scope;
-    std::cout << "2" << std::endl;
-    current_scope->decls.insert({node->id, type_stack.top()});
-    std::cout << "3" << std::endl;
+
+    if (context == PATTERN) {
+        if (!exists_in_scope(node->id)) {
+            current_scope->decls.insert({node->id, type_stack.top()});
+        } else {
+            /* ERROR! Id exists in scope */
+            throw "Id exists in scope";
+        }
+    } else if (context == EXPR) {
+
+    } else {
+        /* ERROR! Unknown scope context! */
+        throw "Unknown scope context!";
+    }
+
 }
 
 void ScopeGenerator::visit(Call *node) {
@@ -298,5 +322,23 @@ void ScopeGenerator::visit(Call *node) {
 
 void ScopeGenerator::visit(Type *node) {
     PRINT("LiteralType")
-
 }
+
+bool ScopeGenerator::exists_in_scope(std::string id) {
+    Scope *scope = current_scope;
+
+    for (;;) {
+        auto got = scope->decls.find(id);
+
+        if (got != scope->decls.end())
+            return true;
+
+        if (scope->parent)
+            scope = scope->parent;
+        else
+            break;
+    }
+
+    return false;
+}
+

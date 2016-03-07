@@ -59,7 +59,7 @@
 %type <type_vec> types_comma_ne
 %type <case_vec> cases_ne
 %type <case_val> case
-%type <pattern_vec> patterns patterns_comma_ne
+%type <pattern_vec> patterns patterns_comma_ne patterns_comma
 %type <pattern_val> pattern literal
 %type <expr_val> expr struct_inst
 %type <expr_vec> exprs_comma exprs_comma_ne
@@ -110,6 +110,9 @@ pattern:    literal                                         { $$ = $1; }
 	| 	ID                                                  { $$ = new Id(* $1); delete $1;  }
 	| 	PARSTART pattern COLON pattern PAREND               { $$ = new ListSplit($2, $4);  }
 	| 	PARSTART patterns_comma_ne COMMA pattern PAREND     { TuplePattern *t = new TuplePattern(); t->patterns = * $2; delete $2; t->patterns.push_back($4); $$ = t; }
+    |   SQSTART patterns_comma SQEND                        { ListPattern *t = new ListPattern(); t->patterns = * $2; delete $2; $$ = t; }
+patterns_comma:    patterns_comma_ne                        { $$ = $1; }
+	|	                                                    { $$ = new vector<Pattern *>(); } ;
 patterns_comma_ne:  patterns_comma_ne COMMA pattern         { $$ = $1; $$->push_back($3); }
 	|   pattern                                             { $$ = new vector<Pattern *>(); $$->push_back($1); } ;
 literal:	INTLITERAL                                      { $$ = new Int($1); }
