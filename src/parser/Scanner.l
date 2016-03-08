@@ -9,6 +9,8 @@
 #include "Node.h"
 #include "Scanner.h"
 
+#define YY_NO_UNISTD_H
+
 typedef parser::Parser::token token;
 typedef parser::Parser::token_type token_type;
 
