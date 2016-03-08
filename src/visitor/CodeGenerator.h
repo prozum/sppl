@@ -16,7 +16,6 @@ namespace visitor {
 
     private:
         std::ostream &ostream;
-        virtual string get_type(Type *) = 0;
     };
 
 }

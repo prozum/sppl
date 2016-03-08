@@ -35,6 +35,11 @@ script:
   - make -j 8
   - sudo make install
 
+after_failure: 
+  - pwd
+  - tree
+  - cat cov-int/build-log.txt
+
 addons:
   coverity_scan:
     project:
