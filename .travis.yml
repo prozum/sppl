@@ -29,16 +29,16 @@ before_install:
 
 install:
   - mkdir build && cd build
-  - cmake ..
+  - cmake .. -DDEBUG=1
 
 script:
   - make -j 8
   - sudo make install
 
-after_failure: 
+after_script:
   - pwd
-  - tree
-  - cat cov-int/build-log.txt
+  - cat /home/travis/build/prozum/sppl/build/cov-int/build-log.txt
+  - cat /home/travis/build/prozum/sppl/build/cov-int/scm_log.txt 
 
 addons:
   coverity_scan:
@@ -46,7 +46,7 @@ addons:
       name: "prozum/sppl"
       description: "Build submitted via Travis CI"
     notification_email: nimoov@prozum.dk
-    build_command_prepend: "make clean"
+    build_command_prepend: "cov-configure --compiler /usr/bin/g++ --comptype gcc"
     build_command:   "make -j 8"
     branch_pattern: coverity
 

@@ -6,7 +6,7 @@ using namespace common;
 using namespace std;
 
 namespace visitor {
-    class HPInkJetVisitor : public Visitor {
+    class Printer : public Visitor {
     public:
         string res;
 
