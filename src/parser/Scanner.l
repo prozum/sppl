@@ -6,7 +6,7 @@
 
 #include <string>
 
-#include "Node.h";
+#include "Node.h"
 #include "Scanner.h"
 
 typedef parser::Parser::token token;
