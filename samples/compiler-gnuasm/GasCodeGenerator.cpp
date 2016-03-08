@@ -11,25 +11,38 @@ vector<string> funcVector;
 vector<string> funcGlobl;
 
 int caseCount = 0;
+int cases = 0;
+
+bool hasMain = false;
 
 GasCodeGenerator::GasCodeGenerator(std::ostream &os) : visitor::CodeGenerator::CodeGenerator(os), os(os) {
 }
 
 void GasCodeGenerator::visit(Program *node) {
     // Visit all functions
+
     for (auto func : node->funcs) {
         func->accept(this);
     }
 
-    // Print all functions to output stream
-    for (auto s : funcVector) {
-        std::cout << s << std::endl;
+    if (!hasMain) {
+        cout << "Error: no main\n";
     }
+
+    string source = buildSource();
+    cout << source << endl;
 }
 
 void GasCodeGenerator::visit(Function *node) {
     string funcName = node->id;
-    funcGlobl.push_back(funcName);
+
+    if (funcName.compare("main") == 0) {
+        hasMain = true;
+    }
+
+    string globl = ".globl ";
+    globl.append(funcName);
+    funcGlobl.push_back(globl);
     function.append(funcName);
     function.append(":\n");
     function.append("pushl %ebp\n");
@@ -39,6 +52,7 @@ void GasCodeGenerator::visit(Function *node) {
     function.append("funcstart:\n");
 
     caseCount = 0;
+    cases = node->cases.size();
 
     for (auto funcCase : node->cases) {
         funcCase->accept(this);
@@ -59,9 +73,23 @@ void GasCodeGenerator::visit(Function *node) {
 
 void GasCodeGenerator::visit(Case *node) {
     caseCount++;
-    function.append(".case");
-    function.append(to_string(caseCount));
-    function.append(":\n");
+
+    if (node->patterns.size() > 1) {
+        if (caseCount == cases) {
+            function.append(".casedefault:\n");
+            node->expr->accept(this);
+        } else {
+            function.append(".case");
+            function.append(to_string(caseCount));
+            function.append(":\n");
+            node->expr->accept(this);
+        }
+    } else {
+        // Function is given no input, thus it is only concerned about the return value.
+        function += ".default:\n";
+        node->expr->accept(this);
+
+    }
 }
 
 void GasCodeGenerator::visit(Or *node) {
@@ -182,4 +210,18 @@ void GasCodeGenerator::visit(Type *node) {
 
 string GasCodeGenerator::get_type(Type *) {
 
+}
+
+string GasCodeGenerator::buildSource() {
+    string source = "";
+    source += ".text\n";
+    for (auto f : funcGlobl) {
+        source += f;
+        source += "\n";
+    }
+
+    for (auto f : funcVector) {
+        source += f;
+    }
+    return source;
 }
