@@ -324,58 +324,51 @@ void HCodeGenerator::visit(Call *node)
 
 void HCodeGenerator::visit(Type *node)
 {
-    if (node->types.empty()) {
-        switch (node->type) {
-        case INT:
-            os << "Int";
-            break;
-        case FLOAT:
-            os << "Float";
-            break;
-        case BOOL:
-            os << "Bool";
-            break;
-        case CHAR:
-            os << "Char";
-            break;
-        case STRING:
-            os << "String";
-        default:
-            break;
-        }
-    } else {
-        switch (node->type) {
-        case LIST:
-            os << "[";
-            node->types.front()->accept(this);
-            os << "]";
-            break;
-        case TUPLE:
-            os << "(";
-            if (node->types.size() != 0) {
-                for (int i = 0; i < node->types.size() - 1; ++i) {
-                    node->types[i]->accept(this);
-                    os << ",";
-                }
-
-                node->types.back()->accept(this);
+    switch (node->type) {
+    case INT:
+        os << "Int";
+        break;
+    case FLOAT:
+        os << "Float";
+        break;
+    case BOOL:
+        os << "Bool";
+        break;
+    case CHAR:
+        os << "Char";
+        break;
+    case STRING:
+        os << "String";
+    case LIST:
+        os << "[";
+        node->types.front()->accept(this);
+        os << "]";
+        break;
+    case TUPLE:
+        os << "(";
+        if (node->types.size() != 0) {
+            for (int i = 0; i < node->types.size() - 1; ++i) {
+                node->types[i]->accept(this);
+                os << ",";
             }
-            os << ")";
-            break;
-        case SIGNATURE:
-            os << "(";
-            if (node->types.size() != 0) {
-                for (int i = 0; i < node->types.size() - 1; ++i) {
-                    node->types[i]->accept(this);
-                    os << " -> ";
-                }
 
-                node->types.back()->accept(this);
-            }
-            os << ")";
-            break;
-        default:
-            break;
+            node->types.back()->accept(this);
         }
+        os << ")";
+        break;
+    case SIGNATURE:
+        os << "(";
+        if (node->types.size() != 0) {
+            for (int i = 0; i < node->types.size() - 1; ++i) {
+                node->types[i]->accept(this);
+                os << " -> ";
+            }
+
+            node->types.back()->accept(this);
+        }
+        os << ")";
+        break;
+    default:
+        break;
     }
 }
