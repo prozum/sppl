@@ -1,7 +1,7 @@
 #include "Compiler.h"
 
 #include "Driver.h"
-#include "HPInkJetVisitor.h"
+#include "Printer.h"
 
 namespace compiler {
 
@@ -11,7 +11,7 @@ namespace compiler {
 
         driver.parse_stream(input);
 
-        visitor::HPInkJetVisitor v;
+        visitor::Printer v;
 
         v.visit(driver.main);
 

@@ -1,11 +1,11 @@
-#include "HPInkJetVisitor.h"
+#include "Printer.h"
 #include <iostream>
 
 using namespace std;
 
 namespace visitor {
 
-    void HPInkJetVisitor::visit(Program *node) {
+    void Printer::visit(Program *node) {
         res = "";
 
         cout << "Program " << endl;
@@ -15,20 +15,17 @@ namespace visitor {
         }
     }
 
-    void HPInkJetVisitor::visit(Function *node) {
+    void Printer::visit(Function *node) {
         cout << "Function " << node->id << endl;
 
         res.append("def ");
         res.append(node->id);
         res.append(" : ");
 
-        if (node->types.size() != 0) {
-            for (int i = 0; i < node->types.size() - 1; ++i) {
-                node->types[i]->accept(this);
+        for (auto & p: node->types) {
+            p->accept(this);
+            if (p != node->types.back())
                 res.append(" -> ");
-            }
-
-            node->types.back()->accept(this);
         }
 
         res.append("\n");
@@ -41,19 +38,16 @@ namespace visitor {
         res.append("\n");
     }
 
-    void HPInkJetVisitor::visit(Case *node) {
+    void Printer::visit(Case *node) {
 
         cout << "Case" << endl;
 
         res.append("\t| ");
 
-        if (node->patterns.size() != 0) {
-            for (int i = 0; i < node->patterns.size() - 1; ++i) {
-                node->patterns[i]->accept(this);
+        for (auto & p: node->patterns) {
+            p->accept(this);
+            if (p != node->patterns.back())
                 res.append(" ");
-            }
-
-            node->patterns.back()->accept(this);
         }
 
         res.append(" = ");
@@ -61,7 +55,7 @@ namespace visitor {
         node->expr->accept(this);
     }
 
-    void HPInkJetVisitor::visit(Or *node) {
+    void Printer::visit(Or *node) {
 
         cout << "Or" << endl;
 
@@ -70,7 +64,7 @@ namespace visitor {
         node->right->accept(this);
     }
 
-    void HPInkJetVisitor::visit(And *node) {
+    void Printer::visit(And *node) {
 
         cout << "And" << endl;
 
@@ -79,7 +73,7 @@ namespace visitor {
         node->right->accept(this);
     }
 
-    void HPInkJetVisitor::visit(Equal *node) {
+    void Printer::visit(Equal *node) {
 
         cout << "Equal" << endl;
 
@@ -88,7 +82,7 @@ namespace visitor {
         node->right->accept(this);
     }
 
-    void HPInkJetVisitor::visit(NotEqual *node) {
+    void Printer::visit(NotEqual *node) {
 
         cout << "Not Equal" << endl;
 
@@ -97,7 +91,7 @@ namespace visitor {
         node->right->accept(this);
     }
 
-    void HPInkJetVisitor::visit(Lesser *node) {
+    void Printer::visit(Lesser *node) {
 
         cout << "Lesser" << endl;
 
@@ -106,7 +100,7 @@ namespace visitor {
         node->right->accept(this);
     }
 
-    void HPInkJetVisitor::visit(Greater *node) {
+    void Printer::visit(Greater *node) {
 
         cout << "Greater" << endl;
 
@@ -115,7 +109,7 @@ namespace visitor {
         node->right->accept(this);
     }
 
-    void HPInkJetVisitor::visit(LesserEq *node) {
+    void Printer::visit(LesserEq *node) {
 
         cout << "LesserEq" << endl;
 
@@ -124,7 +118,7 @@ namespace visitor {
         node->right->accept(this);
     }
 
-    void HPInkJetVisitor::visit(GreaterEq *node) {
+    void Printer::visit(GreaterEq *node) {
 
         cout << "GreaterEq" << endl;
 
@@ -133,7 +127,7 @@ namespace visitor {
         node->right->accept(this);
     }
 
-    void HPInkJetVisitor::visit(Add *node) {
+    void Printer::visit(Add *node) {
 
         cout << "Add" << endl;
 
@@ -142,7 +136,7 @@ namespace visitor {
         node->right->accept(this);
     }
 
-    void HPInkJetVisitor::visit(Sub *node) {
+    void Printer::visit(Sub *node) {
 
         cout << "Sub" << endl;
 
@@ -151,7 +145,7 @@ namespace visitor {
         node->right->accept(this);
     }
 
-    void HPInkJetVisitor::visit(Mul *node) {
+    void Printer::visit(Mul *node) {
 
         cout << "Mul" << endl;
 
@@ -160,7 +154,7 @@ namespace visitor {
         node->right->accept(this);
     }
 
-    void HPInkJetVisitor::visit(Div *node) {
+    void Printer::visit(Div *node) {
 
         cout << "Div" << endl;
 
@@ -169,7 +163,7 @@ namespace visitor {
         node->right->accept(this);
     }
 
-    void HPInkJetVisitor::visit(Mod *node) {
+    void Printer::visit(Mod *node) {
 
         cout << "Mod" << endl;
 
@@ -178,7 +172,7 @@ namespace visitor {
         node->right->accept(this);
     }
 
-    void HPInkJetVisitor::visit(ListAdd *node) {
+    void Printer::visit(ListAdd *node) {
 
         cout << "ListAdd" << endl;
 
@@ -187,7 +181,7 @@ namespace visitor {
         node->right->accept(this);
     }
 
-    void HPInkJetVisitor::visit(Par *node) {
+    void Printer::visit(Par *node) {
 
         cout << "Par" << endl;
 
@@ -196,7 +190,7 @@ namespace visitor {
         res.append(")");
     }
 
-    void HPInkJetVisitor::visit(Not *node) {
+    void Printer::visit(Not *node) {
 
         cout << "Not" << endl;
 
@@ -204,28 +198,28 @@ namespace visitor {
         node->child->accept(this);
     }
 
-    void HPInkJetVisitor::visit(Int *node) {
+    void Printer::visit(Int *node) {
 
         cout << "Int" << endl;
 
         res.append(to_string(node->value));
     }
 
-    void HPInkJetVisitor::visit(Float *node) {
+    void Printer::visit(Float *node) {
 
         cout << "Float" << endl;
 
         res.append(to_string(node->value));
     }
 
-    void HPInkJetVisitor::visit(Bool *node) {
+    void Printer::visit(Bool *node) {
 
         cout << "Bool" << endl;
 
         res.append((node->value) ? "True" : "False");
     }
 
-    void HPInkJetVisitor::visit(Char *node) {
+    void Printer::visit(Char *node) {
 
         cout << "Char" << endl;
 
@@ -234,7 +228,7 @@ namespace visitor {
         res.append("'");
     }
 
-    void HPInkJetVisitor::visit(String *node) {
+    void Printer::visit(String *node) {
 
         cout << "String" << endl;
 
@@ -243,69 +237,60 @@ namespace visitor {
         res.append("\"");
     }
 
-    void HPInkJetVisitor::visit(List *node) {
+    void Printer::visit(List *node) {
 
         cout << "List" << endl;
 
         res.append("[");
 
-        if (node->exprs.size() != 0) {
-            for (int i = 0; i < node->exprs.size() - 1; ++i) {
-                node->exprs[i]->accept(this);
+        for (auto & p: node->exprs) {
+            p->accept(this);
+            if (p != node->exprs.back())
                 res.append(", ");
-            }
-
-            node->exprs.back()->accept(this);
         }
 
         res.append("]");
     }
 
-    void HPInkJetVisitor::visit(Tuple *node) {
+    void Printer::visit(Tuple *node) {
 
         cout << "Tuple" << endl;
 
         res.append("(");
 
-        if (node->exprs.size() != 0) {
-            for (int i = 0; i < node->exprs.size() - 1; ++i) {
-                node->exprs[i]->accept(this);
+        for (auto & p: node->exprs) {
+            p->accept(this);
+            if (p != node->exprs.back())
                 res.append(", ");
-            }
-
-            node->exprs.back()->accept(this);
         }
 
         res.append(")");
     }
 
-    void HPInkJetVisitor::visit(Id *node) {
+    void Printer::visit(Id *node) {
 
         cout << "Id" << endl;
 
         res.append(node->id);
     }
 
-    void HPInkJetVisitor::visit(Call *node) {
+    void Printer::visit(Call *node) {
 
         cout << "Call " << node->exprs.size() << endl;
 
         node->callee->accept(this);
         res.append("(");
 
-        if (node->exprs.size() != 0) {
-            for (int i = 0; i < node->exprs.size() - 1; ++i) {
-                node->exprs[i]->accept(this);
+        for (auto & p: node->exprs) {
+            p->accept(this);
+            if (p != node->exprs.back())
                 res.append(", ");
-            }
-
-            node->exprs.back()->accept(this);
         }
 
         res.append(")");
     }
 
-    void HPInkJetVisitor::visit(Type *node) {
+    void Printer::visit(Type *node) {
 
         cout << "Type" << endl;
 
@@ -345,55 +330,46 @@ namespace visitor {
         }
     }
 
-    void HPInkJetVisitor::print_collection(Type *node, const std::string split) {
+    void Printer::print_collection(Type *node, const std::string split) {
 
-        if (node->types.size() != 0) {
-            for (int i = 0; i < node->types.size() - 1; ++i) {
-                node->types[i]->accept(this);
+        for (auto & p: node->types) {
+            p->accept(this);
+            if (p != node->types.back())
                 res.append(split);
-            }
-
-            node->types.back()->accept(this);
         }
     }
 
-    void HPInkJetVisitor::visit(ListPattern *node) {
+    void Printer::visit(ListPattern *node) {
 
         cout << "ListPattern" << endl;
 
         res.append("[");
 
-        if (node->patterns.size() != 0) {
-            for (int i = 0; i < node->patterns.size() - 1; ++i) {
-                node->patterns[i]->accept(this);
+        for (auto & p: node->patterns) {
+            p->accept(this);
+            if (p != node->patterns.back())
                 res.append(", ");
-            }
-
-            node->patterns.back()->accept(this);
         }
 
         res.append("]");
     }
 
-    void HPInkJetVisitor::visit(TuplePattern *node) {
+    void Printer::visit(TuplePattern *node) {
 
         cout << "TuplePattern" << endl;
 
         res.append("(");
 
-        if (node->patterns.size() != 0) {
-            for (int i = 0; i < node->patterns.size() - 1; ++i) {
-                node->patterns[i]->accept(this);
+        for (auto & p: node->patterns) {
+            p->accept(this);
+            if (p != node->patterns.back())
                 res.append(", ");
-            }
-
-            node->patterns.back()->accept(this);
         }
 
         res.append(")");
     }
 
-    void HPInkJetVisitor::visit(ListSplit *node) {
+    void Printer::visit(ListSplit *node) {
 
         cout << "ListSplit" << endl;
 
