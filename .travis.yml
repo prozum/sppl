@@ -39,6 +39,8 @@ after_failure:
   - pwd
   - tree
   - cat cov-int/build-log.txt
+  - cat /home/travis/build/prozum/sppl/build/cov-int/build-log.txt
+  - cat /home/travis/build/prozum/sppl/build/cov-int/scm_log.txt
 
 addons:
   coverity_scan:
