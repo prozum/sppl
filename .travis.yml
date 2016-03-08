@@ -37,7 +37,8 @@ script:
 
 after_failure: 
   - pwd
-  - cat /home/travis/build/cov-int/build-log.txt
+  - tree
+  - cat cov-int/build-log.txt
 
 addons:
   coverity_scan:
