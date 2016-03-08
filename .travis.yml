@@ -35,13 +35,6 @@ script:
   - make -j 8
   - sudo make install
 
-after_failure: 
-  - pwd
-  - tree
-  - cat cov-int/build-log.txt
-  - cat /home/travis/build/prozum/sppl/build/cov-int/build-log.txt
-  - cat /home/travis/build/prozum/sppl/build/cov-int/scm_log.txt
-
 addons:
   coverity_scan:
     project:
@@ -49,7 +42,7 @@ addons:
       description: "Build submitted via Travis CI"
     notification_email: nimoov@prozum.dk
     build_command_prepend: "make clean"
-    build_command:   "make -j 8"
+    build_command:   "make -j 8 && tree && cat /home/travis/build/prozum/sppl/build/cov-int/build-log.txt && cat /home/travis/build/prozum/sppl/build/cov-int/scm_log.txt"
     branch_pattern: coverity
 
 notifications:
