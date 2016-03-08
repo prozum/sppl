@@ -65,7 +65,7 @@ void GasCodeGenerator::visit(Function *node) {
     function += "funcend:\n";
 
     if (funcName.compare("main") == 0) {    // If the current function is main, we want to terminate the program when done
-        function += "popl %ebx\n";
+        function += "movl $0, %ebx\n";
         function += "movl $1, %eax\n";
         function += "int $0x80\n";
     } else {                                // Otherwise return to calling function
@@ -82,6 +82,24 @@ void GasCodeGenerator::visit(Function *node) {
 
 void GasCodeGenerator::visit(Case *node) {
     caseCount++;
+    int argc = node->patterns.size();
+
+    if (cases == caseCount) {   // Default case
+        function += ".";
+        function += funcName;
+        function += "casedefault:\n";
+    } else {                    // Other cases
+        function += ".";
+        function += funcName;
+        function += "case";
+        function += to_string(caseCount);
+        function += ":\n";
+
+        for (auto p : node->patterns) {
+            p->accept(this);
+        }
+    }
+
     cout << "CaseNotImplemented" << endl;
 }
 
