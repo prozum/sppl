@@ -2,8 +2,16 @@
 #include <iostream>
 #include <vector>
 
+// TODO: Add compile messages and final error messages.
+// TODO: move all debug output lines to debug only.
+
 using namespace common;
 using namespace std;
+
+typedef struct {    // Struct used for getting letterals from patterns and more in an easy and identical way.
+    string n;       // Alternative is another visitor for each scenario where they appear
+    string v;
+} argHelper_t;
 
 string function;    // Contains the current function
 string funcName;    // Contains the name of the current function
@@ -17,6 +25,8 @@ int cases = 0;              // Number of cases
 
 bool hasMain = false;       // If no main is found, good luck assembler
 
+argHelper_t helper;         // Multipurpose helper struct
+
 GasCodeGenerator::GasCodeGenerator(std::ostream &os) : visitor::CodeGenerator::CodeGenerator(os), os(os) {
 }
 
@@ -28,7 +38,7 @@ void GasCodeGenerator::visit(Program *node) {
     }
 
     if (!hasMain) {
-        cout << "Error: no main\n";     // Feedback
+        cout << "Error: no main\n";     // Feedback when no main is present
     } else {
         string source = buildSource();  // Build source.S file
         cout << source << endl;         // print result (for debugging purpose)
@@ -36,10 +46,11 @@ void GasCodeGenerator::visit(Program *node) {
 }
 
 void GasCodeGenerator::visit(Function *node) {
-    funcName = node->id;
+    funcName = node->id;                    // Function name used for anything function related including
+                                            // names and labels.
 
     if (funcName.compare("main") == 0) {    // Checks if we have a main
-        hasMain = true;
+        hasMain = true;                     // It is assumed a "multiple main" case have been caught if present
     }
 
     string globl = ".globl ";               // Build the globl
@@ -47,8 +58,8 @@ void GasCodeGenerator::visit(Function *node) {
     funcGlobl.push_back(globl);
     function += funcName;                   // Function entry
     function += ":\n";
-    function += "pushl %ebp\n";
-    function += "movl %esp, %ebp\n";
+    function += "pushl %ebp\n";             // Save base pointer
+    function += "movl %esp, %ebp\n";        // and move stack pointer
     function += ".";
     function += funcName;
     function += "funcstart:\n";
@@ -56,7 +67,7 @@ void GasCodeGenerator::visit(Function *node) {
     caseCount = 0;
     cases = node->cases.size();             // Get number of cases
 
-    for (auto funcCase : node->cases) {
+    for (auto funcCase : node->cases) {     // Build cases
         funcCase->accept(this);
     }
 
@@ -75,19 +86,19 @@ void GasCodeGenerator::visit(Function *node) {
         function += "ret\n";
     }
 
-    funcVector.push_back(function);
+    funcVector.push_back(function);         // adds function to vector with completed functions
 
-    function.clear();
+    function.clear();                       // Prepare string variable for next function
 }
 
 void GasCodeGenerator::visit(Case *node) {
     caseCount++;
-    int argc = node->patterns.size();
 
     if (cases == caseCount) {   // Default case
         function += ".";
         function += funcName;
         function += "casedefault:\n";
+        function += "FUNCTIONBODY\n";   // TODO: build function body
     } else {                    // Other cases
         function += ".";
         function += funcName;
@@ -95,9 +106,39 @@ void GasCodeGenerator::visit(Case *node) {
         function += to_string(caseCount);
         function += ":\n";
 
-        for (auto p : node->patterns) {
-            p->accept(this);
+        int argNum = 0;                         // first argument have index 0
+        for (auto c : node->patterns) {
+            c->accept(this);                    // Gets the pattern, and puts it in "helper"
+
+            cout << "Working on pattern" << endl;
+
+            if (helper.n.compare("Int") == 0) {     // Case where pattern is an Int
+                // Compare input argument with pattern
+                function += "cmpl $";
+                function += helper.v;
+                function += ", ";
+                int mempos = argNum*4+8;            // Stack starts at 8, each arg with 4 space
+                function += to_string(mempos);
+                function += "(%ebp)\n";
+
+                argNum++;                           // Prepare for next argument
+
+                // If not different move on
+                function += "jne .";
+                function += funcName;
+                function += "case";
+                if (caseCount + 1 == cases) {       // Last case is called default
+                    function += "default";
+                } else {
+                    function += to_string(caseCount + 1);
+                }
+                function += "\n";
+                helper = {};    // Resets struct
+                continue;
+            }
+            // repeat for all possebilities
         }
+        function += "FUNCTIONBODY\n";       // TODO: Build function body
     }
 
     cout << "CaseNotImplemented" << endl;
@@ -168,6 +209,8 @@ void GasCodeGenerator::visit(Not *node) {
 }
 
 void GasCodeGenerator::visit(Int *node) {
+    helper.n = "Int";
+    helper.v = to_string(node->value);
     cout << "IntNotImplemented" << endl;
 }
 

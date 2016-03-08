@@ -4,7 +4,6 @@
 #include <string>
 
 using namespace common;
-
 class GasCodeGenerator: public visitor::CodeGenerator
 {
 public:
