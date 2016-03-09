@@ -66,4 +66,27 @@ namespace common {
     void ListSplit::accept(Visitor *v) { v->visit(this); }
 
     void Type::accept(Visitor *v) { v->visit(this); }
+
+    bool Type::operator==(const Type &other) const {
+        if (this->type == other.type){
+            switch (this->type) {
+                case LIST:
+                    return this->types[0] == other.types[0];
+                case SIGNATURE:
+                case TUPLE:
+                    if (this->types.size() != other.types.size())
+                        return false;
+
+                    for (int i = 0; i < this->types.size(); ++i) {
+                        if (this->types[i] != other.types[i]){
+                            return false;
+                        }
+                    }
+                default:
+                    return true;
+            }
+        } else {
+            return false;
+        }
+    }
 }

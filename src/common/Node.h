@@ -364,5 +364,6 @@ namespace common {
 		Type(TypeEnum t, std::vector<Type *> *ts) { type = t; types = *ts; }
 
 		virtual void accept(Visitor *v);
+		bool operator==(const Type &other) const;
 	};
 }

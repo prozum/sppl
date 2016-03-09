@@ -2,8 +2,16 @@
 #include "CodeGenerator.h"
 #include "Node.h"
 #include <string>
+#include <unordered_map>
+#include <vector>
 
 using namespace common;
+using namespace std;
+
+enum IdContext {
+    PATTERN,
+    EXPR
+};
 
 class CCodeGenerator: public visitor::CodeGenerator
 {
@@ -79,4 +87,7 @@ class CCodeGenerator: public visitor::CodeGenerator
 
         int arg_count = 0;
         bool is_return = false;
+        unordered_map<string, string> real_ids;
+        vector<string> arg_names;
+        IdContext context;
 };
