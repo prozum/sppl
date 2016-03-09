@@ -24,7 +24,7 @@ namespace common {
 
 	class Node {
 	public:
-		Node *parent;
+	Type* node_type;
 
 		virtual void accept(Visitor *v) = 0;
 

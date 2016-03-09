@@ -5,8 +5,13 @@
 #include "TypeChecker.h"
 #include "Node.h"
 #include <vector>
+#include <bits/unordered_map.h>
+#include "Scope.h"
 
 using namespace std;
+
+
+
 
 void TypeChecker::visit(Program *node) {
     /* Visit all children */
@@ -109,7 +114,11 @@ void TypeChecker::visit(NotEqual *node) {
     /* Visit stops here */
 
     /* Code goes here */
-
+    if(check_types(node->left->node_type, node->right->node_type)){
+        node->node_type = new Type(BOOL);
+    } else {
+        throw "Bad programmer exception";
+    }
 
     /* Code stops here */
 }
@@ -126,7 +135,12 @@ void TypeChecker::visit(Lesser *node) {
     /* Visit stops here */
 
     /* Code goes here */
-
+    if(node->left->node_type->type == INT && node->right->node_type->type == INT ||
+       node->left->node_type->type == FLOAT && node->right->node_type->type == FLOAT){
+        node->node_type = new Type(BOOL);
+    } else {
+        throw "Bad programmer exception";
+    }
 
     /* Code stops here */
 }
@@ -143,8 +157,12 @@ void TypeChecker::visit(Greater *node) {
     /* Visit stops here */
 
     /* Code goes here */
-
-
+    if(node->left->node_type->type == INT && node->right->node_type->type == INT ||
+       node->left->node_type->type == FLOAT && node->right->node_type->type == FLOAT){
+        node->node_type = new Type(BOOL);
+    } else {
+        throw "Bad programmer exception";
+    }
     /* Code stops here */
 }
 
@@ -160,7 +178,12 @@ void TypeChecker::visit(LesserEq *node) {
     /* Visit stops here */
 
     /* Code goes here */
-
+    if(node->left->node_type->type == INT && node->right->node_type->type == INT ||
+       node->left->node_type->type == FLOAT && node->right->node_type->type == FLOAT){
+        node->node_type = new Type(BOOL);
+    } else {
+        throw "Bad programmer exception";
+    }
 
     /* Code stops here */
 }
@@ -177,7 +200,12 @@ void TypeChecker::visit(GreaterEq *node) {
     /* Visit stops here */
 
     /* Code goes here */
-
+    if(node->left->node_type->type == INT && node->right->node_type->type == INT ||
+       node->left->node_type->type == FLOAT && node->right->node_type->type == FLOAT){
+        node->node_type = new Type(BOOL);
+    } else {
+        throw "Bad programmer exception";
+    }
 
     /* Code stops here */
 }
@@ -194,7 +222,12 @@ void TypeChecker::visit(Add *node) {
     /* Visit stops here */
 
     /* Code goes here */
-
+    if(node->left->node_type->type == INT && node->right->node_type->type == INT ||
+       node->left->node_type->type == FLOAT && node->right->node_type->type == FLOAT){
+        node->node_type = node->left->node_type;
+    } else {
+        throw "Bad programmer exception";
+    }
 
     /* Code stops here */
 }
@@ -211,7 +244,12 @@ void TypeChecker::visit(Sub *node) {
     /* Visit stops here */
 
     /* Code goes here */
-
+    if(node->left->node_type->type == INT && node->right->node_type->type == INT ||
+       node->left->node_type->type == FLOAT && node->right->node_type->type == FLOAT){
+        node->node_type = node->left->node_type;
+    } else {
+        throw "Bad programmer exception";
+    }
 
     /* Code stops here */
 }
@@ -228,7 +266,12 @@ void TypeChecker::visit(Mul *node) {
     /* Visit stops here */
 
     /* Code goes here */
-
+    if(node->left->node_type->type == INT && node->right->node_type->type == INT ||
+       node->left->node_type->type == FLOAT && node->right->node_type->type == FLOAT){
+        node->node_type = node->left->node_type;
+    } else {
+        throw "Bad programmer exception";
+    }
 
     /* Code stops here */
 }
@@ -245,7 +288,12 @@ void TypeChecker::visit(Div *node) {
     /* Visit stops here */
 
     /* Code goes here */
-
+    if(node->left->node_type->type == INT && node->right->node_type->type == INT ||
+       node->left->node_type->type == FLOAT && node->right->node_type->type == FLOAT){
+        node->node_type = node->left->node_type;
+    } else {
+        throw "Bad programmer exception";
+    }
 
     /* Code stops here */
 }
@@ -262,7 +310,12 @@ void TypeChecker::visit(Mod *node) {
     /* Visit stops here */
 
     /* Code goes here */
-
+    if(node->left->node_type->type == INT && node->right->node_type->type == INT ||
+       node->left->node_type->type == FLOAT && node->right->node_type->type == FLOAT){
+        node->node_type = node->left->node_type;
+    } else {
+        throw "Bad programmer exception";
+    }
 
     /* Code stops here */
 }
@@ -279,7 +332,15 @@ void TypeChecker::visit(ListAdd *node) {
     /* Visit stops here */
 
     /* Code goes here */
-
+    if(node->right->node_type->type == LIST){
+        if(check_types(node->left->node_type, node->right->node_type->types[0])){
+            node->node_type = node->right->node_type;
+        } else {
+            throw "Not same type m8";
+        }
+    } else {
+        throw "Not a list m8";
+    }
 
     /* Code stops here */
 }
@@ -295,8 +356,7 @@ void TypeChecker::visit(Par *node) {
     /* Visit stops here */
 
     /* Code goes here */
-
-
+    node->node_type = node->child->node_type;
     /* Code stops here */
 }
 
@@ -311,42 +371,45 @@ void TypeChecker::visit(Not *node) {
     /* Visit stops here */
 
     /* Code goes here */
-
-
+    if(node->child->node_type->type == BOOL){
+        node->node_type = node->child->node_type;
+    } else {
+        throw " YA DUN FUKD IT UP";
+    }
     /* Code stops here */
 }
 
 void TypeChecker::visit(Int *node) {
     /* Code goes here */
-
+    node -> node_type = new Type(INT);
 
     /* Code stops here */
 }
 
 void TypeChecker::visit(Float *node) {
     /* Code goes here */
-
+    node -> node_type = new Type(FLOAT);
 
     /* Code stops here */
 }
 
 void TypeChecker::visit(Bool *node) {
     /* Code goes here */
-
+    node -> node_type = new Type(BOOL);
 
     /* Code stops here */
 }
 
 void TypeChecker::visit(Char *node) {
     /* Code goes here */
-
+    node -> node_type = new Type(CHAR);
 
     /* Code stops here */
 }
 
 void TypeChecker::visit(String *node) {
     /* Code goes here */
-
+    node -> node_type = new Type(STRING);
 
     /* Code stops here */
 }
@@ -440,11 +503,20 @@ void TypeChecker::visit(Tuple *node) {
     /* Code stops here */
 }
 
+
 void TypeChecker::visit(Id *node) {
     /* Code goes here */
-
-
+    node->node_type = get_type(node, node->scope);
     /* Code stops here */
+}
+
+Type* TypeChecker::get_type(Id *node, Scope *scope){
+    auto got = scope->decls.find(node->id);
+    if(got == scope->decls.end()){
+        return get_type(node, scope->parent);
+    } else {
+        return got->second;
+    }
 }
 
 void TypeChecker::visit(Call *node) {
