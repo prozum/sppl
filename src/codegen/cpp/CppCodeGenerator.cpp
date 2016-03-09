@@ -4,9 +4,6 @@
 using namespace common;
 using namespace std;
 
-int arg_count = 0;
-bool is_return = false;
-
 CCodeGenerator::CCodeGenerator(std::ostream &os) : visitor::CodeGenerator::CodeGenerator(os), os(os)
 {
 }
