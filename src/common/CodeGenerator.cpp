@@ -2,7 +2,7 @@
 
 namespace common {
 
-    CodeGenerator::CodeGenerator() {
+    CodeGenerator::CodeGenerator(std::ostream &out) : output(out) {
 
     }
 }

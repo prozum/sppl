@@ -12,7 +12,9 @@ int main(int argc, char *argv[])
     ifstream in(argv[1]);
     ofstream out(argv[2]);
 
-    Compiler compiler(in, out);
+    compiler::Compiler compiler(in, out);
+
+    compiler.compile();
 
     return 0;
 }

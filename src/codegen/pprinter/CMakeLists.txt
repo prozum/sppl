@@ -1,2 +1,2 @@
-add_library(ppc Printer.cpp Printer.h)
-target_link_libraries(ppc visitor common)
+add_library(pprinter Printer.cpp Printer.h)
+target_link_libraries(pprinter common)
