@@ -1,7 +1,8 @@
+#include <gnuasm/GasCodeGenerator.h>
 #include "Compiler.h"
 
 #include "Driver.h"
-#include "pprinter/Printer.h"
+#include "Printer.h"
 
 namespace compiler {
 
@@ -10,6 +11,9 @@ namespace compiler {
         parser::Driver driver;
 
         driver.parse_stream(input);
+
+        GasCodeGenerator gen(output);
+        gen.visit(driver.main);
 
         // visitor::Printer v;
 
