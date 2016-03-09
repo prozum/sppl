@@ -18,7 +18,7 @@ option(CLLVM "LLVM Intermediate Representation" OFF)
 include_directories(
         src/common
         src/parser
-        src/visitor
+        src/compiler
         src/codegen
 )
 

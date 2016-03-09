@@ -2,10 +2,9 @@
 #include <iostream>
 #include <string>
 
-using namespace common;
 using namespace std;
 
-namespace visitor {
+namespace common {
 
     void Optimizer::visit(Program *node)
     {

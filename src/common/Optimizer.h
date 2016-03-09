@@ -5,11 +5,10 @@
 #include "Visitor.h"
 #include "Node.h"
 
-using namespace common;
 
-namespace visitor {
+namespace common {
 
-    class Optimizer : public common::Visitor {
+    class Optimizer : public Visitor {
 
         void visit(Program *node);
 

@@ -1,28 +1,26 @@
-#include <gnuasm/GasCodeGenerator.h>
 #include "Compiler.h"
 
-#include "Driver.h"
-#include "Printer.h"
 
 namespace compiler {
 
-    void Compiler::compile(std::istream &input,
-                           std::ostream &output) {
-        parser::Driver driver;
+    Compiler::Compiler(std::istream *in, std::ostream *out)
+    {
+        input = in;
+        output = out;
+    }
+
+    void Compiler::set_codegener
+
+    void Compiler::compile() {
 
         driver.parse_stream(input);
 
-        GasCodeGenerator gen(output);
-        gen.visit(driver.main);
+        generator->output = output;
 
-        // visitor::Printer v;
-
-        // v.visit(driver.main);
-
-        // std::cout << v.res << std::endl;
+        generator->visit(driver.main);
     }
 
-    Compiler::Compiler() {
-
+    T Compiler::generator(ostream &out) {
+        return nullptr;
     }
 }
