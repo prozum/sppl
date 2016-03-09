@@ -5,7 +5,7 @@
 using namespace common;
 using namespace std;
 
-namespace visitor {
+namespace codegen {
     class Printer : public Visitor {
     public:
         string res;
