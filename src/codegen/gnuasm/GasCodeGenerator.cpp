@@ -29,7 +29,7 @@ namespace codegen {
 
     argHelper_t helper;         // Multipurpose helper struct
 
-    GasCodeGenerator::GasCodeGenerator(std::ostream &os) : visitor::CodeGenerator::CodeGenerator(os), os(os) {
+    GasCodeGenerator::GasCodeGenerator(std::ostream &os) : common::CodeGenerator::CodeGenerator(os), os(os) {
     }
 
     void GasCodeGenerator::visit(Program *node) {

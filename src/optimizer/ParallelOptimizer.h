@@ -1,15 +1,17 @@
 #pragma once
 
+#include "Visitor.h"
+#include "Optimizer.h"
+#include "Node.h"
+
 #include <ostream>
 #include <string>
-#include "Visitor.h"
-#include "Node.h"
 
 using namespace common;
 
-namespace visitor {
+namespace optimizer {
 
-    class Optimizer : public common::Visitor {
+    class ParallelOptimizer : public Optimizer {
 
         void visit(Program *node);
 
@@ -75,5 +77,4 @@ namespace visitor {
 
         void visit(Type *node);
     };
-
 }

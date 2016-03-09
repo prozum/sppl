@@ -1,5 +1,5 @@
 #include "TypeChecker.h"
 
-namespace visitor {
+namespace common {
 
 }

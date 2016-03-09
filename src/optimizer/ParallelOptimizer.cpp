@@ -1,11 +1,12 @@
-#include "Optimizer.h"
+#include "ParallelOptimizer.h"
+
 #include <iostream>
 #include <string>
 
-using namespace common;
 using namespace std;
+using namespace common;
 
-namespace visitor {
+namespace optimizer {
 
     void Optimizer::visit(Program *node)
     {
@@ -160,5 +161,4 @@ namespace visitor {
     void Optimizer::visit(Type *node)
     {
     }
-
 }

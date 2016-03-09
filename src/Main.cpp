@@ -1,9 +1,8 @@
-#include "compiler/Compiler.h"
+#include "Compiler.h"
 
 #include <fstream>
 
 using namespace std;
-using namespace compiler;
 
 int main(int argc, char *argv[])
 {
@@ -13,7 +12,9 @@ int main(int argc, char *argv[])
     ifstream in(argv[1]);
     ofstream out(argv[2]);
 
-    Compiler::compile(in, out);
+    compiler::Compiler compiler(in, out);
+
+    compiler.compile();
 
     return 0;
 }

@@ -76,4 +76,7 @@ class CCodeGenerator: public visitor::CodeGenerator
 
     private:
         std::ostream &os;
+
+        int arg_count = 0;
+        bool is_return = false;
 };

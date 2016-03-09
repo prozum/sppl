@@ -7,7 +7,7 @@ using namespace common;
 
 namespace codegen {
 
-    class GasCodeGenerator: public visitor::CodeGenerator
+    class GasCodeGenerator: public CodeGenerator
     {
     public:
         GasCodeGenerator(std::ostream &);
