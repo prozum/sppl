@@ -1,2 +1,2 @@
-add_subdirectory(type)
-add_subdirectory(scope)
+add_library(typecheck TypeChecker.cpp ScopeGenerator.cpp TypeChecker.h ScopeGenerator.h)
+target_link_libraries(typecheck common)

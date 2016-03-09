@@ -1,2 +1,2 @@
-add_subdirectory(general)
-add_subdirectory(parallel)
+add_library(optimizer GeneralOptimizer.cpp ParallelOptimizer.cpp GeneralOptimizer.h ParallelOptimizer.h)
+target_link_libraries(optimizer common)
