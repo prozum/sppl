@@ -27,9 +27,6 @@ namespace common {
 		Node *parent;
 
 		virtual void accept(Visitor *v) = 0;
-
-        //indicates if the node can be parallelized
-        bool par = false;
 	};
 
 	class Expr : public Node {
@@ -347,6 +344,9 @@ namespace common {
 	public:
 		Expr *callee;
 		std::vector<Expr*> exprs;
+
+        //indicates if the call should be parallelized
+        bool par = false;
 
 		Call() { }
 		Call(Expr *c) { callee = c; }
