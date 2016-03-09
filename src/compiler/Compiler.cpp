@@ -1,3 +1,4 @@
+#include <gnuasm/GasCodeGenerator.h>
 #include "Compiler.h"
 
 #include "Driver.h"
@@ -11,11 +12,14 @@ namespace compiler {
 
         driver.parse_stream(input);
 
-        visitor::Printer v;
+        GasCodeGenerator gen(output);
+        gen.visit(driver.main);
 
-        v.visit(driver.main);
+        // visitor::Printer v;
 
-        std::cout << v.res << std::endl;
+        // v.visit(driver.main);
+
+        // std::cout << v.res << std::endl;
     }
 
     Compiler::Compiler() {

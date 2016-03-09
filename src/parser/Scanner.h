@@ -38,5 +38,4 @@ namespace parser {
 
         void set_debug(bool b);
     };
-
 }

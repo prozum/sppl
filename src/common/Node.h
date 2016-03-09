@@ -27,6 +27,9 @@ namespace common {
 		Node *parent;
 
 		virtual void accept(Visitor *v) = 0;
+
+        //indicates if the node can be parallelized
+        bool par = false;
 	};
 
 	class Expr : public Node {

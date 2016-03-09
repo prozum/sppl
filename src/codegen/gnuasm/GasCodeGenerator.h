@@ -1,15 +1,16 @@
 #pragma once
-
-#include <ostream>
-#include <string>
-#include "Visitor.h"
+#include "CodeGenerator.h"
 #include "Node.h"
+#include <string>
 
 using namespace common;
 
-namespace visitor {
+namespace codegen {
 
-    class Optimizer : public common::Visitor {
+    class GasCodeGenerator: public visitor::CodeGenerator
+    {
+    public:
+        GasCodeGenerator(std::ostream &);
 
         void visit(Program *node);
 
@@ -74,6 +75,10 @@ namespace visitor {
         void visit(Call *node);
 
         void visit(Type *node);
-    };
 
+    private:
+        std::ostream &os;
+        string get_type(Type *);
+        string buildSource();
+    };
 }
