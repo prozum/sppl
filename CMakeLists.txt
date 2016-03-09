@@ -13,16 +13,16 @@ option(CC "C++ Compiler" OFF)
 option(CHASKELL "Haskell Compiler" OFF)
 option(CGNUASM "GNU Assembly Compiler" OFF)
 option(CLLVM "LLVM Intermediate Representation" OFF)
-option(SCOPE "Scope Generator Sample" OFF)
+#option(SCOPE "Scope Generator Sample" OFF)
 
 include_directories(
         src/common
         src/parser
         src/visitor
-        src/compiler
+        src/codegen
 )
 
 add_subdirectory(src)
-add_subdirectory(samples)
+#add_subdirectory(samples)
 add_subdirectory(tools)
 add_subdirectory(tests)
