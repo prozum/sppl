@@ -3,7 +3,7 @@
 
 using namespace std;
 
-namespace visitor {
+namespace codegen {
 
     void Printer::visit(Program *node) {
         res = "";

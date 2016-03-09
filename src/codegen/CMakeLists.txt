@@ -12,6 +12,3 @@ if(CLLVM)
 endif()
 
 add_subdirectory(pprinter)
-
-add_library(codegen)
-target_link_libraries(codegen cgnuasm pp)

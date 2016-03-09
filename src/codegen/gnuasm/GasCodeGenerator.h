@@ -4,77 +4,81 @@
 #include <string>
 
 using namespace common;
-class GasCodeGenerator: public visitor::CodeGenerator
-{
-public:
-    GasCodeGenerator(std::ostream &);
 
-    void visit(Program *node);
+namespace codegen {
 
-    void visit(Function *node);
+    class GasCodeGenerator: public visitor::CodeGenerator
+    {
+    public:
+        GasCodeGenerator(std::ostream &);
 
-    void visit(Case *node);
+        void visit(Program *node);
 
-    void visit(Or *node);
+        void visit(Function *node);
 
-    void visit(And *node);
+        void visit(Case *node);
 
-    void visit(Equal *node);
+        void visit(Or *node);
 
-    void visit(NotEqual *node);
+        void visit(And *node);
 
-    void visit(Lesser *node);
+        void visit(Equal *node);
 
-    void visit(Greater *node);
+        void visit(NotEqual *node);
 
-    void visit(LesserEq *node);
+        void visit(Lesser *node);
 
-    void visit(GreaterEq *node);
+        void visit(Greater *node);
 
-    void visit(Add *node);
+        void visit(LesserEq *node);
 
-    void visit(Sub *node);
+        void visit(GreaterEq *node);
 
-    void visit(Mul *node);
+        void visit(Add *node);
 
-    void visit(Div *node);
+        void visit(Sub *node);
 
-    void visit(Mod *node);
+        void visit(Mul *node);
 
-    void visit(ListAdd *node);
+        void visit(Div *node);
 
-    void visit(Par *node);
+        void visit(Mod *node);
 
-    void visit(Not *node);
+        void visit(ListAdd *node);
 
-    void visit(Int *node);
+        void visit(Par *node);
 
-    void visit(Float *node);
+        void visit(Not *node);
 
-    void visit(Bool *node);
+        void visit(Int *node);
 
-    void visit(Char *node);
+        void visit(Float *node);
 
-    void visit(String *node);
+        void visit(Bool *node);
 
-    void visit(ListPattern *node);
+        void visit(Char *node);
 
-    void visit(TuplePattern *node);
+        void visit(String *node);
 
-    void visit(ListSplit *node);
+        void visit(ListPattern *node);
 
-    void visit(List *node);
+        void visit(TuplePattern *node);
 
-    void visit(Tuple *node);
+        void visit(ListSplit *node);
 
-    void visit(Id *node);
+        void visit(List *node);
 
-    void visit(Call *node);
+        void visit(Tuple *node);
 
-    void visit(Type *node);
+        void visit(Id *node);
 
-private:
-    std::ostream &os;
-    string get_type(Type *);
-    string buildSource();
-};
+        void visit(Call *node);
+
+        void visit(Type *node);
+
+    private:
+        std::ostream &os;
+        string get_type(Type *);
+        string buildSource();
+    };
+}
