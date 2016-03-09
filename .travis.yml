@@ -46,7 +46,7 @@ addons:
       name: "prozum/sppl"
       description: "Build submitted via Travis CI"
     notification_email: nimoov@prozum.dk
-    build_command_prepend: "cov-configure --compiler /usr/bin/g++ --comptype gcc"
+    build_command_prepend: "cov-configure --gcc --compiler /usr/bin/g++ --comptype gcc"
     build_command:   "make -j 8"
     branch_pattern: coverity
 
