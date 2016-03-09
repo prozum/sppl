@@ -4,379 +4,381 @@
 using namespace std;
 
 namespace codegen {
-
-    void Printer::visit(Program *node) {
-        res = "";
-
+    Printer::Printer(ostream &os) 
+            : CodeGenerator::CodeGenerator(os)
+    {
+    }
+    
+    void Printer::visit(Program &node) {
         cout << "Program " << endl;
 
-        for (Node *func : node->funcs) {
-            func->accept(this);
+        for (Node *func : node.funcs) {
+            func->accept(*this);
         }
     }
 
-    void Printer::visit(Function *node) {
-        cout << "Function " << node->id << endl;
+    void Printer::visit(Function &node) {
+        cout << "Function " << node.id << endl;
 
-        res.append("def ");
-        res.append(node->id);
-        res.append(" : ");
+        output << "def ";
+        output << node.id;
+        output << " : ";
 
-        for (auto & p: node->types) {
-            p->accept(this);
-            if (p != node->types.back())
-                res.append(" -> ");
+        for (auto & p: node.types) {
+            p->accept(*this);
+            if (p != node.types.back())
+                output << " -> ";
         }
 
-        res.append("\n");
+        output << "\n";
 
-        for (Node *_case : node->cases) {
-            _case->accept(this);
-            res.append("\n");
+        for (Node *_case : node.cases) {
+            _case->accept(*this);
+            output << "\n";
         }
 
-        res.append("\n");
+        output << "\n";
     }
 
-    void Printer::visit(Case *node) {
+    void Printer::visit(Case &node) {
 
         cout << "Case" << endl;
 
-        res.append("\t| ");
+        output << "\t| ";
 
-        for (auto & p: node->patterns) {
-            p->accept(this);
-            if (p != node->patterns.back())
-                res.append(" ");
+        for (auto & p: node.patterns) {
+            p->accept(*this);
+            if (p != node.patterns.back())
+                output << " ";
         }
 
-        res.append(" = ");
+        output << " = ";
 
-        node->expr->accept(this);
+        node.expr->accept(*this);
     }
 
-    void Printer::visit(Or *node) {
+    void Printer::visit(Or &node) {
 
         cout << "Or" << endl;
 
-        node->left->accept(this);
-        res.append(" || ");
-        node->right->accept(this);
+        node.left->accept(*this);
+        output << " || ";
+        node.right->accept(*this);
     }
 
-    void Printer::visit(And *node) {
+    void Printer::visit(And &node) {
 
         cout << "And" << endl;
 
-        node->left->accept(this);
-        res.append(" && ");
-        node->right->accept(this);
+        node.left->accept(*this);
+        output << " && ";
+        node.right->accept(*this);
     }
 
-    void Printer::visit(Equal *node) {
+    void Printer::visit(Equal &node) {
 
         cout << "Equal" << endl;
 
-        node->left->accept(this);
-        res.append(" == ");
-        node->right->accept(this);
+        node.left->accept(*this);
+        output << " == ";
+        node.right->accept(*this);
     }
 
-    void Printer::visit(NotEqual *node) {
+    void Printer::visit(NotEqual &node) {
 
         cout << "Not Equal" << endl;
 
-        node->left->accept(this);
-        res.append(" != ");
-        node->right->accept(this);
+        node.left->accept(*this);
+        output << " != ";
+        node.right->accept(*this);
     }
 
-    void Printer::visit(Lesser *node) {
+    void Printer::visit(Lesser &node) {
 
         cout << "Lesser" << endl;
 
-        node->left->accept(this);
-        res.append(" < ");
-        node->right->accept(this);
+        node.left->accept(*this);
+        output << " < ";
+        node.right->accept(*this);
     }
 
-    void Printer::visit(Greater *node) {
+    void Printer::visit(Greater &node) {
 
         cout << "Greater" << endl;
 
-        node->left->accept(this);
-        res.append(" > ");
-        node->right->accept(this);
+        node.left->accept(*this);
+        output << " > ";
+        node.right->accept(*this);
     }
 
-    void Printer::visit(LesserEq *node) {
+    void Printer::visit(LesserEq &node) {
 
         cout << "LesserEq" << endl;
 
-        node->left->accept(this);
-        res.append(" <= ");
-        node->right->accept(this);
+        node.left->accept(*this);
+        output << " <= ";
+        node.right->accept(*this);
     }
 
-    void Printer::visit(GreaterEq *node) {
+    void Printer::visit(GreaterEq &node) {
 
         cout << "GreaterEq" << endl;
 
-        node->left->accept(this);
-        res.append(" >= ");
-        node->right->accept(this);
+        node.left->accept(*this);
+        output << " >= ";
+        node.right->accept(*this);
     }
 
-    void Printer::visit(Add *node) {
+    void Printer::visit(Add &node) {
 
         cout << "Add" << endl;
 
-        node->left->accept(this);
-        res.append(" + ");
-        node->right->accept(this);
+        node.left->accept(*this);
+        output << " + ";
+        node.right->accept(*this);
     }
 
-    void Printer::visit(Sub *node) {
+    void Printer::visit(Sub &node) {
 
         cout << "Sub" << endl;
 
-        node->left->accept(this);
-        res.append(" - ");
-        node->right->accept(this);
+        node.left->accept(*this);
+        output << " - ";
+        node.right->accept(*this);
     }
 
-    void Printer::visit(Mul *node) {
+    void Printer::visit(Mul &node) {
 
         cout << "Mul" << endl;
 
-        node->left->accept(this);
-        res.append(" * ");
-        node->right->accept(this);
+        node.left->accept(*this);
+        output << " * ";
+        node.right->accept(*this);
     }
 
-    void Printer::visit(Div *node) {
+    void Printer::visit(Div &node) {
 
         cout << "Div" << endl;
 
-        node->left->accept(this);
-        res.append(" / ");
-        node->right->accept(this);
+        node.left->accept(*this);
+        output << " / ";
+        node.right->accept(*this);
     }
 
-    void Printer::visit(Mod *node) {
+    void Printer::visit(Mod &node) {
 
         cout << "Mod" << endl;
 
-        node->left->accept(this);
-        res.append(" % ");
-        node->right->accept(this);
+        node.left->accept(*this);
+        output << " % ";
+        node.right->accept(*this);
     }
 
-    void Printer::visit(ListAdd *node) {
+    void Printer::visit(ListAdd &node) {
 
         cout << "ListAdd" << endl;
 
-        node->left->accept(this);
-        res.append(" : ");
-        node->right->accept(this);
+        node.left->accept(*this);
+        output << " : ";
+        node.right->accept(*this);
     }
 
-    void Printer::visit(Par *node) {
+    void Printer::visit(Par &node) {
 
         cout << "Par" << endl;
 
-        res.append("(");
-        node->child->accept(this);
-        res.append(")");
+        output << "(";
+        node.child->accept(*this);
+        output << ")";
     }
 
-    void Printer::visit(Not *node) {
+    void Printer::visit(Not &node) {
 
         cout << "Not" << endl;
 
-        res.append("!");
-        node->child->accept(this);
+        output << "!";
+        node.child->accept(*this);
     }
 
-    void Printer::visit(Int *node) {
+    void Printer::visit(Int &node) {
 
         cout << "Int" << endl;
 
-        res.append(to_string(node->value));
+        output << node.value;
     }
 
-    void Printer::visit(Float *node) {
+    void Printer::visit(Float &node) {
 
         cout << "Float" << endl;
 
-        res.append(to_string(node->value));
+        output << node.value;
     }
 
-    void Printer::visit(Bool *node) {
+    void Printer::visit(Bool &node) {
 
         cout << "Bool" << endl;
 
-        res.append((node->value) ? "True" : "False");
+        output << (node.value) ? "True" : "False";
     }
 
-    void Printer::visit(Char *node) {
+    void Printer::visit(Char &node) {
 
         cout << "Char" << endl;
 
-        res.append("'");
-        res.append(to_string(node->value));
-        res.append("'");
+        output << "'";
+        output << node.value;
+        output << "'";
     }
 
-    void Printer::visit(String *node) {
+    void Printer::visit(String &node) {
 
         cout << "String" << endl;
 
-        res.append("\"");
-        res.append(node->value);
-        res.append("\"");
+        output << "\"";
+        output << node.value;
+        output << "\"";
     }
 
-    void Printer::visit(List *node) {
+    void Printer::visit(List &node) {
 
         cout << "List" << endl;
 
-        res.append("[");
+        output << "[";
 
-        for (auto & p: node->exprs) {
-            p->accept(this);
-            if (p != node->exprs.back())
-                res.append(", ");
+        for (auto & p: node.exprs) {
+            p->accept(*this);
+            if (p != node.exprs.back())
+                output << ", ";
         }
 
-        res.append("]");
+        output << "]";
     }
 
-    void Printer::visit(Tuple *node) {
+    void Printer::visit(Tuple &node) {
 
         cout << "Tuple" << endl;
 
-        res.append("(");
+        output << "(";
 
-        for (auto & p: node->exprs) {
-            p->accept(this);
-            if (p != node->exprs.back())
-                res.append(", ");
+        for (auto & p: node.exprs) {
+            p->accept(*this);
+            if (p != node.exprs.back())
+                output << ", ";
         }
 
-        res.append(")");
+        output << ")";
     }
 
-    void Printer::visit(Id *node) {
+    void Printer::visit(Id &node) {
 
         cout << "Id" << endl;
 
-        res.append(node->id);
+        output << node.id;
     }
 
-    void Printer::visit(Call *node) {
+    void Printer::visit(Call &node) {
 
-        cout << "Call " << node->exprs.size() << endl;
+        cout << "Call " << node.exprs.size() << endl;
 
-        node->callee->accept(this);
-        res.append("(");
+        node.callee->accept(*this);
+        output << "(";
 
-        for (auto & p: node->exprs) {
-            p->accept(this);
-            if (p != node->exprs.back())
-                res.append(", ");
+        for (auto & p: node.exprs) {
+            p->accept(*this);
+            if (p != node.exprs.back())
+                output << ", ";
         }
 
-        res.append(")");
+        output << ")";
     }
 
-    void Printer::visit(Type *node) {
+    void Printer::visit(Type &node) {
 
         cout << "Type" << endl;
 
-        switch (node->type) {
+        switch (node.type) {
             case INT:
-                res.append("Int");
+                output << "Int";
                 break;
             case FLOAT:
-                res.append("Float");
+                output << "Float";
                 break;
             case BOOL:
-                res.append("Bool");
+                output << "Bool";
                 break;
             case CHAR:
-                res.append("Char");
+                output << "Char";
                 break;
             case STRING:
-                res.append("String");
+                output << "String";
                 break;
             case LIST:
-                res.append("[");
-                node->types[0]->accept(this);
-                res.append("]");
+                output << "[";
+                node.types[0]->accept(*this);
+                output << "]";
                 break;
             case TUPLE:
-                res.append("(");
+                output << "(";
                 print_collection(node, ", ");
-                res.append(")");
+                output << ")";
                 break;
             case SIGNATURE:
-                res.append("(");
+                output << "(";
                 print_collection(node, " -> ");
-                res.append(")");
+                output << ")";
                 break;
             default:
                 break;
         }
     }
 
-    void Printer::print_collection(Type *node, const std::string split) {
+    void Printer::print_collection(Type &node, const std::string split) {
 
-        for (auto & p: node->types) {
-            p->accept(this);
-            if (p != node->types.back())
-                res.append(split);
+        for (auto & p: node.types) {
+            p->accept(*this);
+            if (p != node.types.back())
+                output << split;
         }
     }
 
-    void Printer::visit(ListPattern *node) {
+    void Printer::visit(ListPattern &node) {
 
         cout << "ListPattern" << endl;
 
-        res.append("[");
+        output << "[";
 
-        for (auto & p: node->patterns) {
-            p->accept(this);
-            if (p != node->patterns.back())
-                res.append(", ");
+        for (auto & p: node.patterns) {
+            p->accept(*this);
+            if (p != node.patterns.back())
+                output << ", ";
         }
 
-        res.append("]");
+        output << "]";
     }
 
-    void Printer::visit(TuplePattern *node) {
+    void Printer::visit(TuplePattern &node) {
 
         cout << "TuplePattern" << endl;
 
-        res.append("(");
+        output << "(";
 
-        for (auto & p: node->patterns) {
-            p->accept(this);
-            if (p != node->patterns.back())
-                res.append(", ");
+        for (auto & p: node.patterns) {
+            p->accept(*this);
+            if (p != node.patterns.back())
+                output << ", ";
         }
 
-        res.append(")");
+        output << ")";
     }
 
-    void Printer::visit(ListSplit *node) {
+    void Printer::visit(ListSplit &node) {
 
         cout << "ListSplit" << endl;
 
-        res.append("(");
-        node->left->accept(this);
-        res.append(" : ");
-        node->right->accept(this);
-        res.append(")");
+        output << "(";
+        node.left->accept(*this);
+        output << " : ";
+        node.right->accept(*this);
+        output << ")";
     }
 }

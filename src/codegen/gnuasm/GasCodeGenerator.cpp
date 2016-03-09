@@ -32,11 +32,11 @@ namespace codegen {
     GasCodeGenerator::GasCodeGenerator(std::ostream &os) : common::CodeGenerator::CodeGenerator(os), os(os) {
     }
 
-    void GasCodeGenerator::visit(Program *node) {
+    void GasCodeGenerator::visit(Program &node) {
         // Visit all functions
 
-        for (auto func : node->funcs) {
-            func->accept(this);
+        for (auto func : node.funcs) {
+            func->accept(*this);
         }
 
         if (!hasMain) {
@@ -47,8 +47,8 @@ namespace codegen {
         }
     }
 
-    void GasCodeGenerator::visit(Function *node) {
-        funcName = node->id;                    // Function name used for anything function related including
+    void GasCodeGenerator::visit(Function &node) {
+        funcName = node.id;                    // Function name used for anything function related including
                                                 // names and labels.
 
         if (funcName.compare("main") == 0) {    // Checks if we have a main
@@ -67,10 +67,10 @@ namespace codegen {
         function += "funcstart:\n";
 
         caseCount = 0;
-        cases = node->cases.size();             // Get number of cases
+        cases = node.cases.size();             // Get number of cases
 
-        for (auto funcCase : node->cases) {     // Build cases
-            funcCase->accept(this);
+        for (auto funcCase : node.cases) {     // Build cases
+            funcCase->accept(*this);
         }
 
         function += ".";
@@ -93,7 +93,7 @@ namespace codegen {
         function.clear();                       // Prepare string variable for next function
     }
 
-    void GasCodeGenerator::visit(Case *node) {
+    void GasCodeGenerator::visit(Case &node) {
         caseCount++;
 
         if (cases == caseCount) {   // Default case
@@ -109,8 +109,8 @@ namespace codegen {
             function += ":\n";
 
             int argNum = 0;                         // first argument have index 0
-            for (auto c : node->patterns) {
-                c->accept(this);                    // Gets the pattern, and puts it in "helper"
+            for (auto c : node.patterns) {
+                c->accept(*this);                    // Gets the pattern, and puts it in "helper"
 
                 cout << "Working on pattern" << endl;
 
@@ -146,121 +146,121 @@ namespace codegen {
         cout << "CaseNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(Or *node) {
+    void GasCodeGenerator::visit(Or &node) {
         cout << "OrNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(And *node) {
+    void GasCodeGenerator::visit(And &node) {
         cout << "AndNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(Equal *node) {
+    void GasCodeGenerator::visit(Equal &node) {
         cout << "EqualNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(NotEqual *node) {
+    void GasCodeGenerator::visit(NotEqual &node) {
         cout << "NotEqualNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(Lesser *node) {
+    void GasCodeGenerator::visit(Lesser &node) {
         cout << "LesserNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(Greater *node) {
+    void GasCodeGenerator::visit(Greater &node) {
         cout << "GreaterNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(LesserEq *node) {
+    void GasCodeGenerator::visit(LesserEq &node) {
         cout << "LesserEqNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(GreaterEq *node) {
+    void GasCodeGenerator::visit(GreaterEq &node) {
         cout << "GreaterEqNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(Add *node) {
+    void GasCodeGenerator::visit(Add &node) {
         cout << "AddNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(Sub *node) {
+    void GasCodeGenerator::visit(Sub &node) {
         cout << "SubNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(Mul *node) {
+    void GasCodeGenerator::visit(Mul &node) {
         cout << "MulNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(Div *node) {
+    void GasCodeGenerator::visit(Div &node) {
         cout << "DivNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(Mod *node) {
+    void GasCodeGenerator::visit(Mod &node) {
         cout << "ModNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(ListAdd *node) {
+    void GasCodeGenerator::visit(ListAdd &node) {
         cout << "ListAddNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(Par *node) {
+    void GasCodeGenerator::visit(Par &node) {
         cout << "ParNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(Not *node) {
+    void GasCodeGenerator::visit(Not &node) {
         cout << "NotNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(Int *node) {
+    void GasCodeGenerator::visit(Int &node) {
         helper.n = "Int";
-        helper.v = to_string(node->value);
+        helper.v = to_string(node.value);
         cout << "IntNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(Float *node) {
+    void GasCodeGenerator::visit(Float &node) {
         cout << "FloatNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(Bool *node) {
+    void GasCodeGenerator::visit(Bool &node) {
         cout << "BoolNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(Char *node) {
+    void GasCodeGenerator::visit(Char &node) {
         cout << "CharNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(String *node) {
+    void GasCodeGenerator::visit(String &node) {
         cout << "StringNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(ListPattern *node) {
+    void GasCodeGenerator::visit(ListPattern &node) {
         cout << "ListPatternNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(TuplePattern *node) {
+    void GasCodeGenerator::visit(TuplePattern &node) {
         cout << "TuplePatternNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(ListSplit *node) {
+    void GasCodeGenerator::visit(ListSplit &node) {
         cout << "ListSplitNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(List *node) {
+    void GasCodeGenerator::visit(List &node) {
         cout << "ListNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(Tuple *node) {
+    void GasCodeGenerator::visit(Tuple &node) {
         cout << "TupleNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(Id *node) {
+    void GasCodeGenerator::visit(Id &node) {
         cout << "IdNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(Call *node) {
+    void GasCodeGenerator::visit(Call &node) {
         cout << "CallNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(Type *node) {
+    void GasCodeGenerator::visit(Type &node) {
         cout << "TypeNotImplemented" << endl;
     }
 

@@ -24,14 +24,14 @@ namespace common {
 
 	class Node {
 	public:
-	Type* node_type;
+		Type* node_type;
 
-		virtual void accept(Visitor *v) = 0;
+		virtual void accept(Visitor &v) = 0;
 	};
 
 	class Expr : public Node {
 	public:
-		virtual void accept(Visitor *v) = 0;
+		virtual void accept(Visitor &v) = 0;
 	};
 
 	class BinaryOp : public Expr {
@@ -39,19 +39,19 @@ namespace common {
 		Expr *left;
 		Expr *right;
 
-		virtual void accept(Visitor *v) = 0;
+		virtual void accept(Visitor &v) = 0;
 	};
 
 	class UnaryOp : public Expr {
 	public:
 		Expr *child;
 
-		virtual void accept(Visitor *v) = 0;
+		virtual void accept(Visitor &v) = 0;
 	};
 
 	class Pattern : public Expr {
 	public:
-		virtual void accept(Visitor *v) = 0;
+		virtual void accept(Visitor &v) = 0;
 	};
 
 	/* Declaration */
@@ -60,7 +60,7 @@ namespace common {
 	public:
 		std::vector<Function*> funcs;
 
-		virtual void accept(Visitor *v);
+		virtual void accept(Visitor &v);
 	};
 
 	class Function : public Node {
@@ -72,7 +72,7 @@ namespace common {
 		Function() { }
 		Function(std::string s) { id = s; }
 
-		virtual void accept(Visitor *v);
+		virtual void accept(Visitor &v);
 	};
 
 	class Case : public Node {
@@ -83,7 +83,7 @@ namespace common {
 		Case() { }
 		Case(Expr *e) { expr = e; }
 
-		virtual void accept(Visitor *v);
+		virtual void accept(Visitor &v);
 	};
 
 	/* Binary Operators */
@@ -94,7 +94,7 @@ namespace common {
 		Or() { }
 		Or(Expr *l, Expr *r) { left = l; right = r; }
 
-		virtual void accept(Visitor *v);
+		virtual void accept(Visitor &v);
 	};
 
 	class And : public BinaryOp {
@@ -103,7 +103,7 @@ namespace common {
 		And() { }
 		And(Expr *l, Expr *r) { left = l; right = r; }
 
-		virtual void accept(Visitor *v);
+		virtual void accept(Visitor &v);
 	};
 
 	class Equal : public BinaryOp {
@@ -112,7 +112,7 @@ namespace common {
 		Equal() { }
 		Equal(Expr *l, Expr *r) { left = l; right = r; }
 
-		virtual void accept(Visitor *v);
+		virtual void accept(Visitor &v);
 	};
 
 	class NotEqual : public BinaryOp {
@@ -121,7 +121,7 @@ namespace common {
 		NotEqual() { }
 		NotEqual(Expr *l, Expr *r) { left = l; right = r; }
 
-		virtual void accept(Visitor *v);
+		virtual void accept(Visitor &v);
 	};
 
 	class Lesser : public BinaryOp {
@@ -130,7 +130,7 @@ namespace common {
 		Lesser() { }
 		Lesser(Expr *l, Expr *r) { left = l; right = r; }
 
-		virtual void accept(Visitor *v);
+		virtual void accept(Visitor &v);
 	};
 
 	class Greater : public BinaryOp {
@@ -139,7 +139,7 @@ namespace common {
 		Greater() { }
 		Greater(Expr *l, Expr *r) { left = l; right = r; }
 
-		virtual void accept(Visitor *v);
+		virtual void accept(Visitor &v);
 	};
 
 	class LesserEq : public BinaryOp {
@@ -148,7 +148,7 @@ namespace common {
 		LesserEq() { }
 		LesserEq(Expr *l, Expr *r) { left = l; right = r; }
 
-		virtual void accept(Visitor *v);
+		virtual void accept(Visitor &v);
 	};
 
 	class GreaterEq : public BinaryOp {
@@ -157,7 +157,7 @@ namespace common {
 		GreaterEq() { }
 		GreaterEq(Expr *l, Expr *r) { left = l; right = r; }
 
-		virtual void accept(Visitor *v);
+		virtual void accept(Visitor &v);
 	};
 
 	class Add : public BinaryOp {
@@ -166,7 +166,7 @@ namespace common {
 		Add() { }
 		Add(Expr *l, Expr *r) { left = l; right = r; }
 
-		virtual void accept(Visitor *v);
+		virtual void accept(Visitor &v);
 	};
 
 	class Sub : public BinaryOp {
@@ -175,7 +175,7 @@ namespace common {
 		Sub() { }
 		Sub(Expr *l, Expr *r) { left = l; right = r; }
 
-		virtual void accept(Visitor *v);
+		virtual void accept(Visitor &v);
 	};
 
 	class Mul : public BinaryOp {
@@ -184,7 +184,7 @@ namespace common {
 		Mul() { }
 		Mul(Expr *l, Expr *r) { left = l; right = r; }
 
-		virtual void accept(Visitor *v);
+		virtual void accept(Visitor &v);
 	};
 
 	class Div : public BinaryOp {
@@ -193,7 +193,7 @@ namespace common {
 		Div() { }
 		Div(Expr *l, Expr *r) { left = l; right = r; }
 
-		virtual void accept(Visitor *v);
+		virtual void accept(Visitor &v);
 	};
 
 	class Mod : public BinaryOp {
@@ -202,7 +202,7 @@ namespace common {
 		Mod() { }
 		Mod(Expr *l, Expr *r) { left = l; right = r; }
 
-		virtual void accept(Visitor *v);
+		virtual void accept(Visitor &v);
 	};
 
 	class ListAdd : public BinaryOp {
@@ -211,7 +211,7 @@ namespace common {
 		ListAdd() { }
 		ListAdd(Expr *l, Expr *r) { left = l; right = r; }
 
-		virtual void accept(Visitor *v);
+		virtual void accept(Visitor &v);
 	};
 
 	/* Unary Operators */
@@ -222,7 +222,7 @@ namespace common {
 		Par() { }
 		Par(Expr *c) { child = c; }
 
-		virtual void accept(Visitor *v);
+		virtual void accept(Visitor &v);
 	};
 
 	class Not : public UnaryOp {
@@ -231,7 +231,7 @@ namespace common {
 		Not() { }
 		Not(Expr *c) { child = c; }
 
-		virtual void accept(Visitor *v);
+		virtual void accept(Visitor &v);
 	};
 
 	/* Literals */
@@ -243,7 +243,7 @@ namespace common {
 		Int() { }
 		Int(int v) { value = v; }
 
-		virtual void accept(Visitor *v);
+		virtual void accept(Visitor &v);
 	};
 
 	class Float : public Pattern {
@@ -253,7 +253,7 @@ namespace common {
 		Float() { }
 		Float(float v) { value = v; }
 
-		virtual void accept(Visitor *v);
+		virtual void accept(Visitor &v);
 	};
 
 	class Bool : public Pattern {
@@ -263,7 +263,7 @@ namespace common {
 		Bool() { }
 		Bool(bool v) { value = v; }
 
-		virtual void accept(Visitor *v);
+		virtual void accept(Visitor &v);
 	};
 
 	class Char : public Pattern {
@@ -275,7 +275,7 @@ namespace common {
 		Char(char v) { value = v; }
 		Char(std::string v) { tmp = v; }
 
-		virtual void accept(Visitor *v);
+		virtual void accept(Visitor &v);
 	};
 
 	class String : public Pattern {
@@ -285,21 +285,21 @@ namespace common {
 		String() { }
 		String(std::string v) { value = v; }
 
-		virtual void accept(Visitor *v);
+		virtual void accept(Visitor &v);
 	};
 
 	class ListPattern : public Pattern {
 	public:
 		std::vector<Pattern *> patterns;
 
-		virtual void accept(Visitor *v);
+		virtual void accept(Visitor &v);
 	};
 
 	class TuplePattern : public Pattern {
 	public:
 		std::vector<Pattern *> patterns;
 
-		virtual void accept(Visitor *v);
+		virtual void accept(Visitor &v);
 	};
 
 	class ListSplit : public Pattern {
@@ -310,7 +310,7 @@ namespace common {
 		ListSplit() { }
 		ListSplit(Pattern *l, Pattern *r) { left = l; right = r; }
 
-		virtual void accept(Visitor *v);
+		virtual void accept(Visitor &v);
 	};
 
 	/* Other Expressions */
@@ -319,14 +319,14 @@ namespace common {
 	public:
 		std::vector<Expr*> exprs;
 
-		virtual void accept(Visitor *v);
+		virtual void accept(Visitor &v);
 	};
 
 	class Tuple : public Expr {
 	public:
 		std::vector<Expr*> exprs;
 
-		virtual void accept(Visitor *v);
+		virtual void accept(Visitor &v);
 	};
 
 	class Id : public Pattern {
@@ -337,7 +337,7 @@ namespace common {
 		Id() { }
 		Id(std::string i) { id = i; }
 
-		virtual void accept(Visitor *v);
+		virtual void accept(Visitor &v);
 	};
 
 	class Call : public Expr {
@@ -351,7 +351,7 @@ namespace common {
 		Call() { }
 		Call(Expr *c) { callee = c; }
 
-		virtual void accept(Visitor *v);
+		virtual void accept(Visitor &v);
 	};
 
 	class Type : public Node {
@@ -363,7 +363,7 @@ namespace common {
 		Type(TypeEnum t) { type = t; }
 		Type(TypeEnum t, std::vector<Type *> *ts) { type = t; types = *ts; }
 
-		virtual void accept(Visitor *v);
+		virtual void accept(Visitor &v);
 		bool operator==(const Type &other) const;
 	};
 }
