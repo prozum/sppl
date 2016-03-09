@@ -1,7 +1,7 @@
 #include "Compiler.h"
 
 #include "Driver.h"
-#include "Printer.h"
+#include "pprinter/Printer.h"
 
 namespace compiler {
 
@@ -11,11 +11,11 @@ namespace compiler {
 
         driver.parse_stream(input);
 
-        visitor::Printer v;
+        // visitor::Printer v;
 
-        v.visit(driver.main);
+        // v.visit(driver.main);
 
-        std::cout << v.res << std::endl;
+        // std::cout << v.res << std::endl;
     }
 
     Compiler::Compiler() {

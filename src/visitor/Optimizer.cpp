@@ -23,8 +23,8 @@ namespace visitor {
 
     void Optimizer::visit(Case *node)
     {
-        for (auto e : node->expr) {
-            e->accept(this);
+        for (auto p : node->patterns) {
+            p->accept(this);
         }
     }
 
