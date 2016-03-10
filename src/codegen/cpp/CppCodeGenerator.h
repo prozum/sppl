@@ -16,7 +16,11 @@ namespace std {
     {
         std::size_t operator()(const Type& k) const
         {
-            size_t res = std::hash::operator()(k.type);
+            size_t res = std::hash<int>()(k.type);
+
+            for (auto type : k.types) {
+                res ^= (std::hash<Type>()(*type) << 1);
+            }
 
             return res;
         }
@@ -107,13 +111,15 @@ namespace codegen {
             int list_count = 0;
             int sig_count = 0;
             int arg_count = 0;
-            unordered_map<Type &, string> tuples;
-            unordered_map<Type &, string> lists;
-            unordered_map<Type &, string> signatures;
+            unordered_map<Type, string> tuples;
+            unordered_map<Type, string> lists;
+            unordered_map<Type, string> signatures;
             unordered_map<string, string> real_ids;
             vector<string> arg_names;
             IdContext id_context;
 
+            string generate_list(Type &);
             string generate_tuple(Type &);
+            string generate_signature(Type &);
     };
 }
