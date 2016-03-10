@@ -67,7 +67,7 @@ int main(int argc, char *argv[])
 
     ifstream in(input[0]);
     ofstream out(output);
-    ofstream hout(output);
+    ofstream hout(header_output);
 
     compiler::Compiler compiler(&in, &out, &hout);
     compiler.set_backend(backend);
