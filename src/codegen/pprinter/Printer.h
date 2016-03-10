@@ -1,14 +1,17 @@
 #pragma once
 
 #include <string>
+#include "CodeGenerator.h"
 #include "Node.h"
 using namespace common;
 using namespace std;
 
 namespace codegen {
-    class Printer : public Visitor {
+    class Printer : public CodeGenerator {
     public:
         string res;
+
+        Printer(ostream &out) : CodeGenerator(out) { }
 
         virtual void visit(Program *node);
 

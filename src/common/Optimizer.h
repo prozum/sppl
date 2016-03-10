@@ -10,6 +10,8 @@ namespace common {
 
     class Optimizer : public Visitor {
 
+
+        Optimizer();
     };
 
 }

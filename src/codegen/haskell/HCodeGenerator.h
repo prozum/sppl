@@ -6,7 +6,7 @@
 using namespace common;
 
 namespace codegen {
-    class HCodeGenerator: public visitor::CodeGenerator
+    class HCodeGenerator: public CodeGenerator
     {
         public:
             HCodeGenerator(std::ostream &);
@@ -76,7 +76,6 @@ namespace codegen {
             void visit(Type *node);
 
         private:
-            std::ostream &os;
             Function *curr_fun;
     };
 }

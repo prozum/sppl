@@ -4,290 +4,260 @@
 using namespace common;
 using namespace std;
 
-CCodeGenerator::CCodeGenerator(std::ostream &os) : visitor::CodeGenerator::CodeGenerator(os), os(os)
-{
-}
+namespace codegen {
 
-void CCodeGenerator::visit(Program *node)
-{
-    for (auto f : node->funcs) {
-        f->accept(this);
+    CppCodeGenerator::CppCodeGenerator(ostream &out) : CodeGenerator::CodeGenerator(out) {
     }
-}
 
-void CCodeGenerator::visit(Function *node)
-{
-    is_return = true;
-    (node->types.back())->accept(this);
-    is_return = false;
+    void CppCodeGenerator::visit(Program *node) {
+        for (auto f : node->funcs) {
+            f->accept(this);
+        }
+    }
 
-    os << " u" << node->id << "( ";
+    void CppCodeGenerator::visit(Function *node) {
+        is_return = true;
+        (node->types.back())->accept(this);
+        is_return = false;
 
-    if (node->cases.size() - 1 != 0) {
-        for (int i = 0; i < node->cases.size() - 2; ++i) {
-            node->types[i]->accept(this);
-            os << ", ";
-            arg_count++;
+        output << " u" << node->id << "( ";
+
+        if (node->cases.size() - 1 != 0) {
+            for (int i = 0; i < node->cases.size() - 2; ++i) {
+                node->types[i]->accept(this);
+                output << ", ";
+                arg_count++;
+            }
+
+            node->types[node->cases.size() - 2]->accept(this);
+            arg_count = 0;
         }
 
-        node->types[node->cases.size() - 2]->accept(this);
-        arg_count = 0;
-    }
+        output << ") {" << endl;
 
-    os << ") {" << endl;
-
-    for (auto c : node->cases) {
-        c->accept(this);
-    }
-
-    os << "}" << endl;
-}
-
-void CCodeGenerator::visit(Case *node)
-{
-    os << "if (";
-    for (int i = 0; i < node->patterns.size() - 1; ++i) {
-        os << " g" << i << " == ";
-        node->patterns[i]->accept(this);
-    }
-
-    os << ") {" << endl;
-    os << "return ";
-    node->expr->accept(this);
-    os << endl << "}" << endl;
-}
-
-void CCodeGenerator::visit(Or *node)
-{
-    os << "(";
-    node->left->accept(this);
-    os << "||";
-    node->right->accept(this);
-    os << ")";
-}
-
-void CCodeGenerator::visit(And *node)
-{
-    os << "(";
-    node->left->accept(this);
-    os << "&&";
-    node->right->accept(this);
-    os << ")";
-}
-
-void CCodeGenerator::visit(Equal *node)
-{
-    os << "(";
-    node->left->accept(this);
-    os << "==";
-    node->right->accept(this);
-    os << ")";
-}
-
-void CCodeGenerator::visit(NotEqual *node)
-{
-    os << "(";
-    node->left->accept(this);
-    os << "!=";
-    node->right->accept(this);
-    os << ")";
-}
-
-void CCodeGenerator::visit(Lesser *node)
-{
-    os << "(";
-    node->left->accept(this);
-    os << "<";
-    node->right->accept(this);
-    os << ")";
-}
-
-void CCodeGenerator::visit(LesserEq *node)
-{
-    os << "(";
-    node->left->accept(this);
-    os << "<=";
-    node->right->accept(this);
-    os << ")";
-}
-
-void CCodeGenerator::visit(Greater *node)
-{
-    os << "(";
-    node->left->accept(this);
-    os << ">";
-    node->right->accept(this);
-    os << ")";
-}
-
-void CCodeGenerator::visit(GreaterEq *node)
-{
-    os << "(";
-    node->left->accept(this);
-    os << ">=";
-    node->right->accept(this);
-    os << ")";
-}
-
-void CCodeGenerator::visit(Add *node)
-{
-    os << "(";
-    node->left->accept(this);
-    os << "+";
-    node->right->accept(this);
-    os << ")";
-}
-
-void CCodeGenerator::visit(Sub *node)
-{
-    os << "(";
-    node->left->accept(this);
-    os << "-";
-    node->right->accept(this);
-    os << ")";
-}
-
-void CCodeGenerator::visit(Mul *node)
-{
-    os << "(";
-    node->left->accept(this);
-    os << "*";
-    node->right->accept(this);
-    os << ")";
-}
-
-void CCodeGenerator::visit(Div *node)
-{
-    os << "(";
-    node->left->accept(this);
-    os << "/";
-    node->right->accept(this);
-    os << ")";
-}
-
-void CCodeGenerator::visit(Mod *node)
-{
-    os << "(";
-    node->left->accept(this);
-    os << "%";
-    node->right->accept(this);
-    os << ")";
-}
-
-void CCodeGenerator::visit(ListAdd *node)
-{
-    
-}
-
-void CCodeGenerator::visit(Par *node)
-{
-    os << "(";
-    node->child->accept(this);
-    os << ")";
-}
-
-void CCodeGenerator::visit(Not *node)
-{
-    os << "(";
-    os << "!";
-    node->child->accept(this);
-    os << ")";
-}
-
-void CCodeGenerator::visit(ListPattern *node)
-{
-
-}
-
-void CCodeGenerator::visit(TuplePattern *node)
-{
-    
-}
-
-void CCodeGenerator::visit(ListSplit *node)
-{
-    
-}
-
-void CCodeGenerator::visit(Int *node)
-{
-
-}
-
-void CCodeGenerator::visit(Float *node)
-{
-
-}
-
-void CCodeGenerator::visit(Bool *node)
-{
-
-}
-
-void CCodeGenerator::visit(Char *node)
-{
-
-}
-
-void CCodeGenerator::visit(String *node)
-{
-
-}
-
-void CCodeGenerator::visit(List *node)
-{
-
-}
-
-void CCodeGenerator::visit(Tuple *node)
-{
-    
-}
-
-void CCodeGenerator::visit(Id *node)
-{
-    
-}
-
-void CCodeGenerator::visit(Call *node)
-{
-    os << "(";
-    node->callee->accept(this);
-
-    os << " ";
-
-    if (node->exprs.size() != 0) {
-        for (int i = 0; i < node->exprs.size() - 1; ++i) {
-            node->exprs[i]->accept(this);
-            os << ",";
+        for (auto c : node->cases) {
+            c->accept(this);
         }
 
-        node->exprs.back()->accept(this);
-    }
-    os << ")";
-}
-
-void CCodeGenerator::visit(Type *node)
-{
-    switch (node->type) {
-        case FLOAT:
-            os << "double";
-        case CHAR:
-            os << "char";
-        case INT:
-            os << "int";
-        case BOOL:
-            os << "int";
-
-        case STRING:
-        case LIST:
-        case TUPLE:
-        case SIGNATURE:
-        default:
-            break;
+        output << "}" << endl;
     }
 
-    if (!is_return){
-        os << " g" << arg_count;
+    void CppCodeGenerator::visit(Case *node) {
+        output << "if (";
+        for (int i = 0; i < node->patterns.size() - 1; ++i) {
+            output << " g" << i << " == ";
+            node->patterns[i]->accept(this);
+        }
+
+        output << ") {" << endl;
+        output << "return ";
+        node->expr->accept(this);
+        output << endl << "}" << endl;
+    }
+
+    void CppCodeGenerator::visit(Or *node) {
+        output << "(";
+        node->left->accept(this);
+        output << "||";
+        node->right->accept(this);
+        output << ")";
+    }
+
+    void CppCodeGenerator::visit(And *node) {
+        output << "(";
+        node->left->accept(this);
+        output << "&&";
+        node->right->accept(this);
+        output << ")";
+    }
+
+    void CppCodeGenerator::visit(Equal *node) {
+        output << "(";
+        node->left->accept(this);
+        output << "==";
+        node->right->accept(this);
+        output << ")";
+    }
+
+    void CppCodeGenerator::visit(NotEqual *node) {
+        output << "(";
+        node->left->accept(this);
+        output << "!=";
+        node->right->accept(this);
+        output << ")";
+    }
+
+    void CppCodeGenerator::visit(Lesser *node) {
+        output << "(";
+        node->left->accept(this);
+        output << "<";
+        node->right->accept(this);
+        output << ")";
+    }
+
+    void CppCodeGenerator::visit(LesserEq *node) {
+        output << "(";
+        node->left->accept(this);
+        output << "<=";
+        node->right->accept(this);
+        output << ")";
+    }
+
+    void CppCodeGenerator::visit(Greater *node) {
+        output << "(";
+        node->left->accept(this);
+        output << ">";
+        node->right->accept(this);
+        output << ")";
+    }
+
+    void CppCodeGenerator::visit(GreaterEq *node) {
+        output << "(";
+        node->left->accept(this);
+        output << ">=";
+        node->right->accept(this);
+        output << ")";
+    }
+
+    void CppCodeGenerator::visit(Add *node) {
+        output << "(";
+        node->left->accept(this);
+        output << "+";
+        node->right->accept(this);
+        output << ")";
+    }
+
+    void CppCodeGenerator::visit(Sub *node) {
+        output << "(";
+        node->left->accept(this);
+        output << "-";
+        node->right->accept(this);
+        output << ")";
+    }
+
+    void CppCodeGenerator::visit(Mul *node) {
+        output << "(";
+        node->left->accept(this);
+        output << "*";
+        node->right->accept(this);
+        output << ")";
+    }
+
+    void CppCodeGenerator::visit(Div *node) {
+        output << "(";
+        node->left->accept(this);
+        output << "/";
+        node->right->accept(this);
+        output << ")";
+    }
+
+    void CppCodeGenerator::visit(Mod *node) {
+        output << "(";
+        node->left->accept(this);
+        output << "%";
+        node->right->accept(this);
+        output << ")";
+    }
+
+    void CppCodeGenerator::visit(ListAdd *node) {
+
+    }
+
+    void CppCodeGenerator::visit(Par *node) {
+        output << "(";
+        node->child->accept(this);
+        output << ")";
+    }
+
+    void CppCodeGenerator::visit(Not *node) {
+        output << "(";
+        output << "!";
+        node->child->accept(this);
+        output << ")";
+    }
+
+    void CppCodeGenerator::visit(ListPattern *node) {
+
+    }
+
+    void CppCodeGenerator::visit(TuplePattern *node) {
+
+    }
+
+    void CppCodeGenerator::visit(ListSplit *node) {
+
+    }
+
+    void CppCodeGenerator::visit(Int *node) {
+
+    }
+
+    void CppCodeGenerator::visit(Float *node) {
+
+    }
+
+    void CppCodeGenerator::visit(Bool *node) {
+
+    }
+
+    void CppCodeGenerator::visit(Char *node) {
+
+    }
+
+    void CppCodeGenerator::visit(String *node) {
+
+    }
+
+    void CppCodeGenerator::visit(List *node) {
+
+    }
+
+    void CppCodeGenerator::visit(Tuple *node) {
+
+    }
+
+    void CppCodeGenerator::visit(Id *node) {
+
+    }
+
+    void CppCodeGenerator::visit(Call *node) {
+        output << "(";
+        node->callee->accept(this);
+
+        output << " ";
+
+        if (node->exprs.size() != 0) {
+            for (int i = 0; i < node->exprs.size() - 1; ++i) {
+                node->exprs[i]->accept(this);
+                output << ",";
+            }
+
+            node->exprs.back()->accept(this);
+        }
+        output << ")";
+    }
+
+    void CppCodeGenerator::visit(Type *node) {
+        switch (node->type) {
+            case FLOAT:
+                output << "double";
+            case CHAR:
+                output << "char";
+            case INT:
+                output << "int";
+            case BOOL:
+                output << "int";
+
+            case STRING:
+            case LIST:
+            case TUPLE:
+            case SIGNATURE:
+            default:
+                break;
+        }
+
+        if (!is_return) {
+            output << " g" << arg_count;
+        }
     }
 }
