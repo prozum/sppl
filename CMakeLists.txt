@@ -39,6 +39,7 @@ include_directories(
         src/codegen/llvm
         src/codegen/pprinter
         src/compiler
+        tools/profiler
 )
 
 add_subdirectory(src)
