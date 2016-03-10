@@ -20,6 +20,7 @@ namespace optimizer {
         for (auto c : node->cases) {
             c->accept(this);
         }
+
     }
 
     void Optimizer::visit(Case *node)

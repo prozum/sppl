@@ -20,6 +20,7 @@ include_directories(
         src/parser
         src/compiler
         src/codegen
+        tools/profiler
 )
 
 add_subdirectory(src)
