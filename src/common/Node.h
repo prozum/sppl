@@ -29,6 +29,9 @@ namespace common {
 	public:
 		Type* node_type;
 
+        // for the interpreter to save the children values of a Node
+        Expr *val;
+
 		virtual void accept(Visitor &v) = 0;
 	};
 
@@ -362,7 +365,7 @@ namespace common {
 		TypeEnum type = UNKNOWN;
 		std::vector<Type *> types;
 
-		Type() { };
+        Type() { }
 		Type(TypeEnum t) { type = t; }
 		Type(TypeEnum t, std::vector<Type *> *ts) { type = t; types = *ts; }
 
