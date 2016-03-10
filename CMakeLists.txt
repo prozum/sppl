@@ -40,6 +40,7 @@ include_directories(
         src/codegen/pprinter
         src/compiler
         tools/profiler
+        tools/interpreter
 )
 
 add_subdirectory(src)

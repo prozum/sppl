@@ -1,2 +1,2 @@
-add_library(profiler Main.cpp Profiler.cpp Profiler.h Interpreter.cpp Interpreter.h)
-target_link_libraries(profiler common)
+add_library(profiler Main.cpp Profiler.cpp Profiler.h)
+target_link_libraries(profiler interpreter common)

@@ -15,6 +15,12 @@ namespace interpreter {
         this->func_id = func_id;
         node->accept(this);
 
+        for (auto f : node->funcs) {
+            if (f->id == id) {
+                this->set_result(f->val);
+            }
+        }
+
         return result;
     }
 
@@ -165,27 +171,55 @@ namespace interpreter {
 
     void Interpreter::visit(Add *node)
     {
+        node->left->accept(this);
+        node->right->accept(this);
 
+        node->val = new Bool(((Bool*)node->left->val)->value >= ((Bool*)node->left->val)->value);
     }
 
     void Interpreter::visit(Sub *node)
     {
+        node->left->accept(this);
+        node->right->accept(this);
 
+        if (node->left->node_type->type == Int) {
+            node->val = new Int(((Int*)node->left->val)->value - ((Int*)node->left->val)->value);
+        } else {
+            node->val = new Float(((Float*)node->left->val)->value - ((Float*)node->left->val)->value);
+        }
     }
 
     void Interpreter::visit(Mul *node)
     {
+        node->left->accept(this);
+        node->right->accept(this);
 
+        if (node->left->node_type->type == Int) {
+            node->val = new Int(((Int*)node->left->val)->value * ((Int*)node->left->val)->value);
+        } else {
+            node->val = new Float(((Float*)node->left->val)->value * ((Float*)node->left->val)->value);
+        }
     }
 
     void Interpreter::visit(Div *node)
     {
+        node->left->accept(this);
+        node->right->accept(this);
 
+        if (node->left->node_type->type == Int) {
+            node->val = new Int(((Int*)node->left->val)->value / ((Int*)node->left->val)->value);
+        } else {
+            node->val = new Float(((Float*)node->left->val)->value / ((Float*)node->left->val)->value);
+        }
     }
 
     void Interpreter::visit(Mod *node)
     {
-
+        if (node->left->node_type->type == Int) {
+            node->val = new Int(((Int*)node->left->val)->value % ((Int*)node->left->val)->value);
+        } else {
+            node->val = new Float(((Float*)node->left->val)->value % ((Float*)node->left->val)->value);
+        }
     }
 
     void Interpreter::visit(ListAdd *node)
@@ -195,7 +229,8 @@ namespace interpreter {
 
     void Interpreter::visit(Par *node)
     {
-
+        node->child->accept(this);
+        node->val = node->child;
     }
 
     void Interpreter::visit(Not *node)
