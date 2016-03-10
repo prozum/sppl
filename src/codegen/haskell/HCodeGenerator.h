@@ -76,7 +76,6 @@ namespace codegen {
             void visit(Type &node);
 
         private:
-            std::ostream &os;
             Function *curr_fun;
     };
 }

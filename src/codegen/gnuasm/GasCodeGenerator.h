@@ -77,7 +77,6 @@ namespace codegen {
         void visit(Type &node);
 
     private:
-        std::ostream &os;
         string get_type(Type *);
         string buildSource();
     };
