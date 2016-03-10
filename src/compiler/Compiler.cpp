@@ -38,7 +38,7 @@ namespace compiler {
 
         driver.parse_stream(*input);
 
-        generator->visit(driver.main);
+        generator->visit(*driver.main);
     }
 
 }

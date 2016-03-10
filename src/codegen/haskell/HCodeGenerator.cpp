@@ -7,368 +7,368 @@ using namespace std;
 
 namespace codegen {
 
-    HCodeGenerator::HCodeGenerator(std::ostream &out) : CodeGenerator::CodeGenerator(out)
+    HCodeGenerator::HCodeGenerator(std::ostream &os) : CodeGenerator::CodeGenerator(os), os(os)
     {
     }
 
-    void HCodeGenerator::visit(Program *node)
+    void HCodeGenerator::visit(Program &node)
     {
         //os << "module PlaceHolder where" << endl;
 
-        for (auto f : node->funcs) {
+        for (auto f : node.funcs) {
             if (f->id != "main") {
-                f->accept(this);
+                f->accept(*this);
             } else {
-                output << "main = putStrLn (show (";
-                f->cases.front()->expr->accept(this);
-                output << "))\n";
+                os << "main = putStrLn (show (";
+                f->cases.front()->expr->accept(*this);
+                os << "))\n";
             }
         }
     }
 
-    void HCodeGenerator::visit(Function *node)
+    void HCodeGenerator::visit(Function &node)
     {
-        curr_fun = node;
+        curr_fun = &node;
 
-        output << node->id << " :: ";
+        os << node.id << " :: ";
 
-        if (node->types.size() != 0) {
-            for (int i = 0; i < node->types.size() - 1; ++i) {
-                node->types[i]->accept(this);
-                output << " -> ";
+        if (node.types.size() != 0) {
+            for (int i = 0; i < node.types.size() - 1; ++i) {
+                node.types[i]->accept(*this);
+                os << " -> ";
             }
 
-            node->types.back()->accept(this);
+            node.types.back()->accept(*this);
         }
 
-        output << endl;
+        os << endl;
 
-        for (auto c : node->cases) {
-            c->accept(this);
+        for (auto c : node.cases) {
+            c->accept(*this);
         }
 
-        output << endl;
+        os << endl;
     }
 
-    void HCodeGenerator::visit(Case *node)
+    void HCodeGenerator::visit(Case &node)
     {
-        output << curr_fun->id << " ";
+        os << curr_fun->id << " ";
 
-        for (auto p : node->patterns) {
-            p->accept(this);
-            output << " ";
+        for (auto p : node.patterns) {
+            p->accept(*this);
+            os << " ";
         }
 
-        output << "= ";
+        os << "= ";
 
-        node->expr->accept(this);
+        node.expr->accept(*this);
 
-        output << endl;
+        os << endl;
     }
 
-    void HCodeGenerator::visit(Or *node)
+    void HCodeGenerator::visit(Or &node)
     {
-        output << "((||) ";
-        node->left->accept(this);
-        output << " ";
-        node->right->accept(this);
-        output << ")";
+        os << "((||) ";
+        node.left->accept(*this);
+        os << " ";
+        node.right->accept(*this);
+        os << ")";
     }
 
-    void HCodeGenerator::visit(And *node)
+    void HCodeGenerator::visit(And &node)
     {
-        output << "((&&) ";
-        node->left->accept(this);
-        output << " ";
-        node->right->accept(this);
-        output << ")";
+        os << "((&&) ";
+        node.left->accept(*this);
+        os << " ";
+        node.right->accept(*this);
+        os << ")";
     }
 
-    void HCodeGenerator::visit(Equal *node)
+    void HCodeGenerator::visit(Equal &node)
     {
-        output << "((==) ";
-        node->left->accept(this);
-        output << " ";
-        node->right->accept(this);
-        output << ")";
+        os << "((==) ";
+        node.left->accept(*this);
+        os << " ";
+        node.right->accept(*this);
+        os << ")";
     }
 
-    void HCodeGenerator::visit(NotEqual *node)
+    void HCodeGenerator::visit(NotEqual &node)
     {
-        output << "((/=) ";
-        node->left->accept(this);
-        output << " ";
-        node->right->accept(this);
-        output << ")";
+        os << "((/=) ";
+        node.left->accept(*this);
+        os << " ";
+        node.right->accept(*this);
+        os << ")";
     }
 
-    void HCodeGenerator::visit(Lesser *node)
+    void HCodeGenerator::visit(Lesser &node)
     {
-        output << "((<) ";
-        node->left->accept(this);
-        output << " ";
-        node->right->accept(this);
-        output << ")";
+        os << "((<) ";
+        node.left->accept(*this);
+        os << " ";
+        node.right->accept(*this);
+        os << ")";
     }
 
-    void HCodeGenerator::visit(LesserEq *node)
+    void HCodeGenerator::visit(LesserEq &node)
     {
-        output << "((<=) ";
-        node->left->accept(this);
-        output << " ";
-        node->right->accept(this);
-        output << ")";
+        os << "((<=) ";
+        node.left->accept(*this);
+        os << " ";
+        node.right->accept(*this);
+        os << ")";
     }
 
-    void HCodeGenerator::visit(Greater *node)
+    void HCodeGenerator::visit(Greater &node)
     {
-        output << "((>) ";
-        node->left->accept(this);
-        output << " ";
-        node->right->accept(this);
-        output << ")";
+        os << "((>) ";
+        node.left->accept(*this);
+        os << " ";
+        node.right->accept(*this);
+        os << ")";
     }
 
-    void HCodeGenerator::visit(GreaterEq *node)
+    void HCodeGenerator::visit(GreaterEq &node)
     {
-        output << "((>=) ";
-        node->left->accept(this);
-        output << " ";
-        node->right->accept(this);
-        output << ")";
+        os << "((>=) ";
+        node.left->accept(*this);
+        os << " ";
+        node.right->accept(*this);
+        os << ")";
     }
 
-    void HCodeGenerator::visit(Add *node)
+    void HCodeGenerator::visit(Add &node)
     {
-        output << "((+) ";
-        node->left->accept(this);
-        output << " ";
-        node->right->accept(this);
-        output << ")";
+        os << "((+) ";
+        node.left->accept(*this);
+        os << " ";
+        node.right->accept(*this);
+        os << ")";
     }
 
-    void HCodeGenerator::visit(Sub *node)
+    void HCodeGenerator::visit(Sub &node)
     {
-        output << "((-) ";
-        node->left->accept(this);
-        output << " ";
-        node->right->accept(this);
-        output << ")";
+        os << "((-) ";
+        node.left->accept(*this);
+        os << " ";
+        node.right->accept(*this);
+        os << ")";
     }
 
-    void HCodeGenerator::visit(Mul *node)
+    void HCodeGenerator::visit(Mul &node)
     {
-        output << "((*) ";
-        node->left->accept(this);
-        output << " ";
-        node->right->accept(this);
-        output << ")";
+        os << "((*) ";
+        node.left->accept(*this);
+        os << " ";
+        node.right->accept(*this);
+        os << ")";
     }
 
-    void HCodeGenerator::visit(Div *node)
+    void HCodeGenerator::visit(Div &node)
     {
-        output << "((/) ";
-        node->left->accept(this);
-        output << " ";
-        node->right->accept(this);
-        output << ")";
+        os << "((/) ";
+        node.left->accept(*this);
+        os << " ";
+        node.right->accept(*this);
+        os << ")";
     }
 
-    void HCodeGenerator::visit(Mod *node)
+    void HCodeGenerator::visit(Mod &node)
     {
-        output << "(rem ";
-        node->left->accept(this);
-        output << " ";
-        node->right->accept(this);
-        output << ")";
+        os << "(rem ";
+        node.left->accept(*this);
+        os << " ";
+        node.right->accept(*this);
+        os << ")";
     }
 
-    void HCodeGenerator::visit(ListAdd *node)
+    void HCodeGenerator::visit(ListAdd &node)
     {
-        node->left->accept(this);
-        output << ":";
-        node->right->accept(this);
+        node.left->accept(*this);
+        os << ":";
+        node.right->accept(*this);
     }
 
-    void HCodeGenerator::visit(Par *node)
+    void HCodeGenerator::visit(Par &node)
     {
-        output << "(";
-        node->child->accept(this);
-        output << ")";
+        os << "(";
+        node.child->accept(*this);
+        os << ")";
     }
 
-    void HCodeGenerator::visit(Not *node)
+    void HCodeGenerator::visit(Not &node)
     {
-        output << "not ";
-        node->child->accept(this);
+        os << "not ";
+        node.child->accept(*this);
     }
 
-    void HCodeGenerator::visit(ListPattern *node)
+    void HCodeGenerator::visit(ListPattern &node)
     {
-        output << "[";
+        os << "[";
 
-        if (node->patterns.size() != 0) {
-            for (int i = 0; i < node->patterns.size() - 1; ++i) {
-                node->patterns[i]->accept(this);
-                output << ",";
+        if (node.patterns.size() != 0) {
+            for (int i = 0; i < node.patterns.size() - 1; ++i) {
+                node.patterns[i]->accept(*this);
+                os << ",";
             }
 
-            node->patterns.back()->accept(this);
+            node.patterns.back()->accept(*this);
         }
 
-        output << "]";
+        os << "]";
     }
 
-    void HCodeGenerator::visit(TuplePattern *node)
+    void HCodeGenerator::visit(TuplePattern &node)
     {
-        output << "(";
+        os << "(";
 
-        if (node->patterns.size() != 0) {
-            for (int i = 0; i < node->patterns.size() - 1; ++i) {
-                node->patterns[i]->accept(this);
-                output << ",";
+        if (node.patterns.size() != 0) {
+            for (int i = 0; i < node.patterns.size() - 1; ++i) {
+                node.patterns[i]->accept(*this);
+                os << ",";
             }
 
-            node->patterns.back()->accept(this);
+            node.patterns.back()->accept(*this);
         }
 
-        output << ")";
+        os << ")";
     }
 
-    void HCodeGenerator::visit(ListSplit *node)
+    void HCodeGenerator::visit(ListSplit &node)
     {
-        output << "(";
-        node->left->accept(this);
-        output << ":";
-        node->right->accept(this);
-        output << ")";
+        os << "(";
+        node.left->accept(*this);
+        os << ":";
+        node.right->accept(*this);
+        os << ")";
     }
 
-    void HCodeGenerator::visit(Int *node)
+    void HCodeGenerator::visit(Int &node)
     {
-        output << node->value;
+        os << node.value;
     }
 
-    void HCodeGenerator::visit(Float *node)
+    void HCodeGenerator::visit(Float &node)
     {
-        output << node->value;
+        os << node.value;
     }
 
-    void HCodeGenerator::visit(Bool *node)
+    void HCodeGenerator::visit(Bool &node)
     {
-        output << node->value;
+        os << node.value;
     }
 
-    void HCodeGenerator::visit(Char *node)
+    void HCodeGenerator::visit(Char &node)
     {
-        output << node->value;
+        os << node.value;
     }
 
-    void HCodeGenerator::visit(String *node)
+    void HCodeGenerator::visit(String &node)
     {
-        output << node->value;
+        os << node.value;
     }
 
-    void HCodeGenerator::visit(List *node)
+    void HCodeGenerator::visit(List &node)
     {
-        output << "[";
+        os << "[";
 
-        if (node->exprs.size() != 0) {
-            for (int i = 0; i < node->exprs.size() - 1; ++i) {
-                node->exprs[i]->accept(this);
-                output << ",";
+        if (node.exprs.size() != 0) {
+            for (int i = 0; i < node.exprs.size() - 1; ++i) {
+                node.exprs[i]->accept(*this);
+                os << ",";
             }
 
-            node->exprs.back()->accept(this);
+            node.exprs.back()->accept(*this);
         }
 
-        output << "]";
+        os << "]";
     }
 
-    void HCodeGenerator::visit(Tuple *node)
+    void HCodeGenerator::visit(Tuple &node)
     {
-        output << "(";
+        os << "(";
 
-        if (node->exprs.size() != 0) {
-            for (int i = 0; i < node->exprs.size() - 1; ++i) {
-                node->exprs[i]->accept(this);
-                output << ",";
+        if (node.exprs.size() != 0) {
+            for (int i = 0; i < node.exprs.size() - 1; ++i) {
+                node.exprs[i]->accept(*this);
+                os << ",";
             }
 
-            node->exprs.back()->accept(this);
+            node.exprs.back()->accept(*this);
         }
 
-        output << ")";
+        os << ")";
     }
 
-    void HCodeGenerator::visit(Id *node)
+    void HCodeGenerator::visit(Id &node)
     {
-        output << node->id;
+        os << node.id;
     }
 
-    void HCodeGenerator::visit(Call *node)
+    void HCodeGenerator::visit(Call &node)
     {
-        output << "(";
-        node->callee->accept(this);
+        os << "(";
+        node.callee->accept(*this);
 
-        output << " ";
+        os << " ";
 
-        if (node->exprs.size() != 0) {
-            for (int i = 0; i < node->exprs.size() - 1; ++i) {
-                node->exprs[i]->accept(this);
-                output << " ";
+        if (node.exprs.size() != 0) {
+            for (int i = 0; i < node.exprs.size() - 1; ++i) {
+                node.exprs[i]->accept(*this);
+                os << " ";
             }
 
-            node->exprs.back()->accept(this);
+            node.exprs.back()->accept(*this);
         }
-        output << ")";
+        os << ")";
     }
 
-    void HCodeGenerator::visit(Type *node)
+    void HCodeGenerator::visit(Type &node)
     {
-        switch (node->type) {
+        switch (node.type) {
         case INT:
-            output << "Int";
+            os << "Int";
             break;
         case FLOAT:
-            output << "Float";
+            os << "Float";
             break;
         case BOOL:
-            output << "Bool";
+            os << "Bool";
             break;
         case CHAR:
-            output << "Char";
+            os << "Char";
             break;
         case STRING:
-            output << "String";
+            os << "String";
         case LIST:
-            output << "[";
-            node->types.front()->accept(this);
-                output << "]";
+            os << "[";
+            node.types.front()->accept(*this);
+            os << "]";
             break;
         case TUPLE:
-            output << "(";
-            if (node->types.size() != 0) {
-                for (int i = 0; i < node->types.size() - 1; ++i) {
-                    node->types[i]->accept(this);
-                    output << ",";
+            os << "(";
+            if (node.types.size() != 0) {
+                for (int i = 0; i < node.types.size() - 1; ++i) {
+                    node.types[i]->accept(*this);
+                    os << ",";
                 }
 
-                node->types.back()->accept(this);
+                node.types.back()->accept(*this);
             }
-                output << ")";
+            os << ")";
             break;
         case SIGNATURE:
-            output << "(";
-            if (node->types.size() != 0) {
-                for (int i = 0; i < node->types.size() - 1; ++i) {
-                    node->types[i]->accept(this);
-                    output << " -> ";
+            os << "(";
+            if (node.types.size() != 0) {
+                for (int i = 0; i < node.types.size() - 1; ++i) {
+                    node.types[i]->accept(*this);
+                    os << " -> ";
                 }
 
-                node->types.back()->accept(this);
+                node.types.back()->accept(*this);
             }
-                output << ")";
+            os << ")";
             break;
         default:
             break;

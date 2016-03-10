@@ -9,6 +9,7 @@
 #include "Driver.h"
 #include "Parser.h"
 #include "ScopeGenerator.h"
+#include "TypeChecker.h"
 
 std::string get_type(Type *type);
 void print_scopes(Scope *scope);
@@ -16,9 +17,11 @@ void print_scopes(Scope *scope);
 int main(int argc, char** argv) {
     parser::Driver driver;
     ScopeGenerator generator;
+    TypeChecker typeChecker;
 
     driver.parse_file(argv[1]);
     generator.visit(driver.main);
+    typeChecker.visit(driver.main);
 
     //print_scopes(generator.res);
 
