@@ -55,23 +55,25 @@ namespace codegen
     void CCodeGenerator::visit(Case &node)
     {
         /* TODO */
-        output<< "if (";
+        output << "if (";
 
         id_context = IdContext::PATTERN;
         for (int i = 0; i < node.patterns.size(); ++i) {
-            output<< "ga" << i << " == ";
+            output << "ga" << i << " == ";
             node.patterns[i]->accept(*this);
 
             if (i < node.patterns.size() - 1 )
-                output<< " && ";
+                output << " && ";
         }
 
         id_context = IdContext::EXPR;
 
-        output<< ") {" << endl;
-        output<< "return ";
+        output << ")" << endl;
+        output << "{" << endl;
+        output << "\treturn ";
         node.expr->accept(*this);
-        output<< endl << "}" << endl;
+        output << ";" << endl;
+        output << "}" << endl;
     }
 
     void CCodeGenerator::visit(Or &node)
