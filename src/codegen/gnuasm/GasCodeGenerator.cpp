@@ -179,6 +179,30 @@ namespace codegen {
     }
 
     void GasCodeGenerator::visit(Add &node) {
+
+        node.left->accept(*this);
+
+        if (helper.n.compare("Int") == 0) {
+            function += "movl $";
+            function += helper.v;
+            function += ", %eax\n";
+        } else {
+            throw "NonSupportedExpression";
+        }
+
+        function += "pushl %eax\n";
+        node.right->accept(*this);
+
+        if (helper.n.compare("Int") == 0) {
+            function += "movl $";
+            function += helper.v;
+            function += ", %eax\n";
+        } else {
+            throw "NonSupportedExpression";
+        }
+
+        function += "popl %ebx\n";
+        function += "addl %ebx, %eax\n";
         cout << "AddNotImplemented" << endl;
     }
 
@@ -213,7 +237,7 @@ namespace codegen {
     void GasCodeGenerator::visit(Int &node) {
         helper.n = "Int";
         helper.v = to_string(node.value);
-        cout << "IntNotImplemented" << endl;
+        cout << "Got integer => " << helper.v << endl;
     }
 
     void GasCodeGenerator::visit(Float &node) {
