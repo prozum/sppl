@@ -4,11 +4,12 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
+#include <sstream>
 
 using namespace common;
 using namespace std;
 
-enum IdContext {
+enum class IdContext {
     PATTERN,
     EXPR
 };
@@ -16,7 +17,7 @@ enum IdContext {
 class CCodeGenerator: public CodeGenerator
 {
     public:
-        CCodeGenerator(std::ostream &);
+        CCodeGenerator(std::ostream &, std::ostream &);
 
         void visit(Program &node);
                                     
@@ -83,11 +84,18 @@ class CCodeGenerator: public CodeGenerator
         void visit(Type &node);
 
     private:
-        std::ostream &os;
+        std::ostream &header;
 
+        int tuple_count = 0;
+        int list_count = 0;
+        int sig_count = 0;
         int arg_count = 0;
-        bool is_return = false;
+        unordered_map<Type &, string> tuples;
+        unordered_map<Type &, string> lists;
+        unordered_map<Type &, string> signatures;
         unordered_map<string, string> real_ids;
         vector<string> arg_names;
-        IdContext context;
+        IdContext id_context;
+
+        string generate_tuple(Type &);
 };

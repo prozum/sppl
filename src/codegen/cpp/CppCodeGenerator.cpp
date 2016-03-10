@@ -7,7 +7,8 @@ using namespace common;
 using namespace std;
 
 
-CCodeGenerator::CCodeGenerator(std::ostream &os) : CodeGenerator::CodeGenerator(os), os(os)
+CCodeGenerator::CCodeGenerator(std::ostream &os, std::ostream &head)
+        : CodeGenerator::CodeGenerator(os), header(head)
 {
 }
 
@@ -20,172 +21,172 @@ void CCodeGenerator::visit(Program &node)
 
 void CCodeGenerator::visit(Function &node)
 {
-    is_return = true;
+    stringstream arg_name;
+
+    // generate return type
     node.types.back()->accept(*this);
-    is_return = false;
 
-    os << " u" << node.id << "( ";
+    // give function a unique name
+    output<< " u" << node.id << "( ";
 
-    for (auto type : node.types) {
-        type->accept(*this);
-        arg_count++;
+    // generate function arguments
+    for (arg_count = 0; arg_count < node.types.size() - 1; arg_count++) {
+        arg_name << "ga" << arg_count;
+        node.types[arg_count]->accept(*this);
+        arg_names.push_back(arg_name.str());
+        output << " " << arg_name;
 
-        if (type != node.types.back())
-            os << ", ";
+        if (arg_count < node.types.size() - 2) // don't generate ", " after last argument
+            output<< ", ";
     }
 
-    arg_count = 0;
-
-    os << ") {" << endl;
+    output<< ") {" << endl;
 
     for (auto c : node.cases) {
         c->accept(*this);
         real_ids.clear();
     }
 
-    os << "}" << endl;
+    output<< "}" << endl;
     arg_names.clear();
 }
 
 void CCodeGenerator::visit(Case &node)
 {
-    os << "if (";
+    output<< "if (";
 
-    context = PATTERN;
-    for (auto pattern : node.patterns){
-        os << " g" << arg_count << " == ";
-        pattern->accept(*this);
+    id_context = IdContext::PATTERN;
+    for (int i = 0; i < node.patterns.size(); ++i) {
+        output<< "ga" << i << " == ";
+        node.patterns[i]->accept(*this);
 
-        if (pattern != node.patterns.back())
-            os << " && ";
-
-        arg_count++;
+        if (i < node.patterns.size() - 1 )
+            output<< " && ";
     }
 
-    arg_count = 0;
-    context = EXPR;
+    id_context = IdContext::EXPR;
 
-    os << ") {" << endl;
-    os << "return ";
+    output<< ") {" << endl;
+    output<< "return ";
     node.expr->accept(*this);
-    os << endl << "}" << endl;
+    output<< endl << "}" << endl;
 }
 
 void CCodeGenerator::visit(Or &node)
 {
-    os << "(";
+    output<< "(";
     node.left->accept(*this);
-    os << "||";
+    output<< "||";
     node.right->accept(*this);
-    os << ")";
+    output<< ")";
 }
 
 void CCodeGenerator::visit(And &node)
 {
-    os << "(";
+    output<< "(";
     node.left->accept(*this);
-    os << "&&";
+    output<< "&&";
     node.right->accept(*this);
-    os << ")";
+    output<< ")";
 }
 
 void CCodeGenerator::visit(Equal &node)
 {
-    os << "(";
+    output<< "(";
     node.left->accept(*this);
-    os << "==";
+    output<< "==";
     node.right->accept(*this);
-    os << ")";
+    output<< ")";
 }
 
 void CCodeGenerator::visit(NotEqual &node)
 {
-    os << "(";
+    output<< "(";
     node.left->accept(*this);
-    os << "!=";
+    output<< "!=";
     node.right->accept(*this);
-    os << ")";
+    output<< ")";
 }
 
 void CCodeGenerator::visit(Lesser &node)
 {
-    os << "(";
+    output<< "(";
     node.left->accept(*this);
-    os << "<";
+    output<< "<";
     node.right->accept(*this);
-    os << ")";
+    output<< ")";
 }
 
 void CCodeGenerator::visit(LesserEq &node)
 {
-    os << "(";
+    output<< "(";
     node.left->accept(*this);
-    os << "<=";
+    output<< "<=";
     node.right->accept(*this);
-    os << ")";
+    output<< ")";
 }
 
 void CCodeGenerator::visit(Greater &node)
 {
-    os << "(";
+    output<< "(";
     node.left->accept(*this);
-    os << ">";
+    output<< ">";
     node.right->accept(*this);
-    os << ")";
+    output<< ")";
 }
 
 void CCodeGenerator::visit(GreaterEq &node)
 {
-    os << "(";
+    output<< "(";
     node.left->accept(*this);
-    os << ">=";
+    output<< ">=";
     node.right->accept(*this);
-    os << ")";
+    output<< ")";
 }
 
 void CCodeGenerator::visit(Add &node)
 {
-    os << "(";
+    output<< "(";
     node.left->accept(*this);
-    os << "+";
+    output<< "+";
     node.right->accept(*this);
-    os << ")";
+    output<< ")";
 }
 
 void CCodeGenerator::visit(Sub &node)
 {
-    os << "(";
+    output<< "(";
     node.left->accept(*this);
-    os << "-";
+    output<< "-";
     node.right->accept(*this);
-    os << ")";
+    output<< ")";
 }
 
 void CCodeGenerator::visit(Mul &node)
 {
-    os << "(";
+    output<< "(";
     node.left->accept(*this);
-    os << "*";
+    output<< "*";
     node.right->accept(*this);
-    os << ")";
+    output<< ")";
 }
 
 void CCodeGenerator::visit(Div &node)
 {
-    os << "(";
+    output<< "(";
     node.left->accept(*this);
-    os << "/";
+    output<< "/";
     node.right->accept(*this);
-    os << ")";
+    output<< ")";
 }
 
 void CCodeGenerator::visit(Mod &node)
 {
-    os << "(";
+    output<< "(";
     node.left->accept(*this);
-    os << "%";
+    output<< "%";
     node.right->accept(*this);
-    os << ")";
+    output<< ")";
 }
 
 void CCodeGenerator::visit(ListAdd &node)
@@ -195,17 +196,17 @@ void CCodeGenerator::visit(ListAdd &node)
 
 void CCodeGenerator::visit(Par &node)
 {
-    os << "(";
+    output<< "(";
     node.child->accept(*this);
-    os << ")";
+    output<< ")";
 }
 
 void CCodeGenerator::visit(Not &node)
 {
-    os << "(";
-    os << "!";
+    output<< "(";
+    output<< "!";
     node.child->accept(*this);
-    os << ")";
+    output<< ")";
 }
 
 void CCodeGenerator::visit(ListPattern &node)
@@ -225,96 +226,178 @@ void CCodeGenerator::visit(ListSplit &node)
 
 void CCodeGenerator::visit(Int &node)
 {
-    os << node.value;
+    output << node.value;
 }
 
 void CCodeGenerator::visit(Float &node)
 {
-    os << node.value;
+    output << node.value;
 }
 
 void CCodeGenerator::visit(Bool &node)
 {
-    os << node.value;
+    output << node.value;
 }
 
 void CCodeGenerator::visit(Char &node)
 {
-    os << node.value;
+    output << node.value;
 }
 
 void CCodeGenerator::visit(String &node)
 {
-    os << node.value;
+    /* TODO */
 }
 
 void CCodeGenerator::visit(List &node)
 {
-
+    /* TODO */
 }
 
 void CCodeGenerator::visit(Tuple &node)
 {
-    
+    string name;
+    auto got = tuples.find(node.node_type);
+
+    // If current tuple doesn't exists. Create it
+    if (got == tuples.end()) {
+        name = generate_tuple(*node.node_type);
+    } else {
+        name = got->second;
+    }
+
+    output << "gcreate_" << name << "(";
+    for (auto expr : node.exprs){
+        expr->accept(*this);
+
+        if (expr != node.exprs.back())
+            output << ", ";
+    }
+    output << ")";
 }
 
 void CCodeGenerator::visit(Id &node)
 {
-    switch (context) {
-        case PATTERN:
+    switch (id_context) {
+        case IdContext::PATTERN:
             real_ids.insert({node.id, arg_names[arg_count]});
-            os << arg_names[arg_count];
+            output<< arg_names[arg_count];
             break;
-        case EXPR:
-            os << real_ids[node.id];
+        case IdContext::EXPR:
+            output<< real_ids[node.id];
             break;
-        default:
-            throw "WOW! THIS SHOULD NEVER HAPPEN";
     }
 }
 
 void CCodeGenerator::visit(Call &node)
 {
-    os << "(";
+    output<< "(";
     node.callee->accept(*this);
 
-    os << " ";
-
+    output<< "(";
     for (auto expr : node.exprs){
         expr->accept(*this);
 
         if (expr != node.exprs.back())
-            os << ", ";
+            output<< ", ";
     }
+    output<< ")";
 
-    os << ")";
+    output<< ")";
 }
 
-void CCodeGenerator::visit(Type &node)
-{
-    stringstream arg_name;
-
+void CCodeGenerator::visit(Type &node) {
     switch (node.type) {
         case FLOAT:
-            os << "double";
+            output << "double";
+            break;
         case CHAR:
-            os << "char";
+            output << "char";
+            break;
         case INT:
-            os << "int";
+            output << "int";
+            break;
         case BOOL:
-            os << "int";
-
-        case STRING:
-        case LIST:
+            output << "int";
+            break;
         case TUPLE:
+            auto got = tuples.find(node);
+
+            if (got != tuples.end()) {
+                output << got->second;
+            } else {
+                output << generate_tuple(node);
+            }
+            break;
         case SIGNATURE:
+            /* TODO */
+        case STRING:
+            /* TODO */
+        case LIST:
+            /* TODO */
         default:
             break;
     }
+}
 
-    if (!is_return){
-        arg_name << " g" << arg_count;
-        os << arg_name.str();
-        arg_names.push_back(arg_name.str());
+string CCodeGenerator::generate_tuple(Type &type){
+    // result is needed, so we don't start generating a tuple in a tuple in the header file
+    stringstream result;
+    stringstream name;
+
+    // give tuple unique name
+    name << "gt" << tuple_count;
+
+    /* generation of tuple starts here */
+    result << "typedef struct " << name << endl;
+    result << "{" << endl;
+
+    // generate an item for each type in the tuple
+    for (int i = 0; i < type.types.size(); ++i) {
+        result << "\t";
+        type.types[i]->accept(*this); // generate the actual type of the item
+        result << " i" << i << ";" << endl; // give this item a unique name
     }
+
+    result << "} " << name << endl;
+    result << endl;
+    /* generation of tuple ends here */
+
+    /* generation of tuple contructor starts here */
+    // give contructor a unique name
+    result << name << " gcreate_" << name << "(";
+
+    // generate an argument for each item in the struct
+    for (int i = 0; i < type.types.size(); ++i) {
+        type.types[i]->accept(*this); // generate the actual type of the argument
+        result << " i" << i;
+
+        if (i < type.types.size() - 1) // don't print ", " after the last argument
+            result << ", ";
+    }
+    result << ")" << endl;
+    result << "{" << endl;
+
+    // generate a result variable
+    result << "\t" << name << " " << "res;" << endl;
+
+    // for each item in res, assign values
+    for (int i = 0; i < type.types.size(); ++i) {
+        result << "\tres.i" << i << " = i" << i << ";" << endl;
+    }
+    result << "return res" << endl;
+    result << "}" << endl;
+    /* generation of tuple contructor ends here */
+
+    // increase tuple count, so next tuple doesn't have the same name
+    tuple_count++;
+
+    // writing tuple to header file
+    header << result;
+
+    // save tuple in tuple hash map
+    tuples[type] = name.str();
+
+    // return name of tuple generated
+    return name.str();
 }
