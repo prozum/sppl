@@ -123,7 +123,7 @@ void TypeChecker::visit(NotEqual &node) {
     /* Visit stops here */
 
     /* Code goes here */
-    if(check_types(node.left->node_type, node.right->node_type)){
+    if(node.left->node_type == node.right->node_type){
         node.node_type = new Type(BOOL);
     } else {
         throw "Bad programmer exception";
@@ -342,7 +342,7 @@ void TypeChecker::visit(ListAdd &node) {
 
     /* Code goes here */
     if(node.right->node_type->type == LIST){
-        if(check_types(node.left->node_type, node.right->node_type->types[0])){
+        if(node.left->node_type == node.right->node_type->types.front()){
             node.node_type = node.right->node_type;
         } else {
             throw "Not same type m8";
@@ -350,6 +350,7 @@ void TypeChecker::visit(ListAdd &node) {
     } else if(node.right->node_type->type == EMPTYLIST) {
         node.node_type = new Type(LIST);
         node.node_type->types.push_back(node.left->node_type);
+        node.right->node_type = node.node_type;
     } else {
         throw "Not a list m8";
     }
@@ -467,8 +468,8 @@ void TypeChecker::visit(TuplePattern &node) {
     /* Code goes here */
     node.node_type = new Type(TUPLE);
 
-    for (int i = 0; i < node.exprs.size(); ++i) {
-        node.node_type->types.push_back(node.exprs[i]->node_type);
+    for (auto pattern : node.patterns){
+        node.node_type->types.push_back(pattern->node_type);
     }
     /* Code stops here */
 }
@@ -486,7 +487,7 @@ void TypeChecker::visit(ListSplit &node) {
 
     /* Code goes here */
     if(node.right->node_type->type == LIST){
-        if(check_types(node.left->node_type, node.right->node_type->types[0])){
+        if(node.left->node_type == node.right->node_type->types.front()){
             node.node_type = node.right->node_type;
         } else {
             throw "Not same type m8";

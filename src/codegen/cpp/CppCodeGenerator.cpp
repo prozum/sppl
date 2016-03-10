@@ -54,6 +54,7 @@ namespace codegen
 
     void CCodeGenerator::visit(Case &node)
     {
+        /* TODO */
         output<< "if (";
 
         id_context = IdContext::PATTERN;
@@ -192,7 +193,21 @@ namespace codegen
 
     void CCodeGenerator::visit(ListAdd &node)
     {
+        string name;
+        auto got = lists.find(node.right->node_type);
 
+        // If current list doesn't exists. Create it
+        if (got == lists.end()) {
+            name = generate_list(*node.node_type);
+        } else {
+            name = got->second;
+        }
+
+        output << "gpush_" << name << "(";
+        node.right->accept(*this);
+        output << ", ";
+        node.left->accept(*this);
+        output << ")";
     }
 
     void CCodeGenerator::visit(Par &node)
@@ -212,17 +227,20 @@ namespace codegen
 
     void CCodeGenerator::visit(ListPattern &node)
     {
-
+        /* TODO */
+        throw "Not implemented";
     }
 
     void CCodeGenerator::visit(TuplePattern &node)
     {
-
+        /* TODO */
+        throw "Not implemented";
     }
 
     void CCodeGenerator::visit(ListSplit &node)
     {
-
+        /* TODO */
+        throw "Not implemented";
     }
 
     void CCodeGenerator::visit(Int &node)
@@ -242,17 +260,35 @@ namespace codegen
 
     void CCodeGenerator::visit(Char &node)
     {
-        output << node.value;
+        output << "'" << node.value << "'";
     }
 
     void CCodeGenerator::visit(String &node)
     {
         /* TODO */
+        throw "Not implemented";
     }
 
     void CCodeGenerator::visit(List &node)
     {
-        /* TODO */
+        string name;
+        auto got = lists.find(node.node_type);
+
+        // If current list doesn't exists. Create it
+        if (got == lists.end()) {
+            name = generate_list(*node.node_type);
+        } else {
+            name = got->second;
+        }
+
+        output << "gcreate_" << name << "(";
+        for (auto expr : node.exprs){
+            expr->accept(*this);
+
+            if (expr != node.exprs.back())
+                output << ", ";
+        }
+        output << ")";
     }
 
     void CCodeGenerator::visit(Tuple &node)
@@ -282,36 +318,39 @@ namespace codegen
         switch (id_context) {
             case IdContext::PATTERN:
                 real_ids.insert({node.id, arg_names[arg_count]});
-                output<< arg_names[arg_count];
+                output << arg_names[arg_count];
                 break;
             case IdContext::EXPR:
                 switch (node.node_type->type){
                     case LIST:
+                        output << real_ids[node.id];
                         break;
                     case STRING:
+                        output << real_ids[node.id];
+                        break;
+                    default:
+                        output << real_ids[node.id];
                         break;
                 }
-                output<< real_ids[node.id];
-
                 break;
         }
     }
 
     void CCodeGenerator::visit(Call &node)
     {
-        output<< "(";
+        output << "(";
         node.callee->accept(*this);
 
-        output<< "(";
+        output << "(";
         for (auto expr : node.exprs){
             expr->accept(*this);
 
             if (expr != node.exprs.back())
-                output<< ", ";
+                output << ", ";
         }
-        output<< ")";
+        output << ")";
 
-        output<< ")";
+        output << ")";
     }
 
     void CCodeGenerator::visit(Type &node) {
@@ -329,20 +368,34 @@ namespace codegen
                 output << "int";
                 break;
             case TUPLE:
-                auto got = tuples.find(node);
+                auto tuple = tuples.find(node);
 
-                if (got != tuples.end()) {
-                    output << got->second;
+                if (tuple != tuples.end()) {
+                    output << tuple->second;
                 } else {
                     output << generate_tuple(node);
                 }
                 break;
             case SIGNATURE:
-                /* TODO */
+                auto sig = signatures.find(node);
+
+                if (sig != signatures.end()) {
+                    output << sig->second;
+                } else {
+                    output << generate_signature(node);
+                }
+                break;
             case STRING:
                 /* TODO */
+                break;
             case LIST:
-                /* TODO */
+                auto list = lists.find(node);
+
+                if (list != lists.end()) {
+                    output << list->second;
+                } else {
+                    output << generate_list(node);
+                }
             default:
                 break;
         }
@@ -359,14 +412,68 @@ namespace codegen
         result << "typedef struct " << name << endl;
         result << "{" << endl;
         result << "\t";
-        type.types.back()->accept(*this);
+        type.types.front()->accept(*this);
         result << " *items;" << endl;
         result << "\tint head;" << endl;
         result << "\tint size;" << endl;
         result << "}";
         /* generation of list ends here */
 
+        /* generation of list push starts here */
+        result << name << " *gpush_" << name << "(" << name << " *this, ";
+        type.types.front()->accept(*this);
+        result << " item)" << endl;
+        result << "{" << endl;
+        result << "\tif (this->head >= this->size)" << endl;
+        result << "\t{" << endl;
+        result << "\t\tthis->items = (";
+        type.types.front()->accept(*this);
+        result <<" *)realloc(this->items, (this->size *= 2) * sizeof(";
+        type.types.front()->accept(*this);
+        result << ");" << endl;
+        result << "\t}" << endl;
+        result << "\tthis->items[this->head++] = item;" << endl;
+        result << "\treturn this;" << endl;
+        result << "}" << endl;
+        /* generation of list push ends here */
+
+        /* generation of list constructer starts here */
+        result << name << " *gcreate_" << name << "(int count, ...)" << endl;
+        result << "{" << endl;
+        result << "\tint i;" << endl;
+        // rounding the count to next power of 2 (32 bit int specific)
+        result << "\tint size = count;" << endl;
+        result << "\tsize = (size |= (size |= (size |= (size |= (size |= (count - 1) >> 1) >> 2) >> 4) >> 8) >> 16) + ((size += 1) == 0);" << endl;
+        result << "\t" << name << " *res = (" << name << "*)malloc(sizeof(" << name << "));" << endl;
+        result << "\tres->head = 0;" << endl;
+        result << "\tres->size = count;" << endl;
+        result << "\tres->items = (";
+        type.types.front()->accept(*this);
+        result << " *)malloc(size * sizeof(";
+        type.types.front()->accept(*this);
+        result << "));";
+        result << "\tva_list args;" << endl;
+        result << "\tva_start(args, count);" << endl;
+        result << "\tfor(i = count - 1; i >= 0; i--)" << endl;
+        result << "\t{" << endl;
+        result << "\t\t gpush_" << name << "(res, va_arg(args, i));" << endl;
+        result << "\t}" << endl;
+        result << "\tva_end(args);" << endl;
+        /* generation of list constructer ends here */
+
         /* TODO */
+
+        // increase list count, so next list doesn't have the same name
+        list_count++;
+
+        // writing list to header file
+        header << result;
+
+        // save list in signature hash map
+        lists[type] = name.str();
+
+        // return name of list generated
+        return name.str();
     }
 
     string CCodeGenerator::generate_signature(Type &type) {
@@ -392,13 +499,13 @@ namespace codegen
         // increase signature count, so next signature doesn't have the same name
         sig_count++;
 
-        // writing tuple to header file
+        // writing signature to header file
         header << result;
 
         // save signature in signature hash map
         signatures[type] = name.str();
 
-        // return name of tuple generated
+        // return name of signature generated
         return name.str();
     }
 
