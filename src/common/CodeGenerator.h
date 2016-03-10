@@ -11,6 +11,7 @@ namespace common {
 
     class CodeGenerator : public Visitor {
     public:
+
         CodeGenerator(ostream &out);
 
         std::ostream &output;

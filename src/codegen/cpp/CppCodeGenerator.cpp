@@ -6,9 +6,10 @@
 using namespace common;
 using namespace std;
 
-
-CCodeGenerator::CCodeGenerator(std::ostream &os, std::ostream &head)
-        : CodeGenerator::CodeGenerator(os), header(head)
+namespace codegen
+{
+CCodeGenerator::CCodeGenerator(std::ostream &out, std::ostream &head)
+        : CodeGenerator::CodeGenerator(out), header(head)
 {
 }
 

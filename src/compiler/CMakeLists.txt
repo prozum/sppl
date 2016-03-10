@@ -1,3 +1,3 @@
 add_library(compiler Compiler.cpp Compiler.h)
-target_link_libraries(compiler common parser pprinter)
+target_link_libraries(compiler common parser pprinter ccpp chaskell cgnuasm)
 
