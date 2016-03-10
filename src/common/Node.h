@@ -30,6 +30,7 @@ namespace common {
 		Type* node_type;
 
         // for the interpreter to save the children values of a Node
+        // this should probably be moved into the visitor itself later
         Expr *val;
 
 		virtual void accept(Visitor &v) = 0;
@@ -85,6 +86,9 @@ namespace common {
 	public:
 		std::vector<Pattern *> patterns;
 		Expr *expr;
+
+        // used by the profiler to determine growth for case
+        std::vector<int> time_units;
 
 		Case() { }
 		Case(Expr *e) { expr = e; }

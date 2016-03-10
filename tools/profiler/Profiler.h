@@ -1,20 +1,24 @@
 #include "Node.h"
 #include "Visitor.h"
 #include "Interpreter.h"
+#include "Parser.h"
+#include "Driver.h"
+
+#include <vector>
 
 using namespace common;
 using namespace std;
 using namespace interpreter;
 
-namespace Profiler {
+namespace profiler {
     class Profiler : public Visitor {
     public:
 
         Profiler(Program &node);
 
-        string interpret(string func_id);
+        void instruction_time_profile(int runs);
 
-        void dealloc();
+        void user_time_profile(int runs);
 
         void visit(Program &node);
 
@@ -81,10 +85,14 @@ namespace Profiler {
         void visit(Type &node);
 
     private:
-        unordered_map<string, Node> funcs;
-        Program *node;
-        string func_id;
-        string result;
+        parser::Driver driver;
 
-        void set_result(Expr *);
+        int runs;
+        vector<int> time_units;
+        Program *node;
+        Function curr_fun;
+        int case_num;
+
+        enum ProfilerMode {INSTRUCTION_TIME, USER_TIME};
+        ProfilerMode mode;
 }

@@ -1,8 +1,11 @@
 #include "Profiler.h"
 
+#include <random>
+
+using namespace interpreter;
 using namespace common;
 using namespace std;
-using namespace interpreter;
+
 
 namespace profiler {
 
@@ -10,100 +13,42 @@ namespace profiler {
         this->node = node;
     }
 
-    string Profiler::interpret(string func_id = "main") {
-        result = "";
+    void Profiler::instruction_time_profile(int runs)
+    {
+        mode = INSTRUCTION_TIME;
 
-        this->func_id = func_id;
         node->accept(this);
-
-        for (auto f : node->funcs) {
-            if (f->id == id) {
-                this->set_result(f->val);
-            }
-        }
-
-        return result;
     }
 
-    void Profiler::set_result(Expr *exp) {
-        switch (exp->node_type->type) {
-        case INT:
-            result += to_string(((Int*)exp)->value);
-            break;
-        case FLOAT:
-            result += to_string(((Float*)exp)->value);
-            break;
-        case BOOL:
-            result += to_string(((Bool*)exp)->value);
-            break;
-        case CHAR:
-            result += to_string(((Char*)exp)->value);
-            break;
-        case STRING:
-            result += to_string(((String*)exp)->value);
-            break;
-        case LIST:
-            result = "[";
-            for (int i = 0; i < ((String*)exp)->value.size()- 1; ++i) {
-                result += to_string(((String*)exp)->value[i]);
-                result += ",";
-            }
-            node.types.back()->accept(*this);
-            result = "]";
-        case LIST:
-            result = "[";
-            for (int i = 0; i < ((List*)exp)->value.size()- 1; ++i) {
-                result += to_string(((List*)exp)->value[i]);
-                result += ",";
-            }
-            node.types.back()->accept(*this);
-            result = "]";
-            break;
-        case TUPLE:
-            result = "(";
-            for (int i = 0; i < ((Tuple*)exp)->value.size()- 1; ++i) {
-                result += to_string(((Tuple*)exp)->value[i]);
-                result += ",";
-            }
-            node.types.back()->accept(*this);
-            result = ")";
-            break;
-        case SIGNATURE:
-            result += ((Id*)expr)->id;
-        default:
-            result = "Error";
-        }
+    void Profiler::user_time_profile(int runs)
+    {
+        mode = USER_TIME;
+
+        node->accept(this);
     }
 
     void Profiler::visit(Program *node)
     {
         for (auto f : node->funcs) {
-            funcs.insert(f->id, f);
-        }
-
-        for (auto f : node->funcs) {
-            if (f->id == id) {
-                f->accept(this);
-            }
+            f->accept(this);
         }
     }
 
     void Profiler::visit(Function *node)
     {
         for (auto c : node->cases) {
-            if (c) {
-
-            }
+            c->accept(this);
         }
     }
 
     void Profiler::visit(Case *node)
     {
-        /*
-        for (auto e : node->expr) {
-            e->accept(this);
+        if (mode == INSTRUCTION_TIME) {
+
+        } else if (mode == USER_TIME) {
+            // tbd
+            return;
         }
-        */
     }
 
     void Profiler::visit(Or *node)
