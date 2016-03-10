@@ -21,7 +21,7 @@ namespace compiler {
         switch (backend)
         {
             case Backend::CPP:
-                generator = make_unique<codegen::CppCodeGenerator>(*output);
+                generator = make_unique<codegen::CCodeGenerator>(*output);
                 break;
             case Backend::GNUASM:
                 generator = make_unique<codegen::GasCodeGenerator>(*output);
