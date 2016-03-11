@@ -27,7 +27,7 @@ namespace common {
 
 	class Node {
 	public:
-		Type* node_type;
+		Type *node_type;
 
         // for the interpreter to save the children values of a Node
         // this should probably be moved into the visitor itself later
