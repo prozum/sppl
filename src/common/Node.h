@@ -378,5 +378,7 @@ namespace common {
 
 		virtual void accept(Visitor &v);
 		bool operator==(const Type &other) const;
+
+		virtual ~Type();
 	};
 }
