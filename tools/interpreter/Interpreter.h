@@ -88,5 +88,5 @@ namespace interpreter {
         string result;
 
         void set_result(Expr &);
-    }
+    };
 }

@@ -8,158 +8,162 @@ using namespace common;
 
 namespace optimizer {
 
-    void Optimizer::visit(Program *node)
+    void ParallelOptimizer::visit(Program &node)
     {
-        for (auto f : node->funcs){
-            f->accept(this);
+        for (auto f : node.funcs){
+            f->accept(*this);
         }
     }
 
-    void Optimizer::visit(Function *node)
+    void ParallelOptimizer::visit(Function &node)
     {
-        for (auto c : node->cases) {
-            c->accept(this);
+        for (auto c : node.cases) {
+            c->accept(*this);
         }
 
     }
 
-    void Optimizer::visit(Case *node)
+    void ParallelOptimizer::visit(Case &node)
     {
-        for (auto p : node->patterns) {
-            p->accept(this);
+        for (auto p : node.patterns) {
+            p->accept(*this);
         }
     }
 
-    void Optimizer::visit(Or *node)
+    void ParallelOptimizer::visit(Or &node)
     {
 
     }
 
-    void Optimizer::visit(And *node)
+    void ParallelOptimizer::visit(And &node)
     {
 
     }
 
-    void Optimizer::visit(Equal *node)
+    void ParallelOptimizer::visit(Equal &node)
     {
 
     }
 
-    void Optimizer::visit(NotEqual *node)
+    void ParallelOptimizer::visit(NotEqual &node)
     {
 
     }
 
-    void Optimizer::visit(Lesser *node)
+    void ParallelOptimizer::visit(Lesser &node)
     {
 
     }
 
-    void Optimizer::visit(LesserEq *node)
+    void ParallelOptimizer::visit(LesserEq &node)
     {
 
     }
 
-    void Optimizer::visit(Greater *node)
+    void ParallelOptimizer::visit(Greater &node)
     {
 
     }
 
-    void Optimizer::visit(GreaterEq *node)
+    void ParallelOptimizer::visit(GreaterEq &node)
     {
 
     }
 
-    void Optimizer::visit(Add *node)
+    void ParallelOptimizer::visit(Add &node)
     {
 
     }
 
-    void Optimizer::visit(Sub *node)
+    void ParallelOptimizer::visit(Sub &node)
     {
 
     }
 
-    void Optimizer::visit(Mul *node)
+    void ParallelOptimizer::visit(Mul &node)
     {
 
     }
 
-    void Optimizer::visit(Div *node)
+    void ParallelOptimizer::visit(Div &node)
     {
 
     }
 
-    void Optimizer::visit(Mod *node)
+    void ParallelOptimizer::visit(Mod &node)
     {
 
     }
 
-    void Optimizer::visit(ListAdd *node)
+    void ParallelOptimizer::visit(ListAdd &node)
     {
 
     }
 
-    void Optimizer::visit(Par *node)
+    void ParallelOptimizer::visit(Par &node)
     {
 
     }
 
-    void Optimizer::visit(Not *node)
+    void ParallelOptimizer::visit(Not &node)
     {
 
     }
 
-    void Optimizer::visit(ListPattern *node)
+    void ParallelOptimizer::visit(ListPattern &node)
     {
 
     }
 
-    void Optimizer::visit(TuplePattern *node)
+    void ParallelOptimizer::visit(TuplePattern &node)
     {
 
     }
 
-    void Optimizer::visit(ListSplit *node)
+    void ParallelOptimizer::visit(ListSplit &node)
     {
 
     }
 
-    void Optimizer::visit(Int *node)
+    void ParallelOptimizer::visit(Int &node)
     {
     }
 
-    void Optimizer::visit(Float *node)
+    void ParallelOptimizer::visit(Float &node)
     {
     }
 
-    void Optimizer::visit(Bool *node)
+    void ParallelOptimizer::visit(Bool &node)
     {
     }
 
-    void Optimizer::visit(Char *node)
+    void ParallelOptimizer::visit(Char &node)
     {
     }
 
-    void Optimizer::visit(String *node)
+    void ParallelOptimizer::visit(String &node)
     {
     }
 
-    void Optimizer::visit(List *node)
-    {
-
-    }
-
-    void Optimizer::visit(Id *node)
-    {
-    }
-
-    void Optimizer::visit(Call *node)
+    void ParallelOptimizer::visit(List &node)
     {
 
     }
 
-    void Optimizer::visit(Type *node)
+    void ParallelOptimizer::visit(Id &node)
     {
+    }
+
+    void ParallelOptimizer::visit(Call &node)
+    {
+
+    }
+
+    void ParallelOptimizer::visit(Type &node)
+    {
+    }
+
+    void ParallelOptimizer::visit(Tuple &node) {
+
     }
 }

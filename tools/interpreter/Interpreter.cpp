@@ -289,4 +289,12 @@ namespace interpreter {
     {
         //node.val = &node;
     }
+
+    void Interpreter::dealloc() {
+
+    }
+
+    void Interpreter::visit(Tuple &node) {
+
+    }
 }
