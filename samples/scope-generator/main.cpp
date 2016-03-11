@@ -1,7 +1,7 @@
 //
 // Created by hejsil on 3/4/16.
 //
-
+/*
 #include <typeinfo>
 #include <iostream>
 #include <string>
@@ -109,3 +109,4 @@ void print_scopes(Scope *scope) {
 
     tap--;
 }
+ */
