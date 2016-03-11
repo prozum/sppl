@@ -1,2 +1,2 @@
-add_library(typecheck TypeChecker.cpp ScopeGenerator.cpp TypeChecker.h ScopeGenerator.h)
-target_link_libraries(typecheck common)
+add_library(semantics TypeChecker.cpp ScopeGenerator.cpp TypeChecker.h ScopeGenerator.h)
+target_link_libraries(semantics common)

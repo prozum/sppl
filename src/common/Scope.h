@@ -13,12 +13,17 @@ namespace common {
     class Scope {
     public:
         std::unordered_map<std::string, Type *> decls;
+        std::unordered_map<std::string, std::string> real_ids;
 
         Scope *parent;
         std::vector<Scope *> children;
 
         Scope() : Scope(nullptr) { }
         Scope(Scope *p);
+
+        bool exists(std::string id);
+        string get_real_id(std::string id);
+        Type *get_type(std::string id);
     };
 }
 

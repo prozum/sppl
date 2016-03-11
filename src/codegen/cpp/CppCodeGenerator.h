@@ -1,6 +1,8 @@
 #pragma once
 #include "CodeGenerator.h"
 #include "Node.h"
+#include "../../semantics/TypeChecker.h"
+#include "../../semantics/ScopeGenerator.h"
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -111,15 +113,25 @@ namespace codegen {
             int list_count = 0;
             int sig_count = 0;
             int arg_count = 0;
+            int output_tap_count = 0;
+            int header_tap_count = 0;
             unordered_map<Type, string> tuples;
             unordered_map<Type, string> lists;
             unordered_map<Type, string> signatures;
-            unordered_map<string, string> real_ids;
             vector<string> arg_names;
             IdContext id_context;
+            stringstream last_type;
+
+            ScopeGenerator scope_generator;
+            TypeChecker type_checker;
 
             string generate_list(Type &);
             string generate_tuple(Type &);
             string generate_signature(Type &);
+
+            ostream &outputt();
+            ostream &headert();
+            ostream &t(ostream &stream, int i);
+            string tap(int i);
     };
 }
