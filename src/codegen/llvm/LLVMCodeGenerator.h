@@ -1,6 +1,14 @@
 #pragma once
 #include "CodeGenerator.h"
 
-class LLVMCodeGenerator: public CodeGenerator {
+using namespace common;
 
-};
+namespace codegen {
+
+    class LLVMCodeGenerator : public CodeGenerator
+    {
+    public:
+        LLVMCodeGenerator(std::ostream &);
+
+    };
+}

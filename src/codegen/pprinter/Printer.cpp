@@ -218,7 +218,7 @@ namespace codegen {
 
         cout << "Bool" << endl;
 
-        output << (node.value) ? "True" : "False";
+        output << (node.value ? "True" : "False");
     }
 
     void Printer::visit(Char &node) {
