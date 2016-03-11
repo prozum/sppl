@@ -12,7 +12,6 @@ namespace compiler {
 
     void Compiler::set_backend(Backend backend)
     {
-
         switch (backend)
         {
 #ifdef CCPP
