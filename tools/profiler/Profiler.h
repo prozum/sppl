@@ -84,6 +84,12 @@ namespace profiler {
 
         void visit(Type &node);
 
+        Pattern &generate_literal(Types t);
+
+        Pattern &generate_list(Type &t, int len);
+
+        Pattern &generate_tuple(vector<Type *> ts);
+
     private:
         parser::Driver driver;
 
