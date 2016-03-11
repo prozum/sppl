@@ -87,5 +87,6 @@ namespace interpreter {
         string func_id;
         string result;
 
-        void set_result(Expr *);
+        void set_result(Expr &);
+    }
 }
