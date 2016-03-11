@@ -2,7 +2,6 @@
 #include <iostream>
 #include <string>
 
-using namespace common;
 using namespace std;
 
 namespace codegen {

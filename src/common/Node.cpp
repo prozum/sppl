@@ -77,7 +77,7 @@ namespace common {
                     if (this->types.size() != other.types.size())
                         return false;
 
-                    for (int i = 0; i < this->types.size(); ++i) {
+                    for (unsigned int i = 0; i < this->types.size(); ++i) {
                         if (this->types[i] != other.types[i]){
                             return false;
                         }
@@ -88,5 +88,9 @@ namespace common {
         } else {
             return false;
         }
+    }
+
+    Type::~Type() {
+
     }
 }
