@@ -18,16 +18,14 @@ namespace optimizer {
     void GeneralOptimizer::visit(Function &node)
     {
         for (auto c : node.cases) {
-            /*
             // first checks if the case's expression is only a function call
             // secondly checks if the callee of the function call is an Id
             // lastly check is the function call's id is matching the case's parent function
             if (typeid(c->expr) == typeid(Call)
                 && typeid(((Call)c->expr).callee) == typeid(Id)
-                && (((Id)((Call)c->expr).callee)).id == node.id) {
+                && (((Id*)((Call)c->expr).callee))->id == node.id) {
                 c->tail_rec = true;
             }
-            */
             c->accept(*this);
         }
     }
