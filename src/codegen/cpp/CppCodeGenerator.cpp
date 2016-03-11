@@ -2,6 +2,7 @@
 #include <string>
 #include <iostream>
 #include <sstream>
+#include <Scope.h>
 
 using namespace common;
 using namespace std;
@@ -15,182 +16,230 @@ namespace codegen
 
     void CCodeGenerator::visit(Program &node)
     {
+        stringstream func_name;
+        scope_generator.visit(node);
+        type_checker.visit(node);
+
+        outputt()<< "#include <stdarg.h>" << endl;
+        outputt()<< "#include <stdio.h>" << endl;
+        outputt()<< "#include <stdlib.h>" << endl;
+        // TODO real header
+        outputt() << "#include \"test.h\"" << endl;
+        outputt()<< endl;
+        outputt()<< "int main(int argc, char** argv)" << endl;
+        outputt()<< "{" << endl;
+        output_tap_count++;
+        outputt()<< "return umain();" << endl;
+        output_tap_count--;
+        outputt()<< "}" << endl;
+        outputt()<< endl;
+
+
+        for (auto f : node.funcs) {
+            // save a unique name for each function the program
+            func_name << "u" << f->id;
+            f->scope->real_ids[f->id] = func_name.str();
+            func_name.str("");
+        }
+
         for (auto f : node.funcs) {
             f->accept(*this);
+            outputt() << endl;
         }
     }
 
     void CCodeGenerator::visit(Function &node)
     {
+        stringstream func_name;
         stringstream arg_name;
 
-        // generate return type
-        node.types.back()->accept(*this);
-
-        // give function a unique name
-        output<< " u" << node.id << "( ";
+        // get the functions unique name
+        func_name << node.scope->get_real_id(node.id) << "(";
 
         // generate function arguments
-        for (arg_count = 0; arg_count < node.types.size() - 1; arg_count++) {
-            arg_name << "ga" << arg_count;
-            node.types[arg_count]->accept(*this);
+        for (int i = 0; i < node.types.size() - 1; i++) {
+            node.types[i]->accept(*this);
+            arg_name << "ga" << i;
             arg_names.push_back(arg_name.str());
-            output << " " << arg_name.str();
+            func_name << last_type.str() << " " << arg_name.str();
 
-            if (arg_count < node.types.size() - 2) // don't generate ", " after last argument
-                output<< ", ";
+            if (i < node.types.size() - 2) // don't generate ", " after last argument
+                func_name<< ", ";
+
+            arg_name.str("");
         }
 
-        output<< ") {" << endl;
+        func_name << ")";
+
+        node.types.back()->accept(*this);
+
+        // generate function decleration in header
+        headert()<< last_type.str() << " " << func_name.str() << ";" << endl;
+
+        // generate function in output
+        outputt()<< last_type.str() << " " << func_name.str() << endl;
+
+        // generate cases
+        outputt()<< "{" << endl;
+        output_tap_count++;
 
         for (auto c : node.cases) {
             c->accept(*this);
-            real_ids.clear();
         }
 
-        output<< "}" << endl;
+        output_tap_count--;
+        outputt()<< "}" << endl;
         arg_names.clear();
     }
 
     void CCodeGenerator::visit(Case &node)
     {
-        /* TODO */
-        output << "if (";
+        // TODO better pattern matching
 
-        id_context = IdContext::PATTERN;
-        for (int i = 0; i < node.patterns.size(); ++i) {
-            output << "ga" << i << " == ";
-            node.patterns[i]->accept(*this);
+        if (node.patterns.size() != 0) {
+            // generate if-statement for matching
+            outputt() << "if (";
 
-            if (i < node.patterns.size() - 1 )
-                output << " && ";
+            id_context = IdContext::PATTERN;
+            for (arg_count = 0; arg_count < node.patterns.size(); ++arg_count) {
+                output << "ga" << arg_count << " == ";
+                node.patterns[arg_count]->accept(*this);
+
+                if (arg_count < node.patterns.size() - 1 )
+                    output << " && ";
+            }
+
+            output << ")" << endl;
         }
 
-        id_context = IdContext::EXPR;
+        outputt()<< "{" << endl;
+        output_tap_count++;
 
-        output << ")" << endl;
-        output << "{" << endl;
-        output << "\treturn ";
+        // generate return expression
+        id_context = IdContext::EXPR;
+        outputt()<< "return ";
         node.expr->accept(*this);
         output << ";" << endl;
-        output << "}" << endl;
+
+        output_tap_count--;
+        outputt() << "}" << endl;
     }
 
     void CCodeGenerator::visit(Or &node)
     {
-        output<< "(";
+        output << "(";
         node.left->accept(*this);
-        output<< "||";
+        output << "||";
         node.right->accept(*this);
-        output<< ")";
+        output << ")";
     }
 
     void CCodeGenerator::visit(And &node)
     {
-        output<< "(";
+        output << "(";
         node.left->accept(*this);
-        output<< "&&";
+        output << "&&";
         node.right->accept(*this);
-        output<< ")";
+        output << ")";
     }
 
     void CCodeGenerator::visit(Equal &node)
     {
-        output<< "(";
+        output << "(";
         node.left->accept(*this);
-        output<< "==";
+        output << "==";
         node.right->accept(*this);
-        output<< ")";
+        output << ")";
     }
 
     void CCodeGenerator::visit(NotEqual &node)
     {
-        output<< "(";
+        output << "(";
         node.left->accept(*this);
-        output<< "!=";
+        output << "!=";
         node.right->accept(*this);
-        output<< ")";
+        output << ")";
     }
 
     void CCodeGenerator::visit(Lesser &node)
     {
-        output<< "(";
+        output << "(";
         node.left->accept(*this);
-        output<< "<";
+        output << "<";
         node.right->accept(*this);
-        output<< ")";
+        output << ")";
     }
 
     void CCodeGenerator::visit(LesserEq &node)
     {
-        output<< "(";
+        output << "(";
         node.left->accept(*this);
-        output<< "<=";
+        output << "<=";
         node.right->accept(*this);
-        output<< ")";
+        output << ")";
     }
 
     void CCodeGenerator::visit(Greater &node)
     {
-        output<< "(";
+        output << "(";
         node.left->accept(*this);
-        output<< ">";
+        output << ">";
         node.right->accept(*this);
-        output<< ")";
+        output << ")";
     }
 
     void CCodeGenerator::visit(GreaterEq &node)
     {
-        output<< "(";
+        output << "(";
         node.left->accept(*this);
-        output<< ">=";
+        output << ">=";
         node.right->accept(*this);
-        output<< ")";
+        output << ")";
     }
 
     void CCodeGenerator::visit(Add &node)
     {
-        output<< "(";
+        output << "(";
         node.left->accept(*this);
-        output<< "+";
+        output << "+";
         node.right->accept(*this);
-        output<< ")";
+        output << ")";
     }
 
     void CCodeGenerator::visit(Sub &node)
     {
-        output<< "(";
+        output << "(";
         node.left->accept(*this);
-        output<< "-";
+        output << "-";
         node.right->accept(*this);
-        output<< ")";
+        output << ")";
     }
 
     void CCodeGenerator::visit(Mul &node)
     {
-        output<< "(";
+        output << "(";
         node.left->accept(*this);
-        output<< "*";
+        output << "*";
         node.right->accept(*this);
-        output<< ")";
+        output << ")";
     }
 
     void CCodeGenerator::visit(Div &node)
     {
-        output<< "(";
+        output << "(";
         node.left->accept(*this);
-        output<< "/";
+        output << "/";
         node.right->accept(*this);
-        output<< ")";
+        output << ")";
     }
 
     void CCodeGenerator::visit(Mod &node)
     {
-        output<< "(";
+        output << "(";
         node.left->accept(*this);
-        output<< "%";
+        output << "%";
         node.right->accept(*this);
-        output<< ")";
+        output << ")";
     }
 
     void CCodeGenerator::visit(ListAdd &node)
@@ -214,17 +263,17 @@ namespace codegen
 
     void CCodeGenerator::visit(Par &node)
     {
-        output<< "(";
+        output << "(";
         node.child->accept(*this);
-        output<< ")";
+        output << ")";
     }
 
     void CCodeGenerator::visit(Not &node)
     {
-        output<< "(";
-        output<< "!";
+        output << "(";
+        output << "!";
         node.child->accept(*this);
-        output<< ")";
+        output << ")";
     }
 
     void CCodeGenerator::visit(ListPattern &node)
@@ -296,7 +345,7 @@ namespace codegen
     void CCodeGenerator::visit(Tuple &node)
     {
         string name;
-        auto got = tuples.find(*node.node_type);
+        auto got = tuples.find(*(node.node_type));
 
         // If current tuple doesn't exists. Create it
         if (got == tuples.end()) {
@@ -319,19 +368,19 @@ namespace codegen
     {
         switch (id_context) {
             case IdContext::PATTERN:
-                real_ids.insert({node.id, arg_names[arg_count]});
+                node.scope->real_ids[node.id] = arg_names[arg_count];
                 output << arg_names[arg_count];
                 break;
             case IdContext::EXPR:
                 switch (node.node_type->type){
                     case Types::LIST:
-                        output << real_ids[node.id];
+                        output << node.scope->get_real_id(node.id);
                         break;
                     case Types::STRING:
-                        output << real_ids[node.id];
+                        output << node.scope->get_real_id(node.id);
                         break;
                     default:
-                        output << real_ids[node.id];
+                        output << node.scope->get_real_id(node.id);
                         break;
                 }
                 break;
@@ -360,33 +409,33 @@ namespace codegen
 
         switch (node.type) {
             case Types::FLOAT:
-                output << "double";
+                last_type.str("double");
                 break;
             case Types::CHAR:
-                output << "char";
+                last_type.str("char");
                 break;
             case Types::INT:
-                output << "int";
+                last_type.str("int");
                 break;
             case Types::BOOL:
-                output << "int";
+                last_type.str("int");
                 break;
             case Types::TUPLE:
                 got = tuples.find(node);
 
                 if (got != tuples.end()) {
-                    output << got->second;
+                    last_type.str(got->second);
                 } else {
-                    output << generate_tuple(node);
+                    last_type.str(generate_tuple(node));
                 }
                 break;
             case Types::SIGNATURE:
                 got = signatures.find(node);
 
                 if (got != signatures.end()) {
-                    output << got->second;
+                    last_type.str(got->second);
                 } else {
-                    output << generate_signature(node);
+                    last_type.str(generate_signature(node));
                 }
                 break;
             case Types::STRING:
@@ -395,72 +444,76 @@ namespace codegen
                 got = lists.find(node);
 
                 if (got != lists.end()) {
-                    output << got->second;
+                    last_type.str(got->second);
                 } else {
-                    output << generate_list(node);
+                    last_type.str(generate_list(node));
                 }
+                last_type << " *";
             default:
                 break;
         }
     }
 
     string CCodeGenerator::generate_list(Type &type) {
-        // result is needed, so we don't start generating something in a signature in the header file
+        // t(result, tap_count) is needed, so we don't start generating something in a signature in the headert()file
         stringstream result;
         string name = "gl";
-        name += list_count;
+        int tap_count = 0;
+        name += to_string(list_count);
+
+        type.types.front()->accept(*this);
 
         /* generation of list starts here */
-        result << "typedef struct " << name << endl;
-        result << "{" << endl;
-        result << "\t";
-        type.types.front()->accept(*this);
-        result << " *items;" << endl;
-        result << "\tint head;" << endl;
-        result << "\tint size;" << endl;
-        result << "}";
+        t(result, tap_count) << "typedef struct " << name << endl;
+        t(result, tap_count) << "{" << endl;
+        tap_count++;
+        t(result, tap_count) << last_type.str() << " *items;" << endl;
+        t(result, tap_count) << "int head;" << endl;
+        t(result, tap_count) << "int size;" << endl;
+        tap_count--;
+        t(result, tap_count) << "};";
         /* generation of list ends here */
 
         /* generation of list push starts here */
-        result << name << " *gpush_" << name << "(" << name << " *this, ";
-        type.types.front()->accept(*this);
-        result << " item)" << endl;
-        result << "{" << endl;
-        result << "\tif (this->head >= this->size)" << endl;
-        result << "\t{" << endl;
-        result << "\t\tthis->items = (";
-        type.types.front()->accept(*this);
-        result <<" *)realloc(this->items, (this->size *= 2) * sizeof(";
-        type.types.front()->accept(*this);
-        result << ");" << endl;
-        result << "\t}" << endl;
-        result << "\tthis->items[this->head++] = item;" << endl;
-        result << "\treturn this;" << endl;
-        result << "}" << endl;
+        t(result, tap_count) << name << " *gpush_" << name << "(" << name << " *this, ";
+        t(result, tap_count) << last_type.str() << " item)" << endl;
+        t(result, tap_count) << "{" << endl;
+        tap_count++;
+        t(result, tap_count) << "if (this->head >= this->size)" << endl;
+        t(result, tap_count) << "{" << endl;
+        tap_count++;
+        t(result, tap_count) << "this->items = (" << last_type.str() << " *)realloc(this->items, (this->size *= 2) * sizeof(" << last_type.str() << ");" << endl;
+        tap_count--;
+        t(result, tap_count) << "}" << endl;
+        t(result, tap_count) << "this->items[this->head++] = item;" << endl;
+        t(result, tap_count) << "return this;" << endl;
+        tap_count--;
+        t(result, tap_count) << "}" << endl;
         /* generation of list push ends here */
 
         /* generation of list constructer starts here */
-        result << name << " *gcreate_" << name << "(int count, ...)" << endl;
-        result << "{" << endl;
-        result << "\tint i;" << endl;
+        t(result, tap_count) << name << " *gcreate_" << name << "(int count, ...)" << endl;
+        t(result, tap_count) << "{" << endl;
+        tap_count++;
+        t(result, tap_count) << "int i;" << endl;
         // rounding the count to next power of 2 (32 bit int specific)
-        result << "\tint size = count;" << endl;
-        result << "\tsize = (size |= (size |= (size |= (size |= (size |= (count - 1) >> 1) >> 2) >> 4) >> 8) >> 16) + ((size += 1) == 0);" << endl;
-        result << "\t" << name << " *res = (" << name << "*)malloc(sizeof(" << name << "));" << endl;
-        result << "\tres->head = 0;" << endl;
-        result << "\tres->size = count;" << endl;
-        result << "\tres->items = (";
-        type.types.front()->accept(*this);
-        result << " *)malloc(size * sizeof(";
-        type.types.front()->accept(*this);
-        result << "));";
-        result << "\tva_list args;" << endl;
-        result << "\tva_start(args, count);" << endl;
-        result << "\tfor(i = count - 1; i >= 0; i--)" << endl;
-        result << "\t{" << endl;
-        result << "\t\t gpush_" << name << "(res, va_arg(args, i));" << endl;
-        result << "\t}" << endl;
-        result << "\tva_end(args);" << endl;
+        t(result, tap_count) << "int size = count - 1;" << endl;
+        t(result, tap_count) << "size = (size |= (size |= (size |= (size |= (size |= size >> 1) >> 2) >> 4) >> 8) >> 16) + ((size += 1) == 0);" << endl;
+        t(result, tap_count) << "" << name << " *res = (" << name << "*)malloc(sizeof(" << name << "));" << endl;
+        t(result, tap_count) << "res->head = 0;" << endl;
+        t(result, tap_count) << "res->size = size;" << endl;
+        t(result, tap_count) << "res->items = (" << last_type.str() << " *)malloc(size * sizeof(" << last_type.str() << "));";
+        t(result, tap_count) << "va_list args;" << endl;
+        t(result, tap_count) << "va_start(args, count);" << endl;
+        t(result, tap_count) << "for(i = count - 1; i >= 0; i--)" << endl;
+        t(result, tap_count) << "{" << endl;
+        tap_count++;
+        t(result, tap_count) << "gpush_" << name << "(res, va_arg(args, i));" << endl;
+        tap_count--;
+        t(result, tap_count) << "}" << endl;
+        t(result, tap_count) << "va_end(args);" << endl;
+        tap_count--;
+        t(result, tap_count) << "}" << endl;
         /* generation of list constructer ends here */
 
         /* TODO */
@@ -468,8 +521,8 @@ namespace codegen
         // increase list count, so next list doesn't have the same name
         list_count++;
 
-        // writing list to header file
-        header << result.str();
+        // writing list to headert()file
+        headert()<< result.str();
 
         // save list in signature hash map
         lists[type] = name;
@@ -479,29 +532,30 @@ namespace codegen
     }
 
     string CCodeGenerator::generate_signature(Type &type) {
-        // result is needed, so we don't start generating something in a signature in the header file
+        // t(result, tap_count) is needed, so we don't start generating something in a signature in the headert()file
         stringstream result;
         string name = "gs";
-        name += sig_count;
+        int tap_count = 0;
+        name += to_string(sig_count);
 
-        result << "typedef ";
         type.types.back()->accept(*this);
-        result << " (* " << name << ")(";
+        t(result, tap_count) << "typedef " << last_type.str() << " (* " << name << ")(";
 
         for (int i = 0; i < type.types.size() - 1; ++i) {
             type.types[i]->accept(*this); // generate the actual type of the argument
+            t(result, tap_count) << last_type.str();
 
             if (i < type.types.size() - 2) // don't print ", " after the last argument
-                result << ", ";
+                t(result, tap_count) << ", ";
         }
 
-        result << ")";
+        t(result, tap_count) << ")";
 
         // increase signature count, so next signature doesn't have the same name
         sig_count++;
 
-        // writing signature to header file
-        header << result.str();
+        // writing signature to headert()file
+        headert()<< result.str();
 
         // save signature in signature hash map
         signatures[type] = name;
@@ -511,62 +565,87 @@ namespace codegen
     }
 
     string CCodeGenerator::generate_tuple(Type &type) {
-        // result is needed, so we don't start generating something in a tuple in the header file
+        // t(result, tap_count) is needed, so we don't start generating something in a tuple in the headert()file
         stringstream result;
         string name = "gt";
-        name += tuple_count;
+        int tap_count = 0;
+        name += to_string(tuple_count);
 
         /* generation of tuple starts here */
-        result << "typedef struct " << name << endl;
-        result << "{" << endl;
-
+        t(result, tap_count) << "typedef struct " << name << endl;
+        t(result, tap_count) << "{" << endl;
+        tap_count++;
         // generate an item for each type in the tuple
         for (int i = 0; i < type.types.size(); ++i) {
-            result << "\t";
             type.types[i]->accept(*this); // generate the actual type of the item
-            result << " i" << i << ";" << endl; // give this item a unique name
+            t(result, tap_count) << last_type.str() << " i" << i << ";" << endl; // give this item a unique name
         }
-
-        result << "} " << name << endl;
-        result << endl;
+        tap_count--;
+        t(result, tap_count) << "}" << name << ";" << endl;
+        t(result, tap_count) << endl;
         /* generation of tuple ends here */
 
         /* generation of tuple contructor starts here */
         // give contructor a unique name
-        result << name << " gcreate_" << name << "(";
+        t(result, tap_count) << name << " gcreate_" << name << "(";
 
         // generate an argument for each item in the struct
         for (int i = 0; i < type.types.size(); ++i) {
             type.types[i]->accept(*this); // generate the actual type of the argument
-            result << " i" << i;
+            t(result, tap_count) << last_type.str() << " i" << i;
 
             if (i < type.types.size() - 1) // don't print ", " after the last argument
-                result << ", ";
+                t(result, tap_count) << ", ";
         }
-        result << ")" << endl;
-        result << "{" << endl;
+        t(result, tap_count) << ")" << endl;
+        t(result, tap_count) << "{" << endl;
+        tap_count++;
 
-        // generate a result variable
-        result << "\t" << name << " " << "res;" << endl;
+        // generate a t(result, tap_count) variable
+        t(result, tap_count) << "" << name << " " << "res;" << endl;
 
         // for each item in res, assign values
         for (int i = 0; i < type.types.size(); ++i) {
-            result << "\tres.i" << i << " = i" << i << ";" << endl;
+            t(result, tap_count) << "res.i" << i << " = i" << i << ";" << endl;
         }
-        result << "return res" << endl;
-        result << "}" << endl;
+        t(result, tap_count) << "return res;" << endl;
+        tap_count--;
+        t(result, tap_count) << "}" << endl;
         /* generation of tuple contructor ends here */
 
         // increase tuple count, so next tuple doesn't have the same name
         tuple_count++;
 
-        // writing tuple to header file
-        header << result.str();
+        // writing tuple to headert()file
+        headert()<< result.str();
 
         // save tuple in tuple hash map
         tuples[type] = name;
 
         // return name of tuple generated
         return name;
+    }
+
+    string CCodeGenerator::tap(int i) {
+        string res = "";
+
+        for (int j = 0; j < i; j++) {
+            res += "    ";
+        }
+
+        return res;
+    }
+
+    ostream &CCodeGenerator::outputt() {
+        return t(output, output_tap_count);
+    }
+
+    ostream &CCodeGenerator::headert() {
+        return t(header, header_tap_count);
+    }
+
+    ostream &CCodeGenerator::t(ostream &stream, int i) {
+        stream << tap(i);
+        return stream;
     }
 }

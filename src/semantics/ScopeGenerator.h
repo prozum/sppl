@@ -59,8 +59,7 @@ private:
     std::stack<Type *> type_stack;
     ScopeContext context;
     vector<Scope *> garbage;
-
-    bool exists_in_scope(std::string id);
+    vector<Type *> type_garbage;
 };
 
 

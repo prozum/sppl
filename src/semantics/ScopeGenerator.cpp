@@ -20,9 +20,12 @@ void ScopeGenerator::visit(Program &node) {
 
 void ScopeGenerator::visit(Function &node) {
     current_func = &node;
+    node.scope = current_scope;
 
-    if (!exists_in_scope(node.id)) {
-        current_scope->decls.insert({node.id, new Type(Types::SIGNATURE, &node.types)});
+    if (!current_scope->exists(node.id)) {
+        auto type = new Type(Types::SIGNATURE, &node.types);
+        current_scope->decls.insert({node.id, type});
+        type_garbage.push_back(type);
 
         /* Visit children */
         for (auto type : node.types) {
@@ -264,7 +267,7 @@ void ScopeGenerator::visit(Id &node) {
     node.scope = current_scope;
 
     if (context == ScopeContext::PATTERN) {
-        if (!exists_in_scope(node.id)) {
+        if (!current_scope->exists(node.id)) {
             current_scope->decls.insert({node.id, type_stack.top()});
         } else {
             /* ERROR! Id exists in scope */
@@ -284,23 +287,5 @@ void ScopeGenerator::visit(Call &node) {
 
 void ScopeGenerator::visit(Type &node) {
 
-}
-
-bool ScopeGenerator::exists_in_scope(std::string id) {
-    Scope *scope = current_scope;
-
-    for (;;) {
-        auto got = scope->decls.find(id);
-
-        if (got != scope->decls.end())
-            return true;
-
-        if (scope->parent)
-            scope = scope->parent;
-        else
-            break;
-    }
-
-    return false;
 }
 

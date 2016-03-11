@@ -71,14 +71,14 @@ namespace common {
         if (this->type == other.type){
             switch (this->type) {
                 case Types::LIST:
-                    return this->types[0] == other.types[0];
+                    return *this->types[0] == *other.types[0];
                 case Types::SIGNATURE:
                 case Types::TUPLE:
                     if (this->types.size() != other.types.size())
                         return false;
 
                     for (unsigned int i = 0; i < this->types.size(); ++i) {
-                        if (this->types[i] != other.types[i]){
+                        if (!(*this->types[i] == *other.types[i])){
                             return false;
                         }
                     }

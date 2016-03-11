@@ -27,7 +27,7 @@ namespace common {
 
 	class Node {
 	public:
-		Type *node_type;
+		Type* node_type;
 
         // for the interpreter to save the children values of a Node
         // this should probably be moved into the visitor itself later
@@ -75,6 +75,7 @@ namespace common {
 		std::string id;
 		std::vector<Type*> types;
 		std::vector<Case*> cases;
+		Scope *scope;
 
 		Function() { }
 		Function(std::string s) { id = s; }
@@ -89,9 +90,6 @@ namespace common {
 
         // used by the profiler to determine growth for case
         std::vector<int> time_units;
-
-        // used by the optimizer to check tail-rec
-        bool tail_rec = false;
 
 		Case() { }
 		Case(Expr *e) { expr = e; }
