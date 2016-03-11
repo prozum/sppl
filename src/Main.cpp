@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
     string output("a.out");
     string header_output("a.h");
 
-    if (argc == 0) {
+    if (argc == 1) {
         print_help(argv[0]);
         return 0;
     }
