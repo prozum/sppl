@@ -1,9 +1,6 @@
 #include "Compiler.h"
-
-#include "CppCodeGenerator.h"
-#include "GasCodeGenerator.h"
-#include "HCodeGenerator.h"
 #include "Printer.h"
+
 
 namespace compiler {
 
@@ -20,15 +17,29 @@ namespace compiler {
 
         switch (backend)
         {
+#ifdef CCPP
+            #include "CppCodeGenerator.h"
             case Backend::CPP:
-                generator = make_unique<codegen::CCodeGenerator>(*output);
+                generator = make_unique<codegen::CCodeGenerator>(*output, *header_output);
                 break;
+#endif
+#ifdef CGNUASM
+            #include "GasCodeGenerator.h"
             case Backend::GNUASM:
                 generator = make_unique<codegen::GasCodeGenerator>(*output);
                 break;
+#endif CHASKELL
+            #include "HCodeGenerator.h"
             case Backend::HASKELL:
                 generator = make_unique<codegen::HCodeGenerator>(*output);
                 break;
+#endif
+#ifdef CLLVM
+            #include "LLVMCodeGenerator.h"
+            case Backend::LLVM
+                generator = make_unique<codegen::LLVMCodeGenerator>(*output);
+                break;
+#endif
             case Backend::PPRINTER:
                 generator = make_unique<codegen::Printer>(*output);
         }
