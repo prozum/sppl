@@ -16,21 +16,23 @@ int main(int argc, char *argv[])
     {
         if (strcmp(argv[i],"--help") == 0)
         {
-            cout << "Usage: " << argv[0] << "[options] [@input-file] [@output-file]" << endl;
+            cout << "Usage: " << argv[0] << "[options] <inputs>" << endl;
             cout << "Options:" << endl;
+            cout << "  --output         -o     Output binary" << endl;
+            cout << "  --header-output  -ho    Output header" << endl;
 #ifdef CCPP
-            cout << "\t--cpp\t\t\tC++ backend" << endl;
+            cout << "  --cpp                   C++ backend" << endl;
 #endif
 #ifdef CGNUASM
-            cout << "\t--gnuasm\t\tGNU Assembly backend" << endl;
+            cout << "  --gnuasm                GNU Assembly backend" << endl;
 #endif
 #ifdef CHASKELL
-            cout << "\t--haskell\t\tHaskell backend" << endl;
+            cout << "  --haskell               Haskell backend" << endl;
 #endif
 #ifdef CLLVM
-            cout << "\t--llvm\t\t\tLLVM backend" << endl;
+            cout << "  --llvm                  LLVM backend" << endl;
 #endif
-            cout << "\t--pprinter\t\tPretty printer backend" << endl;
+            cout << "  --pprinter              Pretty printer backend" << endl;
             return 0;
         }
 #ifdef CCPP

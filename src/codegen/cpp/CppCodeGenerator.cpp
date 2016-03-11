@@ -35,7 +35,7 @@ namespace codegen
             arg_name << "ga" << arg_count;
             node.types[arg_count]->accept(*this);
             arg_names.push_back(arg_name.str());
-            output << " " << arg_name;
+            output << " " << arg_name.str();
 
             if (arg_count < node.types.size() - 2) // don't generate ", " after last argument
                 output<< ", ";
@@ -196,7 +196,7 @@ namespace codegen
     void CCodeGenerator::visit(ListAdd &node)
     {
         string name;
-        auto got = lists.find(node.right->node_type);
+        auto got = lists.find(*node.right->node_type);
 
         // If current list doesn't exists. Create it
         if (got == lists.end()) {
@@ -274,7 +274,7 @@ namespace codegen
     void CCodeGenerator::visit(List &node)
     {
         string name;
-        auto got = lists.find(node.node_type);
+        auto got = lists.find(*node.node_type);
 
         // If current list doesn't exists. Create it
         if (got == lists.end()) {
@@ -296,7 +296,7 @@ namespace codegen
     void CCodeGenerator::visit(Tuple &node)
     {
         string name;
-        auto got = tuples.find(node.node_type);
+        auto got = tuples.find(*node.node_type);
 
         // If current tuple doesn't exists. Create it
         if (got == tuples.end()) {
@@ -324,10 +324,10 @@ namespace codegen
                 break;
             case IdContext::EXPR:
                 switch (node.node_type->type){
-                    case LIST:
+                    case Types::LIST:
                         output << real_ids[node.id];
                         break;
-                    case STRING:
+                    case Types::STRING:
                         output << real_ids[node.id];
                         break;
                     default:
@@ -356,45 +356,46 @@ namespace codegen
     }
 
     void CCodeGenerator::visit(Type &node) {
+        unordered_map<Type, string>::iterator got;
+
         switch (node.type) {
-            case FLOAT:
+            case Types::FLOAT:
                 output << "double";
                 break;
-            case CHAR:
+            case Types::CHAR:
                 output << "char";
                 break;
-            case INT:
+            case Types::INT:
                 output << "int";
                 break;
-            case BOOL:
+            case Types::BOOL:
                 output << "int";
                 break;
-            case TUPLE:
-                auto tuple = tuples.find(node);
+            case Types::TUPLE:
+                got = tuples.find(node);
 
-                if (tuple != tuples.end()) {
-                    output << tuple->second;
+                if (got != tuples.end()) {
+                    output << got->second;
                 } else {
                     output << generate_tuple(node);
                 }
                 break;
-            case SIGNATURE:
-                auto sig = signatures.find(node);
+            case Types::SIGNATURE:
+                got = signatures.find(node);
 
-                if (sig != signatures.end()) {
-                    output << sig->second;
+                if (got != signatures.end()) {
+                    output << got->second;
                 } else {
                     output << generate_signature(node);
                 }
                 break;
-            case STRING:
-                /* TODO */
+            case Types::STRING:
                 break;
-            case LIST:
-                auto list = lists.find(node);
+            case Types::LIST:
+                got = lists.find(node);
 
-                if (list != lists.end()) {
-                    output << list->second;
+                if (got != lists.end()) {
+                    output << got->second;
                 } else {
                     output << generate_list(node);
                 }
@@ -406,9 +407,8 @@ namespace codegen
     string CCodeGenerator::generate_list(Type &type) {
         // result is needed, so we don't start generating something in a signature in the header file
         stringstream result;
-        stringstream name;
-
-        name << "gl" << list_count;
+        string name = "gl";
+        name += list_count;
 
         /* generation of list starts here */
         result << "typedef struct " << name << endl;
@@ -469,21 +469,20 @@ namespace codegen
         list_count++;
 
         // writing list to header file
-        header << result;
+        header << result.str();
 
         // save list in signature hash map
-        lists[type] = name.str();
+        lists[type] = name;
 
         // return name of list generated
-        return name.str();
+        return name;
     }
 
     string CCodeGenerator::generate_signature(Type &type) {
         // result is needed, so we don't start generating something in a signature in the header file
         stringstream result;
-        stringstream name;
-
-        name << "gs" << sig_count;
+        string name = "gs";
+        name += sig_count;
 
         result << "typedef ";
         type.types.back()->accept(*this);
@@ -502,22 +501,20 @@ namespace codegen
         sig_count++;
 
         // writing signature to header file
-        header << result;
+        header << result.str();
 
         // save signature in signature hash map
-        signatures[type] = name.str();
+        signatures[type] = name;
 
         // return name of signature generated
-        return name.str();
+        return name;
     }
 
     string CCodeGenerator::generate_tuple(Type &type) {
         // result is needed, so we don't start generating something in a tuple in the header file
         stringstream result;
-        stringstream name;
-
-        // give tuple unique name
-        name << "gt" << tuple_count;
+        string name = "gt";
+        name += tuple_count;
 
         /* generation of tuple starts here */
         result << "typedef struct " << name << endl;
@@ -564,12 +561,12 @@ namespace codegen
         tuple_count++;
 
         // writing tuple to header file
-        header << result;
+        header << result.str();
 
         // save tuple in tuple hash map
-        tuples[type] = name.str();
+        tuples[type] = name;
 
         // return name of tuple generated
-        return name.str();
+        return name;
     }
 }

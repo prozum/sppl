@@ -28,22 +28,22 @@ namespace interpreter {
 
     void Interpreter::set_result(Expr &exp) {
         switch (exp.node_type->type) {
-        case INT:
+        case Types::INT:
             result += to_string(((Int &)exp).value);
             break;
-        case FLOAT:
+        case Types::FLOAT:
             result += to_string(((Float &)exp).value);
             break;
-        case BOOL:
+        case Types::BOOL:
             result += to_string(((Bool &)exp).value);
             break;
-        case CHAR:
+        case Types::CHAR:
             result += to_string(((Char &)exp).value);
             break;
-        case STRING:
+        case Types::STRING:
             result += ((String &)exp).value;
             break;
-        case LIST:
+        case Types::LIST:
             result = "[";
             for (int i = 0; i < ((List &)exp).exprs.size()- 1; ++i) {
                 set_result(*((List &)exp).exprs[i]);
@@ -52,7 +52,7 @@ namespace interpreter {
             set_result(*((List &)exp).exprs.back());
             result = "]";
             break;
-        case TUPLE:
+        case Types::TUPLE:
             result = "(";
             for (int i = 0; i < ((Tuple &)exp).exprs.size()- 1; ++i) {
                 set_result(*((Tuple &)exp).exprs[i]);
@@ -61,7 +61,7 @@ namespace interpreter {
             set_result(*((Tuple &)exp).exprs.back());
             result = ")";
             break;
-        case SIGNATURE:
+        case Types::SIGNATURE:
             result += ((Id *)exp.val)->id;
         default:
             result = "Error";
@@ -172,7 +172,7 @@ namespace interpreter {
         node.left->accept(*this);
         node.right->accept(*this);
 
-        if (node.left->node_type->type == INT) {
+        if (node.left->node_type->type == Types::INT) {
             node.val = new Int(((Int*)node.left->val)->value - ((Int*)node.left->val)->value);
         } else {
             node.val = new Float(((Float*)node.left->val)->value - ((Float*)node.left->val)->value);
@@ -184,7 +184,7 @@ namespace interpreter {
         node.left->accept(*this);
         node.right->accept(*this);
 
-        if (node.left->node_type->type == INT) {
+        if (node.left->node_type->type == Types::INT) {
             node.val = new Int(((Int*)node.left->val)->value * ((Int*)node.left->val)->value);
         } else {
             node.val = new Float(((Float*)node.left->val)->value * ((Float*)node.left->val)->value);
@@ -196,7 +196,7 @@ namespace interpreter {
         node.left->accept(*this);
         node.right->accept(*this);
 
-        if (node.left->node_type->type == INT) {
+        if (node.left->node_type->type == Types::INT) {
             node.val = new Int(((Int*)node.left->val)->value / ((Int*)node.left->val)->value);
         } else {
             node.val = new Float(((Float*)node.left->val)->value / ((Float*)node.left->val)->value);
@@ -205,7 +205,7 @@ namespace interpreter {
 
     void Interpreter::visit(Mod &node)
     {
-        if (node.left->node_type->type == INT) {
+        if (node.left->node_type->type == Types::INT) {
             node.val = new Int(((Int*)node.left->val)->value % ((Int*)node.left->val)->value);
         } else {
             //node.val = new Float(((Float*)node.left->val)->value % ((Float*)node.left->val)->value);
