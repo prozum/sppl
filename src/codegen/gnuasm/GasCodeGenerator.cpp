@@ -22,6 +22,8 @@ namespace codegen {
     int cases = 0;              // Number of cases
                                 // These may be moved into function later
 
+    map<string,string> varmap;
+
     typedef struct {
         string typeName;
         string typeValue;
@@ -95,7 +97,12 @@ namespace codegen {
             cout << "PATTERN IN THIS SCOPE => " << helper.typeName << "    " << helper.typeValue << endl;
 
             if (helper.typeName.compare("Id") == 0) {
-
+                int mempos = argc*4+8;
+                string var = "";
+                var += "movl ";
+                var += to_string(mempos);
+                var += ", %eax\n";
+                varmap[helper.typeValue] = var;
             }
             helper = {};
             argc++;
@@ -106,8 +113,6 @@ namespace codegen {
             function += funcName;
             function += "casedefault:\n";
             node.expr->accept(*this);
-
-            function += "FUNCTIONBODY\n";   // TODO: build function body
         } else {                    // Other cases
             function += ".";
             function += funcName;
@@ -149,7 +154,6 @@ namespace codegen {
             node.expr->accept(*this);
 
             helper = {};
-            function += "FUNCTIONBODY\n";       // TODO: Build function body
         }
 
         cout << "CaseNotImplemented" << endl;
@@ -278,7 +282,7 @@ namespace codegen {
 
     void GasCodeGenerator::visit(Id &node) {
         helper.typeName = "Id";
-        helper.typeValue = node.id;
+        helper.typeValue = funcName + node.id;
         cout << "Got ID => " << node.id << endl;
     }
 
