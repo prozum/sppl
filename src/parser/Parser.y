@@ -90,15 +90,15 @@ funcs_ne:	funcs_ne func                                   { $$ = $1; $$->push_ba
 func:		decl cases_ne                                   { $$ = $1; $$->cases = * $2; delete $2; }
 decl:		DEF ID COLON signature                          { $$ = new Function(* $2); $$->types = $4->types; delete $2; delete $4; }
 signature:	signature ARROR type                            { $$ = $1; $$->types.push_back($3); }
-	| type                                                  { $$ = new Type(SIGNATURE); $$->types.push_back($1); } ;
-type:		BOOLTYPE                                        { $$ = new Type(BOOL); }
-	|	INTTYPE                                             { $$ = new Type(INT); }
-	|	FLOATTYPE                                           { $$ = new Type(FLOAT); }
-	|	CHARTYPE                                            { $$ = new Type(CHAR); }
-	|	STRINGTYPE                                          { $$ = new Type(STRING); }
-	|	SQSTART type SQEND                                  { $$ = new Type(LIST); $$->types.push_back($2); }
+	| type                                                  { $$ = new Type(Types::SIGNATURE); $$->types.push_back($1); } ;
+type:		BOOLTYPE                                        { $$ = new Type(Types::BOOL); }
+	|	INTTYPE                                             { $$ = new Type(Types::INT); }
+	|	FLOATTYPE                                           { $$ = new Type(Types::FLOAT); }
+	|	CHARTYPE                                            { $$ = new Type(Types::CHAR); }
+	|	STRINGTYPE                                          { $$ = new Type(Types::STRING); }
+	|	SQSTART type SQEND                                  { $$ = new Type(Types::LIST); $$->types.push_back($2); }
 	|	PARSTART signature PAREND                           { $$ = $2; }
-	|	PARSTART types_comma_ne COMMA type PAREND           { $$ = new Type(TUPLE, $2); delete $2; $$->types.push_back($4); }
+	|	PARSTART types_comma_ne COMMA type PAREND           { $$ = new Type(Types::TUPLE, $2); delete $2; $$->types.push_back($4); }
 types_comma_ne: types_comma_ne COMMA type                   { $$ = $1; $$->push_back($3); }
 	|	type                                                { $$ = new vector<Type *>(); $$->push_back($1); };
 cases_ne:	cases_ne case                                   { $$ = $1; $$->push_back($2); }

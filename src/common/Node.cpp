@@ -70,10 +70,10 @@ namespace common {
     bool Type::operator==(const Type &other) const {
         if (this->type == other.type){
             switch (this->type) {
-                case LIST:
+                case Types::LIST:
                     return this->types[0] == other.types[0];
-                case SIGNATURE:
-                case TUPLE:
+                case Types::SIGNATURE:
+                case Types::TUPLE:
                     if (this->types.size() != other.types.size())
                         return false;
 

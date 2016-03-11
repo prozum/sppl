@@ -297,32 +297,32 @@ namespace codegen {
         cout << "Type" << endl;
 
         switch (node.type) {
-            case INT:
+            case Types::INT:
                 output << "Int";
                 break;
-            case FLOAT:
+            case Types::FLOAT:
                 output << "Float";
                 break;
-            case BOOL:
+            case Types::BOOL:
                 output << "Bool";
                 break;
-            case CHAR:
+            case Types::CHAR:
                 output << "Char";
                 break;
-            case STRING:
+            case Types::STRING:
                 output << "String";
                 break;
-            case LIST:
+            case Types::LIST:
                 output << "[";
                 node.types[0]->accept(*this);
                 output << "]";
                 break;
-            case TUPLE:
+            case Types::TUPLE:
                 output << "(";
                 print_collection(node, ", ");
                 output << ")";
                 break;
-            case SIGNATURE:
+            case Types::SIGNATURE:
                 output << "(";
                 print_collection(node, " -> ");
                 output << ")";

@@ -8,7 +8,7 @@
 using namespace std;
 
 namespace common {
-    enum TypeEnum {
+    enum class Types {
         INT,
         FLOAT,
         BOOL,
@@ -366,12 +366,12 @@ namespace common {
 
 	class Type : public Node {
 	public:
-		TypeEnum type = UNKNOWN;
+		Types type = Types::UNKNOWN;
 		std::vector<Type *> types;
 
         Type() { }
-		Type(TypeEnum t) { type = t; }
-		Type(TypeEnum t, std::vector<Type *> *ts) { type = t; types = *ts; }
+		Type(Types t) { type = t; }
+		Type(Types t, std::vector<Type *> *ts) { type = t; types = *ts; }
 
 		virtual void accept(Visitor &v);
 		bool operator==(const Type &other) const;

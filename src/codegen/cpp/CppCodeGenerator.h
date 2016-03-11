@@ -16,7 +16,7 @@ namespace std {
     {
         std::size_t operator()(const Type& k) const
         {
-            size_t res = std::hash<int>()(k.type);
+            size_t res = std::hash<int>()(static_cast<int>(k.type));
 
             for (auto type : k.types) {
                 res ^= (std::hash<Type>()(*type) << 1);

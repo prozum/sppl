@@ -82,7 +82,7 @@ namespace interpreter {
         void visit(Type &node);
 
     private:
-        unordered_map<string, Node> funcs;
+        unordered_map<string, Node *> funcs;
         Program *node;
         string func_id;
         string result;

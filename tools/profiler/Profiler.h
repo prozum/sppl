@@ -93,6 +93,9 @@ namespace profiler {
         Function curr_fun;
         int case_num;
 
-        enum ProfilerMode {INSTRUCTION_TIME, USER_TIME};
+        enum ProfilerMode {
+            INSTRUCTION_TIME, USER_TIME
+        };
         ProfilerMode mode;
+    };
 }
