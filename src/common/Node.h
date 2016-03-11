@@ -90,6 +90,9 @@ namespace common {
         // used by the profiler to determine growth for case
         std::vector<int> time_units;
 
+        // used by the optimizer to check tail-rec
+        bool tail_rec = false;
+
 		Case() { }
 		Case(Expr *e) { expr = e; }
 
