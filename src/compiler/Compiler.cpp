@@ -30,12 +30,14 @@ namespace compiler {
                 break;
 #endif
 #ifdef CLLVM
-            case Backend::LLVM
+            case Backend::LLVM:
                 generator = make_unique<codegen::LLVMCodeGenerator>(*output);
                 break;
 #endif
             case Backend::PPRINTER:
                 generator = make_unique<codegen::Printer>(*output);
+            default:
+                throw "Not a valid backend";
         }
     }
 

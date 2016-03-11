@@ -1,6 +1,8 @@
 #include "GasCodeGenerator.h"
 #include <iostream>
-#include <vector>
+#include <map>
+#include <bits/stl_map.h>
+#include <Scope.h>
 
 // TODO: Add compile messages and final error messages.
 // TODO: move all debug output lines to debug only.
@@ -9,11 +11,6 @@ using namespace common;
 using namespace std;
 
 namespace codegen {
-
-    typedef struct {    // Struct used for getting letterals from patterns and more in an easy and identical way.
-        string n;       // Alternative is another visitor for each scenario where they appear
-        string v;
-    } argHelper_t;
 
     string function;    // Contains the current function
     string funcName;    // Contains the name of the current function
@@ -25,9 +22,14 @@ namespace codegen {
     int cases = 0;              // Number of cases
                                 // These may be moved into function later
 
-    bool hasMain = false;       // If no main is found, good luck assembler
+    map<string,string> varmap;
 
-    argHelper_t helper;         // Multipurpose helper struct
+    typedef struct {
+        string typeName;
+        string typeValue;
+    } helper_t;
+
+    helper_t helper;
 
     GasCodeGenerator::GasCodeGenerator(std::ostream &out) : CodeGenerator::CodeGenerator(out) {
     }
@@ -39,21 +41,14 @@ namespace codegen {
             func->accept(*this);
         }
 
-        if (!hasMain) {
-            cout << "Error: no main\n";     // Feedback when no main is present
-        } else {
-            string source = buildSource();  // Build source.S file
-            cout << source << endl;         // print result (for debugging purpose)
-        }
+        string source = buildSource();  // Build source.S file
+        output << source << endl;
+
     }
 
     void GasCodeGenerator::visit(Function &node) {
         funcName = node.id;                    // Function name used for anything function related including
                                                 // names and labels.
-
-        if (funcName.compare("main") == 0) {    // Checks if we have a main
-            hasMain = true;                     // It is assumed a "multiple main" case have been caught if present
-        }
 
         string globl = ".globl ";               // Build the globl
         globl += funcName;
@@ -96,11 +91,28 @@ namespace codegen {
     void GasCodeGenerator::visit(Case &node) {
         caseCount++;
 
+        int argc = 0;
+        for (auto c : node.patterns) {
+            c->accept(*this);
+            cout << "PATTERN IN THIS SCOPE => " << helper.typeName << "    " << helper.typeValue << endl;
+
+            if (helper.typeName.compare("Id") == 0) {
+                int mempos = argc*4+8;
+                string var = "";
+                var += "movl ";
+                var += to_string(mempos);
+                var += ", %eax\n";
+                varmap[helper.typeValue] = var;
+            }
+            helper = {};
+            argc++;
+        }
+
         if (cases == caseCount) {   // Default case
             function += ".";
             function += funcName;
             function += "casedefault:\n";
-            function += "FUNCTIONBODY\n";   // TODO: build function body
+            node.expr->accept(*this);
         } else {                    // Other cases
             function += ".";
             function += funcName;
@@ -114,10 +126,10 @@ namespace codegen {
 
                 cout << "Working on pattern" << endl;
 
-                if (helper.n.compare("Int") == 0) {     // Case where pattern is an Int
+                if (helper.typeName.compare("Int") == 0) {     // Case where pattern is an Int
                     // Compare input argument with pattern
                     function += "cmpl $";
-                    function += helper.v;
+                    function += helper.typeValue;
                     function += ", ";
                     int mempos = argNum*4+8;            // Stack starts at 8, each arg with 4 space
                     function += to_string(mempos);
@@ -135,12 +147,13 @@ namespace codegen {
                         function += to_string(caseCount + 1);
                     }
                     function += "\n";
-                    helper = {};    // Resets struct
                     continue;
                 }
                 // repeat for all possebilities
             }
-            function += "FUNCTIONBODY\n";       // TODO: Build function body
+            node.expr->accept(*this);
+
+            helper = {};
         }
 
         cout << "CaseNotImplemented" << endl;
@@ -179,27 +192,12 @@ namespace codegen {
     }
 
     void GasCodeGenerator::visit(Add &node) {
+        cout << "ADD" << endl;
 
         node.left->accept(*this);
 
-        if (helper.n.compare("Int") == 0) {
-            function += "movl $";
-            function += helper.v;
-            function += ", %eax\n";
-        } else {
-            throw "NonSupportedExpression";
-        }
-
         function += "pushl %eax\n";
         node.right->accept(*this);
-
-        if (helper.n.compare("Int") == 0) {
-            function += "movl $";
-            function += helper.v;
-            function += ", %eax\n";
-        } else {
-            throw "NonSupportedExpression";
-        }
 
         function += "popl %ebx\n";
         function += "addl %ebx, %eax\n";
@@ -235,9 +233,15 @@ namespace codegen {
     }
 
     void GasCodeGenerator::visit(Int &node) {
-        helper.n = "Int";
-        helper.v = to_string(node.value);
-        cout << "Got integer => " << helper.v << endl;
+        function += "movl $";
+        function += to_string(node.value);
+        function += ", %eax\n";
+
+        helper.typeName = "Int";
+        helper.typeValue = to_string(node.value);
+
+
+        cout << "Got integer => " << to_string(node.value) << endl;
     }
 
     void GasCodeGenerator::visit(Float &node) {
@@ -277,10 +281,32 @@ namespace codegen {
     }
 
     void GasCodeGenerator::visit(Id &node) {
-        cout << "IdNotImplemented" << endl;
+        helper.typeName = "Id";
+        helper.typeValue = funcName + node.id;
+        cout << "Got ID => " << node.id << endl;
     }
 
     void GasCodeGenerator::visit(Call &node) {
+
+        // TODO: Find way pu push arguments to stack.
+        vector<string> params;
+        for (auto arg : node.exprs) {
+            arg->accept(*this);
+
+            if(helper.typeName.compare("Int") == 0) {
+                function += "pushl %eax\n";
+            } else if (helper.typeName.compare("Id") == 0) {
+
+            }
+        }
+
+        node.callee->accept(*this); // function to call;
+        function += "call ";
+        function += helper.typeValue;
+        function += "\n";
+
+        helper = {};
+
         cout << "CallNotImplemented" << endl;
     }
 
@@ -289,7 +315,7 @@ namespace codegen {
     }
 
     string GasCodeGenerator::get_type(Type *) {
-        cout << "get_typeNotImplemented" << endl;
+        return "GasCodeGenerator";
     }
 
     string GasCodeGenerator::buildSource() {

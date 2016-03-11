@@ -41,7 +41,7 @@ void TypeChecker::visit(Case &node) {
     /* code starts here*/
     if(node.patterns.size()+1 == current_func->types.size()){
         for (int i = 0; i < node.patterns.size(); ++i) {
-            if(node.patterns[i]->node_type != current_func->types[i]){
+            if(!equal(node.patterns[i]->node_type, current_func->types[i])){
                 throw "bad programmer exception";
             }
         }
@@ -104,7 +104,7 @@ void TypeChecker::visit(Equal &node) {
     /* Visit stops here */
 
     /* Code goes here */
-    if(node.left->node_type == node.right->node_type){
+    if(equal(node.left->node_type, node.right->node_type)){
         node.node_type = new Type(Types::BOOL);
         garbage.push_back(node.node_type);
     } else {
@@ -125,7 +125,7 @@ void TypeChecker::visit(NotEqual &node) {
     /* Visit stops here */
 
     /* Code goes here */
-    if(node.left->node_type == node.right->node_type){
+    if(equal(node.left->node_type, node.right->node_type)){
         node.node_type = new Type(Types::BOOL);
         garbage.push_back(node.node_type);
     } else {
@@ -349,7 +349,7 @@ void TypeChecker::visit(ListAdd &node) {
 
     /* Code goes here */
     if(node.right->node_type->type == Types::LIST){
-        if(node.left->node_type == node.right->node_type->types.front()){
+        if(equal(node.left->node_type, node.right->node_type->types.front())){
             node.node_type = node.right->node_type;
         } else {
             throw "Not same type m8";
@@ -426,6 +426,8 @@ void TypeChecker::visit(Bool &node) {
 
 void TypeChecker::visit(Char &node) {
     /* Code goes here */
+    // TODO check char length
+    node.value = node.tmp.front();
     node.node_type = new Type(Types::CHAR);
     garbage.push_back(node.node_type);
 
@@ -434,6 +436,7 @@ void TypeChecker::visit(Char &node) {
 
 void TypeChecker::visit(String &node) {
     /* Code goes here */
+
     node.node_type = new Type(Types::STRING);
     garbage.push_back(node.node_type);
 
@@ -458,7 +461,7 @@ void TypeChecker::visit(ListPattern &node) {
         garbage.push_back(node.node_type);
     } else {
         for (int i = 0; i < node.patterns.size()-1; ++i) {
-            if(node.patterns[i]->node_type != node.patterns[i+1]->node_type){
+            if(!equal(node.patterns[i]->node_type, node.patterns[i+1]->node_type)){
                 throw "bad programmer exception";
             }
         }
@@ -502,7 +505,7 @@ void TypeChecker::visit(ListSplit &node) {
 
     /* Code goes here */
     if(node.right->node_type->type == Types::LIST){
-        if(node.left->node_type == node.right->node_type->types.front()){
+        if(equal(node.left->node_type, node.right->node_type->types.front())){
             node.node_type = node.right->node_type;
         } else {
             throw "Not same type m8";
@@ -535,7 +538,7 @@ void TypeChecker::visit(List &node) {
         garbage.push_back(node.node_type);
     } else {
         for (int i = 0; i < node.exprs.size()-1; ++i) {
-            if(node.exprs[i]->node_type != node.exprs[i+1]->node_type){
+            if(!equal(node.exprs[i]->node_type, node.exprs[i+1]->node_type)){
                 throw "bad programmer exception";
             }
         }
@@ -570,17 +573,8 @@ void TypeChecker::visit(Tuple &node) {
 
 void TypeChecker::visit(Id &node) {
     /* Code goes here */
-    node.node_type = get_type(node, node.scope);
+    node.node_type = node.scope->get_type(node.id);
     /* Code stops here */
-}
-
-Type* TypeChecker::get_type(Id &node, Scope *scope){
-    auto got = scope->decls.find(node.id);
-    if(got == scope->decls.end()){
-        return get_type(node, scope->parent);
-    } else {
-        return got->second;
-    }
 }
 
 void TypeChecker::visit(Call &node) {
@@ -600,7 +594,7 @@ void TypeChecker::visit(Call &node) {
     if(node.callee->node_type->type == Types::SIGNATURE){
         if(node.exprs.size()+1 == node.callee->node_type->types.size()){
             for (int i = 0; i < node.exprs.size(); ++i) {
-                if(node.exprs[i]->node_type != node.callee->node_type->types[i]){
+                if(!equal(node.exprs[i]->node_type, node.callee->node_type->types[i])){
                     throw "bad programmer exception";
                 }
             }
@@ -631,4 +625,8 @@ void TypeChecker::visit(Type &node) {
     node.node_type = &node;
 
     /* Code stops here */
+}
+
+bool TypeChecker::equal(Type *type1, Type *type2) {
+    return *type1 == *type2;
 }
