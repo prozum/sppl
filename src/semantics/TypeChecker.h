@@ -53,8 +53,6 @@ private:
     stack<vector<Type>> type_stack;
     Function *current_func;
 
-    bool check_types(Type *type1, Type *type2);
-    TypeEnum type_cast(TypeEnum type);
     Type *get_type(Id &node, Scope *scope);
 };
 
