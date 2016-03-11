@@ -5,6 +5,28 @@
 using namespace std;
 using namespace compiler;
 
+void print_help(char *program_name)
+{
+    cout << "Usage: " << program_name << " [options] <inputs>" << endl;
+    cout << "Options:" << endl;
+    cout << "  --help           -h     Show available options" << endl << endl;
+    cout << "  --output         -o     Output binary" << endl;
+    cout << "  --header-output  -ho    Output header" << endl << endl;
+#ifdef CCPP
+    cout << "  --cpp                   C++ backend" << endl;
+#endif
+#ifdef CGNUASM
+    cout << "  --gnuasm                GNU Assembly backend" << endl;
+#endif
+#ifdef CHASKELL
+    cout << "  --haskell               Haskell backend" << endl;
+#endif
+#ifdef CLLVM
+    cout << "  --llvm                  LLVM backend" << endl;
+#endif
+    cout << "  --pprinter              Pretty printer backend" << endl;
+}
+
 int main(int argc, char *argv[])
 {
     Backend backend = Backend::PPRINTER;
@@ -12,28 +34,15 @@ int main(int argc, char *argv[])
     string output("a.out");
     string header_output("a.h");
 
-    for (int i = 1; i < argc; i++)
-    {
-        if (strcmp(argv[i],"--help") == 0 || strcmp(argv[i],"-h") == 0)
-        {
-            cout << "Usage: " << argv[0] << " [options] <inputs>" << endl;
-            cout << "Options:" << endl;
-            cout << "  --help           -h     Show available options" << endl << endl;
-            cout << "  --output         -o     Output binary" << endl;
-            cout << "  --header-output  -ho    Output header" << endl << endl;
-#ifdef CCPP
-            cout << "  --cpp                   C++ backend" << endl;
-#endif
-#ifdef CGNUASM
-            cout << "  --gnuasm                GNU Assembly backend" << endl;
-#endif
-#ifdef CHASKELL
-            cout << "  --haskell               Haskell backend" << endl;
-#endif
-#ifdef CLLVM
-            cout << "  --llvm                  LLVM backend" << endl;
-#endif
-            cout << "  --pprinter              Pretty printer backend" << endl;
+    if (argc == 0) {
+        print_help(argv[0]);
+        return 0;
+    }
+
+    for (int i = 1; i < argc; i++) {
+
+        if (strcmp(argv[i], "--help") == 0 || strcmp(argv[i], "-h") == 0) {
+            print_help(argv[0]);
             return 0;
         }
 #ifdef CCPP
