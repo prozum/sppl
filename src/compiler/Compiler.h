@@ -1,8 +1,25 @@
 #pragma once
+
 #include <iostream>
 #include <memory>
 #include "Driver.h"
 #include "CodeGenerator.h"
+
+#ifdef CCPP
+#include "CppCodeGenerator.h"
+#endif
+
+#ifdef CGNUASM
+#include "GasCodeGenerator.h"
+#endif
+
+#ifdef CHASKELL
+#include "HCodeGenerator.h"
+#endif
+
+#ifdef CLLVM
+#include "LLVMCodeGenerator.h"
+#endif
 
 using namespace common;
 
