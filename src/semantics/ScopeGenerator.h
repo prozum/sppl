@@ -11,7 +11,7 @@
 
 using namespace common;
 
-enum Scope_Context {
+enum class ScopeContext {
     PATTERN,
     EXPR
 };
@@ -57,7 +57,8 @@ private:
     Scope *current_scope;
     Function *current_func;
     std::stack<Type *> type_stack;
-    Scope_Context context;
+    ScopeContext context;
+    vector<Scope *> garbage;
 
     bool exists_in_scope(std::string id);
 };

@@ -9,6 +9,7 @@
 void ScopeGenerator::visit(Program &node) {
     res = new Scope();
     current_scope = res;
+    garbage.push_back(current_scope);
 
     /* Visit all children */
     for (auto func : node.funcs) {
@@ -41,11 +42,12 @@ void ScopeGenerator::visit(Case &node) {
     auto case_scope = new Scope(current_scope);
     current_scope->children.push_back(case_scope);
     current_scope = case_scope;
+    garbage.push_back(current_scope);
 
     if (node.patterns.size() == current_func->types.size() - 1) {
 
         /* Visit children */
-        context = PATTERN;
+        context = ScopeContext::PATTERN;
 
         for (int i = 0; i < node.patterns.size(); i++){
             type_stack.push(current_func->types[i]);
@@ -53,7 +55,7 @@ void ScopeGenerator::visit(Case &node) {
             type_stack.pop();
         }
 
-        context = EXPR;
+        context = ScopeContext::EXPR;
         node.expr->accept(*this);
     } else {
         /* ERROR! Cases doesn't have the currect number of patterns */
@@ -212,7 +214,7 @@ void ScopeGenerator::visit(ListPattern &node) {
 }
 
 void ScopeGenerator::visit(TuplePattern &node) {
-    if (node.patterns.size() == type_stack.top()->types.size() && type_stack.top()->type == TUPLE) {
+    if (node.patterns.size() == type_stack.top()->types.size() && type_stack.top()->type == Types::TUPLE) {
 
         /* Visit children */
         for (int i = 0; i < node.patterns.size(); i++){
@@ -261,20 +263,14 @@ void ScopeGenerator::visit(Tuple &node) {
 void ScopeGenerator::visit(Id &node) {
     node.scope = current_scope;
 
-    if (context == PATTERN) {
+    if (context == ScopeContext::PATTERN) {
         if (!exists_in_scope(node.id)) {
             current_scope->decls.insert({node.id, type_stack.top()});
         } else {
             /* ERROR! Id exists in scope */
             throw "Id exists in scope";
         }
-    } else if (context == EXPR) {
-
-    } else {
-        /* ERROR! Unknown scope context! */
-        throw "Unknown scope context!";
     }
-
 }
 
 void ScopeGenerator::visit(Call &node) {
