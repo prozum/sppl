@@ -54,10 +54,20 @@ int main(int argc, char *argv[])
         else if (strcmp(argv[i],"--pprinter") == 0)
             backend = Backend::PPRINTER;
         else if (strcmp(argv[i],"--output") == 0 || strcmp(argv[i],"-o") == 0)
-            output = argv[++i];
+            if (i < argc - 1)
+                output = argv[++i];
+            else {
+                cerr << "No output file specified" << endl;
+                return 2;
+            }
         else if (strcmp(argv[i],"--header-output") == 0 || strcmp(argv[i],"-ho") == 0)
-            header_output = argv[++i];
-        else
+            if (i < argc - 1)
+                header_output = argv[++i];
+            else {
+                cerr << "No output header specified" << endl;
+                return 3;
+            }
+         else
             input.push_back(argv[i]);
     }
 
