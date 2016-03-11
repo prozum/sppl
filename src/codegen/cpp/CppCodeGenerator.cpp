@@ -16,6 +16,7 @@ namespace codegen
 
     void CCodeGenerator::visit(Program &node)
     {
+        stringstream func_name;
         scope_generator.visit(node);
         type_checker.visit(node);
 
@@ -36,12 +37,14 @@ namespace codegen
 
         for (auto f : node.funcs) {
             // save a unique name for each function the program
-            f->scope->real_ids[f->id] = "u" + f->id;
+            func_name << "u" << f->id;
+            f->scope->real_ids[f->id] = func_name.str();
+            func_name.str("");
         }
 
         for (auto f : node.funcs) {
             f->accept(*this);
-            outputt()<< endl;
+            outputt() << endl;
         }
     }
 
@@ -342,7 +345,7 @@ namespace codegen
     void CCodeGenerator::visit(Tuple &node)
     {
         string name;
-        auto got = tuples.find(*node.node_type);
+        auto got = tuples.find(*(node.node_type));
 
         // If current tuple doesn't exists. Create it
         if (got == tuples.end()) {
@@ -404,37 +407,35 @@ namespace codegen
     void CCodeGenerator::visit(Type &node) {
         unordered_map<Type, string>::iterator got;
 
-        last_type.str("");
-
         switch (node.type) {
             case Types::FLOAT:
-                last_type << "double";
+                last_type.str("double");
                 break;
             case Types::CHAR:
-                last_type << "char";
+                last_type.str("char");
                 break;
             case Types::INT:
-                last_type << "int";
+                last_type.str("int");
                 break;
             case Types::BOOL:
-                last_type << "int";
+                last_type.str("int");
                 break;
             case Types::TUPLE:
                 got = tuples.find(node);
 
                 if (got != tuples.end()) {
-                    last_type << got->second;
+                    last_type.str(got->second);
                 } else {
-                    last_type << generate_tuple(node);
+                    last_type.str(generate_tuple(node));
                 }
                 break;
             case Types::SIGNATURE:
                 got = signatures.find(node);
 
                 if (got != signatures.end()) {
-                    last_type << got->second;
+                    last_type.str(got->second);
                 } else {
-                    last_type << generate_signature(node);
+                    last_type.str(generate_signature(node));
                 }
                 break;
             case Types::STRING:
@@ -443,9 +444,9 @@ namespace codegen
                 got = lists.find(node);
 
                 if (got != lists.end()) {
-                    last_type << got->second;
+                    last_type.str(got->second);
                 } else {
-                    last_type << generate_list(node);
+                    last_type.str(generate_list(node));
                 }
                 last_type << " *";
             default:
@@ -458,7 +459,7 @@ namespace codegen
         stringstream result;
         string name = "gl";
         int tap_count = 0;
-        name += list_count;
+        name += to_string(list_count);
 
         type.types.front()->accept(*this);
 
@@ -470,7 +471,7 @@ namespace codegen
         t(result, tap_count) << "int head;" << endl;
         t(result, tap_count) << "int size;" << endl;
         tap_count--;
-        t(result, tap_count) << "}";
+        t(result, tap_count) << "};";
         /* generation of list ends here */
 
         /* generation of list push starts here */
@@ -535,7 +536,7 @@ namespace codegen
         stringstream result;
         string name = "gs";
         int tap_count = 0;
-        name += sig_count;
+        name += to_string(sig_count);
 
         type.types.back()->accept(*this);
         t(result, tap_count) << "typedef " << last_type.str() << " (* " << name << ")(";
@@ -568,7 +569,7 @@ namespace codegen
         stringstream result;
         string name = "gt";
         int tap_count = 0;
-        name += tuple_count;
+        name += to_string(tuple_count);
 
         /* generation of tuple starts here */
         t(result, tap_count) << "typedef struct " << name << endl;
@@ -577,10 +578,10 @@ namespace codegen
         // generate an item for each type in the tuple
         for (int i = 0; i < type.types.size(); ++i) {
             type.types[i]->accept(*this); // generate the actual type of the item
-            t(result, tap_count) << "\t" << last_type.str() << " i" << i << ";" << endl; // give this item a unique name
+            t(result, tap_count) << last_type.str() << " i" << i << ";" << endl; // give this item a unique name
         }
         tap_count--;
-        t(result, tap_count) << "} " << name << endl;
+        t(result, tap_count) << "}" << name << ";" << endl;
         t(result, tap_count) << endl;
         /* generation of tuple ends here */
 
@@ -607,7 +608,7 @@ namespace codegen
         for (int i = 0; i < type.types.size(); ++i) {
             t(result, tap_count) << "res.i" << i << " = i" << i << ";" << endl;
         }
-        t(result, tap_count) << "return res" << endl;
+        t(result, tap_count) << "return res;" << endl;
         tap_count--;
         t(result, tap_count) << "}" << endl;
         /* generation of tuple contructor ends here */
