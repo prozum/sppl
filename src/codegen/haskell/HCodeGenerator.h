@@ -1,6 +1,6 @@
 #pragma once
+
 #include "CodeGenerator.h"
-#include "Node.h"
 #include <string>
 
 using namespace common;

@@ -12,7 +12,7 @@ namespace codegen {
     void Printer::visit(Program &node) {
         cout << "Program " << endl;
 
-        for (Node *func : node.funcs) {
+        for (auto& func: node.funcs) {
             func->accept(*this);
         }
     }
@@ -20,24 +20,22 @@ namespace codegen {
     void Printer::visit(Function &node) {
         cout << "Function " << node.id << endl;
 
-        output << "def ";
-        output << node.id;
-        output << " : ";
+        output << "def " << node.id << " : ";
 
-        for (auto & p: node.types) {
+        for (auto& p: node.types) {
             p->accept(*this);
             if (p != node.types.back())
                 output << " -> ";
         }
 
-        output << "\n";
+        output << endl;
 
-        for (Node *_case : node.cases) {
+        for (auto& _case : node.cases) {
             _case->accept(*this);
-            output << "\n";
+            output << endl;
         }
 
-        output << "\n";
+        output << endl;
     }
 
     void Printer::visit(Case &node) {
