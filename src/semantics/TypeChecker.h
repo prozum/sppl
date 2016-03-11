@@ -51,6 +51,7 @@ public:
     virtual void visit(Type &node);
 private:
     Function *current_func;
+    vector<Type *> garbage;
 
     Type *get_type(Id &node, Scope *scope);
 };
