@@ -74,7 +74,7 @@ namespace common {
 	public:
 		std::string id;
 		std::vector<Type*> types;
-		std::vector<Case*> cases;
+        std::vector<Case*> cases;
 		Scope *scope;
 
 		Function() { }
@@ -90,6 +90,7 @@ namespace common {
 
         // used by the profiler to determine growth for case
         std::vector<int> time_units;
+        bool tail_rec = false;
 
 		Case() { }
 		Case(Expr *e) { expr = e; }
