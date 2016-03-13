@@ -121,6 +121,7 @@ namespace codegen {
             vector<string> arg_names;
             IdContext id_context;
             stringstream last_type;
+            string string_type_name;
 
             ScopeGenerator scope_generator;
             TypeChecker type_checker;
