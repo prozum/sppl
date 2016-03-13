@@ -1,5 +1,9 @@
-add_subdirectory(profiler)
-include_directories(profiler)
+if (PROFILER)
+    add_subdirectory(profiler)
+    include_directories(profiler)
+endif()
 
-add_subdirectory(interpreter)
-include_directories(interpreter)
+if (INTERPRETER)
+    add_subdirectory(interpreter)
+    include_directories(interpreter)
+endif()
