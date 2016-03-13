@@ -84,13 +84,16 @@ namespace profiler {
 
         void visit(Type &node);
 
-        Pattern &generate_literal(Types t);
-
-        Pattern &generate_list(Type &t, int len);
-
-        Pattern &generate_tuple(vector<Type *> ts);
-
     private:
+        enum ProfilerMode {
+            INSTRUCTION_TIME,   // count instructions
+            USER_TIME,          // measures run time
+            DEPENDENCY_CHECK    // calculate the function deps
+        };
+
+        // indicates which mode the profiler is in
+        ProfilerMode mode;
+
         parser::Driver driver;
 
         int runs;
@@ -99,9 +102,8 @@ namespace profiler {
         Function curr_fun;
         int case_num;
 
-        enum ProfilerMode {
-            INSTRUCTION_TIME, USER_TIME
-        };
-        ProfilerMode mode;
+
+
+
     };
 }

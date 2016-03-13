@@ -89,7 +89,17 @@ namespace common {
 		Expr *expr;
 
         // used by the profiler to determine growth for case
+		// the first element in the vector is for the first test
+		// second is for the second test, and so on
         std::vector<int> time_units;
+
+		// used by the profiler to check the degree of dependencies
+		// a dependency of 0 means that it doesn't depend on other function
+		// 1 means that it depends on itself or a function with a dependency of 0
+		// 2 means that it depends on a function with a dependency of 1, and so on
+		int dep_deg = 0;
+
+		// used by the optimizer to indicate if a case is tail recursive
         bool tail_rec = false;
 
 		Case() { }
