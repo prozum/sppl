@@ -120,7 +120,7 @@ namespace codegen {
             unordered_map<Type, string> signatures;
             vector<string> arg_names;
             IdContext id_context;
-            stringstream last_type;
+            string last_type;
             string string_type_name;
 
             ScopeGenerator scope_generator;
@@ -129,6 +129,7 @@ namespace codegen {
             string generate_list(Type &);
             string generate_tuple(Type &);
             string generate_signature(Type &);
+            void generate_std();
 
             ostream &outputt();
             ostream &headert();

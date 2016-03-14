@@ -19,41 +19,9 @@ namespace codegen
         stringstream func_name;
         scope_generator.visit(node);
         type_checker.visit(node);
-        Type _char = Type(Types::CHAR);
-        Type real_string = Type(Types::LIST);
-        real_string.types.push_back(&_char);
 
-        headert() << "#include <stdarg.h>" << endl;
-        headert() << "#include <stdio.h>" << endl;
-        headert() << "#include <stdlib.h>" << endl;
-        headert() << "#include <string.h>" << endl;
-        headert() << endl;
+        generate_std();
 
-        string_type_name = generate_list(real_string);
-
-        /* generation of string constructer starts here */
-        headert() << string_type_name << " *gcreate_string(char* values)" << endl;
-        headert() << "{" << endl;
-        header_tap_count++;
-        headert() << "int i;" << endl;
-        headert() << "int str_length = strlen(values);" << endl;
-        headert() << "int size = str_length - 1;" << endl;
-        headert() << "size = (size |= (size |= (size |= (size |= (size |= size >> 1) >> 2) >> 4) >> 8) >> 16) + ((size += 1) == 0);" << endl;
-        headert() << string_type_name << " *res = (" << string_type_name << "*)malloc(sizeof(" << string_type_name << "));" << endl;
-        headert() << "res->head = 0;" << endl;
-        headert() << "res->size = size;" << endl;
-        headert() << "res->items = (char *)malloc(size * sizeof(char));" << endl;
-        headert() << "for(i = str_length - 1; i >= 0; i--)" << endl;
-        headert() << "{" << endl;
-        header_tap_count++;
-        headert() << "gpush_" << string_type_name << "(res, values[i]);" << endl;
-        header_tap_count--;
-        headert() << "}" << endl;
-        header_tap_count--;
-        headert() << "}" << endl;
-        /* generation of string constructer ends here */
-
-        headert() << endl;
         // TODO real header
         outputt() << "#include \"test.h\"" << endl;
         outputt() << endl;
@@ -91,7 +59,7 @@ namespace codegen
             node.types[i]->accept(*this);
             arg_name << "ga" << i;
             arg_names.push_back(arg_name.str());
-            func_name << last_type.str() << " " << arg_name.str();
+            func_name << last_type << " " << arg_name.str();
 
             if (i < node.types.size() - 2) // don't generate ", " after last argument
                 func_name<< ", ";
@@ -104,11 +72,11 @@ namespace codegen
         node.types.back()->accept(*this);
 
         // generate function decleration in header
-        headert() << last_type.str() << " " << func_name.str() << ";" << endl;
+        headert() << last_type << " " << func_name.str() << ";" << endl;
         headert() << endl;
 
         // generate function in output
-        outputt()<< last_type.str() << " " << func_name.str() << endl;
+        outputt()<< last_type << " " << func_name.str() << endl;
 
         outputt()<< "{" << endl;
         output_tap_count++;
@@ -366,8 +334,8 @@ namespace codegen
             name = got->second;
         }
 
-        output << "gcreate_" << name << "(";
-        for (int i = node.exprs.size() - 1; i >= 0; i++) {
+        output << "gcreate_" << name << "(" << node.exprs.size() << ", ";
+        for (int i = node.exprs.size() - 1; i >= 0; i--) {
             node.exprs[i]->accept(*this);
 
             if (i != 0)
@@ -444,33 +412,33 @@ namespace codegen
 
         switch (node.type) {
             case Types::FLOAT:
-                last_type.str("double");
+                last_type = "double";
                 break;
             case Types::CHAR:
-                last_type.str("char");
+                last_type = "char";
                 break;
             case Types::INT:
-                last_type.str("int");
+                last_type = "int";
                 break;
             case Types::BOOL:
-                last_type.str("int");
+                last_type = "int";
                 break;
             case Types::TUPLE:
                 got = tuples.find(node);
 
                 if (got != tuples.end()) {
-                    last_type.str(got->second);
+                    last_type = got->second;
                 } else {
-                    last_type.str(generate_tuple(node));
+                    last_type = generate_tuple(node);
                 }
                 break;
             case Types::SIGNATURE:
                 got = signatures.find(node);
 
                 if (got != signatures.end()) {
-                    last_type.str(got->second);
+                    last_type = got->second;
                 } else {
-                    last_type.str(generate_signature(node));
+                    last_type = generate_signature(node);
                 }
                 break;
             case Types::STRING:
@@ -479,11 +447,11 @@ namespace codegen
                 got = lists.find(node);
 
                 if (got != lists.end()) {
-                    last_type.str(got->second);
+                    last_type = got->second;
                 } else {
-                    last_type.str(generate_list(node));
+                    last_type = generate_list(node);
                 }
-                last_type << " *";
+                last_type += " *";
             default:
                 break;
         }
@@ -502,7 +470,7 @@ namespace codegen
         t(result, tap_count) << "typedef struct " << name << endl;
         t(result, tap_count) << "{" << endl;
         tap_count++;
-        t(result, tap_count) << last_type.str() << " *items;" << endl;
+        t(result, tap_count) << last_type << " *items;" << endl;
         t(result, tap_count) << "int head;" << endl;
         t(result, tap_count) << "int size;" << endl;
         tap_count--;
@@ -512,13 +480,13 @@ namespace codegen
         t(result, tap_count) << endl;
 
         /* generation of list push starts here */
-        t(result, tap_count) << name << " *gpush_" << name << "(" << name << " *this, " << last_type.str() << " item)" << endl;
+        t(result, tap_count) << name << " *gpush_" << name << "(" << name << " *this, " << last_type << " item)" << endl;
         t(result, tap_count) << "{" << endl;
         tap_count++;
         t(result, tap_count) << "if (this->head >= this->size)" << endl;
         t(result, tap_count) << "{" << endl;
         tap_count++;
-        t(result, tap_count) << "this->items = (" << last_type.str() << " *)realloc(this->items, (this->size *= 2) * sizeof(" << last_type.str() << "));" << endl;
+        t(result, tap_count) << "this->items = (" << last_type << " *)realloc(this->items, (this->size *= 2) * sizeof(" << last_type << "));" << endl;
         tap_count--;
         t(result, tap_count) << "}" << endl;
         t(result, tap_count) << endl;
@@ -534,23 +502,27 @@ namespace codegen
         t(result, tap_count) << name << " *gcreate_" << name << "(int count, ...)" << endl;
         t(result, tap_count) << "{" << endl;
         tap_count++;
-        t(result, tap_count) << "va_list args;" << endl;
-        t(result, tap_count) << "va_start(args, count);" << endl;
         t(result, tap_count) << "int i;" << endl;
         // rounding the count to next power of 2 (32 bit int specific)
-        t(result, tap_count) << "int size = count - 1;" << endl;
-        t(result, tap_count) << "size = (size |= (size |= (size |= (size |= (size |= size >> 1) >> 2) >> 4) >> 8) >> 16) + ((size += 1) == 0);" << endl;
+        t(result, tap_count) << "int size = gnearest_pow2(count);" << endl;
         t(result, tap_count) << "" << name << " *res = (" << name << "*)malloc(sizeof(" << name << "));" << endl;
+        t(result, tap_count) << endl;
         t(result, tap_count) << "res->head = 0;" << endl;
         t(result, tap_count) << "res->size = size;" << endl;
-        t(result, tap_count) << "res->items = (" << last_type.str() << " *)malloc(size * sizeof(" << last_type.str() << "));" << endl;
+        t(result, tap_count) << "res->items = (" << last_type << " *)malloc(size * sizeof(" << last_type << "));" << endl;
+        t(result, tap_count) << endl;
+        t(result, tap_count) << "va_list args;" << endl;
+        t(result, tap_count) << "va_start(args, count);" << endl;
+        t(result, tap_count) << endl;
         t(result, tap_count) << "for(i = 0; i < count; i++)" << endl;
         t(result, tap_count) << "{" << endl;
         tap_count++;
-        t(result, tap_count) << "gpush_" << name << "(res, va_arg(args, " << last_type.str() << "));" << endl;
+        t(result, tap_count) << "gpush_" << name << "(res, va_arg(args, " << last_type << "));" << endl;
         tap_count--;
         t(result, tap_count) << "}" << endl;
+        t(result, tap_count) << endl;
         t(result, tap_count) << "va_end(args);" << endl;
+        t(result, tap_count) << "return res;" << endl;
         tap_count--;
         t(result, tap_count) << "}" << endl;
         /* generation of list constructer ends here */
@@ -580,11 +552,11 @@ namespace codegen
         name += to_string(sig_count);
 
         type.types.back()->accept(*this);
-        t(result, tap_count) << "typedef " << last_type.str() << " (* " << name << ")(";
+        t(result, tap_count) << "typedef " << last_type << " (* " << name << ")(";
 
         for (int i = 0; i < type.types.size() - 1; ++i) {
             type.types[i]->accept(*this); // generate the actual type of the argument
-            t(result, tap_count) << last_type.str();
+            t(result, tap_count) << last_type;
 
             if (i < type.types.size() - 2) // don't print ", " after the last argument
                 t(result, tap_count) << ", ";
@@ -620,7 +592,7 @@ namespace codegen
         // generate an item for each type in the tuple
         for (int i = 0; i < type.types.size(); ++i) {
             type.types[i]->accept(*this); // generate the actual type of the item
-            t(result, tap_count) << last_type.str() << " i" << i << ";" << endl; // give this item a unique name
+            t(result, tap_count) << last_type << " gi" << i << ";" << endl; // give this item a unique name
         }
         tap_count--;
         t(result, tap_count) << "}" << name << ";" << endl;
@@ -634,7 +606,7 @@ namespace codegen
         // generate an argument for each item in the struct
         for (int i = 0; i < type.types.size(); ++i) {
             type.types[i]->accept(*this); // generate the actual type of the argument
-            t(result, tap_count) << last_type.str() << " i" << i;
+            t(result, tap_count) << last_type << " gi" << i;
 
             if (i < type.types.size() - 1) // don't print ", " after the last argument
                 t(result, tap_count) << ", ";
@@ -648,7 +620,7 @@ namespace codegen
 
         // for each item in res, assign values
         for (int i = 0; i < type.types.size(); ++i) {
-            t(result, tap_count) << "res.i" << i << " = i" << i << ";" << endl;
+            t(result, tap_count) << "res.gi" << i << " = gi" << i << ";" << endl;
         }
         t(result, tap_count) << "return res;" << endl;
         tap_count--;
@@ -668,6 +640,60 @@ namespace codegen
 
         // return name of tuple generated
         return name;
+    }
+
+    void CCodeGenerator::generate_std() {
+        Type _char = Type(Types::CHAR);
+        Type real_string = Type(Types::LIST);
+        real_string.types.push_back(&_char);
+
+        headert() << "#include <stdarg.h>" << endl;
+        headert() << "#include <stdio.h>" << endl;
+        headert() << "#include <stdlib.h>" << endl;
+        headert() << "#include <string.h>" << endl;
+        headert() << endl;
+
+        /* generating to nearest power of 2 function starts here */
+        headert() << "int gnearest_pow2(int gn)" << endl;
+        headert() << "{" << endl;
+        header_tap_count++;
+        headert() << "gn--;" << endl;
+        headert() << "gn |= gn >> 1;" << endl;
+        headert() << "gn |= gn >> 2;" << endl;
+        headert() << "gn |= gn >> 4;" << endl;
+        headert() << "gn |= gn >> 8;" << endl;
+        headert() << "gn |= gn >> 16;" << endl;
+        headert() << "gn++;" << endl;
+        headert() << "return gn + (gn == 0);" << endl;
+        header_tap_count--;
+        headert() << "}" << endl;
+        headert() << endl;
+        /* generating to nearest power of 2 function ends here */
+
+        string_type_name = generate_list(real_string);
+
+        /* generation of string constructer starts here */
+        headert() << string_type_name << " *gcreate_string(char* values)" << endl;
+        headert() << "{" << endl;
+        header_tap_count++;
+        headert() << "int i;" << endl;
+        headert() << "int str_length = strlen(values);" << endl;
+        headert() << "int size = gnearest_pow2(str_length);" << endl;
+        headert() << string_type_name << " *res = (" << string_type_name << "*)malloc(sizeof(" << string_type_name << "));" << endl;
+        headert() << "res->head = 0;" << endl;
+        headert() << "res->size = size;" << endl;
+        headert() << "res->items = (char *)malloc(size * sizeof(char));" << endl;
+        headert() << "for(i = str_length - 1; i >= 0; i--)" << endl;
+        headert() << "{" << endl;
+        header_tap_count++;
+        headert() << "gpush_" << string_type_name << "(res, values[i]);" << endl;
+        header_tap_count--;
+        headert() << "}" << endl;
+        header_tap_count--;
+        headert() << "}" << endl;
+        /* generation of string constructer ends here */
+
+        headert() << endl;
     }
 
 
