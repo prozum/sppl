@@ -22,9 +22,12 @@ class LLVMCodeGenerator : public common::CodeGenerator {
     void visit(common::Float &node);
     void visit(common::Call &node);
 
-  private:
+    llvm::Function *create_function(common::Function *func);
+
+    unique_ptr<llvm::Module> Module;
+
+private:
     llvm::IRBuilder<> Builder;
-    llvm::Module Module;
     std::map<std::string, llvm::Value *> ContextValues;
     llvm::Function *cur_func;
     llvm::Value *cur_val;

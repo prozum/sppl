@@ -3,46 +3,68 @@
 using namespace llvm;
 
 namespace codegen {
-LLVMCodeGenerator::LLVMCodeGenerator(std::ostream &out)
-    : common::CodeGenerator::CodeGenerator(out),
-      Builder(getGlobalContext()),
-      Module("SpplModule", getGlobalContext()) {}
+    LLVMCodeGenerator::LLVMCodeGenerator(std::ostream &out)
+            : common::CodeGenerator::CodeGenerator(out),
+              Builder(getGlobalContext()),
+              Module(std::make_unique<llvm::Module>("SpplModule", getGlobalContext())) {}
+
+    llvm::Function *LLVMCodeGenerator::create_function(common::Function *func) {
+         // Get output type
+        Type *output_type;
+        switch (func->types[0]->type)
+        {
+            case common::Types::FLOAT:
+                output_type = Type::getFloatTy(getGlobalContext());
+                break;
+            default:
+                throw "Not supported";
+        }
+
+        // Get input types
+        std::vector<Type *> input_types;
+        for (unsigned i = 0; i < func->types.size() - 1; i++) {
+            switch (func->types[i]->type) {
+                case common::Types::FLOAT:
+                    input_types.push_back(Type::getFloatTy(getGlobalContext()));
+                    break;
+
+                default:
+                    throw "Not supported";
+            }
+        }
+        
+        // Setup function input/out types
+        auto func_type = FunctionType::get(output_type, input_types, false);
+
+        // Create anonymous or normal function
+        if (jit_mode) {
+            cur_func = Function::Create(func_type, Function::ExternalLinkage, "__anon_expr", Module.get());
+
+        }
+        else
+            cur_func = Function::Create(func_type, Function::ExternalLinkage, func->id, Module.get());
+
+        // Setup function arguments
+        unsigned i = 0;
+        for (auto &arg : cur_func->args()) arg.setName("x" + to_string(i++));
+
+        return cur_func;
+    }
 
 void LLVMCodeGenerator::visit(common::Program &node) {
     for (auto &func : node.funcs) {
         func->accept(*this);
     }
 
-    Module.dump();
+    Module->dump();
 }
 
 void LLVMCodeGenerator::visit(common::Function &node) {
     // Input/output types
-    //std::vector<Type *> Doubles(node.patterns.size(),
+    // std::vector<Type *> Doubles(node.patterns.size(),
     //                            Type::getDoubleTy(getGlobalContext()));
 
-	std::vector<Type *> func_types;
-	for (int i = 0; i < node.types.size() - 1; i++) {
-		switch (node.types[i]->type) {
-			case common::Types::FLOAT:
-                func_types.push_back(Type::getFloatTy(getGlobalContext()));
-                break;
-
-            default:
-                throw "Not supported";
-		}
-	}
-
-    // Setup function input/out types
-    auto func_type = FunctionType::get(Type::getDoubleTy(getGlobalContext()),
-                                       func_types, false);
-
-    // Create function
-    cur_func = Function::Create(func_type, Function::ExternalLinkage, node.id, &Module);
-
-    // Setup function arguments
-    unsigned i = 0;
-    for (auto &arg : cur_func->args()) arg.setName("x" + to_string(i++));
+    create_function(&node);
 
     for (auto &_case : node.cases) {
         _case->accept(*this);
@@ -62,8 +84,6 @@ void LLVMCodeGenerator::visit(common::Case &node) {
 
     cur_val = Builder.CreateRet(cur_val);
 
-    // cur_val->dump();
-
     verifyFunction(*cur_func);
 }
 
@@ -81,28 +101,19 @@ void LLVMCodeGenerator::visit(common::Float &node) {
 }
 
 void LLVMCodeGenerator::visit(common::Call &node) {
-
-    //switch (node.node_type->type)
-    //{
-    //    case common::Types::
-    //}
-
     node.callee->accept(*this);
     auto callee = cur_val;
 
     std::vector<Value *> args;
-    for (auto& arg: node.exprs) {
+    for (auto &arg : node.exprs) {
         arg->accept(*this);
         args.push_back(cur_val);
     }
 
-    //Function *call = Module.getFunction(node.);
-
     cur_val = Builder.CreateCall(callee, args, "calltmp");
 }
 
-    void  LLVMCodeGenerator::visit(common::Id &node)
-    {
-        cur_val = Module.getFunction(node.id);
-    }
+void LLVMCodeGenerator::visit(common::Id &node) {
+    cur_val = Module->getFunction(node.id);
+}
 }

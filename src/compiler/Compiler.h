@@ -52,6 +52,7 @@ namespace compiler {
         parser::Driver driver;
 
         void compile();
+        Function * parse_anon_expr();
 
         void set_backend(Backend backend);
     };
