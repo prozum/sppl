@@ -9,25 +9,28 @@
 
 #include "CodeGenerator.h"
 
-
 namespace codegen {
 
-    class LLVMCodeGenerator : public common::CodeGenerator
-    {
-    public:
-        LLVMCodeGenerator(std::ostream &);
+class LLVMCodeGenerator : public common::CodeGenerator {
+  public:
+    LLVMCodeGenerator(std::ostream &);
 
-        void visit(common::Program &node);
-        void visit(common::Function &node);
-        void visit(common::Case &node);
-        void visit(common::Add &node);
-        void visit(common::Float &node);
+    void visit(common::Program &node);
+    void visit(common::Function &node);
+    void visit(common::Case &node);
+    void visit(common::Add &node);
+    void visit(common::Float &node);
+    void visit(common::Call &node);
 
-    private:
-        llvm::IRBuilder<> Builder;
-        llvm::Module Module;
-        std::map<std::string, llvm::Value*> ContextValues;
-        common::Function *current_func;
-        llvm::Value *current_val;
-    };
+  private:
+    llvm::IRBuilder<> Builder;
+    llvm::Module Module;
+    std::map<std::string, llvm::Value *> ContextValues;
+    llvm::Function *cur_func;
+    llvm::Value *cur_val;
+
+    void visit(common::Id);
+
+    void visit(common::Id &node);
+};
 }

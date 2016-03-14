@@ -44,7 +44,6 @@ namespace common {
 	public:
 		virtual void visit(Program &node) { throw "Not implemented"; }
 
-
 		virtual void visit(Function &node) { throw "Not implemented"; }
 
 		virtual void visit(Case &node) { throw "Not implemented"; }
