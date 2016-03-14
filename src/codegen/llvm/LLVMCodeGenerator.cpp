@@ -22,8 +22,8 @@ void LLVMCodeGenerator::visit(common::Function &node) {
     //                            Type::getDoubleTy(getGlobalContext()));
 
 	std::vector<Type *> func_types;
-	for (auto& type: node.types) {
-		switch (type->type) {
+	for (int i = 0; i < node.types.size() - 1; i++) {
+		switch (node.types[i]->type) {
 			case common::Types::FLOAT:
                 func_types.push_back(Type::getFloatTy(getGlobalContext()));
                 break;
