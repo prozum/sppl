@@ -32,6 +32,7 @@ endif()
 
 include_directories(
         src/common
+        src/semantics
         src/parser
         src/codegen/cpp
         src/codegen/haskell

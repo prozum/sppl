@@ -45,6 +45,9 @@ namespace compiler {
 
         driver.parse_stream(*input);
 
+        scope_generator.visit(*driver.main);
+        type_checker.visit(*driver.main);
+
         generator->visit(*driver.main);
     }
 
