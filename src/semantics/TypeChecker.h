@@ -79,7 +79,7 @@ namespace semantics {
 
     private:
         Function *current_func;
-        vector<Type *> garbage;
+        vector<void *> garbage;
 
         bool equal(Type *type1, Type *type2);
     };

@@ -299,8 +299,42 @@ namespace codegen
 
     void CCodeGenerator::visit(ListPattern &node)
     {
-        /* TODO */
-        throw "Not implemented";
+        // result is needed, so we don't start generating something in a signature in the headert() file
+        stringstream result;
+        string arg_name = current_arg_name;
+        string name = "gp";
+        int tap_count = 0;
+        name += to_string(pattern_count);
+
+        pattern_count++;
+
+        node.node_type->accept(*this);
+        t(result, tap_count) << "int " << name << "(" << last_type << " arg)" << endl;
+        t(result, tap_count) << "{" << endl;
+        tap_count++;
+        t(result, tap_count) << "return ";
+
+        for (int i = 0; i < node.patterns.size(); i++) {
+            current_arg_name = "gat_" + lists[*node.node_type] + "(arg, " + to_string(i) + ")";
+            arg_name_stack.insert(arg_name_stack.begin(), "gat_" + lists[*node.node_type] + "(");
+            arg_name_stack.push_back(", " + to_string(i) + ")");
+            node.patterns[i]->accept(*this);
+            arg_name_stack.pop_back();
+            arg_name_stack.erase(arg_name_stack.begin());
+            result << last_pattern;
+
+            if (i < node.patterns.size() - 1)
+                result << " && ";
+        }
+
+        result << ";" << endl;
+        tap_count--;
+        t(result, tap_count) << "}" << endl;
+        t(result, tap_count) << endl;
+
+        last_pattern = name + "(" + arg_name + ")";
+
+        headert() << result.str();
     }
 
     void CCodeGenerator::visit(TuplePattern &node)
@@ -619,6 +653,16 @@ namespace codegen
         t(result, tap_count) << "}" << endl;
         t(result, tap_count) << endl;
         /* generation of list constructer ends here */
+
+        /* generation of at function starts here */
+        t(result, tap_count) << last_type << " gat_" << name << "(" << name << " *this, int index)" << endl;
+        t(result, tap_count) << "{" << endl;
+        tap_count++;
+        t(result, tap_count) << "return this->items[this->head - (1 + index)];" << endl;
+        tap_count--;
+        t(result, tap_count) << "}" << endl;
+        t(result, tap_count) << endl;
+        /* generation of at function ends here */
 
         /* TODO */
 

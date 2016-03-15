@@ -46,6 +46,7 @@ public:
     ObjLayerT ObjectLayer;
     CompileLayerT CompileLayer;
     std::vector<ModuleHandleT> ModuleHandles;
+    std::unique_ptr<legacy::FunctionPassManager> PassManager;
 
 
     codegen::LLVMCodeGenerator Generator;

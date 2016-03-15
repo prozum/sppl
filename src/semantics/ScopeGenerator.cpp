@@ -24,7 +24,7 @@ namespace semantics {
         if (!current_scope->exists(node.id)) {
             auto type = new Type(Types::SIGNATURE, &node.types);
             current_scope->decls.insert({node.id, type});
-            type_garbage.push_back(type);
+            garbage.push_back(type);
 
             /* Visit children */
             for (auto type : node.types) {
