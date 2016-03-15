@@ -121,6 +121,7 @@ namespace codegen {
             vector<string> arg_names;
             vector<string> arg_name_stack;
             vector<string> assignments;
+            vector<int> list_split_stack;
             IdContext id_context;
             string current_arg_name;
             string last_pattern;
