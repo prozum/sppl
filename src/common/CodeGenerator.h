@@ -2,7 +2,6 @@
 
 #include <ostream>
 #include <string>
-#include <llvm/IR/Function.h>
 #include "Visitor.h"
 #include "Node.h"
 
