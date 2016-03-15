@@ -44,8 +44,14 @@ namespace compiler {
     void Compiler::compile() {
 
         driver.parse_stream(*input);
+        if (driver.main == nullptr)
+            return;
+
+        scope_generator.visit(*driver.main);
+        type_checker.visit(*driver.main);
 
         generator->visit(*driver.main);
     }
+
 
 }

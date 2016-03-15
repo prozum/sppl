@@ -8,6 +8,7 @@ option(CGNUASM "GNU Assembly Compiler" OFF)
 option(CLLVM "LLVM Intermediate Representation Compiler" OFF)
 option(PROFILER "Profiler description" OFF)
 option(INTERPRETER "Interpreter description" OFF)
+option(JIT "LLVM JIT Compiler" OFF)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
 if(DEBUG)
@@ -32,6 +33,7 @@ endif()
 
 include_directories(
         src/common
+        src/semantics
         src/parser
         src/codegen/cpp
         src/codegen/haskell
@@ -39,11 +41,9 @@ include_directories(
         src/codegen/llvm
         src/codegen/pprinter
         src/compiler
-        tools/profiler
-        tools/interpreter
 )
 
 add_subdirectory(src)
-#add_subdirectory(samples)
+add_subdirectory(samples)
 add_subdirectory(tools)
 add_subdirectory(tests)

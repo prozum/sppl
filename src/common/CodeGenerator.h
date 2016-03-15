@@ -2,6 +2,7 @@
 
 #include <ostream>
 #include <string>
+#include <llvm/IR/Function.h>
 #include "Visitor.h"
 #include "Node.h"
 
@@ -15,6 +16,8 @@ namespace common {
         CodeGenerator(ostream &out);
 
         std::ostream &output;
+
+        bool jit_mode = false;
     };
 
 }
