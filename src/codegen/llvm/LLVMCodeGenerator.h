@@ -24,10 +24,10 @@ class LLVMCodeGenerator : public common::CodeGenerator {
 
     llvm::Function *create_function(common::Function *func);
 
+    llvm::IRBuilder<> Builder;
     unique_ptr<llvm::Module> Module;
 
 private:
-    llvm::IRBuilder<> Builder;
     std::map<std::string, llvm::Value *> ContextValues;
     llvm::Function *cur_func;
     llvm::Value *cur_val;

@@ -40,11 +40,17 @@ namespace codegen {
         if (jit_mode) {
             cur_func = Function::Create(func_type, Function::ExternalLinkage, "__anon_expr", Module.get());
 
+            BasicBlock *block = BasicBlock::Create(getGlobalContext(), "entry", cur_func);
+            Builder.SetInsertPoint(block);
+
+            func->cases[0]->expr->accept(*this);
+
+            Builder.CreateRet(cur_val);
         }
         else
             cur_func = Function::Create(func_type, Function::ExternalLinkage, func->id, Module.get());
 
-        // Setup function arguments
+        // Setup names for arguments
         unsigned i = 0;
         for (auto &arg : cur_func->args()) arg.setName("x" + to_string(i++));
 
@@ -93,7 +99,7 @@ void LLVMCodeGenerator::visit(common::Add &node) {
     node.right->accept(*this);
     auto right = cur_val;
 
-    Builder.CreateFAdd(left, right, "addtmp");
+    cur_val = Builder.CreateFAdd(left, right, "addtmp");
 }
 
 void LLVMCodeGenerator::visit(common::Float &node) {
