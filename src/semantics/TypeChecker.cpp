@@ -467,7 +467,10 @@ void TypeChecker::visit(ListPattern &node) {
                 throw "bad programmer exception";
             }
         }
-        node.node_type = node.patterns[0]->node_type;
+
+        node.node_type = new Type(Types::LIST);
+        node.node_type->types.push_back(node.patterns[0]->node_type);
+        garbage.push_back(node.node_type);
     }
     /* Code stops here */
 }

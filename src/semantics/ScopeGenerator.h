@@ -86,7 +86,6 @@ namespace semantics {
         Function *current_func;
         std::stack<Type *> type_stack;
         ScopeContext context;
-        vector<Scope *> garbage;
-        vector<Type *> type_garbage;
+        vector<void *> garbage;
     };
 }
