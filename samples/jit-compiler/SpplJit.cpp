@@ -8,6 +8,7 @@ SpplJit::SpplJit(istream *in, ostream *out) : Machine(EngineBuilder().selectTarg
                                               Generator(*out)
 {
     llvm::sys::DynamicLibrary::LoadLibraryPermanently(nullptr);
+    init_module_passmanager();
     Generator.jit_mode = true;
 }
 
@@ -64,40 +65,50 @@ void SpplJit::init_module_passmanager() {
     Generator.Module->setDataLayout(Machine->createDataLayout());
 
     // Create a new pass manager attached to it.
-    auto pass_manager = llvm::make_unique<legacy::FunctionPassManager>(Generator.Module.get());
+    PassManager = llvm::make_unique<legacy::FunctionPassManager>(Generator.Module.get());
 
     // Optimization
-    pass_manager->add(createInstructionCombiningPass());
-    pass_manager->add(createReassociatePass());
-    pass_manager->add(createGVNPass());
-    pass_manager->add(createCFGSimplificationPass());
+    PassManager->add(createInstructionCombiningPass());
+    PassManager->add(createReassociatePass());
+    PassManager->add(createGVNPass());
+    PassManager->add(createCFGSimplificationPass());
 
-    pass_manager->doInitialization();
+    PassManager->doInitialization();
 }
 
 
 void SpplJit::eval(std::string str) {
     Driver.parse_string(str);
 
-    auto jit_expr = Generator.create_function(Driver.main->funcs[0]);
+    auto jit_func = Generator.create_function(Driver.main->funcs[0]);
+
+    verifyFunction(*jit_func);
+    PassManager->run(*jit_func);
+
+    Generator.Module->dump();
+
 
     auto handler = add_module(std::move(Generator.Module));
     init_module_passmanager();
 
 
-    auto anon_func = find_symbol("__anon_expr");
+    auto anon_expr = find_symbol("__anon_expr");
 
-    double (*df_ptr)();
+    float (*df_ptr)();
     int (*if_ptr)();
-    switch (jit_expr->getReturnType()->getTypeID())
+    df_ptr = (float (*)()) (intptr_t) anon_expr.getAddress();
+    cout << "Evaluated to " << std::to_string(df_ptr()) << endl;
+
+    /*
+    switch (jit_func->getReturnType()->getTypeID())
     {
-        case llvm::Type::DoubleTyID:
-            df_ptr = (double (*)()) (intptr_t)anon_func.getAddress();
+        case llvm::Type::FloatTyID:
+            df_ptr = (float (*)()) (intptr_t)anon_expr.getAddress();
             cout << "Evaluated to " << std::to_string(df_ptr()) << endl;
             break;
         default:
             throw "Not supported";
-    }
+    }*/
 
 
     remove_module(handler);
