@@ -23,8 +23,6 @@ namespace codegen
     void CCodeGenerator::visit(Program &node)
     {
         stringstream func_name;
-        scope_generator.visit(node);
-        type_checker.visit(node);
 
         generate_std();
 
@@ -99,9 +97,11 @@ namespace codegen
         // generate cases
         for (auto c : node.cases) {
             c->accept(*this);
+            assignments.clear();
         }
 
         outputt() << endl;
+        outputt() << "printf(\"No cases realized!\\n\");" << endl;
         outputt() << "exit(1);" << endl;
         output_tap_count--;
         outputt() << "}" << endl;
@@ -120,6 +120,7 @@ namespace codegen
                 current_arg_name = arg_names[i];
                 arg_name_stack.push_back(arg_names[i]);
                 node.patterns[i]->accept(*this);
+                arg_name_stack.pop_back();
                 output << last_pattern;
 
                 if (i < node.patterns.size() - 1 )
@@ -318,22 +319,23 @@ namespace codegen
         t(result, tap_count) << "int " << name << "(" << last_type << " arg)" << endl;
         t(result, tap_count) << "{" << endl;
         tap_count++;
-        t(result, tap_count) << "return " << endl;
+        t(result, tap_count) << "return ";
 
         for (int i = 0; i < node.patterns.size(); i++) {
-            current_arg_name = arg_name + ".gi" + to_string(i);
+            current_arg_name = "arg.gi" + to_string(i);
             arg_name_stack.push_back(".gi" + to_string(i));
             node.patterns[i]->accept(*this);
             arg_name_stack.pop_back();
-            t(result, tap_count) << last_pattern;
+            result << last_pattern;
 
             if (i < node.patterns.size() - 1)
-                t(result, tap_count) << " && ";
+                result << " && ";
         }
 
         result << ";" << endl;
         tap_count--;
         t(result, tap_count) << "}" << endl;
+        t(result, tap_count) << endl;
 
         last_pattern = name + "(" + arg_name + ")";
 
@@ -349,13 +351,7 @@ namespace codegen
     void CCodeGenerator::visit(Int &node)
     {
         if (id_context == IdContext::PATTERN) {
-            string name = "";
-
-            for (auto str : arg_name_stack) {
-                name += str;
-            }
-
-            last_pattern = name + " == " + to_string(node.value);
+            last_pattern = current_arg_name + " == " + to_string(node.value);
         } else {
             output << node.value;
         }
@@ -364,13 +360,7 @@ namespace codegen
     void CCodeGenerator::visit(Float &node)
     {
         if (id_context == IdContext::PATTERN) {
-            string name = "";
-
-            for (auto str : arg_name_stack) {
-                name += str;
-            }
-
-            last_pattern = name + " == " + to_string(node.value);
+            last_pattern = current_arg_name + " == " + to_string(node.value);
         } else {
             output << node.value;
         }
@@ -380,13 +370,7 @@ namespace codegen
     void CCodeGenerator::visit(Bool &node)
     {
         if (id_context == IdContext::PATTERN) {
-            string name = "";
-
-            for (auto str : arg_name_stack) {
-                name += str;
-            }
-
-            last_pattern = name + " == " + to_string(node.value);
+            last_pattern = current_arg_name + " == " + to_string(node.value);
         } else {
             output << node.value;
         }
@@ -395,13 +379,7 @@ namespace codegen
     void CCodeGenerator::visit(Char &node)
     {
         if (id_context == IdContext::PATTERN) {
-            string name = "";
-
-            for (auto str : arg_name_stack) {
-                name += str;
-            }
-
-            last_pattern = name + " == '" + to_string(node.value) + "'";
+            last_pattern = current_arg_name + " == '" + to_string(node.value) + "'";
         } else {
             output << "'" << node.value << "'";
         }
@@ -482,7 +460,7 @@ namespace codegen
 
                 assignments.push_back(assign);
 
-                last_pattern = "true";
+                last_pattern = "1";
                 break;
             case IdContext::EXPR:
                 switch (node.node_type->type){
@@ -591,9 +569,8 @@ namespace codegen
         t(result, tap_count) << "int size;" << endl;
         tap_count--;
         t(result, tap_count) << "}" << name << ";" << endl;
-        /* generation of list ends here */
-
         t(result, tap_count) << endl;
+        /* generation of list ends here */
 
         /* generation of list push starts here */
         t(result, tap_count) << name << " *gpush_" << name << "(" << name << " *this, " << last_type << " item)" << endl;
@@ -610,16 +587,15 @@ namespace codegen
         t(result, tap_count) << "return this;" << endl;
         tap_count--;
         t(result, tap_count) << "}" << endl;
+        t(result, tap_count) << endl;
         /* generation of list push ends here */
 
-        t(result, tap_count) << endl;
 
         /* generation of list constructer starts here */
         t(result, tap_count) << name << " *gcreate_" << name << "(int count, ...)" << endl;
         t(result, tap_count) << "{" << endl;
         tap_count++;
         t(result, tap_count) << "int i;" << endl;
-        // rounding the count to next power of 2 (32 bit int specific)
         t(result, tap_count) << "int size = gnearest_pow2(count);" << endl;
         t(result, tap_count) << "" << name << " *res = (" << name << "*)malloc(sizeof(" << name << "));" << endl;
         t(result, tap_count) << endl;
@@ -641,9 +617,8 @@ namespace codegen
         t(result, tap_count) << "return res;" << endl;
         tap_count--;
         t(result, tap_count) << "}" << endl;
-        /* generation of list constructer ends here */
-
         t(result, tap_count) << endl;
+        /* generation of list constructer ends here */
 
         /* TODO */
 

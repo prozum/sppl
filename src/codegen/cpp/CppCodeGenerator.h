@@ -132,9 +132,6 @@ namespace codegen {
             Type real_string;
             Type string_list;
 
-            ScopeGenerator scope_generator;
-            TypeChecker type_checker;
-
             string generate_list(Type &);
             string generate_tuple(Type &);
             string generate_signature(Type &);
