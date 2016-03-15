@@ -48,11 +48,11 @@ void TypeChecker::visit(Case &node) {
             }
 
             if (!equal(node.patterns[i]->node_type, current_func->types[i])) {
-                throw "bad programmer exception";
+                throw "fuck";
             }
         }
     } else {
-        throw "bad programmer exception";
+        throw "Number of cases is wrong";
     }
 }
 
@@ -114,7 +114,7 @@ void TypeChecker::visit(Equal &node) {
         node.node_type = new Type(Types::BOOL);
         garbage.push_back(node.node_type);
     } else {
-        throw "Bad programmer exception";
+        throw "equal operator need to compare same types";
     }
     /* Code stops here */
 }
@@ -135,7 +135,7 @@ void TypeChecker::visit(NotEqual &node) {
         node.node_type = new Type(Types::BOOL);
         garbage.push_back(node.node_type);
     } else {
-        throw "Bad programmer exception";
+        throw "not equal operator need to compare same types";
     }
 
     /* Code stops here */
@@ -158,7 +158,7 @@ void TypeChecker::visit(Lesser &node) {
         node.node_type = new Type(Types::BOOL);
         garbage.push_back(node.node_type);
     } else {
-        throw "Bad programmer exception";
+        throw "lesser operator only compares int, float";
     }
 
     /* Code stops here */
@@ -181,7 +181,7 @@ void TypeChecker::visit(Greater &node) {
         node.node_type = new Type(Types::BOOL);
         garbage.push_back(node.node_type);
     } else {
-        throw "Bad programmer exception";
+        throw "greater operator only compares int, float";
     }
     /* Code stops here */
 }
@@ -203,7 +203,7 @@ void TypeChecker::visit(LesserEq &node) {
         node.node_type = new Type(Types::BOOL);
         garbage.push_back(node.node_type);
     } else {
-        throw "Bad programmer exception";
+        throw "lesser equal only compares int, float";
     }
 
     /* Code stops here */
@@ -226,7 +226,7 @@ void TypeChecker::visit(GreaterEq &node) {
         node.node_type = new Type(Types::BOOL);
         garbage.push_back(node.node_type);
     } else {
-        throw "Bad programmer exception";
+        throw "greater equal only compares int, float";
     }
 
     /* Code stops here */
@@ -248,7 +248,7 @@ void TypeChecker::visit(Add &node) {
         node.left->node_type->type == Types::FLOAT && node.right->node_type->type == Types::FLOAT) {
         node.node_type = node.left->node_type;
     } else {
-        throw "Bad programmer exception";
+        throw "can only add int to int and float to float";
     }
 
     /* Code stops here */
@@ -270,7 +270,7 @@ void TypeChecker::visit(Sub &node) {
         node.left->node_type->type == Types::FLOAT && node.right->node_type->type == Types::FLOAT) {
         node.node_type = node.left->node_type;
     } else {
-        throw "Bad programmer exception";
+        throw "can only sub int from int and float from float";
     }
 
     /* Code stops here */
@@ -292,7 +292,7 @@ void TypeChecker::visit(Mul &node) {
         node.left->node_type->type == Types::FLOAT && node.right->node_type->type == Types::FLOAT) {
         node.node_type = node.left->node_type;
     } else {
-        throw "Bad programmer exception";
+        throw "can only multiply int with int and float with float";
     }
 
     /* Code stops here */
@@ -314,7 +314,7 @@ void TypeChecker::visit(Div &node) {
         node.left->node_type->type == Types::FLOAT && node.right->node_type->type == Types::FLOAT) {
         node.node_type = node.left->node_type;
     } else {
-        throw "Bad programmer exception";
+        throw "can only divide int with int and float with float";
     }
 
     /* Code stops here */
@@ -336,7 +336,7 @@ void TypeChecker::visit(Mod &node) {
         node.left->node_type->type == Types::FLOAT && node.right->node_type->type == Types::FLOAT) {
         node.node_type = node.left->node_type;
     } else {
-        throw "Bad programmer exception";
+        throw "can only modulo int with int and float with float";
     }
 
     /* Code stops here */
@@ -358,7 +358,7 @@ void TypeChecker::visit(ListAdd &node) {
         if (equal(node.left->node_type, node.right->node_type->types.front())) {
             node.node_type = node.right->node_type;
         } else {
-            throw "Not same type m8";
+            throw "not same types in list";
         }
     } else if (node.right->node_type->type == Types::EMPTYLIST) {
         node.node_type = new Type(Types::LIST);
@@ -366,7 +366,7 @@ void TypeChecker::visit(ListAdd &node) {
         node.right->node_type = node.node_type;
         garbage.push_back(node.node_type);
     } else {
-        throw "Not a list m8";
+        throw "making list from non list";
     }
 
     /* Code stops here */
@@ -401,7 +401,7 @@ void TypeChecker::visit(Not &node) {
     if (node.child->node_type->type == Types::BOOL) {
         node.node_type = node.child->node_type;
     } else {
-        throw " YA DUN FUKD IT UP";
+        throw "can only use not on bools";
     }
     /* Code stops here */
 }
@@ -468,7 +468,7 @@ void TypeChecker::visit(ListPattern &node) {
     } else {
         for (int i = 0; i < node.patterns.size() - 1; ++i) {
             if (!equal(node.patterns[i]->node_type, node.patterns[i + 1]->node_type)) {
-                throw "bad programmer exception";
+                throw "list pattern types not equal";
             }
         }
 
@@ -517,7 +517,7 @@ void TypeChecker::visit(ListSplit &node) {
         if (equal(node.left->node_type, node.right->node_type->types.front())) {
             node.node_type = node.right->node_type;
         } else {
-            throw "Not same type m8";
+            throw "Not same types in list split";
         }
     } else if (node.right->node_type->type == Types::STRING) {
         node.node_type = node.right->node_type;
@@ -526,7 +526,7 @@ void TypeChecker::visit(ListSplit &node) {
         node.node_type->types.push_back(node.left->node_type);
         garbage.push_back(node.node_type);
     } else {
-        throw "Not a list m8";
+        throw "not a list in listsplit";
     }
     /* Code stops here */
 }
@@ -550,7 +550,7 @@ void TypeChecker::visit(List &node) {
     } else {
         for (int i = 0; i < node.exprs.size() - 1; ++i) {
             if (!equal(node.exprs[i]->node_type, node.exprs[i + 1]->node_type)) {
-                throw "bad programmer exception";
+                throw "wrong type when creating list";
             }
         }
         node.node_type = new Type(Types::LIST);
@@ -608,15 +608,15 @@ void TypeChecker::visit(Call &node) {
         if (node.exprs.size() + 1 == node.callee->node_type->types.size()) {
             for (int i = 0; i < node.exprs.size(); ++i) {
                 if (!equal(node.exprs[i]->node_type, node.callee->node_type->types[i])) {
-                    throw "bad programmer exception";
+                    throw "wrong types in call";
                 }
             }
         } else {
-            throw "bad programmer exception";
+            throw "wrong size in call";
         }
         node.node_type = node.callee->node_type->types.back();
     } else {
-        throw "bad programmer exception";
+        throw "wrong signature in call";
     }
 
     /* Code stops here */
