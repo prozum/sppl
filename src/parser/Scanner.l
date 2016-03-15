@@ -73,14 +73,14 @@ return token::CHARTYPE;
     return token::FLOATLITERAL;
 }
 
-"'".+"'" {
+"'"[^']"'" {
     yylval->str_val = new string(yytext);
     yylval->str_val->pop_back();
     yylval->str_val->erase (0,1);
     return token::CHARLITERAL;
 }
 
-"\"".*"\"" {
+"\""[^"]*"\"" {
     yylval->str_val = new string(yytext);
     yylval->str_val->pop_back();
     yylval->str_val->erase (0,1);

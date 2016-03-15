@@ -112,16 +112,25 @@ namespace codegen {
             int tuple_count = 0;
             int list_count = 0;
             int sig_count = 0;
-            int arg_count = 0;
+            int pattern_count = 0;
             int output_tap_count = 0;
             int header_tap_count = 0;
             unordered_map<Type, string> tuples;
             unordered_map<Type, string> lists;
             unordered_map<Type, string> signatures;
             vector<string> arg_names;
+            vector<string> arg_name_stack;
+            vector<string> assignments;
             IdContext id_context;
-            stringstream last_type;
+            string current_arg_name;
+            string last_pattern;
+            string last_type;
             string string_type_name;
+
+            Type _char;
+            Type fake_string;
+            Type real_string;
+            Type string_list;
 
             ScopeGenerator scope_generator;
             TypeChecker type_checker;
@@ -129,6 +138,7 @@ namespace codegen {
             string generate_list(Type &);
             string generate_tuple(Type &);
             string generate_signature(Type &);
+            void generate_std();
 
             ostream &outputt();
             ostream &headert();
