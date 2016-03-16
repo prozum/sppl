@@ -77,7 +77,7 @@
 #undef yylex
 #define yylex driver.lexer->lex
 
-#define line_no driver.lexer->lineno()
+#define line_no driver.lexer->lineno() + 1
 
 using namespace common;
 using namespace std;
