@@ -22,7 +22,7 @@ namespace semantics {
         node.scope = current_scope;
 
         if (!current_scope->exists(node.id)) {
-            auto type = new Type(Types::SIGNATURE, &node.types);
+            auto type = new Type(Types::SIGNATURE, node.types);
             current_scope->decls.insert({node.id, type});
             garbage.push_back(type);
 
@@ -51,7 +51,7 @@ namespace semantics {
             /* Visit children */
             context = ScopeContext::PATTERN;
 
-            for (int i = 0; i < node.patterns.size(); i++) {
+            for (size_t i = 0; i < node.patterns.size(); i++) {
                 type_stack.push(current_func->types[i]);
                 node.patterns[i]->accept(*this);
                 type_stack.pop();
@@ -219,7 +219,7 @@ namespace semantics {
         if (node.patterns.size() == type_stack.top()->types.size() && type_stack.top()->type == Types::TUPLE) {
 
             /* Visit children */
-            for (int i = 0; i < node.patterns.size(); i++) {
+            for (size_t i = 0; i < node.patterns.size(); i++) {
                 type_stack.push(type_stack.top()->types[i]);
                 node.patterns[i]->accept(*this);
                 type_stack.pop();

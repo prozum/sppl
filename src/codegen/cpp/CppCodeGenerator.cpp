@@ -70,7 +70,7 @@ namespace codegen
         func_name << node.scope->get_real_id(node.id) << "(";
 
         // generate function arguments
-        for (int i = 0; i < node.types.size() - 1; i++) {
+        for (size_t i = 0; i < node.types.size() - 1; i++) {
             node.types[i]->accept(*this);
             arg_name << "ga" << i;
             arg_names.push_back(arg_name.str());
@@ -119,8 +119,7 @@ namespace codegen
             outputt() << "if (";
 
             id_context = IdContext::PATTERN;
-            for (int i = 0; i < node.patterns.size(); i++) {
-                current_arg_name = arg_names[i];
+            for (size_t i = 0; i < node.patterns.size(); i++) {
                 arg_name_stack.push_back(arg_names[i]);
                 node.patterns[i]->accept(*this);
                 arg_name_stack.pop_back();
@@ -305,9 +304,6 @@ namespace codegen
         // result is needed, so we don't start generating something in a signature in the headert() file
         stringstream result;
         string arg_name = "";
-        string name = "gp";
-        int tap_count = 0;
-        name += to_string(pattern_count);
 
         node.node_type->accept(*this);
 
@@ -317,7 +313,7 @@ namespace codegen
 
         result << arg_name << "->head - " << list_offsets.back() << " == " << node.patterns.size();
 
-        for (int i = 0; i < node.patterns.size(); i++) {
+        for (size_t i = 0; i < node.patterns.size(); i++) {
             arg_name_stack.insert(arg_name_stack.begin(), "gat_" + lists[*node.node_type] + "(");
             arg_name_stack.push_back(", " + to_string(i + list_offsets.back()) + ")");
             list_offsets.push_back(0);
@@ -338,7 +334,7 @@ namespace codegen
 
         node.node_type->accept(*this);
 
-        for (int i = 0; i < node.patterns.size(); i++) {
+        for (size_t i = 0; i < node.patterns.size(); i++) {
             arg_name_stack.push_back(".gi" + to_string(i));
             node.patterns[i]->accept(*this);
             arg_name_stack.pop_back();
@@ -736,7 +732,7 @@ namespace codegen
         type.types.back()->accept(*this);
         t(result, tap_count) << "typedef " << last_type << " (* " << name << ")(";
 
-        for (int i = 0; i < type.types.size() - 1; ++i) {
+        for (size_t i = 0; i < type.types.size() - 1; ++i) {
             type.types[i]->accept(*this); // generate the actual type of the argument
             t(result, tap_count) << last_type;
 
@@ -772,7 +768,7 @@ namespace codegen
         t(result, tap_count) << "{" << endl;
         tap_count++;
         // generate an item for each type in the tuple
-        for (int i = 0; i < type.types.size(); ++i) {
+        for (size_t i = 0; i < type.types.size(); ++i) {
             type.types[i]->accept(*this); // generate the actual type of the item
             t(result, tap_count) << last_type << " gi" << i << ";" << endl; // give this item a unique name
         }
@@ -786,7 +782,7 @@ namespace codegen
         t(result, tap_count) << name << " gcreate_" << name << "(";
 
         // generate an argument for each item in the struct
-        for (int i = 0; i < type.types.size(); ++i) {
+        for (size_t i = 0; i < type.types.size(); ++i) {
             type.types[i]->accept(*this); // generate the actual type of the argument
             t(result, tap_count) << last_type << " gi" << i;
 
@@ -801,7 +797,7 @@ namespace codegen
         t(result, tap_count) << "" << name << " " << "res;" << endl;
 
         // for each item in res, assign values
-        for (int i = 0; i < type.types.size(); ++i) {
+        for (size_t i = 0; i < type.types.size(); ++i) {
             t(result, tap_count) << "res.gi" << i << " = gi" << i << ";" << endl;
         }
         t(result, tap_count) << "return res;" << endl;

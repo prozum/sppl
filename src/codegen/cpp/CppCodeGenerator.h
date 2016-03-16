@@ -112,7 +112,6 @@ namespace codegen {
             int tuple_count = 0;
             int list_count = 0;
             int sig_count = 0;
-            int pattern_count = 0;
             int output_tap_count = 0;
             int header_tap_count = 0;
             unordered_map<Type, string> tuples;

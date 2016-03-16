@@ -74,9 +74,8 @@ return token::CHARTYPE;
 }
 
 "'"[^']"'" {
-    yylval->str_val = new string(yytext);
-    yylval->str_val->pop_back();
-    yylval->str_val->erase (0,1);
+
+    yylval->char_val =yytext[1];
     return token::CHARLITERAL;
 }
 

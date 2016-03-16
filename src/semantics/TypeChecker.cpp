@@ -42,7 +42,7 @@ void TypeChecker::visit(Case &node) {
 
     /* code starts here*/
     if (node.patterns.size() + 1 == current_func->types.size()) {
-        for (int i = 0; i < node.patterns.size(); ++i) {
+        for (size_t i = 0; i < node.patterns.size(); ++i) {
             if (node.patterns[i]->node_type->type == Types::EMPTYLIST) {
                 node.patterns[i]->node_type = current_func->types[i];
             }
@@ -132,7 +132,7 @@ void TypeChecker::visit(NotEqual &node) {
 
     /* Code goes here */
     if (equal(node.left->node_type, node.right->node_type)) {
-        node.node_type = new Type(Types::BOOL);
+        node.node_type = new Type(Types::BOOL, vector<Type *>(), 0);
         garbage.push_back(node.node_type);
     } else {
         throw "not equal operator need to compare same types";
@@ -153,8 +153,8 @@ void TypeChecker::visit(Lesser &node) {
     /* Visit stops here */
 
     /* Code goes here */
-    if (node.left->node_type->type == Types::INT && node.right->node_type->type == Types::INT ||
-        node.left->node_type->type == Types::FLOAT && node.right->node_type->type == Types::FLOAT) {
+    if ((node.left->node_type->type == Types::INT && node.right->node_type->type == Types::INT) ||
+        (node.left->node_type->type == Types::FLOAT && node.right->node_type->type == Types::FLOAT)) {
         node.node_type = new Type(Types::BOOL);
         garbage.push_back(node.node_type);
     } else {
@@ -176,8 +176,8 @@ void TypeChecker::visit(Greater &node) {
     /* Visit stops here */
 
     /* Code goes here */
-    if (node.left->node_type->type == Types::INT && node.right->node_type->type == Types::INT ||
-        node.left->node_type->type == Types::FLOAT && node.right->node_type->type == Types::FLOAT) {
+    if ((node.left->node_type->type == Types::INT && node.right->node_type->type == Types::INT) ||
+        (node.left->node_type->type == Types::FLOAT && node.right->node_type->type == Types::FLOAT)) {
         node.node_type = new Type(Types::BOOL);
         garbage.push_back(node.node_type);
     } else {
@@ -198,8 +198,8 @@ void TypeChecker::visit(LesserEq &node) {
     /* Visit stops here */
 
     /* Code goes here */
-    if (node.left->node_type->type == Types::INT && node.right->node_type->type == Types::INT ||
-        node.left->node_type->type == Types::FLOAT && node.right->node_type->type == Types::FLOAT) {
+    if ((node.left->node_type->type == Types::INT && node.right->node_type->type == Types::INT) ||
+        (node.left->node_type->type == Types::FLOAT && node.right->node_type->type == Types::FLOAT)) {
         node.node_type = new Type(Types::BOOL);
         garbage.push_back(node.node_type);
     } else {
@@ -221,8 +221,8 @@ void TypeChecker::visit(GreaterEq &node) {
     /* Visit stops here */
 
     /* Code goes here */
-    if (node.left->node_type->type == Types::INT && node.right->node_type->type == Types::INT ||
-        node.left->node_type->type == Types::FLOAT && node.right->node_type->type == Types::FLOAT) {
+    if ((node.left->node_type->type == Types::INT && node.right->node_type->type == Types::INT) ||
+        (node.left->node_type->type == Types::FLOAT && node.right->node_type->type == Types::FLOAT)) {
         node.node_type = new Type(Types::BOOL);
         garbage.push_back(node.node_type);
     } else {
@@ -244,8 +244,8 @@ void TypeChecker::visit(Add &node) {
     /* Visit stops here */
 
     /* Code goes here */
-    if (node.left->node_type->type == Types::INT && node.right->node_type->type == Types::INT ||
-        node.left->node_type->type == Types::FLOAT && node.right->node_type->type == Types::FLOAT) {
+    if ((node.left->node_type->type == Types::INT && node.right->node_type->type == Types::INT) ||
+        (node.left->node_type->type == Types::FLOAT && node.right->node_type->type == Types::FLOAT)) {
         node.node_type = node.left->node_type;
     } else {
         throw "can only add int to int and float to float";
@@ -266,8 +266,8 @@ void TypeChecker::visit(Sub &node) {
     /* Visit stops here */
 
     /* Code goes here */
-    if (node.left->node_type->type == Types::INT && node.right->node_type->type == Types::INT ||
-        node.left->node_type->type == Types::FLOAT && node.right->node_type->type == Types::FLOAT) {
+    if ((node.left->node_type->type == Types::INT && node.right->node_type->type == Types::INT) ||
+        (node.left->node_type->type == Types::FLOAT && node.right->node_type->type == Types::FLOAT)) {
         node.node_type = node.left->node_type;
     } else {
         throw "can only sub int from int and float from float";
@@ -288,8 +288,8 @@ void TypeChecker::visit(Mul &node) {
     /* Visit stops here */
 
     /* Code goes here */
-    if (node.left->node_type->type == Types::INT && node.right->node_type->type == Types::INT ||
-        node.left->node_type->type == Types::FLOAT && node.right->node_type->type == Types::FLOAT) {
+    if ((node.left->node_type->type == Types::INT && node.right->node_type->type == Types::INT) ||
+        (node.left->node_type->type == Types::FLOAT && node.right->node_type->type == Types::FLOAT)) {
         node.node_type = node.left->node_type;
     } else {
         throw "can only multiply int with int and float with float";
@@ -310,8 +310,8 @@ void TypeChecker::visit(Div &node) {
     /* Visit stops here */
 
     /* Code goes here */
-    if (node.left->node_type->type == Types::INT && node.right->node_type->type == Types::INT ||
-        node.left->node_type->type == Types::FLOAT && node.right->node_type->type == Types::FLOAT) {
+    if ((node.left->node_type->type == Types::INT && node.right->node_type->type == Types::INT) ||
+        (node.left->node_type->type == Types::FLOAT && node.right->node_type->type == Types::FLOAT)) {
         node.node_type = node.left->node_type;
     } else {
         throw "can only divide int with int and float with float";
@@ -332,8 +332,8 @@ void TypeChecker::visit(Mod &node) {
     /* Visit stops here */
 
     /* Code goes here */
-    if (node.left->node_type->type == Types::INT && node.right->node_type->type == Types::INT ||
-        node.left->node_type->type == Types::FLOAT && node.right->node_type->type == Types::FLOAT) {
+    if ((node.left->node_type->type == Types::INT && node.right->node_type->type == Types::INT) ||
+        (node.left->node_type->type == Types::FLOAT && node.right->node_type->type == Types::FLOAT)) {
         node.node_type = node.left->node_type;
     } else {
         throw "can only modulo int with int and float with float";
@@ -433,7 +433,6 @@ void TypeChecker::visit(Bool &node) {
 void TypeChecker::visit(Char &node) {
     /* Code goes here */
     // TODO check char length
-    node.value = node.tmp.front();
     node.node_type = new Type(Types::CHAR);
     garbage.push_back(node.node_type);
 
@@ -466,7 +465,7 @@ void TypeChecker::visit(ListPattern &node) {
         node.node_type = new Type(Types::EMPTYLIST);
         garbage.push_back(node.node_type);
     } else {
-        for (int i = 0; i < node.patterns.size() - 1; ++i) {
+        for (size_t i = 0; i < node.patterns.size() - 1; ++i) {
             if (!equal(node.patterns[i]->node_type, node.patterns[i + 1]->node_type)) {
                 throw "list pattern types not equal";
             }
@@ -548,7 +547,7 @@ void TypeChecker::visit(List &node) {
         node.node_type = new Type(Types::EMPTYLIST);
         garbage.push_back(node.node_type);
     } else {
-        for (int i = 0; i < node.exprs.size() - 1; ++i) {
+        for (size_t i = 0; i < node.exprs.size() - 1; ++i) {
             if (!equal(node.exprs[i]->node_type, node.exprs[i + 1]->node_type)) {
                 throw "wrong type when creating list";
             }
@@ -577,7 +576,7 @@ void TypeChecker::visit(Tuple &node) {
     node.node_type = new Type(Types::TUPLE);
     garbage.push_back(node.node_type);
 
-    for (int i = 0; i < node.exprs.size(); ++i) {
+    for (size_t i = 0; i < node.exprs.size(); ++i) {
         node.node_type->types.push_back(node.exprs[i]->node_type);
     }
     /* Code stops here */
@@ -606,7 +605,7 @@ void TypeChecker::visit(Call &node) {
     /* Code goes here */
     if (node.callee->node_type->type == Types::SIGNATURE) {
         if (node.exprs.size() + 1 == node.callee->node_type->types.size()) {
-            for (int i = 0; i < node.exprs.size(); ++i) {
+            for (size_t i = 0; i < node.exprs.size(); ++i) {
                 if (!equal(node.exprs[i]->node_type, node.callee->node_type->types[i])) {
                     throw "wrong types in call";
                 }
