@@ -44,7 +44,7 @@ void TypeChecker::visit(Case &node) {
     if (node.patterns.size() + 1 == current_func->types.size()) {
         for (int i = 0; i < node.patterns.size(); ++i) {
             if (!equal(node.patterns[i]->node_type, current_func->types[i])) {
-                throw "fuck";
+                throw "wrong type in case";
             }
         }
     } else {
