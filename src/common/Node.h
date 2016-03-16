@@ -317,10 +317,10 @@ namespace common {
 
 	class Float : public Pattern {
 	public:
-		long double value;
+		double value;
 
-		Float(long double);
-		Float(long double, int);
+		Float(double);
+		Float(double, int);
 
 		virtual void accept(Visitor &);
 	};

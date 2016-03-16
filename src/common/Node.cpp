@@ -369,10 +369,10 @@ namespace common {
             Pattern(line_no),
             value(value) { }
 
-    Float::Float(long double value) :
+    Float::Float(double value) :
             value(value) { }
 
-    Float::Float(long double value,
+    Float::Float(double value,
                  int line_no) :
             Pattern(line_no),
             value(value) { }
