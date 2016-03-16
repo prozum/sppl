@@ -60,8 +60,8 @@ namespace semantics {
             context = ScopeContext::EXPR;
             node.expr->accept(*this);
         } else {
-            /* ERROR! Cases doesn't have the currect number of patterns */
-            throw "Case doesn't have the currect number of patterns";
+            /* ERROR! Cases doesn't have the correct number of patterns */
+            throw "Case doesn't have the correct number of patterns";
         }
 
         current_scope = current_scope->parent;
