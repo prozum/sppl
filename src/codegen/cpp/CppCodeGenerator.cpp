@@ -18,7 +18,7 @@ namespace codegen
         string_list = Type(Types::LIST);
         real_string.types.push_back(&_char);
         string_list.types.push_back(&fake_string);
-        list_split_stack.push_back(0);
+        list_offsets.push_back(0);
     }
 
     void CCodeGenerator::visit(Program &node)
@@ -315,12 +315,14 @@ namespace codegen
             arg_name += str;
         }
 
-        result << arg_name << "->head - " << list_split_stack.back() << " == " << node.patterns.size();
+        result << arg_name << "->head - " << list_offsets.back() << " == " << node.patterns.size();
 
         for (int i = 0; i < node.patterns.size(); i++) {
             arg_name_stack.insert(arg_name_stack.begin(), "gat_" + lists[*node.node_type] + "(");
-            arg_name_stack.push_back(", " + to_string(i + list_split_stack.back()) + ")");
+            arg_name_stack.push_back(", " + to_string(i + list_offsets.back()) + ")");
+            list_offsets.push_back(0);
             node.patterns[i]->accept(*this);
+            list_offsets.pop_back();
             arg_name_stack.pop_back();
             arg_name_stack.erase(arg_name_stack.begin());
             result << " && " << last_pattern;
@@ -354,18 +356,18 @@ namespace codegen
         stringstream result;
 
         arg_name_stack.insert(arg_name_stack.begin(), "gat_" + lists[*node.node_type] + "(");
-        arg_name_stack.push_back(", " + to_string(list_split_stack.back()) + ")");
-        list_split_stack.push_back(0);
+        arg_name_stack.push_back(", " + to_string(list_offsets.back()) + ")");
+        list_offsets.push_back(0);
         node.left->accept(*this);
-        list_split_stack.pop_back();
+        list_offsets.pop_back();
         arg_name_stack.pop_back();
         arg_name_stack.erase(arg_name_stack.begin());
 
         result << "(" << last_pattern << " && ";
 
-        list_split_stack[list_split_stack.size() - 1]++;
+        list_offsets[list_offsets.size() - 1]++;
         node.right->accept(*this);
-        list_split_stack[list_split_stack.size() - 1]--;
+        list_offsets[list_offsets.size() - 1]--;
 
         result << last_pattern << ")";
 
@@ -442,7 +444,7 @@ namespace codegen
                 arg += str;
             }
 
-            last_pattern = "gcompare_string(" + arg + ", \"" + node.value + "\", " + to_string(list_split_stack.back()) + ")";
+            last_pattern = "gcompare_string(" + arg + ", \"" + node.value + "\", " + to_string(list_offsets.back()) + ")";
         } else {
             output << "gcreate_string(\"" << node.value << "\")";
         }
@@ -509,7 +511,7 @@ namespace codegen
                 assign << last_type << " u" << node.id << " = ";
 
                 if (node.node_type->type == Types::LIST || node.node_type->type == Types::STRING) {
-                    assign << "gclone_" << lists[*node.node_type] << "(" << name << ", " << list_split_stack.back() << ");";
+                    assign << "gclone_" << lists[*node.node_type] << "(" << name << ", " << list_offsets.back() << ");";
                 } else {
                     assign << name << ";";
                 }
