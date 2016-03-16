@@ -48,7 +48,7 @@ void TypeChecker::visit(Case &node) {
             }
 
             if (!equal(node.patterns[i]->node_type, current_func->types[i])) {
-                throw "fuck";
+                throw "wrong type in case";
             }
         }
     } else {
