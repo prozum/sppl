@@ -18,6 +18,7 @@ namespace codegen
         string_list = Type(Types::LIST);
         real_string.types.push_back(&_char);
         string_list.types.push_back(&fake_string);
+        list_offsets.push_back(0);
     }
 
     void CCodeGenerator::visit(Program &node)
@@ -41,7 +42,8 @@ namespace codegen
         output_tap_count--;
         outputt() << "}" << endl;
         outputt() << endl;
-        outputt() << "return umain(args);" << endl;
+        outputt() << "printf(\"%d\\n\", umain(args));" << endl;
+        outputt() << "return 0;" << endl;
         output_tap_count--;
         outputt() << "}" << endl;
         outputt() << endl;
@@ -68,7 +70,7 @@ namespace codegen
         func_name << node.scope->get_real_id(node.id) << "(";
 
         // generate function arguments
-        for (int i = 0; i < node.types.size() - 1; i++) {
+        for (size_t i = 0; i < node.types.size() - 1; i++) {
             node.types[i]->accept(*this);
             arg_name << "ga" << i;
             arg_names.push_back(arg_name.str());
@@ -97,6 +99,7 @@ namespace codegen
         // generate cases
         for (auto c : node.cases) {
             c->accept(*this);
+            outputt() << endl;
             assignments.clear();
         }
 
@@ -116,14 +119,13 @@ namespace codegen
             outputt() << "if (";
 
             id_context = IdContext::PATTERN;
-            for (int i = 0; i < node.patterns.size(); i++) {
-                current_arg_name = arg_names[i];
+            for (size_t i = 0; i < node.patterns.size(); i++) {
                 arg_name_stack.push_back(arg_names[i]);
                 node.patterns[i]->accept(*this);
                 arg_name_stack.pop_back();
                 output << last_pattern;
 
-                if (i < node.patterns.size() - 1 )
+                if (i < node.patterns.size() - 1)
                     output << " && ";
             }
 
@@ -299,30 +301,40 @@ namespace codegen
 
     void CCodeGenerator::visit(ListPattern &node)
     {
-        /* TODO */
-        throw "Not implemented";
+        // result is needed, so we don't start generating something in a signature in the headert() file
+        stringstream result;
+        string arg_name = "";
+
+        node.node_type->accept(*this);
+
+        for (auto str : arg_name_stack) {
+            arg_name += str;
+        }
+
+        result << arg_name << "->head - " << list_offsets.back() << " == " << node.patterns.size();
+
+        for (size_t i = 0; i < node.patterns.size(); i++) {
+            arg_name_stack.insert(arg_name_stack.begin(), "gat_" + lists[*node.node_type] + "(");
+            arg_name_stack.push_back(", " + to_string(i + list_offsets.back()) + ")");
+            list_offsets.push_back(0);
+            node.patterns[i]->accept(*this);
+            list_offsets.pop_back();
+            arg_name_stack.pop_back();
+            arg_name_stack.erase(arg_name_stack.begin());
+            result << " && " << last_pattern;
+        }
+
+        last_pattern = "(" + result.str() + ")";
     }
 
     void CCodeGenerator::visit(TuplePattern &node)
     {
         // result is needed, so we don't start generating something in a signature in the headert() file
         stringstream result;
-        string arg_name = current_arg_name;
-        string name = "gp";
-        int tap_count = 0;
-        name += to_string(pattern_count);
-
-        pattern_count++;
 
         node.node_type->accept(*this);
 
-        t(result, tap_count) << "int " << name << "(" << last_type << " arg)" << endl;
-        t(result, tap_count) << "{" << endl;
-        tap_count++;
-        t(result, tap_count) << "return ";
-
-        for (int i = 0; i < node.patterns.size(); i++) {
-            current_arg_name = "arg.gi" + to_string(i);
+        for (size_t i = 0; i < node.patterns.size(); i++) {
             arg_name_stack.push_back(".gi" + to_string(i));
             node.patterns[i]->accept(*this);
             arg_name_stack.pop_back();
@@ -332,26 +344,42 @@ namespace codegen
                 result << " && ";
         }
 
-        result << ";" << endl;
-        tap_count--;
-        t(result, tap_count) << "}" << endl;
-        t(result, tap_count) << endl;
-
-        last_pattern = name + "(" + arg_name + ")";
-
-        headert() << result.str();
+        last_pattern = "(" + result.str() + ")";
     }
 
     void CCodeGenerator::visit(ListSplit &node)
     {
-        /* TODO */
-        throw "Not implemented";
+        stringstream result;
+
+        arg_name_stack.insert(arg_name_stack.begin(), "gat_" + lists[*node.node_type] + "(");
+        arg_name_stack.push_back(", " + to_string(list_offsets.back()) + ")");
+        list_offsets.push_back(0);
+        node.left->accept(*this);
+        list_offsets.pop_back();
+        arg_name_stack.pop_back();
+        arg_name_stack.erase(arg_name_stack.begin());
+
+        result << "(" << last_pattern << " && ";
+
+        list_offsets[list_offsets.size() - 1]++;
+        node.right->accept(*this);
+        list_offsets[list_offsets.size() - 1]--;
+
+        result << last_pattern << ")";
+
+        last_pattern = result.str();
     }
 
     void CCodeGenerator::visit(Int &node)
     {
         if (id_context == IdContext::PATTERN) {
-            last_pattern = current_arg_name + " == " + to_string(node.value);
+            string arg = "";
+
+            for (auto str : arg_name_stack) {
+                arg += str;
+            }
+
+            last_pattern = arg + " == " + to_string(node.value);
         } else {
             output << node.value;
         }
@@ -360,7 +388,13 @@ namespace codegen
     void CCodeGenerator::visit(Float &node)
     {
         if (id_context == IdContext::PATTERN) {
-            last_pattern = current_arg_name + " == " + to_string(node.value);
+            string arg = "";
+
+            for (auto str : arg_name_stack) {
+                arg += str;
+            }
+
+            last_pattern = arg + " == " + to_string(node.value);
         } else {
             output << node.value;
         }
@@ -370,7 +404,13 @@ namespace codegen
     void CCodeGenerator::visit(Bool &node)
     {
         if (id_context == IdContext::PATTERN) {
-            last_pattern = current_arg_name + " == " + to_string(node.value);
+            string arg = "";
+
+            for (auto str : arg_name_stack) {
+                arg += str;
+            }
+
+            last_pattern = arg + " == " + to_string(node.value);
         } else {
             output << node.value;
         }
@@ -379,7 +419,13 @@ namespace codegen
     void CCodeGenerator::visit(Char &node)
     {
         if (id_context == IdContext::PATTERN) {
-            last_pattern = current_arg_name + " == '" + to_string(node.value) + "'";
+            string arg = "";
+
+            for (auto str : arg_name_stack) {
+                arg += str;
+            }
+
+            last_pattern = arg + " == '" + node.value + "'";
         } else {
             output << "'" << node.value << "'";
         }
@@ -387,9 +433,17 @@ namespace codegen
 
     void CCodeGenerator::visit(String &node)
     {
-        // TODO pattern matching
+        if (id_context == IdContext::PATTERN) {
+            string arg = "";
 
-        output << "gcreate_string(\"" << node.value << "\")";
+            for (auto str : arg_name_stack) {
+                arg += str;
+            }
+
+            last_pattern = "gcompare_string(" + arg + ", \"" + node.value + "\", " + to_string(list_offsets.back()) + ")";
+        } else {
+            output << "gcreate_string(\"" << node.value << "\")";
+        }
     }
 
     void CCodeGenerator::visit(List &node)
@@ -439,8 +493,8 @@ namespace codegen
 
     void CCodeGenerator::visit(Id &node)
     {
+        stringstream assign;
         string name = "";
-        string assign = "";
 
         switch (id_context) {
             case IdContext::PATTERN:
@@ -450,15 +504,15 @@ namespace codegen
                 }
 
                 node.node_type->accept(*this);
-                assign += last_type + " u" + node.id + " = ";
+                assign << last_type << " u" << node.id << " = ";
 
-                if (node.node_type->type == Types::LIST) {
-                    assign += "gclone_" + last_type + "(" + name + ");";
+                if (node.node_type->type == Types::LIST || node.node_type->type == Types::STRING) {
+                    assign << "gclone_" << lists[*node.node_type] << "(" << name << ", " << list_offsets.back() << ");";
                 } else {
-                    assign += name + ";";
+                    assign << name << ";";
                 }
 
-                assignments.push_back(assign);
+                assignments.push_back(assign.str());
 
                 last_pattern = "1";
                 break;
@@ -590,7 +644,6 @@ namespace codegen
         t(result, tap_count) << endl;
         /* generation of list push ends here */
 
-
         /* generation of list constructer starts here */
         t(result, tap_count) << name << " *gcreate_" << name << "(int count, ...)" << endl;
         t(result, tap_count) << "{" << endl;
@@ -615,6 +668,40 @@ namespace codegen
         t(result, tap_count) << endl;
         t(result, tap_count) << "va_end(args);" << endl;
         t(result, tap_count) << "return res;" << endl;
+        tap_count--;
+        t(result, tap_count) << "}" << endl;
+        t(result, tap_count) << endl;
+        /* generation of list constructer ends here */
+
+        /* generation of at function starts here */
+        t(result, tap_count) << last_type << " gat_" << name << "(" << name << " *this, int index)" << endl;
+        t(result, tap_count) << "{" << endl;
+        tap_count++;
+        t(result, tap_count) << "return this->items[this->head - (1 + index)];" << endl;
+        tap_count--;
+        t(result, tap_count) << "}" << endl;
+        t(result, tap_count) << endl;
+        /* generation of at function ends here */
+
+        /* generation of list constructer starts here */
+        t(result, tap_count) << name << " *gclone_" << name << "(" << name << " *list, int offset)" << endl;
+        t(result, tap_count) << "{" << endl;
+        tap_count++;
+        t(result, tap_count) << "int i;" << endl;
+        t(result, tap_count) << name << " *res = (" << name << "*)malloc(sizeof(" << name << "));" << endl;
+        t(result, tap_count) << endl;
+        t(result, tap_count) << "res->head = list->head - offset;" << endl;
+        t(result, tap_count) << "res->size = list->size;" << endl;
+        t(result, tap_count) << "res->items = (" << last_type << " *)malloc(list->size * sizeof(" << last_type << "));" << endl;
+        t(result, tap_count) << endl;
+        t(result, tap_count) << "for (i = 0; i < res->head; i++)" << endl;
+        t(result, tap_count) << "{" << endl;
+        tap_count++;
+        t(result, tap_count) << "res->items[i] = list->items[i];" << endl;
+        tap_count--;
+        t(result, tap_count) << "}" << endl;
+        t(result, tap_count) << "return res;" << endl;
+        t(result, tap_count) << endl;
         tap_count--;
         t(result, tap_count) << "}" << endl;
         t(result, tap_count) << endl;
@@ -645,7 +732,7 @@ namespace codegen
         type.types.back()->accept(*this);
         t(result, tap_count) << "typedef " << last_type << " (* " << name << ")(";
 
-        for (int i = 0; i < type.types.size() - 1; ++i) {
+        for (size_t i = 0; i < type.types.size() - 1; ++i) {
             type.types[i]->accept(*this); // generate the actual type of the argument
             t(result, tap_count) << last_type;
 
@@ -681,7 +768,7 @@ namespace codegen
         t(result, tap_count) << "{" << endl;
         tap_count++;
         // generate an item for each type in the tuple
-        for (int i = 0; i < type.types.size(); ++i) {
+        for (size_t i = 0; i < type.types.size(); ++i) {
             type.types[i]->accept(*this); // generate the actual type of the item
             t(result, tap_count) << last_type << " gi" << i << ";" << endl; // give this item a unique name
         }
@@ -695,7 +782,7 @@ namespace codegen
         t(result, tap_count) << name << " gcreate_" << name << "(";
 
         // generate an argument for each item in the struct
-        for (int i = 0; i < type.types.size(); ++i) {
+        for (size_t i = 0; i < type.types.size(); ++i) {
             type.types[i]->accept(*this); // generate the actual type of the argument
             t(result, tap_count) << last_type << " gi" << i;
 
@@ -710,7 +797,7 @@ namespace codegen
         t(result, tap_count) << "" << name << " " << "res;" << endl;
 
         // for each item in res, assign values
-        for (int i = 0; i < type.types.size(); ++i) {
+        for (size_t i = 0; i < type.types.size(); ++i) {
             t(result, tap_count) << "res.gi" << i << " = gi" << i << ";" << endl;
         }
         t(result, tap_count) << "return res;" << endl;
@@ -757,6 +844,7 @@ namespace codegen
         /* generating to nearest power of 2 function ends here */
 
         string_type_name = generate_list(real_string);
+        lists[fake_string] = string_type_name;
         generate_list(string_list);
 
         /* generation of string constructer starts here */
@@ -782,7 +870,42 @@ namespace codegen
         headert() << "return res;" << endl;
         header_tap_count--;
         headert() << "}" << endl;
+        headert() << endl;
         /* generation of string constructer ends here */
+
+        /* generation of string compare here */
+        headert() << "int gcompare_string(" << string_type_name << "*string, char* values, int offset)" << endl;
+        headert() << "{" << endl;
+        header_tap_count++;
+        headert() << "int i, j;" << endl;
+        headert() << "int size = strlen(values);" << endl;
+        headert() << endl;
+        headert() << "if (size == string->head - offset)" << endl;
+        headert() << "{" << endl;
+        header_tap_count++;
+        headert() << "for (i = 0, j = size - 1; i < size; i++, j--)" << endl;
+        headert() << "{" << endl;
+        header_tap_count++;
+        headert() << "if (string->items[j] != values[i])" << endl;
+        header_tap_count++;
+        headert() << "return 0;" << endl;
+        header_tap_count--;
+        header_tap_count--;
+        headert() << "}" << endl;
+        header_tap_count--;
+        headert() << "}" << endl;
+        headert() << "else" << endl;
+        headert() << "{" << endl;
+        header_tap_count++;
+        headert() << "return 0;" << endl;
+        header_tap_count--;
+        headert() << "}" << endl;
+        headert() << endl;
+        headert() << "return 1;" << endl;
+        header_tap_count--;
+        headert() << "}" << endl;
+        headert() << endl;
+        /* generation of string compare ends here */
 
         headert() << endl;
     }

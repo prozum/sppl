@@ -22,9 +22,9 @@ namespace semantics {
         node.scope = current_scope;
 
         if (!current_scope->exists(node.id)) {
-            auto type = new Type(Types::SIGNATURE, &node.types);
+            auto type = new Type(Types::SIGNATURE, node.types);
             current_scope->decls.insert({node.id, type});
-            type_garbage.push_back(type);
+            garbage.push_back(type);
 
             /* Visit children */
             for (auto type : node.types) {
@@ -51,7 +51,7 @@ namespace semantics {
             /* Visit children */
             context = ScopeContext::PATTERN;
 
-            for (int i = 0; i < node.patterns.size(); i++) {
+            for (size_t i = 0; i < node.patterns.size(); i++) {
                 type_stack.push(current_func->types[i]);
                 node.patterns[i]->accept(*this);
                 type_stack.pop();
@@ -219,7 +219,7 @@ namespace semantics {
         if (node.patterns.size() == type_stack.top()->types.size() && type_stack.top()->type == Types::TUPLE) {
 
             /* Visit children */
-            for (int i = 0; i < node.patterns.size(); i++) {
+            for (size_t i = 0; i < node.patterns.size(); i++) {
                 type_stack.push(type_stack.top()->types[i]);
                 node.patterns[i]->accept(*this);
                 type_stack.pop();
@@ -234,6 +234,16 @@ namespace semantics {
     void ScopeGenerator::visit(ListSplit &node) {
         if (type_stack.top()->type == Types::LIST) {
             type_stack.push(type_stack.top()->types[0]);
+
+            /* Visit children */
+            node.left->accept(*this);
+            type_stack.pop();
+            node.right->accept(*this);
+            /* Visit stops here */
+        } else if (type_stack.top()->type == Types::STRING){
+            auto _char = new Type(Types::CHAR);
+            type_stack.push(_char);
+            garbage.push_back(_char);
 
             /* Visit children */
             node.left->accept(*this);

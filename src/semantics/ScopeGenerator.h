@@ -16,6 +16,7 @@ namespace semantics {
     class ScopeGenerator : public Visitor {
     public:
         Scope *res;
+        bool is_valid = true;
 
         void visit(Program &node);
 
@@ -86,7 +87,6 @@ namespace semantics {
         Function *current_func;
         std::stack<Type *> type_stack;
         ScopeContext context;
-        vector<Scope *> garbage;
-        vector<Type *> type_garbage;
+        vector<void *> garbage;
     };
 }

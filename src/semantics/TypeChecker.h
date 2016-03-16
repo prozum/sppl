@@ -1,17 +1,21 @@
 #pragma once
 
 #include "Visitor.h"
+#include "Printer.h"
 #include <stack>
 #include <vector>
 #include <Node.h>
 
 using namespace common;
 using namespace std;
+using namespace codegen;
 
 namespace semantics {
     class TypeChecker : public Visitor {
     public:
         bool is_valid = true;
+
+        TypeChecker();
 
         virtual void visit(Program &node);
 
@@ -79,7 +83,9 @@ namespace semantics {
 
     private:
         Function *current_func;
-        vector<Type *> garbage;
+        vector<void *> garbage;
+
+        Printer printer;
 
         bool equal(Type *type1, Type *type2);
     };
