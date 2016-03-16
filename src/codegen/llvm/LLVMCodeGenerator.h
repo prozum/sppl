@@ -4,12 +4,18 @@
 #include <llvm/IR/LLVMContext.h>
 #include <llvm/IR/Module.h>
 #include <llvm/IR/Verifier.h>
+#include <llvm/IR/ValueSymbolTable.h>
 
 #include <iostream>
 
 #include "CodeGenerator.h"
 
 namespace codegen {
+
+    enum Context {
+        PATTERN,
+        EXPR,
+    };
 
 class LLVMCodeGenerator : public common::CodeGenerator {
   public:
@@ -22,18 +28,24 @@ class LLVMCodeGenerator : public common::CodeGenerator {
     void visit(common::Float &node);
     void visit(common::Call &node);
 
-    llvm::Function *create_function(common::Function *func);
 
     llvm::IRBuilder<> Builder;
     unique_ptr<llvm::Module> Module;
+    llvm::Function *cur_func;
 
 private:
+    llvm::ValueSymbolTable SymbolTable;
     std::map<std::string, llvm::Value *> ContextValues;
-    llvm::Function *cur_func;
     llvm::Value *cur_val;
+    int case_id;
+    Context ctx;
 
     void visit(common::Id);
 
     void visit(common::Id &node);
+
+    void visit(common::Int &node);
+
+    llvm::AllocaInst *CreateAlloca(const string &name);
 };
 }

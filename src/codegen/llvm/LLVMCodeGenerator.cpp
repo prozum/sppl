@@ -8,13 +8,30 @@ namespace codegen {
               Builder(getGlobalContext()),
               Module(std::make_unique<llvm::Module>("SpplModule", getGlobalContext())) {}
 
-    llvm::Function *LLVMCodeGenerator::create_function(common::Function *func) {
-         // Get output type
+    AllocaInst *LLVMCodeGenerator::CreateAlloca(const std::string &name) {
+        IRBuilder<> TmpB(&cur_func->getEntryBlock(), cur_func->getEntryBlock().begin());
+        return TmpB.CreateAlloca(Type::getDoubleTy(getGlobalContext()), nullptr, name.c_str());
+    }
+
+    void LLVMCodeGenerator::visit(common::Program &node) {
+        for (auto &func : node.funcs) {
+            func->accept(*this);
+        }
+
+        Module->dump();
+    }
+
+    void LLVMCodeGenerator::visit(common::Function &node) {
+
+        // Get output type
         Type *output_type;
-        switch (func->types[0]->type)
+        switch (node.types[0]->type)
         {
             case common::Types::FLOAT:
                 output_type = Type::getFloatTy(getGlobalContext());
+                break;
+            case common::Types::INT:
+                output_type = Type::getInt64Ty(getGlobalContext());
                 break;
             default:
                 throw "Not supported";
@@ -22,104 +39,118 @@ namespace codegen {
 
         // Get input types
         std::vector<Type *> input_types;
-        for (unsigned i = 0; i < func->types.size() - 1; i++) {
-            switch (func->types[i]->type) {
+        for (unsigned i = 0; i < node.types.size() - 1; i++) {
+            switch (node.types[i]->type) {
                 case common::Types::FLOAT:
                     input_types.push_back(Type::getFloatTy(getGlobalContext()));
+                    break;
+                case common::Types::INT:
+                    input_types.push_back(Type::getInt64Ty(getGlobalContext()));
                     break;
 
                 default:
                     throw "Not supported";
             }
         }
-        
-        // Setup function input/out types
+
+        // Setup function input/output types
         auto func_type = FunctionType::get(output_type, input_types, false);
 
-        // Create anonymous or normal function
-        if (jit_mode) {
-            cur_func = Function::Create(func_type, Function::ExternalLinkage, "__anon_expr", Module.get());
-
-            BasicBlock *block = BasicBlock::Create(getGlobalContext(), "entry", cur_func);
-            Builder.SetInsertPoint(block);
-
-            func->cases[0]->expr->accept(*this);
-
-            Builder.CreateRet(cur_val);
-        }
-        else
-            cur_func = Function::Create(func_type, Function::ExternalLinkage, func->id, Module.get());
+        // Create function and entry block
+        cur_func = Function::Create(func_type, Function::ExternalLinkage, node.id, Module.get());
+        BasicBlock *block = BasicBlock::Create(getGlobalContext(), "entry", cur_func);
+        Builder.SetInsertPoint(block);
 
         // Setup names for arguments
-        unsigned i = 0;
-        for (auto &arg : cur_func->args()) arg.setName("x" + to_string(i++));
+        auto i = 0;
+        for (auto &arg : cur_func->args()) {
+            arg.setName("__arg" + to_string(i));
+            ContextValues["__arg" + to_string(i)] = &arg;
+            i++;
+        }
 
-        return cur_func;
+        // Visit cases
+        case_id = 0;
+        for (auto &_case : node.cases) {
+            _case->accept(*this);
+            case_id++;
+        }
     }
-
-void LLVMCodeGenerator::visit(common::Program &node) {
-    for (auto &func : node.funcs) {
-        func->accept(*this);
-    }
-
-    Module->dump();
-}
-
-void LLVMCodeGenerator::visit(common::Function &node) {
-    // Input/output types
-    // std::vector<Type *> Doubles(node.patterns.size(),
-    //                            Type::getDoubleTy(getGlobalContext()));
-
-    create_function(&node);
-
-    for (auto &_case : node.cases) {
-        _case->accept(*this);
-    }
-}
 
 void LLVMCodeGenerator::visit(common::Case &node) {
-    // Create function block
-    BasicBlock *block =
-        BasicBlock::Create(getGlobalContext(), "entry", cur_func);
+
+    string case_name = cur_func->getName().str() + "_case" + std::to_string(case_id);
+
+
+
+    ctx = PATTERN;
+    //ContextValues.clear();
+    for (size_t i = 0; i < node.patterns.size(); i++) {
+        cur_val = ContextValues["__arg" + to_string(i)];
+        node.patterns[i]->accept(*this);
+        //ContextValues["__arg" + to_string(i)] = cur_val;
+        //auto cond = Builder.CreateICmpEQ(cur_val, ConstantFP::get(getGlobalContext(), APFloat(0.0)), case_name);
+    }
+
+    // Create case block
+    BasicBlock *block = BasicBlock::Create(getGlobalContext(), case_name, cur_func);
     Builder.SetInsertPoint(block);
 
-    ContextValues.clear();
-    for (auto &arg : cur_func->args()) ContextValues[arg.getName()] = &arg;
 
+    // Generate expression in case block
+    ctx = EXPR;
     node.expr->accept(*this);
-
     cur_val = Builder.CreateRet(cur_val);
+
+    //Builder.CreateStore (Value *Val, Value *Ptr
+    //Builder.CreateAlloca(cur_val->getType(), nullptr, "hej");
+    //Builder.CreateLoad(cur_val, "hej");
 
     verifyFunction(*cur_func);
 }
 
-void LLVMCodeGenerator::visit(common::Add &node) {
-    node.left->accept(*this);
-    auto left = cur_val;
-    node.right->accept(*this);
-    auto right = cur_val;
+    void LLVMCodeGenerator::visit(common::Add &node) {
+        node.left->accept(*this);
+        auto left = cur_val;
+        node.right->accept(*this);
+        auto right = cur_val;
 
-    cur_val = Builder.CreateFAdd(left, right, "addtmp");
-}
-
-void LLVMCodeGenerator::visit(common::Float &node) {
-    cur_val = ConstantFP::get(getGlobalContext(), APFloat(node.value));
-}
-
-void LLVMCodeGenerator::visit(common::Call &node) {
-    node.callee->accept(*this);
-    auto callee = cur_val;
-
-    std::vector<Value *> args;
-    for (auto &arg : node.exprs) {
-        arg->accept(*this);
-        args.push_back(cur_val);
+        cur_val = Builder.CreateFAdd(left, right, "addtmp");
     }
 
-    cur_val = Builder.CreateCall(callee, args, "calltmp");
-}
+    void LLVMCodeGenerator::visit(common::Float &node) {
+        cur_val = ConstantFP::get(getGlobalContext(), APFloat(node.value));
+    }
 
-void LLVMCodeGenerator::visit(common::Id &node) {
-    cur_val = Module->getFunction(node.id);
-}
+    void LLVMCodeGenerator::visit(common::Int &node) {
+        cur_val = ConstantInt::get(IntegerType::get(getGlobalContext(), 64), node.value);
+    }
+
+    void LLVMCodeGenerator::visit(common::Call &node) {
+        node.callee->accept(*this);
+        auto callee = cur_val;
+
+        std::vector<Value *> args;
+        for (auto &arg : node.exprs) {
+            arg->accept(*this);
+            args.push_back(cur_val);
+        }
+
+        cur_val = Builder.CreateCall(callee, args, "calltmp");
+    }
+
+    void LLVMCodeGenerator::visit(common::Id &node) {
+        switch (ctx)
+        {
+            case PATTERN:
+                ContextValues[node.id] = cur_val;
+                break;
+            case EXPR:
+                cur_val = ContextValues[node.id];
+                if (cur_val)
+                    return;
+                cur_val = Module->getFunction(node.id);
+                break;
+        }
+    }
 }
