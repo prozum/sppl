@@ -16,6 +16,7 @@ namespace semantics {
     class ScopeGenerator : public Visitor {
     public:
         Scope *res;
+        bool is_valid = true;
 
         void visit(Program &node);
 

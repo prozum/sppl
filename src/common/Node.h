@@ -105,6 +105,7 @@ namespace common {
 		Function();
 		Function(std::string);
 		Function(string, vector<Type*>);
+		Function(string, vector<Type*>, int);
 		Function(string, vector<Type*>, vector<Case*>);
 		Function(string, vector<Type*>, vector<Case*>, int);
 
@@ -113,8 +114,8 @@ namespace common {
 
 	class Case : public Node {
 	public:
-		vector<Pattern *> patterns;
 		Expr *expr;
+		vector<Pattern *> patterns;
 
         // used by the profiler to determine growth for case
 		// the first element in the vector is for the first test
@@ -447,6 +448,7 @@ namespace common {
 
 		Type();
 		Type(Types);
+		Type(Types, int);
 		Type(Types, vector<Type *>);
 		Type(Types, vector<Type *>, int);
 		virtual ~Type();

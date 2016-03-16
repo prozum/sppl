@@ -150,7 +150,16 @@ namespace common {
             id(id),
             types(types) { }
 
-    Function::Function(string id, vector<Type *> types, vector<Case *> cases) :
+    Function::Function(string id,
+                       vector<Type *> types,
+                       int line_no) :
+            Node(line_no),
+            id(id),
+            types(types) { }
+
+    Function::Function(string id,
+                       vector<Type *> types,
+                       vector<Case *> cases) :
             id(id),
             types(types),
             cases(cases) { }
@@ -476,6 +485,11 @@ namespace common {
     Type::Type() { }
 
     Type::Type(Types type) :
+            type(type) { }
+
+    Type::Type(Types type,
+               int line_no) :
+            Node(line_no),
             type(type) { }
 
     Type::Type(Types type,
