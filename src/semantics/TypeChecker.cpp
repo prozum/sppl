@@ -43,6 +43,10 @@ void TypeChecker::visit(Case &node) {
     /* code starts here*/
     if (node.patterns.size() + 1 == current_func->types.size()) {
         for (int i = 0; i < node.patterns.size(); ++i) {
+            if (node.patterns[i]->node_type->type == Types::EMPTYLIST) {
+                node.patterns[i]->node_type = current_func->types[i];
+            }
+
             if (!equal(node.patterns[i]->node_type, current_func->types[i])) {
                 throw "wrong type in case";
             }
@@ -515,6 +519,8 @@ void TypeChecker::visit(ListSplit &node) {
         } else {
             throw "Not same types in list split";
         }
+    } else if (node.right->node_type->type == Types::STRING) {
+        node.node_type = node.right->node_type;
     } else if (node.right->node_type->type == Types::EMPTYLIST) {
         node.node_type = new Type(Types::LIST);
         node.node_type->types.push_back(node.left->node_type);

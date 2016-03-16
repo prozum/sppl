@@ -240,6 +240,16 @@ namespace semantics {
             type_stack.pop();
             node.right->accept(*this);
             /* Visit stops here */
+        } else if (type_stack.top()->type == Types::STRING){
+            auto _char = new Type(Types::CHAR);
+            type_stack.push(_char);
+            garbage.push_back(_char);
+
+            /* Visit children */
+            node.left->accept(*this);
+            type_stack.pop();
+            node.right->accept(*this);
+            /* Visit stops here */
         } else {
             /* ERROR! Expected list type, but was something else */
             throw "Expected list type, but was something else";
