@@ -35,7 +35,7 @@ namespace codegen
         output_tap_count++;
         outputt() << lists[string_list] << " *args = gcreate_" << lists[string_list] << "(0);" << endl;
         outputt() << "int i;" << endl;
-        outputt() << "for(i = 0; i < argc; i++)" << endl;
+        outputt() << "for(i = argc - 1; i >= 0; i--)" << endl;
         outputt() << "{" << endl;
         output_tap_count++;
         outputt() << "gpush_" << lists[string_list] << "(args, gcreate_string(argv[i]));" << endl;

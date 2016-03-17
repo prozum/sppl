@@ -13,7 +13,7 @@ using namespace codegen;
 namespace semantics {
     class TypeChecker : public Visitor {
     public:
-        bool is_valid = true;
+        bool is_valid;
 
         TypeChecker();
 
@@ -82,10 +82,10 @@ namespace semantics {
         virtual void visit(Type &node);
 
     private:
+        Printer printer;
+        bool error;
         Function *current_func;
         vector<void *> garbage;
-
-        Printer printer;
 
         bool equal(Type *type1, Type *type2);
     };
