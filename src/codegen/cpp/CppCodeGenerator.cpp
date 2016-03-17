@@ -168,6 +168,7 @@ namespace codegen
 
     void CCodeGenerator::visit(Equal &node)
     {
+        // Todo Compare strings and lists
         output << "(";
         node.left->accept(*this);
         output << "==";
@@ -177,6 +178,7 @@ namespace codegen
 
     void CCodeGenerator::visit(NotEqual &node)
     {
+        // Todo Compare strings and lists
         output << "(";
         node.left->accept(*this);
         output << "!=";
@@ -706,6 +708,35 @@ namespace codegen
         t(result, tap_count) << "}" << endl;
         t(result, tap_count) << endl;
         /* generation of list constructer ends here */
+
+        /* generation of compare function starts here */
+        t(result, tap_count) << "int gcompare_" << name << "(" << last_type << " *list1, " << last_type << "* list2)" << endl;
+        t(result, tap_count) << "{" << endl;
+        tap_count++;
+        t(result, tap_count) << "int i;" << endl;
+        t(result, tap_count) << "if (list1->head != list2->head)" << endl;
+        t(result, tap_count) << "{" << endl;
+        tap_count++;
+        t(result, tap_count) << "return 0;" << endl;
+        tap_count--;
+        t(result, tap_count) << "}" << endl;
+        t(result, tap_count) << endl;
+        t(result, tap_count) << "for (i = 0; i < list1->head; i++)" << endl;
+        t(result, tap_count) << "{" << endl;
+        tap_count++;
+        t(result, tap_count) << "if (1"; // Todo compare
+        result << ")" << endl;
+        tap_count++;
+        t(result, tap_count) << "return 0;";
+        tap_count--;
+        tap_count--;
+        t(result, tap_count) << "}" << endl;
+        tap_count--;
+        t(result, tap_count) << endl;
+        t(result, tap_count) << "return 1;" << endl;
+        t(result, tap_count) << "}" << endl;
+        t(result, tap_count) << endl;
+        /* generation of compare function ends here */
 
         /* TODO */
 
