@@ -24,6 +24,12 @@ namespace codegen {
                 return Type::getFloatTy(getGlobalContext());
             case common::Types::INT:
                 return Type::getInt64Ty(getGlobalContext());
+            case common::Types::BOOL:
+                // TODO: Implement BOOL
+            case common::Types::CHAR:
+                // TODO: Implement CHAR
+            case common::Types::STRING:
+                // TODO: Implement STRING
             default:
                 throw "Not supported";
         }
@@ -115,15 +121,15 @@ void LLVMCodeGenerator::visit(common::Case &node) {
     }
 
     void LLVMCodeGenerator::visit(common::Bool &node) {
-        // TODO: Body
+        cur_val = ConstantInt::get(IntegerType::get(getGlobalContext(), 64), node.value);   // TODO: Better way?
     }
 
     void LLVMCodeGenerator::visit(common::Char &node) {
-        // TODO: Body
+        cur_val = ConstantInt::get(IntegerType::get(getGlobalContext(), 64), node.value);   // TODO: Better way?
     }
 
     void LLVMCodeGenerator::visit(common::String &node) {
-        // TODO: Body
+        cur_val = ConstantDataArray::getString(getGlobalContext(), node.value, true);       // TODO: Correct way?
     }
 
     void LLVMCodeGenerator::visit(common::Call &node) {

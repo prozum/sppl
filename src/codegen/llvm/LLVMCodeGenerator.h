@@ -22,16 +22,6 @@ class LLVMCodeGenerator : public common::CodeGenerator {
     LLVMCodeGenerator(std::ostream &);
 
     void visit(common::Program &node);
-    void visit(common::Function &node);
-    void visit(common::Case &node);
-    void visit(common::Add &node);
-    void visit(common::Int &node);
-    void visit(common::Float &node);
-    void visit(common::Bool &node);
-    void visit(common::Char &node);
-    void visit(common::String &node);
-    void visit(common::Call &node);
-
 
     llvm::IRBuilder<> Builder;
     unique_ptr<llvm::Module> Module;
@@ -45,10 +35,17 @@ private:
     Context ctx;
 
     void visit(common::Id);
-
     void visit(common::Id &node);
 
+    void visit(common::Function &node);
+    void visit(common::Case &node);
+    void visit(common::Add &node);
     void visit(common::Int &node);
+    void visit(common::Float &node);
+    void visit(common::Bool &node);
+    void visit(common::Char &node);
+    void visit(common::String &node);
+    void visit(common::Call &node);
 
     llvm::AllocaInst *CreateAlloca(const string &name);
 
