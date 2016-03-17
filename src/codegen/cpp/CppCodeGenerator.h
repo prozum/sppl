@@ -136,9 +136,6 @@ namespace codegen {
             string generate_signature(Type &);
             void generate_std();
 
-            ostream &outputt();
-            ostream &headert();
-            ostream &t(ostream &stream, int i);
-            string tap(int i);
+            string tap_endl(int i);
     };
 }
