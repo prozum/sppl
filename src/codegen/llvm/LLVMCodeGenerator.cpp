@@ -45,52 +45,105 @@ namespace codegen {
 
         // Create function and entry block
         cur_func = Function::Create(func_type, Function::ExternalLinkage, node.id, Module.get());
-        BasicBlock *block = BasicBlock::Create(getGlobalContext(), "entry", cur_func);
-        Builder.SetInsertPoint(block);
+        BasicBlock *entry = BasicBlock::Create(getGlobalContext(), "entry", cur_func);
+        cur_error_block = BasicBlock::Create(getGlobalContext(), "error", cur_func);
 
         // Setup names for arguments
         auto i = 0;
         for (auto &arg : cur_func->args()) {
-            arg.setName("_arg" + to_string(i));
+            arg.setName("_arg" + to_string(i++));
             Arguments.push_back(&arg);
         }
 
+        // Setup case and pattern blocks
+        //CaseBlocks.clear();
+        /*for (size_t i = 0; i < node.cases.size(); i++) {
+            PatternBlocks[i].clear();
+            for (size_t j = 0; j < node.cases[i]->patterns.size() ; j++)
+                PatternBlocks[i].push_back(BasicBlock::Create(getGlobalContext(), "case" + to_string(i) + "_pattern" + to_string(j), cur_func));
+            CaseBlocks[i] = BasicBlock::Create(getGlobalContext(), "case" + to_string(i), cur_func);
+        }*/
+
         // Visit cases
-        case_id = 0;
+        cur_case_id = last_case_id = node.cases.size() - 1;
         for (auto &_case : node.cases) {
             _case->accept(*this);
-            case_id++;
+            cur_case_id--;
         }
+
+        Builder.SetInsertPoint(entry);
+        Builder.CreateBr(cur_pattern_block);
+
+        verifyFunction(*cur_func);
+    }
+
+    Value *LLVMCodeGenerator::compare(Value *val1, Value *val2)
+    {
+        if (val1->getType()->isFloatTy())
+            return Builder.CreateFCmpONE(val1, val2, "cmptmp");
+        else if (val1->getType()->isIntegerTy() || val1->getType()->isIntegerTy())
+            return Builder.CreateICmpEQ(val1, val2, "cmptmp");
+        else
+            throw "Not supported!";
+
     }
 
 void LLVMCodeGenerator::visit(common::Case &node) {
 
-    string case_name = cur_func->getName().str() + "_case" + std::to_string(case_id);
+    cur_case_block = BasicBlock::Create(getGlobalContext(), "case" + to_string(cur_case_id), cur_func);
 
-    ctx = PATTERN;
-    ContextValues.clear();
-    for (size_t i = 0; i < node.patterns.size(); i++) {
-        cur_val = Arguments[i];
-        node.patterns[i]->accept(*this);
-        //ContextValues["__arg" + to_string(i)] = cur_val;
-        //auto cond = Builder.CreateICmpEQ(cur_val, ConstantFP::get(getGlobalContext(), APFloat(0.0)), case_name);
+    BasicBlock *true_block;
+    BasicBlock *false_block;
+    if (cur_case_id == last_case_id)
+        false_block = cur_error_block;
+    else
+        false_block = cur_pattern_block;
+
+
+    if (node.patterns.size()) {
+        ctx = PATTERN;
+        ContextValues.clear();
+        for (size_t i = node.patterns.size(); i != 0; --i) {
+
+            // Last pattern should branch to next case
+            if (i == node.patterns.size())
+                true_block = cur_case_block;
+            else
+                true_block = cur_pattern_block;
+
+            // Create new branch
+            cur_pattern_block = BasicBlock::Create(getGlobalContext(),
+                                                   "case" + to_string(cur_case_id) + "_pattern" + to_string(i - 1),
+                                                   cur_func);
+            Builder.SetInsertPoint(cur_pattern_block);
+
+            // Check arguments
+            cur_val = Arguments[i - 1];
+            node.patterns[i - 1]->accept(*this);
+            cur_val = compare(cur_val, Arguments[1]);
+
+            // Create condition
+            Builder.CreateCondBr(cur_val, true_block, false_block);
+        }
+    }
+    else
+    {
+        cur_pattern_block = BasicBlock::Create(getGlobalContext(),
+                                               "case" + to_string(cur_case_id) + "_pattern" + to_string(0),
+                                               cur_func);
+        Builder.SetInsertPoint(cur_pattern_block);
+        Builder.CreateBr(cur_case_block);
     }
 
-    // Create case block
-    BasicBlock *block = BasicBlock::Create(getGlobalContext(), case_name, cur_func);
-    Builder.SetInsertPoint(block);
 
+    //Builder.CreateCondBr(cur_val, case_block, )
 
     // Generate expression in case block
+    Builder.SetInsertPoint(cur_case_block);
     ctx = EXPR;
     node.expr->accept(*this);
     cur_val = Builder.CreateRet(cur_val);
 
-    //Builder.CreateStore (Value *Val, Value *Ptr
-    //Builder.CreateAlloca(cur_val->getType(), nullptr, "hej");
-    //Builder.CreateLoad(cur_val, "hej");
-
-    verifyFunction(*cur_func);
 }
 
     void LLVMCodeGenerator::visit(common::Add &node) {
