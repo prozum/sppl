@@ -88,6 +88,9 @@ namespace common {
 	public:
 		vector<Function*> funcs;
 
+		// for debuggin only
+		Expr *debug_expr;
+
 		Program();
 		Program(vector<Function*>);
 		Program(vector<Function*>, int);
