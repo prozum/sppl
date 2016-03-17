@@ -35,7 +35,7 @@ namespace codegen {
         switch (type)
         {
             case common::Types::FLOAT:
-                return Type::getFloatTy(getGlobalContext());
+                return Type::getDoubleTy(getGlobalContext());
             case common::Types::INT:
                 return Type::getInt64Ty(getGlobalContext());
             case common::Types::BOOL:
@@ -118,62 +118,62 @@ namespace codegen {
 
     }
 
-void LLVMCodeGenerator::visit(common::Case &node) {
+    void LLVMCodeGenerator::visit(common::Case &node) {
 
-    cur_case_block = BasicBlock::Create(getGlobalContext(), "case" + to_string(cur_case_id), cur_func);
+        cur_case_block = BasicBlock::Create(getGlobalContext(), "case" + to_string(cur_case_id), cur_func);
 
-    BasicBlock *true_block;
-    BasicBlock *false_block;
-    if (cur_case_id == last_case_id)
-        false_block = cur_error_block;
-    else
-        false_block = cur_pattern_block;
+        BasicBlock *true_block;
+        BasicBlock *false_block;
+        if (cur_case_id == last_case_id)
+            false_block = cur_error_block;
+        else
+            false_block = cur_pattern_block;
 
 
-    if (node.patterns.size()) {
-        ctx = PATTERN;
-        ContextValues.clear();
-        for (size_t i = node.patterns.size(); i != 0; --i) {
+        if (node.patterns.size()) {
+            ctx = PATTERN;
+            ContextValues.clear();
+            for (size_t i = node.patterns.size(); i != 0; --i) {
 
-            // Last pattern should branch to next case
-            if (i == node.patterns.size())
-                true_block = cur_case_block;
-            else
-                true_block = cur_pattern_block;
+                // Last pattern should branch to next case
+                if (i == node.patterns.size())
+                    true_block = cur_case_block;
+                else
+                    true_block = cur_pattern_block;
 
-            // Create new branch
+                // Create new branch
+                cur_pattern_block = BasicBlock::Create(getGlobalContext(),
+                                                       "case" + to_string(cur_case_id) + "_pattern" + to_string(i - 1),
+                                                       cur_func);
+                Builder.SetInsertPoint(cur_pattern_block);
+
+                // Check arguments
+                cur_val = arguments[i - 1];
+                node.patterns[i - 1]->accept(*this);
+                cur_val = compare(cur_val, arguments[i - 1]);
+
+                // Create condition
+                Builder.CreateCondBr(cur_val, true_block, false_block);
+            }
+        }
+        else
+        {
             cur_pattern_block = BasicBlock::Create(getGlobalContext(),
-                                                   "case" + to_string(cur_case_id) + "_pattern" + to_string(i - 1),
+                                                   "case" + to_string(cur_case_id) + "_pattern" + to_string(0),
                                                    cur_func);
             Builder.SetInsertPoint(cur_pattern_block);
-
-            // Check arguments
-            cur_val = arguments[i - 1];
-            node.patterns[i - 1]->accept(*this);
-            cur_val = compare(cur_val, arguments[i - 1]);
-
-            // Create condition
-            Builder.CreateCondBr(cur_val, true_block, false_block);
+            Builder.CreateBr(cur_case_block);
         }
-    }
-    else
-    {
-        cur_pattern_block = BasicBlock::Create(getGlobalContext(),
-                                               "case" + to_string(cur_case_id) + "_pattern" + to_string(0),
-                                               cur_func);
-        Builder.SetInsertPoint(cur_pattern_block);
-        Builder.CreateBr(cur_case_block);
-    }
 
-    // Generate expression in case block
-    Builder.SetInsertPoint(cur_case_block);
-    ctx = EXPR;
-    node.expr->accept(*this);
+        // Generate expression in case block
+        Builder.SetInsertPoint(cur_case_block);
+        ctx = EXPR;
+        node.expr->accept(*this);
 
-    // Add return value to phi node
-    cur_phi_node->addIncoming(cur_val, cur_case_block);
-    Builder.CreateBr(cur_ret_block);
-}
+        // Add return value to phi node
+        cur_phi_node->addIncoming(cur_val, cur_case_block);
+        Builder.CreateBr(cur_ret_block);
+    }
 
     void LLVMCodeGenerator::visit(common::Add &node) {
         node.left->accept(*this);
