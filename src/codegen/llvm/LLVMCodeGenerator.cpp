@@ -112,6 +112,58 @@ void LLVMCodeGenerator::visit(common::Case &node) {
         }
     }
 
+    void LLVMCodeGenerator::visit(common::Sub &node) {
+        node.left->accept(*this);
+        auto left = cur_val;
+        node.right->accept(*this);
+        auto right = cur_val;
+
+        if ( node.left->node_type->type == common::Types::FLOAT && node.right->node_type->type == common::Types::FLOAT) {
+            cur_val = Builder.CreateFSub(left, right, "subtmp");
+        } else {
+            cur_val = Builder.CreateSub(left, right, "subtmp");
+        }
+    }
+
+    void LLVMCodeGenerator::visit(common::Mul &node) {
+        node.left->accept(*this);
+        auto left = cur_val;
+        node.right->accept(*this);
+        auto right = cur_val;
+
+        if ( node.left->node_type->type == common::Types::FLOAT && node.right->node_type->type == common::Types::FLOAT) {
+            cur_val = Builder.CreateFMul(left, right, "multmp");
+        } else {
+            cur_val = Builder.CreateMul(left, right, "multmp");
+        }
+    }
+
+    void LLVMCodeGenerator::visit(common::Div &node) {
+        node.left->accept(*this);
+        auto left = cur_val;
+        node.right->accept(*this);
+        auto right = cur_val;
+
+        if ( node.left->node_type->type == common::Types::FLOAT && node.right->node_type->type == common::Types::FLOAT) {
+            cur_val = Builder.CreateFDiv(left, right, "divtmp");
+        } else {
+            cur_val = Builder.CreateSDiv(left, right, "divtmp");
+        }
+    }
+
+    void LLVMCodeGenerator::visit(common::Mod &node) {
+        node.left->accept(*this);
+        auto left = cur_val;
+        node.right->accept(*this);
+        auto right = cur_val;
+
+        if ( node.left->node_type->type == common::Types::FLOAT && node.right->node_type->type == common::Types::FLOAT) {
+            cur_val = Builder.CreateFRem(left, right, "modtmp");
+        } else {
+            cur_val = Builder.CreateSRem(left, right, "modtmp");
+        }
+    }
+
     void LLVMCodeGenerator::visit(common::Float &node) {
         cur_val = ConstantFP::get(getGlobalContext(), APFloat(node.value));
     }

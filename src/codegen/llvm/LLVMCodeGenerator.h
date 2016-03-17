@@ -40,6 +40,10 @@ private:
     void visit(common::Function &node);
     void visit(common::Case &node);
     void visit(common::Add &node);
+    void visit(common::Sub &node);
+    void visit(common::Mul &node);
+    void visit(common::Div &node);
+    void visit(common::Mod &node);
     void visit(common::Int &node);
     void visit(common::Float &node);
     void visit(common::Bool &node);
