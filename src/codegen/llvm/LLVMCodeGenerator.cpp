@@ -365,4 +365,8 @@ namespace codegen {
             cur_val = Builder.CreateICmpSGE(left, right, "lttmp");
         }
     }
+
+    void LLVMCodeGenerator::visit(common::Par &node) {
+        node.child->accept(*this);
+    }
 }

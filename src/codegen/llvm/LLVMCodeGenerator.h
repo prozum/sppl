@@ -65,6 +65,7 @@ private:
 
 	void visit(common::Id &node);
     void visit(common::Call &node);
+	void visit(common::Par &node);
 
     llvm::Type *get_type(common::Types type);
 
