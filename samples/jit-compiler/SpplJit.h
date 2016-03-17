@@ -21,6 +21,8 @@
 
 #include "Compiler.h"
 #include "Driver.h"
+#include "TypeChecker.h"
+#include "ScopeGenerator.h"
 
 using namespace llvm;
 using namespace llvm::orc;
@@ -47,7 +49,8 @@ public:
     CompileLayerT CompileLayer;
     std::vector<ModuleHandleT> ModuleHandles;
     std::unique_ptr<legacy::FunctionPassManager> PassManager;
-
+    semantics::ScopeGenerator scope_generator;
+    semantics::TypeChecker type_checker;
 
     codegen::LLVMCodeGenerator Generator;
     parser::Driver Driver;
