@@ -115,7 +115,11 @@ void LLVMCodeGenerator::visit(common::Case &node) {
         node.right->accept(*this);
         auto right = cur_val;
 
-        cur_val = Builder.CreateFAdd(left, right, "addtmp");
+        if ( node.left->node_type->type == common::Types::FLOAT && node.right->node_type->type == common::Types::FLOAT) {
+            cur_val = Builder.CreateFAdd(left, right, "addtmp");
+        } else {
+            cur_val = Builder.CreateAdd(left, right, "addtmp");
+        }
     }
 
     void LLVMCodeGenerator::visit(common::Float &node) {
@@ -124,6 +128,18 @@ void LLVMCodeGenerator::visit(common::Case &node) {
 
     void LLVMCodeGenerator::visit(common::Int &node) {
         cur_val = ConstantInt::get(IntegerType::get(getGlobalContext(), 64), node.value);
+    }
+
+    void LLVMCodeGenerator::visit(common::Bool &node) {
+        // TODO: Body
+    }
+
+    void LLVMCodeGenerator::visit(common::Char &node) {
+        // TODO: Body
+    }
+
+    void LLVMCodeGenerator::visit(common::String &node) {
+        // TODO: Body
     }
 
     void LLVMCodeGenerator::visit(common::Call &node) {

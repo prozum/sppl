@@ -25,7 +25,11 @@ class LLVMCodeGenerator : public common::CodeGenerator {
     void visit(common::Function &node);
     void visit(common::Case &node);
     void visit(common::Add &node);
+    void visit(common::Int &node);
     void visit(common::Float &node);
+    void visit(common::Bool &node);
+    void visit(common::Char &node);
+    void visit(common::String &node);
     void visit(common::Call &node);
 
 
