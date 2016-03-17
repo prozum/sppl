@@ -83,7 +83,7 @@ void SpplJit::eval(std::string str) {
     scope_generator.visit(*Driver.main);
     type_checker.visit(*Driver.main);
     Driver.main->accept(Generator);
-    auto jit_expr = Generator.cur_func;
+    auto jit_expr = Generator.GetFunction();
 
     // Verify jit expression
     PassManager->run(*jit_expr);

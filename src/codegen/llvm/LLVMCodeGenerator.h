@@ -25,15 +25,18 @@ class LLVMCodeGenerator : public common::CodeGenerator {
 
     llvm::IRBuilder<> Builder;
     unique_ptr<llvm::Module> Module;
-    llvm::Function *cur_func;
-    llvm::BasicBlock *cur_pattern_block;
-    llvm::BasicBlock *cur_case_block;
+    std::map<std::string, llvm::Value *> ContextValues;
+    llvm::Function *GetFunction();
 
 private:
-    std::vector<llvm::Argument *> Arguments;
-    std::map<std::string, llvm::Value *> ContextValues;
+    llvm::Function *cur_func;
     llvm::Value *cur_val;
+    llvm::BasicBlock *cur_pattern_block;
+    llvm::BasicBlock *cur_case_block;
     llvm::BasicBlock *cur_error_block;
+    llvm::BasicBlock *cur_ret_block;
+    llvm::PHINode *cur_phi_node;
+    std::vector<llvm::Argument *> arguments;
     size_t cur_case_id;
     size_t last_case_id;
     Context ctx;
@@ -55,10 +58,10 @@ private:
     void visit(common::String &node);
     void visit(common::Call &node);
 
-    llvm::AllocaInst *CreateAlloca(const string &name);
 
     llvm::Type *get_type(common::Types type);
 
     llvm::Value *compare(llvm::Value *val1, llvm::Value *val2);
+
 };
 }

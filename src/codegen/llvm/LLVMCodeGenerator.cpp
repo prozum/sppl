@@ -16,6 +16,11 @@ namespace codegen {
         Module->dump();
     }
 
+    llvm::Function *LLVMCodeGenerator::GetFunction()
+    {
+        return cur_func;
+    }
+
     Type* LLVMCodeGenerator::get_type(common::Types type)
     {
         switch (type)
@@ -52,13 +57,23 @@ namespace codegen {
         // Create function and entry block
         cur_func = Function::Create(func_type, Function::ExternalLinkage, node.id, Module.get());
         BasicBlock *entry = BasicBlock::Create(getGlobalContext(), "entry", cur_func);
+
+        // Create error block
         cur_error_block = BasicBlock::Create(getGlobalContext(), "error", cur_func);
+        Builder.SetInsertPoint(cur_error_block);
+        Builder.CreateRet(ConstantInt::get(IntegerType::get(getGlobalContext(), 64), 255));
+
+        // Setup return block and phi node
+        cur_ret_block = BasicBlock::Create(getGlobalContext(), "ret", cur_func);
+        Builder.SetInsertPoint(cur_ret_block);
+        cur_phi_node = Builder.CreatePHI(output_type, node.cases.size(), "rettmp");
+        Builder.CreateRet(cur_phi_node);
 
         // Setup names for arguments
         auto i = 0;
         for (auto &arg : cur_func->args()) {
             arg.setName("_arg" + to_string(i++));
-            Arguments.push_back(&arg);
+            arguments.push_back(&arg);
         }
 
         // Setup case and pattern blocks
@@ -124,9 +139,9 @@ void LLVMCodeGenerator::visit(common::Case &node) {
             Builder.SetInsertPoint(cur_pattern_block);
 
             // Check arguments
-            cur_val = Arguments[i - 1];
+            cur_val = arguments[i - 1];
             node.patterns[i - 1]->accept(*this);
-            cur_val = compare(cur_val, Arguments[1]);
+            cur_val = compare(cur_val, arguments[i - 1]);
 
             // Create condition
             Builder.CreateCondBr(cur_val, true_block, false_block);
@@ -141,15 +156,14 @@ void LLVMCodeGenerator::visit(common::Case &node) {
         Builder.CreateBr(cur_case_block);
     }
 
-
-    //Builder.CreateCondBr(cur_val, case_block, )
-
     // Generate expression in case block
     Builder.SetInsertPoint(cur_case_block);
     ctx = EXPR;
     node.expr->accept(*this);
-    cur_val = Builder.CreateRet(cur_val);
 
+    // Add return value to phi node
+    cur_phi_node->addIncoming(cur_val, cur_case_block);
+    Builder.CreateBr(cur_ret_block);
 }
 
     void LLVMCodeGenerator::visit(common::Add &node) {
