@@ -80,13 +80,14 @@ void SpplJit::eval(std::string str) {
 
     // Parse/Generate jit expression
     Driver.parse_string(str);
-    scope_generator.visit(*Driver.main);
-    type_checker.visit(*Driver.main);
-    Driver.main->accept(Generator);
-    auto jit_expr = Generator.GetFunction();
+    auto expr = Driver.main->debug_expr;
+    expr->accept(ScopeGenerator);
+    expr->accept(TypeChecker);
+
+    auto anon_func = Generator.GreateAnonymousFunction(expr);
 
     // Verify jit expression
-    PassManager->run(*jit_expr);
+    PassManager->run(*anon_func);
 
     // Print jit expression
     Generator.Module->dump();
@@ -94,11 +95,21 @@ void SpplJit::eval(std::string str) {
     auto handler = add_module(std::move(Generator.Module));
     init_module_passmanager();
 
-    auto anon_expr = find_symbol("expr");
+    auto anon_expr = find_symbol("__anon_func");
 
-    float (*df_ptr)();
-    df_ptr = (float (*)()) (intptr_t) anon_expr.getAddress();
-    cout << "Evaluated to " << std::to_string(df_ptr()) << endl;
+    int64_t (*int64_ptr)();
+    double (*double_ptr)();
+    switch (expr->node_type->type)
+    {
+        case common::Types::INT:
+            int64_ptr = (int64_t (*)()) (intptr_t) anon_expr.getAddress();
+            cout << "Evaluated to " << std::to_string(int64_ptr()) << endl;
+            break;
+        case common::Types::FLOAT:
+            double_ptr = (double (*)()) (intptr_t) anon_expr.getAddress();
+            cout << "Evaluated to " << std::to_string(double_ptr()) << endl;
+            break;
+    }
 
     remove_module(handler);
 }

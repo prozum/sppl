@@ -19,9 +19,8 @@ int main(int argc, char *argv[]) {
     while (tmp.compare("q") != 0)
     {
         cout << "Input code:";
-        jit.eval("def f: Int -> Int\n| 1 = 10\n| 2 = 20" + tmp);
         cin >> tmp;
-        jit.eval("def expr: Int -> Int\n| = " + tmp);
+        jit.eval(tmp);
         cout << endl << endl;
     }
 }

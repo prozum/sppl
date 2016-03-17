@@ -8,6 +8,19 @@ namespace codegen {
               Builder(getGlobalContext()),
               Module(std::make_unique<llvm::Module>("SpplModule", getGlobalContext())) {}
 
+    llvm::Function *LLVMCodeGenerator::GreateAnonymousFunction(common::Expr *expr)
+    {
+        auto expr_type = FunctionType::get(get_type(expr->node_type->type), false);
+        cur_func = Function::Create(expr_type, Function::ExternalLinkage, "__anon_func", Module.get());
+        BasicBlock *entry = BasicBlock::Create(getGlobalContext(), "entry", cur_func);
+        Builder.SetInsertPoint(entry);
+
+        expr->accept(*this);
+        Builder.CreateRet(cur_val);
+
+        return  cur_func;
+    }
+
     void LLVMCodeGenerator::visit(common::Program &node) {
         for (auto &func : node.funcs) {
             func->accept(*this);
@@ -16,10 +29,6 @@ namespace codegen {
         Module->dump();
     }
 
-    llvm::Function *LLVMCodeGenerator::GetFunction()
-    {
-        return cur_func;
-    }
 
     Type* LLVMCodeGenerator::get_type(common::Types type)
     {

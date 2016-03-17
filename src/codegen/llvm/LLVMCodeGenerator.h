@@ -26,7 +26,7 @@ class LLVMCodeGenerator : public common::CodeGenerator {
     llvm::IRBuilder<> Builder;
     unique_ptr<llvm::Module> Module;
     std::map<std::string, llvm::Value *> ContextValues;
-    llvm::Function *GetFunction();
+    llvm::Function *GreateAnonymousFunction(common::Expr *expr);
 
 private:
     llvm::Function *cur_func;
