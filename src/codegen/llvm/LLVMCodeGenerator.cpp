@@ -8,11 +8,6 @@ namespace codegen {
               Builder(getGlobalContext()),
               Module(std::make_unique<llvm::Module>("SpplModule", getGlobalContext())) {}
 
-    AllocaInst *LLVMCodeGenerator::CreateAlloca(const std::string &name) {
-        IRBuilder<> TmpB(&cur_func->getEntryBlock(), cur_func->getEntryBlock().begin());
-        return TmpB.CreateAlloca(Type::getDoubleTy(getGlobalContext()), nullptr, name.c_str());
-    }
-
     void LLVMCodeGenerator::visit(common::Program &node) {
         for (auto &func : node.funcs) {
             func->accept(*this);
@@ -21,36 +16,28 @@ namespace codegen {
         Module->dump();
     }
 
-    void LLVMCodeGenerator::visit(common::Function &node) {
-
-        // Get output type
-        Type *output_type;
-        switch (node.types[0]->type)
+    Type* LLVMCodeGenerator::get_type(common::Types type)
+    {
+        switch (type)
         {
             case common::Types::FLOAT:
-                output_type = Type::getFloatTy(getGlobalContext());
-                break;
+                return Type::getFloatTy(getGlobalContext());
             case common::Types::INT:
-                output_type = Type::getInt64Ty(getGlobalContext());
-                break;
+                return Type::getInt64Ty(getGlobalContext());
             default:
                 throw "Not supported";
         }
+    }
+
+    void LLVMCodeGenerator::visit(common::Function &node) {
+
+        // Get output type
+        Type *output_type = get_type(node.types[0]->type);
 
         // Get input types
         std::vector<Type *> input_types;
         for (unsigned i = 0; i < node.types.size() - 1; i++) {
-            switch (node.types[i]->type) {
-                case common::Types::FLOAT:
-                    input_types.push_back(Type::getFloatTy(getGlobalContext()));
-                    break;
-                case common::Types::INT:
-                    input_types.push_back(Type::getInt64Ty(getGlobalContext()));
-                    break;
-
-                default:
-                    throw "Not supported";
-            }
+            input_types.push_back(get_type(node.types[i]->type));
         }
 
         // Setup function input/output types
@@ -64,9 +51,8 @@ namespace codegen {
         // Setup names for arguments
         auto i = 0;
         for (auto &arg : cur_func->args()) {
-            arg.setName("__arg" + to_string(i));
-            ContextValues["__arg" + to_string(i)] = &arg;
-            i++;
+            arg.setName("_arg" + to_string(i));
+            Arguments.push_back(&arg);
         }
 
         // Visit cases
@@ -81,12 +67,10 @@ void LLVMCodeGenerator::visit(common::Case &node) {
 
     string case_name = cur_func->getName().str() + "_case" + std::to_string(case_id);
 
-
-
     ctx = PATTERN;
-    //ContextValues.clear();
+    ContextValues.clear();
     for (size_t i = 0; i < node.patterns.size(); i++) {
-        cur_val = ContextValues["__arg" + to_string(i)];
+        cur_val = Arguments[i];
         node.patterns[i]->accept(*this);
         //ContextValues["__arg" + to_string(i)] = cur_val;
         //auto cond = Builder.CreateICmpEQ(cur_val, ConstantFP::get(getGlobalContext(), APFloat(0.0)), case_name);

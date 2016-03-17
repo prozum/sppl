@@ -38,7 +38,7 @@ class LLVMCodeGenerator : public common::CodeGenerator {
     llvm::Function *cur_func;
 
 private:
-    llvm::ValueSymbolTable SymbolTable;
+    std::vector<llvm::Argument *> Arguments;
     std::map<std::string, llvm::Value *> ContextValues;
     llvm::Value *cur_val;
     int case_id;
@@ -51,5 +51,7 @@ private:
     void visit(common::Int &node);
 
     llvm::AllocaInst *CreateAlloca(const string &name);
+
+    llvm::Type *get_type(common::Types type);
 };
 }
