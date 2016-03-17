@@ -6,4 +6,4 @@ add_definitions(${LLVM_DEFINITIONS})
 
 add_library(cllvm LLVMCodeGenerator.cpp LLVMCodeGenerator.h)
 llvm_map_components_to_libnames(llvm_libs support core irreader mcjit native)
-target_link_libraries(cllvm common parser compiler ${llvm_libs})
+target_link_libraries(cllvm common parser ${llvm_libs})

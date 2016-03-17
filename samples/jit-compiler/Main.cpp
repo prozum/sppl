@@ -20,7 +20,7 @@ int main(int argc, char *argv[]) {
     {
         cout << "Input code:";
         cin >> tmp;
-        jit.eval("def main: Float -> Float\n| x = " + tmp);
+        jit.eval("def expr: Float -> Float\n| x = " + tmp);
         cout << endl << endl;
     }
 }

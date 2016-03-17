@@ -1,7 +1,6 @@
 #include "SpplJit.h"
 
 
-
 SpplJit::SpplJit(istream *in, ostream *out) : Machine(EngineBuilder().selectTarget()),
                                               Layout(Machine->createDataLayout()),
                                               CompileLayer(ObjectLayer, SimpleCompiler(*Machine)),
@@ -78,38 +77,28 @@ void SpplJit::init_module_passmanager() {
 
 
 void SpplJit::eval(std::string str) {
+
+    // Parse/Generate jit expression
     Driver.parse_string(str);
+    scope_generator.visit(*Driver.main);
+    type_checker.visit(*Driver.main);
+    Driver.main->accept(Generator);
+    auto jit_expr = Generator.cur_func;
 
-    auto jit_func = Generator.create_function(Driver.main->funcs[0]);
+    // Verify jit expression
+    PassManager->run(*jit_expr);
 
-    verifyFunction(*jit_func);
-    PassManager->run(*jit_func);
-
+    // Print jit expression
     Generator.Module->dump();
-
 
     auto handler = add_module(std::move(Generator.Module));
     init_module_passmanager();
 
-
-    auto anon_expr = find_symbol("__anon_expr");
+    auto anon_expr = find_symbol("expr");
 
     float (*df_ptr)();
-    int (*if_ptr)();
     df_ptr = (float (*)()) (intptr_t) anon_expr.getAddress();
     cout << "Evaluated to " << std::to_string(df_ptr()) << endl;
-
-    /*
-    switch (jit_func->getReturnType()->getTypeID())
-    {
-        case llvm::Type::FloatTyID:
-            df_ptr = (float (*)()) (intptr_t)anon_expr.getAddress();
-            cout << "Evaluated to " << std::to_string(df_ptr()) << endl;
-            break;
-        default:
-            throw "Not supported";
-    }*/
-
 
     remove_module(handler);
 }
