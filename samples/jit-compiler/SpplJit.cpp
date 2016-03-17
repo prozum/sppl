@@ -1,7 +1,6 @@
 #include "SpplJit.h"
 
 
-
 SpplJit::SpplJit(istream *in, ostream *out) : Machine(EngineBuilder().selectTarget()),
                                               Layout(Machine->createDataLayout()),
                                               CompileLayer(ObjectLayer, SimpleCompiler(*Machine)),
@@ -81,6 +80,8 @@ void SpplJit::eval(std::string str) {
 
     // Parse/Generate jit expression
     Driver.parse_string(str);
+    scope_generator.visit(*Driver.main);
+    type_checker.visit(*Driver.main);
     Driver.main->accept(Generator);
     auto jit_expr = Generator.cur_func;
 
