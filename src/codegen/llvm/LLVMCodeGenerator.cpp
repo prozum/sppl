@@ -39,9 +39,9 @@ namespace codegen {
             case common::Types::INT:
                 return Type::getInt64Ty(getGlobalContext());
             case common::Types::BOOL:
-                // TODO: Implement BOOL
+                return Type::getInt1Ty(getGlobalContext());
             case common::Types::CHAR:
-                // TODO: Implement CHAR
+                return Type::getInt32Ty(getGlobalContext()); // utf8 char
             case common::Types::STRING:
                 // TODO: Implement STRING
             default:
@@ -285,6 +285,84 @@ namespace codegen {
                     return;
                 cur_val = Module->getFunction(node.id);
                 break;
+        }
+    }
+
+    void LLVMCodeGenerator::visit(common::Equal &node) {
+        node.left->accept(*this);
+        auto left = cur_val;
+        node.right->accept(*this);
+        auto right = cur_val;
+
+        if ( node.left->node_type->type == common::Types::FLOAT && node.right->node_type->type == common::Types::FLOAT) {
+            cur_val = Builder.CreateFCmpOEQ(left, right, "eqtmp");
+        } else {
+            cur_val = Builder.CreateICmpEQ(left, right, "eqtmp");
+        }
+    }
+
+    void LLVMCodeGenerator::visit(common::NotEqual &node) {
+        node.left->accept(*this);
+        auto left = cur_val;
+        node.right->accept(*this);
+        auto right = cur_val;
+
+        if ( node.left->node_type->type == common::Types::FLOAT && node.right->node_type->type == common::Types::FLOAT) {
+            cur_val = Builder.CreateFCmpONE(left, right, "neqtmp");
+        } else {
+            cur_val = Builder.CreateICmpNE(left, right, "neqtmp");
+        }
+    }
+
+    void LLVMCodeGenerator::visit(common::Lesser &node) {
+        node.left->accept(*this);
+        auto left = cur_val;
+        node.right->accept(*this);
+        auto right = cur_val;
+
+        if ( node.left->node_type->type == common::Types::FLOAT && node.right->node_type->type == common::Types::FLOAT) {
+            cur_val = Builder.CreateFCmpOLT(left, right, "lttmp");
+        } else {
+            cur_val = Builder.CreateICmpSLT(left, right, "lttmp");
+        }
+    }
+
+    void LLVMCodeGenerator::visit(common::Greater &node) {
+        node.left->accept(*this);
+        auto left = cur_val;
+        node.right->accept(*this);
+        auto right = cur_val;
+
+        if ( node.left->node_type->type == common::Types::FLOAT && node.right->node_type->type == common::Types::FLOAT) {
+            cur_val = Builder.CreateFCmpOGT(left, right, "lttmp");
+        } else {
+            cur_val = Builder.CreateICmpSGT(left, right, "lttmp");
+        }
+    }
+
+    void LLVMCodeGenerator::visit(common::LesserEq &node) {
+        node.left->accept(*this);
+        auto left = cur_val;
+        node.right->accept(*this);
+        auto right = cur_val;
+
+        if ( node.left->node_type->type == common::Types::FLOAT && node.right->node_type->type == common::Types::FLOAT) {
+            cur_val = Builder.CreateFCmpOLE(left, right, "lttmp");
+        } else {
+            cur_val = Builder.CreateICmpSLE(left, right, "lttmp");
+        }
+    }
+
+    void LLVMCodeGenerator::visit(common::GreaterEq &node) {
+        node.left->accept(*this);
+        auto left = cur_val;
+        node.right->accept(*this);
+        auto right = cur_val;
+
+        if ( node.left->node_type->type == common::Types::FLOAT && node.right->node_type->type == common::Types::FLOAT) {
+            cur_val = Builder.CreateFCmpOGE(left, right, "lttmp");
+        } else {
+            cur_val = Builder.CreateICmpSGE(left, right, "lttmp");
         }
     }
 }
