@@ -49,6 +49,7 @@ public:
     CompileLayerT CompileLayer;
     std::vector<ModuleHandleT> ModuleHandles;
     std::unique_ptr<legacy::FunctionPassManager> PassManager;
+    semantics::CaseChecker CaseChecker;
     semantics::ScopeGenerator ScopeGenerator;
     semantics::TypeChecker TypeChecker;
 
