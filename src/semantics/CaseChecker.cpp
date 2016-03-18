@@ -6,6 +6,11 @@ namespace semantics {
         for (auto func : node.funcs) {
             func->accept(*this);
         }
+
+        if(hasError) {
+            cerr << "Errors in function cases. Aborting..." << endl;
+            exit(1);
+        }
     }
 
     void CaseChecker::visit(common::Function &node) {
@@ -13,24 +18,24 @@ namespace semantics {
         currentFunction = node.id;
         hasDefault = false;
 
-        cout << "Case checker: " << to_string(node.cases.size()) << endl;       // DEBUG INFO
-        cout << "Input Length: " << to_string(expectedPatternCount) << endl;    // DEBUG INFO
-
         if (node.cases.size() > 0) {
             for (auto c : node.cases) {
                 c->accept(*this);
             }
         } else {
-            std::cerr << "Error: No cases found @ " << currentFunction << " line " << to_string(node.line_no) << endl;
+            hasError = true;
+            std::cerr << "Error: No cases found @ " << currentFunction << " line " << to_string(node.line_no) << " => a general case is required" << endl;
         }
 
         if(hasDefault == false) {
+            hasError = true;
             cerr << "Error: No default case @ " << currentFunction << " line " << to_string(node.line_no) << " => should catch general case for " << to_string(node.types.size() -1) << " patterns" << endl;
         }
     }
 
     void CaseChecker::visit(common::Case &node) {
         if (node.patterns.size() != expectedPatternCount) {
+            hasError = true;
             std::cerr << "Error: Invalid pattern  @ " << currentFunction << " line " << to_string(node.line_no);
             if (node.patterns.size() < expectedPatternCount) {
                 std::cerr << " => too few patterns in case, expected " << to_string(expectedPatternCount) << " but got " << to_string(node.patterns.size()) << endl;
@@ -40,6 +45,7 @@ namespace semantics {
             return;
         } else {
             if (hasDefault == true) {
+                hasError = true;
                 std::cerr << "Error: Unreachable case after default @ " << currentFunction << " line " << to_string(node.line_no) << endl;
             } else {
                 bool isDef = true;
