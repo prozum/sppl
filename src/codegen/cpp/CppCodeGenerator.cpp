@@ -354,7 +354,7 @@ namespace codegen
 
             // don't add pattern, if pattern is "1"
             if (last_pattern != "1") {
-                bool empty = false;
+                empty = false;
                 result << " && " << last_pattern;
             }
         }
@@ -606,52 +606,58 @@ namespace codegen
 
     void CCodeGenerator::visit(Id &node)
     {
-        // Todo comments from here and down
-
         stringstream assign;
         string name = "";
 
-        switch (id_context) {
-            case IdContext::PATTERN:
+        if (id_context == IdContext::PATTERN) {
+            // created name from arg_name_stack
+            for (auto str : arg_name_stack) {
+                name += str;
+            }
 
-                for (auto str : arg_name_stack) {
-                    name += str;
-                }
+            // get id's type
+            node.node_type->accept(*this);
 
-                node.node_type->accept(*this);
-                assign << last_type << " u" << node.id << " = ";
+            // generate an assignment for the id, which sould occur after the if-statment
+            assign << last_type << " u" << node.id << " = ";
 
-                if (node.node_type->type == Types::LIST || node.node_type->type == Types::STRING) {
-                    assign << "gclone_" << lists[*node.node_type] << "(" << name << ", " << list_offsets.back() << ");";
-                } else {
-                    assign << name << ";";
-                }
+            // if id is of a type that is allocated on the heap (aka strings and lists)
+            // then make a copy of it, since the language should have no sideeffects
+            // there could also be an offset, the lists and string should be copied with
+            if (node.node_type->type == Types::LIST || node.node_type->type == Types::STRING) {
+                assign << "gclone_" << lists[*node.node_type] << "(" << name << ", " << list_offsets.back() << ");";
+            } else {
+                assign << name << ";";
+            }
 
-                assignments.push_back(assign.str());
+            // save the assigment untill after the pattern has been generated
+            assignments.push_back(assign.str());
 
-                last_pattern = "1";
-                break;
-            case IdContext::EXPR:
-                switch (node.node_type->type){
-                    case Types::LIST:
-                        output << "u" << node.id;
-                        break;
-                    case Types::STRING:
-                        output << "u" << node.id;
-                        break;
-                    default:
-                        output << "u" << node.id;
-                        break;
-                }
-                break;
+            // since and id, in a pattern is allways true, then last_pattern is just set to "1"
+            last_pattern = "1";
+        } else {
+            switch (node.node_type->type){
+                // We assume, that if the programmer uses an id, that is of type list or string,
+                // then they indent of making changes to it. A clone is therefor made, so no
+                // sideeffects occur in the program.
+                case Types::LIST:
+                case Types::STRING:
+                    assign << "gclone_" << lists[*node.node_type] << "(u" << node.id << ", 0);";
+                    break;
+                default:
+                    output << "u" << node.id;
+                    break;
+            }
         }
     }
 
     void CCodeGenerator::visit(Call &node)
     {
         output << "(";
+        // generate the callee (aka, the function being called)
         node.callee->accept(*this);
 
+        // generate the arguments the function is being called with
         output << "(";
         for (auto expr : node.exprs){
             expr->accept(*this);
@@ -667,6 +673,7 @@ namespace codegen
     void CCodeGenerator::visit(Type &node) {
         unordered_map<Type, string>::iterator got;
 
+        // generate the currect c type, based on sppl's types
         switch (node.type) {
             case Types::FLOAT:
                 last_type = "double";
@@ -680,16 +687,20 @@ namespace codegen
             case Types::BOOL:
                 last_type = "int";
                 break;
+            // for tuples, lists, signatures and strings, custom types will be generated
             case Types::TUPLE:
+                // find custom type
                 got = tuples.find(node);
 
                 if (got != tuples.end()) {
                     last_type = got->second;
                 } else {
+                    // if type didn't exist, then generate it
                     last_type = generate_tuple(node);
                 }
                 break;
             case Types::SIGNATURE:
+                // find custom type
                 got = signatures.find(node);
 
                 if (got != signatures.end()) {
@@ -699,7 +710,11 @@ namespace codegen
                 }
                 break;
             case Types::STRING:
+                // the string type is generate at the start of the generation.
+                // we therefor just use the name that this type was give.
                 last_type = string_type_name;
+
+                // strings are allocated on the heap, and we therefor need a pointer to it.
                 last_type += " *";
                 break;
             case Types::LIST:
@@ -816,6 +831,7 @@ namespace codegen
         result << "for (i = 0; i < list1->head; i++) {" << res_endl; tap_count++;
         result << "if ("; // Todo compare
 
+        /*
         switch (type.types[0]->type) {
             case Types::LIST:
                 result << "!gcompare_" << lists[type.types[0]] << "(list1->items[i], list2->items[i])";
@@ -827,6 +843,7 @@ namespace codegen
                 result << "list2->items[i] != list2->items[i]";
                 break;
         }
+         */
 
         result << ")" << res_endl;
         result << "return 0;"; tap_count--; tap_count--;
@@ -946,6 +963,7 @@ namespace codegen
         result << "for (i = 0; i < list1->head; i++) {" << res_endl; tap_count++;
         result << "if ("; // Todo compare
 
+        /*
         switch (type.types[0]->type) {
             case Types::LIST:
                 result << "!gcompare_" << lists[type.types[0]] << "(list1->items[i], list2->items[i])";
@@ -957,6 +975,7 @@ namespace codegen
                 result << "list2->items[i] != list2->items[i]";
                 break;
         }
+         */
 
         result << ")" << res_endl;
         result << "return 0;" << res_endl; tap_count--; tap_count--;
