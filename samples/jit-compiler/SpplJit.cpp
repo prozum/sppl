@@ -1,3 +1,4 @@
+#include <CaseChecker.h>
 #include "SpplJit.h"
 
 
@@ -80,6 +81,7 @@ void SpplJit::eval(std::string str) {
 
     // Parse/Generate jit expression
     Driver.parse_string(str);
+    case_checker.visit(*Driver.main);
     scope_generator.visit(*Driver.main);
     type_checker.visit(*Driver.main);
     Driver.main->accept(Generator);

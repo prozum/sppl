@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <memory>
+#include <CaseChecker.h>
 #include "Driver.h"
 #include "CodeGenerator.h"
 #include "TypeChecker.h"
@@ -47,6 +48,7 @@ namespace compiler {
         std::ostream* output;
         std::ostream* header_output;
         std::unique_ptr<CodeGenerator> generator;
+        semantics::CaseChecker case_checker;
         semantics::ScopeGenerator scope_generator;
         semantics::TypeChecker type_checker;
         parser::Driver driver;

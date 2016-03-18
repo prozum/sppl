@@ -47,6 +47,7 @@ namespace compiler {
         if (driver.main == nullptr)
             return;
 
+        case_checker.visit(*driver.main);
         scope_generator.visit(*driver.main);
         type_checker.visit(*driver.main);
 
