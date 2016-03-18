@@ -84,22 +84,20 @@ namespace codegen
         header << head_endl;
 
         // generate function in output
-        output << function.str()                         << out_endl; output_tap_count++;
-        output << "{"                                    << out_endl;
+        output_tap_count++;
+        output << function.str() << "{" << out_endl;
 
         // generate cases
         for (auto c : node.cases) {
             c->accept(*this);
-            output << out_endl;
 
             // clear assigments specific for current case
             assignments.clear();
         }
 
         // generate error, for when program doesn't realize a case
-        output                                              << out_endl;
-        output <<     "printf(\"No cases realized!\\n\");"  << out_endl;
-        output <<     "exit(1);"                            << out_endl; output_tap_count--;
+        output <<     "printf(\"No cases realized!\\n\");"  << out_endl; output_tap_count--;
+        output <<     "exit(1);"                            << out_endl;
         output << "}"                                       << out_endl;
         output                                              << out_endl;
 
@@ -129,33 +127,39 @@ namespace codegen
 
             // only add pattern, if pattern is not "1"
             if (last_pattern != "1") {
+
+                if (!empty)
+                    pattern << " && ";
+
                 empty = false;
                 pattern << last_pattern;
-
-                if (i < node.patterns.size() - 1 && last_pattern != "1")
-                    pattern << " && ";
             }
         }
 
-        pattern << ")" << out_endl; output_tap_count++;
+        pattern << ") {";
 
         // only generate if statement, if the pattern wasn't empty
         if (!empty) {
-            output << pattern.str() << " {" << out_endl;
+            output_tap_count++;
+            output << pattern.str() << out_endl;
         }
 
         // generate all nessesary assigments
         for (auto assign : assignments) {
             output << assign << out_endl;
+
+            if (assign == assignments.back())
+                output << out_endl;
         }
 
-        output << out_endl;
-
         // generate return expression
+        if (!empty)
+            output_tap_count--;
+
         id_context = IdContext::EXPR;
         output<< "return ";
         node.expr->accept(*this);
-        output << ";" << out_endl; output_tap_count--;
+        output << ";" << out_endl;
 
         if (!empty) {
             output << "}" << out_endl;
@@ -183,21 +187,37 @@ namespace codegen
 
     void CCodeGenerator::visit(Equal &node)
     {
-        // Todo Compare strings and lists and tuples
-        output << "(";
-        node.left->accept(*this);
-        output << "==";
-        node.right->accept(*this);
-        output << ")";
+        switch (node.left->node_type->type) {
+            case Types::TUPLE:
+                output << "gcompare_" << tuples[*node.left->node_type] << "(";
+                node.left->accept(*this);
+                output << ", ";
+                node.right->accept(*this);
+                output << ")";
+                break;
+            case Types::LIST:
+            case Types::STRING:
+                output << "gcompare_" << lists[*node.left->node_type] << "(";
+                node.left->accept(*this);
+                output << ", ";
+                node.right->accept(*this);
+                output << ")";
+                break;
+            default:
+                output << "(";
+                node.left->accept(*this);
+                output << "==";
+                node.right->accept(*this);
+                output << ")";
+                break;
+        }
     }
 
     void CCodeGenerator::visit(NotEqual &node)
     {
-        // Todo Compare strings and lists and tuples
-        output << "(";
-        node.left->accept(*this);
-        output << "!=";
-        node.right->accept(*this);
+        Equal eq = Equal(node.left, node.right);
+        output << "(!";
+        eq.accept(*this);
         output << ")";
     }
 
@@ -323,7 +343,6 @@ namespace codegen
         // result is needed, so we don't generate something else, while the ListPattern is being generated
         stringstream result;
         string arg_name = "";
-        bool empty = true;
 
         // visit nodes type, to ensure that a list of this type has be generated
         node.node_type->accept(*this);
@@ -354,17 +373,11 @@ namespace codegen
 
             // don't add pattern, if pattern is "1"
             if (last_pattern != "1") {
-                empty = false;
                 result << " && " << last_pattern;
             }
         }
 
-        // if empty, then let last_pattern be "1"
-        if (empty) {
-            last_pattern = "1";
-        } else {
-            last_pattern = "(" + result.str() + ")";
-        }
+        last_pattern = "(" + result.str() + ")";
     }
 
     void CCodeGenerator::visit(TuplePattern &node)
@@ -389,11 +402,11 @@ namespace codegen
 
             // don't add pattern, if pattern is "1"
             if (last_pattern != "1") {
+                if (!empty)
+                    result << " && ";
+
                 empty = false;
                 result << last_pattern;
-
-                if (i < node.patterns.size() - 1)
-                    result << " && ";
             }
 
         }
@@ -432,7 +445,7 @@ namespace codegen
         // don't add pattern, if pattern is "1"
         if (last_pattern != "1") {
             empty = false;
-            result << last_pattern << " && ";
+            result << last_pattern;
         }
 
         // right side of a list split, will be the list, but with the first + offset elements missing.
@@ -447,6 +460,9 @@ namespace codegen
 
         // don't add pattern, if pattern is "1"
         if (last_pattern != "1") {
+            if (!empty)
+                result << " && ";
+
             empty = false;
             result << last_pattern;
         }
@@ -642,7 +658,7 @@ namespace codegen
                 // sideeffects occur in the program.
                 case Types::LIST:
                 case Types::STRING:
-                    assign << "gclone_" << lists[*node.node_type] << "(u" << node.id << ", 0);";
+                    output << "gclone_" << lists[*node.node_type] << "(u" << node.id << ", 0)";
                     break;
                 default:
                     output << "u" << node.id;
@@ -706,6 +722,7 @@ namespace codegen
                 if (got != signatures.end()) {
                     last_type = got->second;
                 } else {
+                    // if type didn't exist, then generate it
                     last_type = generate_signature(node);
                 }
                 break;
@@ -718,13 +735,17 @@ namespace codegen
                 last_type += " *";
                 break;
             case Types::LIST:
+                // find custom type
                 got = lists.find(node);
 
                 if (got != lists.end()) {
                     last_type = got->second;
                 } else {
+                    // if type didn't exist, then generate it
                     last_type = generate_list(node);
                 }
+
+                // lists are allocated on the heap, and we therefor need a pointer to it.
                 last_type += " *";
                 break;
             default:
@@ -733,125 +754,129 @@ namespace codegen
     }
 
     string CCodeGenerator::generate_list(Type &type) {
-        // result is needed, so we don't start generating something in a signature in the header file
+        // while generating a type, other types could be generated at the same time.
+        // we therefor need to save our generated code in a temporary variable, so
+        // that these generations doesn't write on top of eachother
         stringstream result;
-        string name = "gl";
         int tap_count = 0;
+        string name = "gl";
         name += to_string(list_count);
 
         // increase list count, so next list doesn't have the same name
         list_count++;
 
+        // get name of the items types
         type.types.front()->accept(*this);
 
         /* generation of list starts here */
-        result << "typedef struct " << name << res_endl;tap_count++;
-        result << "{" << res_endl;
-        result << last_type << " *items;" << res_endl;
-        result << "int head;" << res_endl;
-        result << "int size;" << res_endl; tap_count--;
-        result << "}" << name << ";" << res_endl;
-        result << res_endl;
+                                                                                                                         tap_count++;
+        result << "typedef struct " << name << " {"                                                         << res_endl;
+        result <<      last_type << " *items;"                                                              << res_endl;
+        result <<     "int head;"                                                                           << res_endl; tap_count--;
+        result <<     "int size;"                                                                           << res_endl;
+        result << "}" << name << ";"                                                                        << res_endl;
+        result                                                                                              << res_endl;
         /* generation of list ends here */
 
         /* generation of list push starts here */
-        result << name << " *gpush_" << name << "(" << name << " *this, " << last_type << " item)" << res_endl; tap_count++;
-        result << "{" << res_endl;
-        result << "if (this->head >= this->size)" << res_endl; tap_count++;
-        result << "{" << res_endl;
-        result << "this->items = (" << last_type << " *)realloc(this->items, (this->size *= 2) * sizeof(" << last_type << "));" << res_endl; tap_count--;
-        result << "}" << res_endl;
-        result << res_endl;
-        result << "this->items[this->head++] = item;" << res_endl;
-        result << "return this;" << res_endl; tap_count--;
-        result << "}" << res_endl;
-        result << res_endl;
+                                                                                                                         tap_count++;
+        result <<  name << " *gpush_" << name << "(" << name << " *this, " << last_type << " item) {"       << res_endl; tap_count++;
+        result <<     "if (this->head >= this->size) {"                                                     << res_endl;
+        result <<         "this->size *= 2;"                                                                << res_endl; tap_count--;
+        result <<         "this->items = realloc(this->items, this->size * sizeof(" << last_type << "));"   << res_endl;
+        result <<     "}"                                                                                   << res_endl;
+        result                                                                                              << res_endl;
+        result <<     "this->items[this->head++] = item;"                                                   << res_endl; tap_count--;
+        result <<     "return this;"                                                                        << res_endl;
+        result << "}"                                                                                       << res_endl;
+        result                                                                                              << res_endl;
         /* generation of list push ends here */
 
         /* generation of list constructer starts here */
-        result << name << " *gcreate_" << name << "(int count, ...)" << res_endl; tap_count++;
-        result << "{" << res_endl;
-        result << "int i;" << res_endl;
-        result << "int size = gnearest_pow2(count);" << res_endl;
-        result << "" << name << " *res = (" << name << "*)malloc(sizeof(" << name << "));" << res_endl;
-        result << res_endl;
-        result << "res->head = 0;" << res_endl;
-        result << "res->size = size;" << res_endl;
-        result << "res->items = (" << last_type << " *)malloc(size * sizeof(" << last_type << "));" << res_endl;
-        result << res_endl;
-        result << "va_list args;" << res_endl;
-        result << "va_start(args, count);" << res_endl;
-        result << res_endl;
-        result << "for(i = 0; i < count; i++)" << res_endl; tap_count++;
-        result << "{" << res_endl;
-        result << "gpush_" << name << "(res, va_arg(args, " << last_type << "));" << res_endl; tap_count--;
-        result << "}" << res_endl;
-        result << res_endl;
-        result << "va_end(args);" << res_endl;
-        result << "return res;" << res_endl; tap_count--;
-        result << "}" << res_endl;
-        result << res_endl;
+                                                                                                                         tap_count++;
+        result <<  name << " *gcreate_" << name << "(int count, ...) {"                                     << res_endl;
+        result <<     "int i;"                                                                              << res_endl;
+        result <<     "int size = gnearest_pow2(count);"                                                    << res_endl;
+        result <<      name << " *res = (" << name << "*)malloc(sizeof(" << name << "));"                   << res_endl;
+        result                                                                                              << res_endl;
+        result <<     "res->head = 0;"                                                                      << res_endl;
+        result <<     "res->size = size;"                                                                   << res_endl;
+        result <<     "res->items = malloc(size * sizeof(" << last_type << "));"                            << res_endl;
+        result                                                                                              << res_endl;
+        result <<     "va_list args;"                                                                       << res_endl;
+        result <<     "va_start(args, count);"                                                              << res_endl;
+        result                                                                                              << res_endl; tap_count++;
+        result <<     "for(i = 0; i < count; i++) {"                                                        << res_endl; tap_count--;
+        result <<         "gpush_" << name << "(res, va_arg(args, " << last_type << "));"                   << res_endl;
+        result <<     "}"                                                                                   << res_endl;
+        result                                                                                              << res_endl;
+        result <<     "va_end(args);"                                                                       << res_endl; tap_count--;
+        result <<     "return res;"                                                                         << res_endl;
+        result << "}"                                                                                       << res_endl;
+        result                                                                                              << res_endl;
         /* generation of list constructer ends here */
 
         /* generation of at function starts here */
-        result << last_type << " gat_" << name << "(" << name << " *this, int index)" << res_endl; tap_count++;
-        result << "{" << res_endl;
-        result << "return this->items[this->head - (1 + index)];" << res_endl; tap_count--;
-        result << "}" << res_endl;
-        result << res_endl;
+                                                                                                                         tap_count++;
+        result <<  last_type << " gat_" << name << "(" << name << " *this, int index) {"                    << res_endl; tap_count++;
+        result <<     "if (index >= this->head) {"                                                          << res_endl;
+        result <<         "printf(\"Out of bound!\");"                                                      << res_endl; tap_count--;
+        result <<         "exit(1);"                                                                        << res_endl;
+        result <<     "}"                                                                                   << res_endl; tap_count--;
+        result <<     "return this->items[this->head - (1 + index)];"                                       << res_endl;
+        result << "}"                                                                                       << res_endl;
+        result                                                                                              << res_endl;
         /* generation of at function ends here */
 
         /* generation of list constructer starts here */
-        result << name << " *gclone_" << name << "(" << name << " *list, int offset)" << res_endl; tap_count++;
-        result << "{" << res_endl;
-        result << "int i;" << res_endl;
-        result << name << " *res = (" << name << "*)malloc(sizeof(" << name << "));" << res_endl;
-        result << res_endl;
-        result << "res->head = list->head - offset;" << res_endl;
-        result << "res->size = list->size;" << res_endl;
-        result << "res->items = (" << last_type << " *)malloc(list->size * sizeof(" << last_type << "));" << res_endl;
-        result << res_endl; tap_count++;
-        result << "for (i = 0; i < res->head; i++) {" << res_endl;
-        result << "res->items[i] = list->items[i];" << res_endl; tap_count--;
-        result << "}" << res_endl;
-        result << "return res;" << res_endl;
-        result << res_endl; tap_count--;
-        result << "}" << res_endl;
-        result << res_endl;
+                                                                                                                         tap_count++;
+        result <<  name << " *gclone_" << name << "(" << name << " *list, int offset) {"                    << res_endl;
+        result <<     "int i;"                                                                              << res_endl;
+        result <<      name << " *res = (" << name << "*)malloc(sizeof(" << name << "));"                   << res_endl;
+        result                                                                                              << res_endl;
+        result <<     "res->head = list->head - offset;"                                                    << res_endl;
+        result <<     "res->size = list->size;"                                                             << res_endl;
+        result <<     "res->items = malloc(list->size * sizeof(" << last_type << "));"                      << res_endl;
+        result                                                                                              << res_endl; tap_count++;
+        result <<     "for (i = 0; i < res->head; i++) {"                                                   << res_endl; tap_count--;
+        result <<         "res->items[i] = list->items[i];"                                                 << res_endl;
+        result <<     "}"                                                                                   << res_endl;
+        result                                                                                              << res_endl; tap_count--;
+        result <<     "return res;"                                                                         << res_endl;
+        result << "}"                                                                                       << res_endl;
+        result                                                                                              << res_endl;
         /* generation of list constructer ends here */
 
         /* generation of compare function starts here */
-        result << "int gcompare_" << name << "(" << last_type << " *list1, " << last_type << "* list2)" << res_endl; tap_count++;
-        result << "{" << res_endl;
-        result << "int i;" << res_endl; tap_count++;
-        result << "if (list1->head != list2->head) {" << res_endl;
-        result << "return 0;" << res_endl; tap_count--;
-        result << "}" << res_endl;
-        result << res_endl; tap_count++;
-        result << "for (i = 0; i < list1->head; i++) {" << res_endl; tap_count++;
-        result << "if ("; // Todo compare
+                                                                                                                         tap_count++;
+        result << "int gcompare_" << name << "(" << name << " *list1, " << name << "* list2) {"   << res_endl;
+        result <<     "int i;"                                                                              << res_endl; tap_count++;
+        result <<     "if (list1->head != list2->head) {"                                                   << res_endl; tap_count--;
+        result <<         "return 0;"                                                                       << res_endl;
+        result <<     "}"                                                                                   << res_endl;
+        result                                                                                              << res_endl; tap_count++;
+        result <<     "for (i = 0; i < list1->head; i++) {"                                                 << res_endl; tap_count++;
+        result <<         "if (";
 
-        /*
-        switch (type.types[0]->type) {
+        switch (type.types.front()->type) {
             case Types::LIST:
-                result << "!gcompare_" << lists[type.types[0]] << "(list1->items[i], list2->items[i])";
+                result << "!gcompare_" << lists[*type.types.front()] << "(list1->items[i], list2->items[i])";
                 break;
             case Types::TUPLE:
-                result << "!gcompare_" << tuples[type.types[0]] << "(list1->items[i], list2->items[i])";
+                result << "!gcompare_" << tuples[*type.types.front()] << "(list1->items[i], list2->items[i])";
                 break;
             default:
-                result << "list2->items[i] != list2->items[i]";
+                result << "list1->items[i] != list2->items[i]";
                 break;
         }
-         */
-
-        result << ")" << res_endl;
-        result << "return 0;"; tap_count--; tap_count--;
-        result << "}" << res_endl; tap_count--;
-        result << res_endl;
-        result << "return 1;" << res_endl; tap_count--;
-        result << "}" << res_endl;
-        result << res_endl;
+        result << ")"                                                                                       << res_endl;
+                                                                                                                         tap_count--; tap_count--;
+        result <<             "return 0;"                                                                   << res_endl;
+        result <<     "}"                                                                                   << res_endl;
+        result                                                                                              << res_endl; tap_count--;
+        result <<     "return 1;"                                                                           << res_endl;
+        result << "}"                                                                                       << res_endl;
+        result                                                                                              << res_endl;
         /* generation of compare function ends here */
 
         /* TODO */
@@ -911,14 +936,18 @@ namespace codegen
         tuple_count++;
 
         /* generation of tuple starts here */
-        result << "typedef struct " << name << res_endl; tap_count++;
-        result << "{" << res_endl;
+                                                                                                                         tap_count++;
+        result << "typedef struct " << name << "{"                                                          << res_endl;
         // generate an item for each type in the tuple
         for (size_t i = 0; i < type.types.size(); ++i) {
             type.types[i]->accept(*this); // generate the actual type of the item
-            result << last_type << " gi" << i << ";" << endl; // give this item a unique name
+
+            if (i == type.types.size() - 1)
+                tap_count--;
+
+            result << last_type << " gi" << i << ";" << res_endl; // give this item a unique name
+
         }
-        tap_count--;
         result << "}" << name << ";" << res_endl;
         result << res_endl;
         /* generation of tuple ends here */
@@ -946,24 +975,24 @@ namespace codegen
         for (size_t i = 0; i < type.types.size(); ++i) {
             result << "res.gi" << i << " = gi" << i << ";" << res_endl;
         }
-        result << "return res;" << res_endl; tap_count--;
+        tap_count--;
+        result << "return res;" << res_endl;
         result << "}" << res_endl;
         result << res_endl;
         /* generation of tuple contructor ends here */
 
         /* generation of compare function starts here */
-        result << "int gcompare_" << name << "(" << name << " *list1, " << name << "* list2)" << res_endl; tap_count++;
-        result << "{" << res_endl;
-        result << "int i;" << res_endl;
-        result << "if (list1->head != list2->head)" << res_endl; tap_count++;
-        result << "{" << res_endl;
-        result << "return 0;" << res_endl; tap_count--;
-        result << "}" << res_endl;
-        result << res_endl; tap_count++;
-        result << "for (i = 0; i < list1->head; i++) {" << res_endl; tap_count++;
-        result << "if ("; // Todo compare
+                                                                                                                         tap_count++;
+        result << "int gcompare_" << name << "(" << name << " *list1, " << name << "* list2) {"             << res_endl;
+        result <<     "int i;"                                                                              << res_endl; tap_count++;
+        result <<     "if (list1->head != list2->head) {"                                                   << res_endl; tap_count--;
+        result <<         "return 0;"                                                                       << res_endl;
+        result <<     "}"                                                                                   << res_endl;
+        result                                                                                              << res_endl; //tap_count++;
 
         /*
+        result <<         "if ("; // Todo compare
+
         switch (type.types[0]->type) {
             case Types::LIST:
                 result << "!gcompare_" << lists[type.types[0]] << "(list1->items[i], list2->items[i])";
@@ -975,13 +1004,15 @@ namespace codegen
                 result << "list2->items[i] != list2->items[i]";
                 break;
         }
-         */
 
         result << ")" << res_endl;
         result << "return 0;" << res_endl; tap_count--; tap_count--;
         result << "}" << res_endl;
-        result << res_endl;
-        result << "return 1;" << res_endl; tap_count--;
+         */
+
+
+        result << res_endl; tap_count--;
+        result << "return 1;" << res_endl;
         result << "}" << res_endl;
         result << res_endl;
         /* generation of compare function ends here */
@@ -998,26 +1029,26 @@ namespace codegen
 
     void CCodeGenerator::generate_std() {
 
-        header << "#include <stdarg.h>" << head_endl;
-        header << "#include <stdio.h>" << head_endl;
-        header << "#include <stdlib.h>" << head_endl;
-        header << "#include <string.h>" << head_endl;
-        header << head_endl;
+        header << "#include <stdarg.h>"                                                                     << head_endl;
+        header << "#include <stdio.h>"                                                                      << head_endl;
+        header << "#include <stdlib.h>"                                                                     << head_endl;
+        header << "#include <string.h>"                                                                     << head_endl;
+        header                                                                                              << head_endl;
 
         /* generating to nearest power of 2 function starts here */
-        header << "int gnearest_pow2(int gn)" << head_endl; header_tap_count++;
-        header << "{" << head_endl;
-        header << "gn--;" << head_endl;
-        header << "gn |= gn >> 1;" << head_endl;
-        header << "gn |= gn >> 2;" << head_endl;
-        header << "gn |= gn >> 4;" << head_endl;
-        header << "gn |= gn >> 8;" << head_endl;
-        header << "gn |= gn >> 16;" << head_endl;
-        header << "gn++;" << head_endl;
-        header << head_endl;
-        header << "return gn + (gn == 0);" << head_endl; header_tap_count--;
-        header << "}" << head_endl;
-        header << head_endl;
+                                                                                                                         header_tap_count++;
+        header << "int gnearest_pow2(int gn) {"                                                             << head_endl;
+        header <<     "gn--;"                                                                               << head_endl;
+        header <<     "gn |= gn >> 1;"                                                                      << head_endl;
+        header <<     "gn |= gn >> 2;"                                                                      << head_endl;
+        header <<     "gn |= gn >> 4;"                                                                      << head_endl;
+        header <<     "gn |= gn >> 8;"                                                                      << head_endl;
+        header <<     "gn |= gn >> 16;"                                                                     << head_endl;
+        header <<     "gn++;"                                                                               << head_endl;
+        header                                                                                              << head_endl; header_tap_count--;
+        header <<     "return gn + (gn == 0);"                                                              << head_endl;
+        header << "}"                                                                                       << head_endl;
+        header                                                                                              << head_endl;
         /* generating to nearest power of 2 function ends here */
 
         string_type_name = generate_list(real_string);
@@ -1025,51 +1056,44 @@ namespace codegen
         generate_list(string_list);
 
         /* generation of string constructer starts here */
-        header << string_type_name << " *gcreate_string(char* values)" << head_endl; header_tap_count++;
-        header << "{" << head_endl;
-        header << "int i;" << head_endl;
-        header << "int str_length = strlen(values);" << head_endl;
-        header << "int size = gnearest_pow2(str_length);" << head_endl;
-        header << string_type_name << " *res = (" << string_type_name << "*)malloc(sizeof(" << string_type_name << "));" << head_endl;
-        header << head_endl;
-        header << "res->head = 0;" << head_endl;
-        header << "res->size = size;" << head_endl;
-        header << "res->items = (int *)malloc(size * sizeof(int));" << head_endl;
-        header << head_endl;
-        header << "for(i = str_length - 1; i >= 0; i--)" << head_endl;
-        header << "{" << head_endl; header_tap_count++;
-        header << "gpush_" << string_type_name << "(res, values[i]);" << head_endl; header_tap_count--;
-        header << "}" << head_endl;
-        header << head_endl;
-        header << "return res;" << head_endl;
-        header_tap_count--;
-        header << "}" << head_endl;
-        header << head_endl;
-        header << head_endl;
+                                                                                                                          header_tap_count++;
+        header <<  string_type_name << " *gcreate_string(char* values) {"                                   << head_endl;
+        header <<     "int i;"                                                                              << head_endl;
+        header <<     "int str_length = strlen(values);"                                                    << head_endl;
+        header <<     "int size = gnearest_pow2(str_length);"                                               << head_endl;
+        header <<      string_type_name << " *res = malloc(sizeof(" << string_type_name << "));"            << head_endl;
+        header                                                                                              << head_endl;
+        header <<     "res->head = 0;"                                                                      << head_endl;
+        header <<     "res->size = size;"                                                                   << head_endl;
+        header <<     "res->items = malloc(size * sizeof(int));"                                            << head_endl;
+        header                                                                                              << head_endl; header_tap_count++;
+        header <<     "for(i = str_length - 1; i >= 0; i--) {"                                              << head_endl; header_tap_count--;
+        header <<         "gpush_" << string_type_name << "(res, values[i]);"                               << head_endl;
+        header <<     "}"                                                                                   << head_endl;
+        header                                                                                              << head_endl; header_tap_count--;
+        header <<     "return res;"                                                                         << head_endl;
+        header << "}"                                                                                       << head_endl;
+        header                                                                                              << head_endl;
         /* generation of string constructer ends here */
 
         /* generation of string compare here */
-        header << "int gcompare_string(" << string_type_name << "*string, char* values, int offset)" << head_endl; header_tap_count++;
-        header << "{" << head_endl;
-        header << "int i, j;" << head_endl;
-        header << "int size = strlen(values);" << head_endl;
-        header << head_endl;
-        header << "if (size == string->head - offset)" << head_endl; header_tap_count++;
-        header << "{" << head_endl;
-        header << "for (i = 0, j = size - 1; i < size; i++, j--)" << head_endl; header_tap_count++;
-        header << "{" << head_endl; header_tap_count++;
-        header << "if (string->items[j] != values[i])" << head_endl;
-        header << "return 0;" << head_endl; header_tap_count--; header_tap_count--;
-        header << "}" << head_endl; header_tap_count--;
-        header << "}" << head_endl;
-        header << "else" << head_endl; header_tap_count++;
-        header << "{" << head_endl;
-        header << "return 0;" << head_endl;  header_tap_count--;
-        header << "}" << head_endl;
-        header << head_endl;
-        header << "return 1;" << head_endl; header_tap_count--;
-        header << "}" << head_endl;
-        header << head_endl;
+                                                                                                                         header_tap_count++;
+        header << "int gcompare_string(" << string_type_name << " *string, char* values, int offset) {"     << head_endl;
+        header <<     "int i, j;"                                                                           << head_endl;
+        header <<     "int size = strlen(values);"                                                          << head_endl;
+        header                                                                                              << head_endl; header_tap_count++;
+        header <<     "if (size == string->head - offset) {"                                                << head_endl; header_tap_count++;
+        header <<         "for (i = 0, j = size - 1; i < size; i++, j--) {"                                 << head_endl; header_tap_count++;
+        header <<             "if (string->items[j] != values[i])"                                          << head_endl; header_tap_count--; header_tap_count--;
+        header <<                 "return 0;"                                                               << head_endl; header_tap_count--;
+        header <<         "}"                                                                               << head_endl; header_tap_count++;
+        header <<     "} else {"                                                                            << head_endl; header_tap_count--;
+        header <<         "return 0;"                                                                       << head_endl;
+        header <<     "}"                                                                                   << head_endl;
+        header                                                                                              << head_endl; header_tap_count--;
+        header <<     "return 1;"                                                                           << head_endl;
+        header << "}"                                                                                       << head_endl;
+        header                                                                                              << head_endl;
         /* generation of string compare ends here */
 
     }
