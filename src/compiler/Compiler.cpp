@@ -49,7 +49,14 @@ namespace compiler {
 
         case_checker.visit(*driver.main);
         scope_generator.visit(*driver.main);
+
+        if (!scope_generator.is_valid)
+            return;
+
         type_checker.visit(*driver.main);
+
+        if (!type_checker.is_valid)
+            return;
 
         generator->visit(*driver.main);
     }

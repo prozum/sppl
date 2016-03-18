@@ -49,9 +49,9 @@ public:
     CompileLayerT CompileLayer;
     std::vector<ModuleHandleT> ModuleHandles;
     std::unique_ptr<legacy::FunctionPassManager> PassManager;
-    semantics::CaseChecker case_checker;
-    semantics::ScopeGenerator scope_generator;
-    semantics::TypeChecker type_checker;
+    semantics::CaseChecker CaseChecker;
+    semantics::ScopeGenerator ScopeGenerator;
+    semantics::TypeChecker TypeChecker;
 
     codegen::LLVMCodeGenerator Generator;
     parser::Driver Driver;
