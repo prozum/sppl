@@ -3,8 +3,10 @@
 #include <stack>
 #include "Node.h"
 #include "Visitor.h"
+#include "Printer.h"
 
 using namespace common;
+using namespace codegen;
 
 namespace semantics {
 
@@ -16,7 +18,9 @@ namespace semantics {
     class ScopeGenerator : public Visitor {
     public:
         Scope *res;
-        bool is_valid = true;
+        bool is_valid;
+
+        ScopeGenerator();
 
         void visit(Program &node);
 
@@ -83,10 +87,12 @@ namespace semantics {
         void visit(Type &node);
 
     private:
+        Printer printer;
         Scope *current_scope;
         Function *current_func;
         std::stack<Type *> type_stack;
         ScopeContext context;
         vector<void *> garbage;
+        bool error;
     };
 }
