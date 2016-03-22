@@ -60,7 +60,7 @@ using namespace std;
 }
 
 "Char"	{
-return token::CHARTYPE;
+    return token::CHARTYPE;
 }
 
 [0-9]+ {
@@ -91,7 +91,7 @@ return token::CHARTYPE;
     return token::BOOLLITERAL;
 }
 
-[a-zA-Z][a-zA-Z0-9]* {
+[a-zA-Z_][a-zA-Z0-9_]* {
     yylval->str_val = new string(yytext);
     return token::ID;
 }

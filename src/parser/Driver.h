@@ -33,8 +33,6 @@ public:
     class Scanner* lexer;
 
     common::Program *main;
-
-
 };
 
 }
