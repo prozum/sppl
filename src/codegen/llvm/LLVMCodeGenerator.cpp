@@ -51,9 +51,9 @@ namespace codegen {
             case common::Types::STRING:
                 return Type::getInt8PtrTy(getGlobalContext());
             case common::Types::TUPLE:
-                return get_struct_type(node_type);
+                return PointerType::getUnqual(get_struct_type(node_type));
             case common::Types::LIST:
-                return get_list_type(node_type);
+                return PointerType::getUnqual(get_list_type(node_type));
             default:
                 throw "Not supported";
         }

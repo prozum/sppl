@@ -76,41 +76,58 @@ void SpplJit::init_module_passmanager() {
 }
 
 
-size_t SpplJit::get_output(size_t addr, common::Type *node_type, string &out)
+string SpplJit::get_output(intptr_t data, common::Type *node_type)
 {
+    string out;
+
     switch (node_type->type) {
         case common::Types::INT:
-            out += to_string(*(int64_t *)addr);
-            return  addr + sizeof(int64_t);
+            return to_string((int64_t)data);
         case common::Types::FLOAT:
-            out += to_string(*(double *)addr);
-            return addr + sizeof(double);
+            // WTF is double type a pointer
+            return to_string(*(double *)data);
         case common::Types::STRING:
             out += "\"";
-            out += *(char **) addr;
+            out += (char *) data;
             out += "\"";
-            return addr + sizeof(char *);
+            return out;
         case common::Types::TUPLE:
-            return get_tuple_output(addr, node_type->types, out);
+            return get_tuple_output(data, node_type->types);
     }
 }
 
-size_t SpplJit::get_tuple_output(size_t addr, vector<common::Type *> node_types, string &out)
+string SpplJit::get_tuple_output(intptr_t addr, vector<common::Type *> node_types)
 {
-    out += "(";
+    string out("(");
     for (auto &node_type: node_types) {
-        addr = get_output(addr, node_type, out);
+        switch (node_type->type)
+        {
+            case common::Types::INT:
+                out += get_output(*(int64_t *)addr, node_type);
+                addr += sizeof(int64_t);
+                break;
+            case common::Types::FLOAT:
+                out += get_output(addr, node_type);
+                addr += sizeof(double);
+                break;
+            case common::Types::STRING:
+                out += get_output(*(intptr_t *)addr, node_type);
+                addr += sizeof(intptr_t *);
+                break;
+            case common::Types::TUPLE:
+                out += get_tuple_output(*(intptr_t *) addr, node_type->types);
+                addr += sizeof(intptr_t *);
+                break;
+        }
         if (node_type != node_types.back())
             out += ",";
     }
-
     out += ")";
-
-    return addr;
+    return out;
 }
 
-void SpplJit::eval(std::string str) {
-
+void SpplJit::eval(std::string str)
+{
     // Parse jit expression
     Driver.parse_string(str);
     auto expr = Driver.main->debug_expr;
@@ -134,8 +151,7 @@ void SpplJit::eval(std::string str) {
     auto anon_func = find_symbol("__anon_func");
     auto func_ptr = (size_t (*)())anon_func.getAddress();
 
-    string output;
-    get_output(func_ptr(), expr->node_type, output);
+    string output = get_output(func_ptr(), expr->node_type);
     cout << "output: " << output << endl;
 
     remove_module(handler);
