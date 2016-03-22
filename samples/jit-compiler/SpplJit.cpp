@@ -76,40 +76,67 @@ void SpplJit::init_module_passmanager() {
 }
 
 
+size_t SpplJit::get_output(size_t addr, common::Type *node_type, string &out)
+{
+    switch (node_type->type) {
+        case common::Types::INT:
+            out += to_string(*(int64_t *)addr);
+            return  addr + sizeof(int64_t);
+        case common::Types::FLOAT:
+            out += to_string(*(double *)addr);
+            return addr + sizeof(double);
+        case common::Types::STRING:
+            out += "\"";
+            out += *(char **) addr;
+            out += "\"";
+            return addr + sizeof(char *);
+        case common::Types::TUPLE:
+            return get_tuple_output(addr, node_type->types, out);
+    }
+}
+
+size_t SpplJit::get_tuple_output(size_t addr, vector<common::Type *> node_types, string &out)
+{
+    out += "(";
+    for (auto &node_type: node_types) {
+        addr = get_output(addr, node_type, out);
+        if (node_type != node_types.back())
+            out += ",";
+    }
+
+    out += ")";
+
+    return addr;
+}
+
 void SpplJit::eval(std::string str) {
 
-    // Parse/Generate jit expression
+    // Parse jit expression
     Driver.parse_string(str);
     auto expr = Driver.main->debug_expr;
     expr->accept(ScopeGenerator);
     expr->accept(TypeChecker);
 
-    auto anon_func = Generator.GreateAnonymousFunction(expr);
+    // Generate ir code for jit function
+    auto ir_func = Generator.GreateAnonymousFunction(expr);
 
-    // Verify jit expression
-    PassManager->run(*anon_func);
+    // Verify ir code
+    PassManager->run(*ir_func);
 
-    // Print jit expression
+    // Print ir code
     Generator.Module->dump();
 
+    // Setup new module for jit function
     auto handler = add_module(std::move(Generator.Module));
     init_module_passmanager();
 
-    auto anon_expr = find_symbol("__anon_func");
+    // Get jit function
+    auto anon_func = find_symbol("__anon_func");
+    auto func_ptr = (size_t (*)())anon_func.getAddress();
 
-    int64_t (*int64_ptr)();
-    double (*double_ptr)();
-    switch (expr->node_type->type)
-    {
-        case common::Types::INT:
-            int64_ptr = (int64_t (*)()) (intptr_t) anon_expr.getAddress();
-            cout << "Evaluated to " << std::to_string(int64_ptr()) << endl;
-            break;
-        case common::Types::FLOAT:
-            double_ptr = (double (*)()) (intptr_t) anon_expr.getAddress();
-            cout << "Evaluated to " << std::to_string(double_ptr()) << endl;
-            break;
-    }
+    string output;
+    get_output(func_ptr(), expr->node_type, output);
+    cout << "output: " << output << endl;
 
     remove_module(handler);
 }

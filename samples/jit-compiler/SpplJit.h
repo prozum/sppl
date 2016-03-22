@@ -55,6 +55,8 @@ public:
     codegen::LLVMCodeGenerator Generator;
     parser::Driver Driver;
 
+    size_t get_output(size_t addr, common::Type *node_type, string &out);
+    size_t get_tuple_output(size_t addr, vector<common::Type *> node_type, string &out);
 
     template <typename T> static std::vector<T> singletonSet(T t) {
         std::vector<T> Vec;
@@ -69,4 +71,5 @@ public:
         InitializeNativeTargetAsmPrinter();
         InitializeNativeTargetAsmParser();
     }
+
 };

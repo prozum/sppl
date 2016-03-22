@@ -10,7 +10,7 @@ namespace codegen {
 
     llvm::Function *LLVMCodeGenerator::GreateAnonymousFunction(common::Expr *expr)
     {
-        auto expr_type = FunctionType::get(get_type(expr->node_type->type), false);
+        auto expr_type = FunctionType::get(get_type(expr->node_type), false);
         cur_func = Function::Create(expr_type, Function::ExternalLinkage, "__anon_func", Module.get());
         BasicBlock *entry = BasicBlock::Create(getGlobalContext(), "entry", cur_func);
         Builder.SetInsertPoint(entry);
@@ -30,34 +30,68 @@ namespace codegen {
     }
 
 
-    Type* LLVMCodeGenerator::get_type(common::Types type)
+    llvm::Type *LLVMCodeGenerator::get_type(common::Type *node_type, bool ptr)
     {
-        switch (type)
+        llvm::Type *type;
+
+        switch (node_type->type)
         {
             case common::Types::FLOAT:
-                return Type::getDoubleTy(getGlobalContext());
+                type = Type::getDoubleTy(getGlobalContext());
+                break;
             case common::Types::INT:
-                return Type::getInt64Ty(getGlobalContext());
+                type = Type::getInt64Ty(getGlobalContext());
+                break;
             case common::Types::BOOL:
-                return Type::getInt1Ty(getGlobalContext());
+                type = Type::getInt1Ty(getGlobalContext());
+                break;
             case common::Types::CHAR:
-                return Type::getInt32Ty(getGlobalContext()); // utf8 char
+                type = Type::getInt8Ty(getGlobalContext());
+                break;
             case common::Types::STRING:
-                // TODO: Implement STRING
+                return Type::getInt8PtrTy(getGlobalContext());
+            case common::Types::TUPLE:
+                return get_struct_type(node_type);
+            case common::Types::LIST:
+                return get_list_type(node_type);
             default:
                 throw "Not supported";
         }
+
+        if (ptr)
+            return PointerType::getUnqual(type);
+        else
+            return type;
+    }
+
+    llvm::StructType *LLVMCodeGenerator::get_struct_type(common::Type *node_type)
+    {
+        std::vector<Type *> tmp_vec;
+
+        for (auto &sub_type: node_type->types)
+            tmp_vec.push_back(get_type(sub_type));
+        llvm::ArrayRef<Type *> tuple_types(tmp_vec);
+
+        return StructType::create(getGlobalContext(), tuple_types);
+    }
+
+    llvm::StructType *LLVMCodeGenerator::get_list_type(common::Type *node_type)
+    {
+        vector<llvm::Type *> tmp_vec = { get_type(node_type->types[0], true), Type::getInt64Ty(getGlobalContext()) };
+        llvm::ArrayRef<Type *> list_types(tmp_vec);
+
+        return StructType::create(getGlobalContext(), list_types);
     }
 
     void LLVMCodeGenerator::visit(common::Function &node) {
 
         // Get output type
-        Type *output_type = get_type(node.types[0]->type);
+        Type *output_type = get_type(node.types[0]);
 
         // Get input types
         std::vector<Type *> input_types;
-        for (unsigned i = 0; i < node.types.size() - 1; i++) {
-            input_types.push_back(get_type(node.types[i]->type));
+        for (size_t i = 0; i < node.types.size() - 1; i++) {
+            input_types.push_back(get_type(node.types[i]));
         }
 
         // Setup function input/output types
@@ -101,6 +135,7 @@ namespace codegen {
             cur_case_id--;
         }
 
+        // Make entry point to first pattern
         Builder.SetInsertPoint(entry);
         Builder.CreateBr(cur_pattern_block);
 
@@ -111,11 +146,10 @@ namespace codegen {
     {
         if (val1->getType()->isFloatTy())
             return Builder.CreateFCmpONE(val1, val2, "cmptmp");
-        else if (val1->getType()->isIntegerTy() || val1->getType()->isIntegerTy())
+        else if (val1->getType()->isIntegerTy())
             return Builder.CreateICmpEQ(val1, val2, "cmptmp");
         else
             throw "Not supported!";
-
     }
 
     void LLVMCodeGenerator::visit(common::Case &node) {
@@ -240,54 +274,6 @@ namespace codegen {
         }
     }
 
-    void LLVMCodeGenerator::visit(common::Float &node) {
-        cur_val = ConstantFP::get(getGlobalContext(), APFloat(node.value));
-    }
-
-    void LLVMCodeGenerator::visit(common::Int &node) {
-        cur_val = ConstantInt::get(IntegerType::get(getGlobalContext(), 64), node.value);
-    }
-
-    void LLVMCodeGenerator::visit(common::Bool &node) {
-        cur_val = ConstantInt::get(IntegerType::get(getGlobalContext(), 64), node.value);   // TODO: Better way?
-    }
-
-    void LLVMCodeGenerator::visit(common::Char &node) {
-        cur_val = ConstantInt::get(IntegerType::get(getGlobalContext(), 64), node.value);   // TODO: Better way?
-    }
-
-    void LLVMCodeGenerator::visit(common::String &node) {
-        cur_val = ConstantDataArray::getString(getGlobalContext(), node.value, true);       // TODO: Correct way?
-    }
-
-    void LLVMCodeGenerator::visit(common::Call &node) {
-        node.callee->accept(*this);
-        auto callee = cur_val;
-
-        std::vector<Value *> args;
-        for (auto &arg : node.exprs) {
-            arg->accept(*this);
-            args.push_back(cur_val);
-        }
-
-        cur_val = Builder.CreateCall(callee, args, "calltmp");
-    }
-
-    void LLVMCodeGenerator::visit(common::Id &node) {
-        switch (ctx)
-        {
-            case PATTERN:
-                ContextValues[node.id] = cur_val;
-                break;
-            case EXPR:
-                cur_val = ContextValues[node.id];
-                if (cur_val)
-                    return;
-                cur_val = Module->getFunction(node.id);
-                break;
-        }
-    }
-
     void LLVMCodeGenerator::visit(common::Equal &node) {
         node.left->accept(*this);
         auto left = cur_val;
@@ -366,7 +352,90 @@ namespace codegen {
         }
     }
 
+    void LLVMCodeGenerator::visit(common::Float &node) {
+        cur_val = ConstantFP::get(get_type(node.node_type), node.value);
+    }
+
+    void LLVMCodeGenerator::visit(common::Int &node) {
+        cur_val = ConstantInt::get(get_type(node.node_type), node.value);
+    }
+
+    void LLVMCodeGenerator::visit(common::Bool &node) {
+        cur_val = ConstantInt::get(get_type(node.node_type), node.value);
+    }
+
+    void LLVMCodeGenerator::visit(common::Char &node) {
+        cur_val = ConstantInt::get(get_type(node.node_type), node.value);
+    }
+
+    void LLVMCodeGenerator::visit(common::String &node) {
+        cur_val = Builder.CreateGlobalString(node.value, cur_func->getName() + ".str");
+
+    }
+
+    void LLVMCodeGenerator::visit(common::Call &node) {
+        node.callee->accept(*this);
+        auto callee = cur_val;
+
+        std::vector<Value *> args;
+        for (auto &arg : node.exprs) {
+            arg->accept(*this);
+            args.push_back(cur_val);
+        }
+
+        cur_val = Builder.CreateCall(callee, args, "calltmp");
+    }
+
+    void LLVMCodeGenerator::visit(common::Id &node) {
+        switch (ctx)
+        {
+            case PATTERN:
+                ContextValues[node.id] = cur_val;
+                break;
+            case EXPR:
+                cur_val = ContextValues[node.id];
+                if (cur_val)
+                    return;
+                cur_val = Module->getFunction(node.id);
+                break;
+        }
+    }
+
+
     void LLVMCodeGenerator::visit(common::Par &node) {
         node.child->accept(*this);
     }
+
+    void LLVMCodeGenerator::visit(common::Tuple &node) {
+        std::vector<llvm::Constant *> tmp;
+
+        for (auto &expr: node.exprs) {
+            expr->accept(*this);
+            tmp.push_back((Constant *)cur_val);
+        }
+
+        ArrayRef<Constant *> tuple_val(tmp);
+
+        auto const_val = ConstantStruct::get(get_struct_type(node.node_type), tuple_val);
+        cur_val = new GlobalVariable(*Module.get(), const_val->getType(), true, GlobalVariable::ExternalLinkage, const_val);
+
+    }
+
+    void LLVMCodeGenerator::visit(common::List &node) {
+        std::vector<llvm::Constant *> tmp;
+
+        for (auto &expr: node.exprs) {
+            expr->accept(*this);
+            tmp.push_back(dynamic_cast<Constant *>(cur_val));
+        }
+
+        ArrayRef<Constant *> list_data(tmp);
+
+        auto list_type = ArrayType::get(get_type(node.node_type->types[0]), node.exprs.size());
+        auto const_val = ConstantArray::get(list_type, list_data);
+
+        cur_val = new GlobalVariable(*Module.get(), const_val->getType(), true, GlobalVariable::ExternalLinkage, const_val);
+    }
+
+
 }

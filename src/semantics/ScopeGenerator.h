@@ -9,8 +9,8 @@ using namespace common;
 namespace semantics {
 
     enum class ScopeContext {
-        PATTERN,
-        EXPR
+        EXPR,
+        PATTERN
     };
 
     class ScopeGenerator : public Visitor {

@@ -18,7 +18,7 @@ int main(int argc, char *argv[]) {
     string tmp("");
     while (tmp.compare("q") != 0)
     {
-        cout << "Input code:";
+        cout << "input: ";
         cin >> tmp;
         jit.eval(tmp);
         cout << endl << endl;

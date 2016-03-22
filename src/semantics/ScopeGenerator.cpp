@@ -10,6 +10,11 @@ namespace semantics {
         current_scope = res;
         garbage.push_back(current_scope);
 
+        if (node.debug_expr) {
+            node.debug_expr->accept(*this);
+            return;
+        }
+
         /* Visit all children */
         for (auto func : node.funcs) {
             func->accept(*this);

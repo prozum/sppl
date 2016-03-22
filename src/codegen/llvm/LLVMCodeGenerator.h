@@ -1,10 +1,12 @@
 #pragma once
 #include <llvm/ADT/STLExtras.h>
 #include <llvm/IR/IRBuilder.h>
-#include <llvm/IR/LLVMContext.h>
 #include <llvm/IR/Module.h>
 #include <llvm/IR/Verifier.h>
-#include <llvm/IR/ValueSymbolTable.h>
+
+#include <llvm/IR/DerivedTypes.h>
+#include <llvm/IR/TypeFinder.h>
+#include <llvm/IR/TypeBuilder.h>
 
 #include <iostream>
 
@@ -49,6 +51,8 @@ private:
     void visit(common::Bool &node);
     void visit(common::Char &node);
     void visit(common::String &node);
+	void visit(common::Tuple &node);
+	void visit(common::List &node);
 
     void visit(common::Add &node);
     void visit(common::Sub &node);
@@ -67,7 +71,9 @@ private:
     void visit(common::Call &node);
 	void visit(common::Par &node);
 
-    llvm::Type *get_type(common::Types type);
+    llvm::Type *get_type(common::Type *node_type, bool ptr = false);
+	llvm::StructType *get_struct_type(common::Type *node_type);
+	llvm::StructType *get_list_type(common::Type *node_type);
 
     llvm::Value *compare(llvm::Value *val1, llvm::Value *val2);
 
