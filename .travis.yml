@@ -29,7 +29,7 @@ before_install:
 
 install:
   - mkdir build && cd build
-  - cmake .. -DDEBUG=1
+  - cmake .. -DDEBUG=1 -CLLVM=1
 
 script:
   - make -j 8
