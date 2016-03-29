@@ -39,12 +39,12 @@ namespace codegen
         output <<      lists[string_list] << " *args = gcreate_" << lists[string_list] << "(0);"            << out_endl;
         output <<     "int i;"                                                                              << out_endl;
         output                                                                                              << out_endl; output_tap_count++;
-        output <<     "for(i = argc - 1; i >= 0; i--) {"                                                    << out_endl;
-        output <<         "gpush_" << lists[string_list] << "(args, gcreate_string(argv[i]));"              << out_endl; output_tap_count--;
+        output <<     "for(i = argc - 1; i >= 0; i--) {"                                                    << out_endl; output_tap_count--;
+        output <<         "gpush_" << lists[string_list] << "(args, gcreate_string(argv[i]));"              << out_endl;
         output <<     "}"                                                                                   << out_endl;
         output                                                                                              << out_endl;
-        output <<     "printf(\"%d\\n\", umain(args));"                                                     << out_endl;
-        output <<     "return 0;"                                                                           << out_endl; output_tap_count--;
+        output <<     "printf(\"%d\\n\", umain(args));"                                                     << out_endl; output_tap_count--;
+        output <<     "return 0;"                                                                           << out_endl;
         output << "}"                                                                                       << out_endl;
         output                                                                                              << out_endl;
 
@@ -187,9 +187,20 @@ namespace codegen
 
     void CCodeGenerator::visit(Equal &node)
     {
+        unordered_map<Type, string>::iterator got;
+        string name;
+
         switch (node.left->node_type->type) {
             case Types::TUPLE:
-                output << "gcompare_" << tuples[*node.left->node_type] << "(";
+                got = tuples.find(*node.left->node_type);
+
+                if (got == tuples.end()) {
+                    name = generate_tuple(*node.left->node_type);
+                } else {
+                    name = got->second;
+                }
+
+                output << "gcompare_" << name << "(";
                 node.left->accept(*this);
                 output << ", ";
                 node.right->accept(*this);
@@ -197,7 +208,15 @@ namespace codegen
                 break;
             case Types::LIST:
             case Types::STRING:
-                output << "gcompare_" << lists[*node.left->node_type] << "(";
+                got = tuples.find(*node.left->node_type);
+
+                if (got == tuples.end()) {
+                    name = generate_list(*node.left->node_type);
+                } else {
+                    name = got->second;
+                }
+
+                output << "gcompare_" << name << "(";
                 node.left->accept(*this);
                 output << ", ";
                 node.right->accept(*this);
@@ -983,34 +1002,29 @@ namespace codegen
 
         /* generation of compare function starts here */
                                                                                                                          tap_count++;
-        result << "int gcompare_" << name << "(" << name << " *list1, " << name << "* list2) {"             << res_endl;
-        result <<     "int i;"                                                                              << res_endl; tap_count++;
-        result <<     "if (list1->head != list2->head) {"                                                   << res_endl; tap_count--;
-        result <<         "return 0;"                                                                       << res_endl;
-        result <<     "}"                                                                                   << res_endl;
-        result                                                                                              << res_endl; //tap_count++;
+        result << "int gcompare_" << name << "(" << name << " tuple1, " << name << " tuple2) {"             << res_endl; tap_count++;
 
-        /*
-        result <<         "if ("; // Todo compare
+        for (size_t i = 0; i < type.types.size(); ++i) {
+            result << "if (";
 
-        switch (type.types[0]->type) {
-            case Types::LIST:
-                result << "!gcompare_" << lists[type.types[0]] << "(list1->items[i], list2->items[i])";
-                break;
-            case Types::TUPLE:
-                result << "!gcompare_" << tuples[type.types[0]] << "(list1->items[i], list2->items[i])";
-                break;
-            default:
-                result << "list2->items[i] != list2->items[i]";
-                break;
+            switch (type.types[i]->type) {
+                case Types::STRING:
+                case Types::LIST:
+                    result << "!gcompare_" << lists[*type.types[i]] << "(tuple1.gi" << i << ", tuple2.gi" << i << ")";
+                    break;
+                case Types::TUPLE:
+                    result << "!gcompare_" << tuples[*type.types[i]] << "(tuple1.gi" << i << ", tuple2.gi" << i << ")";
+                    break;
+                default:
+                    result << "(tuple1.gi" << i << "!= tuple2.gi" << i << ")";
+                    break;
+            }
+
+            result << ")"           << res_endl; tap_count--;
+            result << "return 0;"   << res_endl;
+            result                  << res_endl; tap_count++;
         }
-
-        result << ")" << res_endl;
-        result << "return 0;" << res_endl; tap_count--; tap_count--;
-        result << "}" << res_endl;
-         */
-
-
+        tap_count--;
         result << res_endl; tap_count--;
         result << "return 1;" << res_endl;
         result << "}" << res_endl;
