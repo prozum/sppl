@@ -28,7 +28,7 @@ int MathClass::adder(int a, int b) {
 
 int MathClass::subber(int a, int b) {
 	return a - b;
-};
+}
 
 //******************************************************
 
