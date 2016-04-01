@@ -51,7 +51,7 @@ namespace codegen {
             case common::Types::STRING:
                 return Type::getInt8PtrTy(getGlobalContext());
             case common::Types::TUPLE:
-                return PointerType::getUnqual(get_struct_type(node_type));
+                return PointerType::getUnqual(get_tuple_type(node_type));
             case common::Types::LIST:
                 return PointerType::getUnqual(get_list_type(node_type));
             default:
@@ -64,23 +64,38 @@ namespace codegen {
             return type;
     }
 
-    llvm::StructType *LLVMCodeGenerator::get_struct_type(common::Type *node_type)
+    llvm::StructType *LLVMCodeGenerator::get_tuple_type(common::Type *node_type)
     {
-        std::vector<Type *> tmp_vec;
+        auto type = tuple_types.find(*node_type);
 
+        if (type != tuple_types.end())
+            return type->second;
+        
+        std::vector<Type *> tmp_vec;
         for (auto &sub_type: node_type->types)
             tmp_vec.push_back(get_type(sub_type));
-        llvm::ArrayRef<Type *> tuple_types(tmp_vec);
+        llvm::ArrayRef<Type *> types(tmp_vec);
 
-        return StructType::create(getGlobalContext(), tuple_types);
+        auto new_type = StructType::create(getGlobalContext(), types);
+        tuple_types[*node_type] = new_type;
+
+        return new_type;
     }
 
     llvm::StructType *LLVMCodeGenerator::get_list_type(common::Type *node_type)
     {
-        vector<llvm::Type *> tmp_vec = { get_type(node_type->types[0], true), Type::getInt64Ty(getGlobalContext()) };
-        llvm::ArrayRef<Type *> list_types(tmp_vec);
+        auto type = list_types.find(*node_type);
 
-        return StructType::create(getGlobalContext(), list_types);
+        if (type != list_types.end())
+            return type->second;
+
+        vector<llvm::Type *> tmp_vec = { get_type(node_type->types[0], true), Type::getInt64Ty(getGlobalContext()) };
+        llvm::ArrayRef<Type *> types(tmp_vec);
+
+        auto new_type = StructType::create(getGlobalContext(), types);
+        list_types[*node_type] = new_type;
+
+        return new_type;
     }
 
     void LLVMCodeGenerator::visit(common::Function &node) {
@@ -416,7 +431,7 @@ namespace codegen {
 
         ArrayRef<Constant *> tuple_val(tmp);
 
-        auto const_val = ConstantStruct::get(get_struct_type(node.node_type), tuple_val);
+        auto const_val = ConstantStruct::get(get_tuple_type(node.node_type), tuple_val);
         cur_val = new GlobalVariable(*Module.get(), const_val->getType(), true, GlobalVariable::ExternalLinkage, const_val);
 
     }

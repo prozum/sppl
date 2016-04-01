@@ -11,25 +11,6 @@
 using namespace common;
 using namespace std;
 
-namespace std {
-
-    template <>
-    struct hash<Type>
-    {
-        std::size_t operator()(const Type& k) const
-        {
-            size_t res = std::hash<int>()(static_cast<int>(k.type));
-
-            for (auto type : k.types) {
-                res ^= (std::hash<Type>()(*type) << 1);
-            }
-
-            return res;
-        }
-    };
-
-}
-
 namespace codegen {
 
     enum class IdContext {
