@@ -149,6 +149,9 @@ namespace codegen {
 
     void Printer::visit(Float &node) {
         output << node.value;
+
+        if (node.value == (int)node.value)
+            output << ".0";
     }
 
     void Printer::visit(Bool &node) {

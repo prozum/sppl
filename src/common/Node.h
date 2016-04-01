@@ -8,6 +8,7 @@
 using namespace std;
 
 namespace common {
+
     enum class Types {
         INT,
         FLOAT,
@@ -21,10 +22,12 @@ namespace common {
 		UNKNOWN
 	};
 
+
+
+	// Forward declare Scope
 	class Scope;
 
-	/* Abstract Nodes */
-
+	// Abstract Nodes
 	class Node {
 	public:
 		Type* node_type = nullptr;
@@ -39,6 +42,23 @@ namespace common {
 		Node(int);
 
 		virtual void accept(Visitor &) = 0;
+	};
+
+	class Type : public Node {
+	public:
+		Types type;
+		vector<Type *> types;
+
+		Type();
+		Type(Types);
+		Type(Types, int);
+		Type(Types, vector<Type *>);
+		Type(Types, vector<Type *>, int);
+		virtual ~Type();
+
+		virtual void accept(Visitor &v);
+		bool operator==(const Type &other) const;
+
 	};
 
 	class Expr : public Node {
@@ -443,21 +463,22 @@ namespace common {
 
 		virtual void accept(Visitor &);
 	};
+}
 
-	class Type : public Node {
-	public:
-		Types type;
-		vector<Type *> types;
+namespace std
+{
+	template <>
+    struct hash<common::Type>
+    {
+        std::size_t operator()(const common::Type& k) const
+        {
+            size_t res = std::hash<int>()(static_cast<int>(k.type));
 
-		Type();
-		Type(Types);
-		Type(Types, int);
-		Type(Types, vector<Type *>);
-		Type(Types, vector<Type *>, int);
-		virtual ~Type();
+            for (auto type : k.types) {
+                res ^= (hash<common::Type>()(*type) << 1);
+            }
 
-		virtual void accept(Visitor &v);
-		bool operator==(const Type &other) const;
-
-	};
+            return res;
+        }
+    };
 }

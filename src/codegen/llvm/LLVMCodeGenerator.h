@@ -8,9 +8,12 @@
 #include <llvm/IR/TypeFinder.h>
 #include <llvm/IR/TypeBuilder.h>
 
+#include <unordered_map>
 #include <iostream>
 
 #include "CodeGenerator.h"
+
+using namespace std;
 
 namespace codegen {
 
@@ -31,6 +34,9 @@ class LLVMCodeGenerator : public common::CodeGenerator {
     llvm::Function *GreateAnonymousFunction(common::Expr *expr);
 
 private:
+
+	std::unordered_map<common::Type, llvm::StructType *> tuple_types;
+	std::unordered_map<common::Type, llvm::StructType *> list_types;
     llvm::Function *cur_func;
     llvm::Value *cur_val;
     llvm::BasicBlock *cur_pattern_block;
@@ -72,7 +78,7 @@ private:
 	void visit(common::Par &node);
 
     llvm::Type *get_type(common::Type *node_type, bool ptr = false);
-	llvm::StructType *get_struct_type(common::Type *node_type);
+	llvm::StructType *get_tuple_type(common::Type *node_type);
 	llvm::StructType *get_list_type(common::Type *node_type);
 
     llvm::Value *compare(llvm::Value *val1, llvm::Value *val2);
