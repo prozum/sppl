@@ -1,0 +1,2 @@
+def main: Int -> Int
+	| 0 = 1
