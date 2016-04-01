@@ -170,3 +170,19 @@ void TestMaster::addCharCharChar() {
     sourceFile.close();
     compileChecker(false);
 }
+
+// Addition - Mix
+
+void TestMaster::addMixFloatInt() {
+    ofstream sourceFile("source.sppl");
+    sourceFile << "def main : Float | = 2.0 + 2";
+    sourceFile.close();
+    compileChecker(false);
+}
+
+void TestMaster::addMixIntFloat() {
+    ofstream sourceFile("source.sppl");
+    sourceFile << "def main : Int | = 2 + 2.0";
+    sourceFile.close();
+    compileChecker(false);
+}

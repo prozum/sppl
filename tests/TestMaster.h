@@ -36,6 +36,9 @@ class TestMaster : public CppUnit::TestFixture{
     CPPUNIT_TEST(addCharStrChar);
     CPPUNIT_TEST(addCharCharStr);
     CPPUNIT_TEST(addCharCharChar);
+    // Addition - Mix
+    CPPUNIT_TEST(addMixFloatInt);
+    CPPUNIT_TEST(addMixIntFloat);
     CPPUNIT_TEST_SUITE_END();
 public:
     ifstream in;
@@ -72,6 +75,10 @@ protected:
     void addCharStrChar();
     void addCharCharStr();
     void addCharCharChar();
+
+    // Addition - Mix
+    void addMixIntFloat();
+    void addMixFloatInt();
 
     void compileChecker(bool success);
 };
