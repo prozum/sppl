@@ -31,6 +31,11 @@ class TestMaster : public CppUnit::TestFixture{
     CPPUNIT_TEST(addBoolTrueFalse);
     CPPUNIT_TEST(addBoolFalseTrue);
     CPPUNIT_TEST(addBoolFalseFalse);
+    // Addition - Character
+    CPPUNIT_TEST(addCharStrStr);
+    CPPUNIT_TEST(addCharStrChar);
+    CPPUNIT_TEST(addCharCharStr);
+    CPPUNIT_TEST(addCharCharChar);
     CPPUNIT_TEST_SUITE_END();
 public:
     ifstream in;
@@ -61,6 +66,12 @@ protected:
     void addBoolTrueFalse();
     void addBoolFalseTrue();
     void addBoolFalseFalse();
+
+    // Addition - Character
+    void addCharStrStr();
+    void addCharStrChar();
+    void addCharCharStr();
+    void addCharCharChar();
 
     void compileChecker(bool success);
 };

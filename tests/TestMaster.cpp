@@ -141,3 +141,32 @@ void TestMaster::addBoolFalseFalse() {
     compileChecker(false);
 }
 
+// Addition - Character
+
+void TestMaster::addCharStrStr() {
+    ofstream sourceFile("source.sppl");
+    sourceFile << "def main : Str | = \"string\" + \"string\"";
+    sourceFile.close();
+    compileChecker(false);
+}
+
+void TestMaster::addCharStrChar() {
+    ofstream sourceFile("source.sppl");
+    sourceFile << "def main : Str | = \"string\" + 'c'";
+    sourceFile.close();
+    compileChecker(false);
+}
+
+void TestMaster::addCharCharStr() {
+    ofstream sourceFile("source.sppl");
+    sourceFile << "def main : Char | = 'c' + \"string\"";
+    sourceFile.close();
+    compileChecker(false);
+}
+
+void TestMaster::addCharCharChar() {
+    ofstream sourceFile("source.sppl");
+    sourceFile << "def main : Char | = 'c' + 'c'";
+    sourceFile.close();
+    compileChecker(false);
+}
