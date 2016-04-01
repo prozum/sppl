@@ -81,4 +81,5 @@ protected:
     void addMixFloatInt();
 
     void compileChecker(bool success);
+    void buildSimple(std::string pattern, std::string left, std::string op, std::string right, bool status);
 };

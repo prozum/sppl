@@ -37,152 +37,103 @@ void TestMaster::compileChecker(bool success) {
     remove("target.head");
 }
 
+void TestMaster::buildSimple(std::string pattern, std::string left, std::string op, std::string right, bool status) {
+    ofstream sourceFile("source.sppl");
+    sourceFile << "def main : " << pattern << " | = " << left << " " << op << " " << right;
+    sourceFile.close();
+    compileChecker(status);
+}
+
 // Addition - Integer
 
 void TestMaster::addIntPosPos() {
-    ofstream sourceFile("source.sppl");
-    sourceFile << "def main : Int | = 2 + 2";
-    sourceFile.close();
-    compileChecker(true);
+    buildSimple("Int", "2", "+", "2", true);
 }
 
 void TestMaster::addIntZeroZero() {
-    ofstream sourceFile("source.sppl");
-    sourceFile << "def main : Int | = 0 + 0";
-    sourceFile.close();
-    compileChecker(true);
+    buildSimple("Int", "0", "+", "0", true);
 }
 
 void TestMaster::addIntPosNeg() {
-    ofstream sourceFile("source.sppl");
-    sourceFile << "def main : Int | = 2 + -2";
-    sourceFile.close();
-    compileChecker(true);
+    buildSimple("Int", "2", "+", "-2", true);
 }
 
 void TestMaster::addIntNegPos() {
-    ofstream sourceFile("source.sppl");
-    sourceFile << "def main : Int | = -2 + 2";
-    sourceFile.close();
-    compileChecker(true);
+    buildSimple("Int", "-2", "+", "2", true);
 }
 
 void TestMaster::addIntNegNeg() {
-    ofstream sourceFile("source.sppl");
-    sourceFile << "def main : Int | = -2 + -2";
-    sourceFile.close();
-    compileChecker(true);
+    buildSimple("Int", "-2", "+", "-2", true);
 }
 
 // Addition - Float
 
 void TestMaster::addFloatPosPos() {
-    ofstream sourceFile("source.sppl");
-    sourceFile << "def main : Float | = 2.0 + 2.0";
-    sourceFile.close();
-    compileChecker(true);
+    buildSimple("Float", "2.0", "+", "2.0", true);
 }
 
 void TestMaster::addFloatZeroZero() {
-    ofstream sourceFile("source.sppl");
-    sourceFile << "def main : Float | = 0.0 + 0.0";
-    sourceFile.close();
-    compileChecker(true);
+    buildSimple("Float", "0.0", "+", "0.0", true);
 }
 
 void TestMaster::addFloatPosNeg() {
-    ofstream sourceFile("source.sppl");
-    sourceFile << "def main : Float | = 2.0 + -2.0";
-    sourceFile.close();
-    compileChecker(true);
+    buildSimple("Float", "2.0", "+", "-2.0", true);
 }
 
 void TestMaster::addFloatNegPos() {
-    ofstream sourceFile("source.sppl");
-    sourceFile << "def main : Float | = -2.0 + 2.0";
-    sourceFile.close();
-    compileChecker(true);
+    buildSimple("Float", "-2.0", "+", "2.0", true);
 }
 
 void TestMaster::addFloatNegNeg() {
-    ofstream sourceFile("source.sppl");
-    sourceFile << "def main : Float | = -2.0 + -2.0";
-    sourceFile.close();
-    compileChecker(true);
+    buildSimple("Float", "-2.0", "+", "-2.0", true);
 }
 
 // Addition - Boolean
 
 void TestMaster::addBoolTrueTrue() {
-    ofstream sourceFile("source.sppl");
-    sourceFile << "def main : Bool | = True + True";
-    sourceFile.close();
-    compileChecker(false);
+    buildSimple("Bool", "True", "+", "True", false);
 }
 
 void TestMaster::addBoolTrueFalse() {
-    ofstream sourceFile("source.sppl");
-    sourceFile << "def main : Bool | = True + False";
-    sourceFile.close();
-    compileChecker(false);
+    buildSimple("Bool", "True", "+", "False", false);
 }
 
 void TestMaster::addBoolFalseTrue() {
-    ofstream sourceFile("source.sppl");
-    sourceFile << "def main : Bool | = False + True";
-    sourceFile.close();
-    compileChecker(false);
+    buildSimple("Bool", "False", "+", "True", false);
 }
 
 void TestMaster::addBoolFalseFalse() {
-    ofstream sourceFile("source.sppl");
-    sourceFile << "def main : Bool | = False + False";
-    sourceFile.close();
-    compileChecker(false);
+    buildSimple("Bool", "False", "+", "False", false);
 }
 
 // Addition - Character
 
 void TestMaster::addCharStrStr() {
-    ofstream sourceFile("source.sppl");
-    sourceFile << "def main : Str | = \"string\" + \"string\"";
-    sourceFile.close();
-    compileChecker(false);
+    buildSimple("String", "\"string\"", "+", "\"string\"", false);
 }
 
 void TestMaster::addCharStrChar() {
-    ofstream sourceFile("source.sppl");
-    sourceFile << "def main : Str | = \"string\" + 'c'";
-    sourceFile.close();
-    compileChecker(false);
+    buildSimple("String", "\"string\"", "+", "'c'", false);
+
 }
 
 void TestMaster::addCharCharStr() {
-    ofstream sourceFile("source.sppl");
-    sourceFile << "def main : Char | = 'c' + \"string\"";
-    sourceFile.close();
-    compileChecker(false);
+    buildSimple("Char", "'c'", "+", "\"string\"", false);
+
 }
 
 void TestMaster::addCharCharChar() {
-    ofstream sourceFile("source.sppl");
-    sourceFile << "def main : Char | = 'c' + 'c'";
-    sourceFile.close();
-    compileChecker(false);
+    buildSimple("Char", "'c'", "+", "'c'", false);
+
 }
 
 // Addition - Mix
 
 void TestMaster::addMixFloatInt() {
-    ofstream sourceFile("source.sppl");
-    sourceFile << "def main : Float | = 2.0 + 2";
-    sourceFile.close();
-    compileChecker(false);
+    buildSimple("Float", "2.0", "+", "2", false);
 }
 
 void TestMaster::addMixIntFloat() {
-    ofstream sourceFile("source.sppl");
-    sourceFile << "def main : Int | = 2 + 2.0";
-    sourceFile.close();
-    compileChecker(false);
+    buildSimple("Int", "2", "+", "2.0", false);
+
 }
