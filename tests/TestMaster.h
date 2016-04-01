@@ -39,6 +39,33 @@ class TestMaster : public CppUnit::TestFixture{
     // Addition - Mix
     CPPUNIT_TEST(addMixFloatInt);
     CPPUNIT_TEST(addMixIntFloat);
+
+    // Subtraction - Integer
+    CPPUNIT_TEST(subIntPosPos);
+    CPPUNIT_TEST(subIntZeroZero);
+    CPPUNIT_TEST(subIntNegPos);
+    CPPUNIT_TEST(subIntPosNeg);
+    CPPUNIT_TEST(subIntNegNeg);
+    // Subtraction - Float
+    CPPUNIT_TEST(subFloatPosPos);
+    CPPUNIT_TEST(subFloatZeroZero);
+    CPPUNIT_TEST(subFloatPosNeg);
+    CPPUNIT_TEST(subFloatNegPos);
+    CPPUNIT_TEST(subFloatNegNeg);
+    // Subtraction - Boolean
+    CPPUNIT_TEST(subBoolTrueTrue);
+    CPPUNIT_TEST(subBoolTrueFalse);
+    CPPUNIT_TEST(subBoolFalseTrue);
+    CPPUNIT_TEST(subBoolFalseFalse);
+    // Subtraction - Character
+    CPPUNIT_TEST(subCharStrStr);
+    CPPUNIT_TEST(subCharStrChar);
+    CPPUNIT_TEST(subCharCharStr);
+    CPPUNIT_TEST(subCharCharChar);
+    // Subtraction - Mix
+    CPPUNIT_TEST(subMixFloatInt);
+    CPPUNIT_TEST(subMixIntFloat);
+
     CPPUNIT_TEST_SUITE_END();
 public:
     ifstream in;
@@ -80,6 +107,36 @@ protected:
     void addMixIntFloat();
     void addMixFloatInt();
 
+    // Subtraction - Integer
+    void subIntPosPos();
+    void subIntZeroZero();
+    void subIntPosNeg();
+    void subIntNegPos();
+    void subIntNegNeg();
+
+    // Subtraction - Float
+    void subFloatPosPos();
+    void subFloatZeroZero();
+    void subFloatPosNeg();
+    void subFloatNegPos();
+    void subFloatNegNeg();
+
+    // Subtraction - Boolean
+    void subBoolTrueTrue();
+    void subBoolTrueFalse();
+    void subBoolFalseTrue();
+    void subBoolFalseFalse();
+
+    // Subtraction - Character
+    void subCharStrStr();
+    void subCharStrChar();
+    void subCharCharStr();
+    void subCharCharChar();
+
+    // Subtraction - Mix
+    void subMixIntFloat();
+    void subMixFloatInt();
+    
     void compileChecker(bool success);
     void buildSimple(std::string pattern, std::string left, std::string op, std::string right, bool status);
 };

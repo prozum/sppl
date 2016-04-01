@@ -44,6 +44,10 @@ void TestMaster::buildSimple(std::string pattern, std::string left, std::string 
     compileChecker(status);
 }
 
+/*
+ * ADDITION
+ */
+
 // Addition - Integer
 
 void TestMaster::addIntPosPos() {
@@ -135,5 +139,101 @@ void TestMaster::addMixFloatInt() {
 
 void TestMaster::addMixIntFloat() {
     buildSimple("Int", "2", "+", "2.0", false);
+}
 
+/*
+ * SUBTRACTION
+ */
+
+// Subtraction - Integer
+
+void TestMaster::subIntPosPos() {
+    buildSimple("Int", "2", "-", "2", true);
+}
+
+void TestMaster::subIntZeroZero() {
+    buildSimple("Int", "0", "-", "0", true);
+}
+
+void TestMaster::subIntPosNeg() {
+    buildSimple("Int", "2", "-", "-2", true);
+}
+
+void TestMaster::subIntNegPos() {
+    buildSimple("Int", "-2", "-", "2", true);
+}
+
+void TestMaster::subIntNegNeg() {
+    buildSimple("Int", "-2", "-", "-2", true);
+}
+
+// Subtraction - Float
+
+void TestMaster::subFloatPosPos() {
+    buildSimple("Float", "2.0", "-", "2.0", true);
+}
+
+void TestMaster::subFloatZeroZero() {
+    buildSimple("Float", "0.0", "-", "0.0", true);
+}
+
+void TestMaster::subFloatPosNeg() {
+    buildSimple("Float", "2.0", "-", "-2.0", true);
+}
+
+void TestMaster::subFloatNegPos() {
+    buildSimple("Float", "-2.0", "-", "2.0", true);
+}
+
+void TestMaster::subFloatNegNeg() {
+    buildSimple("Float", "-2.0", "-", "-2.0", true);
+}
+
+// Subtraction - Boolean
+
+void TestMaster::subBoolTrueTrue() {
+    buildSimple("Bool", "True", "-", "True", false);
+}
+
+void TestMaster::subBoolTrueFalse() {
+    buildSimple("Bool", "True", "-", "False", false);
+}
+
+void TestMaster::subBoolFalseTrue() {
+    buildSimple("Bool", "False", "-", "True", false);
+}
+
+void TestMaster::subBoolFalseFalse() {
+    buildSimple("Bool", "False", "-", "False", false);
+}
+
+// Subtraction - Character
+
+void TestMaster::subCharStrStr() {
+    buildSimple("String", "\"string\"", "-", "\"string\"", false);
+}
+
+void TestMaster::subCharStrChar() {
+    buildSimple("String", "\"string\"", "-", "'c'", false);
+
+}
+
+void TestMaster::subCharCharStr() {
+    buildSimple("Char", "'c'", "-", "\"string\"", false);
+
+}
+
+void TestMaster::subCharCharChar() {
+    buildSimple("Char", "'c'", "-", "'c'", false);
+
+}
+
+// Subtraction - Mix
+
+void TestMaster::subMixFloatInt() {
+    buildSimple("Float", "2.0", "-", "2", false);
+}
+
+void TestMaster::subMixIntFloat() {
+    buildSimple("Int", "2", "-", "2.0", false);
 }
