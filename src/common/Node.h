@@ -27,11 +27,11 @@ namespace common {
 
 	class Node {
 	public:
-		Type* node_type;
+		Type* node_type = nullptr;
 
         // for the interpreter to save the children values of a Node
         // this should probably be moved into the visitor itself later
-        Expr *val;
+        Expr *val = nullptr;
 
 		int line_no;
 
@@ -52,8 +52,8 @@ namespace common {
 
 	class BinaryOp : public Expr {
 	public:
-		Expr *left;
-		Expr *right;
+		Expr *left = nullptr;
+		Expr *right = nullptr;
 
 		BinaryOp();
 		BinaryOp(Expr *, Expr *);
@@ -64,7 +64,7 @@ namespace common {
 
 	class UnaryOp : public Expr {
 	public:
-		Expr *child;
+		Expr *child = nullptr;
 
 		UnaryOp();
 		UnaryOp(Expr *);
@@ -89,7 +89,7 @@ namespace common {
 		vector<Function*> funcs;
 
 		// for debuggin only
-		Expr *debug_expr;
+		Expr *debug_expr = nullptr;
 
 		Program();
 		Program(vector<Function*>);
@@ -103,7 +103,7 @@ namespace common {
 		string id;
 		vector<Type*> types;
         vector<Case*> cases;
-		Scope *scope;
+		Scope *scope = nullptr;
 
 		Function();
 		Function(std::string);
@@ -117,7 +117,7 @@ namespace common {
 
 	class Case : public Node {
 	public:
-		Expr *expr;
+		Expr *expr = nullptr;
 		vector<Pattern *> patterns;
 
         // used by the profiler to determine growth for case
@@ -382,8 +382,8 @@ namespace common {
 
 	class ListSplit : public Pattern {
 	public:
-		Pattern *left;
-		Pattern *right;
+		Pattern *left = nullptr;
+		Pattern *right = nullptr;
 
 		ListSplit();
 		ListSplit(Pattern *, Pattern *);
@@ -419,7 +419,7 @@ namespace common {
 	class Id : public Pattern {
 	public:
 		string id;
-		Scope *scope;
+		Scope *scope = nullptr;
 
 		Id();
 		Id(std::string);
@@ -430,7 +430,7 @@ namespace common {
 
 	class Call : public Expr {
 	public:
-		Expr *callee;
+		Expr *callee = nullptr;
 		vector<Expr*> exprs;
 
         //indicates if the call should be parallelized
