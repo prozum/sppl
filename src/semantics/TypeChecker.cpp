@@ -5,13 +5,14 @@
 #include "TypeChecker.h"
 #include <unordered_map>
 #include <iostream>
+#include <sstream>
 #include "Scope.h"
 
 using namespace std;
 
 namespace semantics
 {
-    TypeChecker::TypeChecker() : is_valid(true), printer(cerr), error(false) { }
+    TypeChecker::TypeChecker() : is_valid(true) { }
 
     void TypeChecker::visit(Program &node) {
         /* Visit all children */
@@ -29,9 +30,11 @@ namespace semantics
             type->accept(*this);
         }
         for (auto cse : node.cases) {
-            cse->accept(*this);
-            // return to here, when error happens
-            error = false;
+            try {
+                cse->accept(*this);
+            } catch (string s) {
+                cerr << s << endl;
+            }
         }
         /* Visit stops here */
     }
@@ -42,9 +45,6 @@ namespace semantics
             pattern->accept(*this);
         }
         node.expr->accept(*this);
-
-        if (error)
-            return;
         /* Visit stops here */
 
         /* code starts here*/
@@ -56,31 +56,30 @@ namespace semantics
 
                 if (!equal(node.patterns[i]->node_type, current_func->types[i])) {
                     is_valid = false;
-                    error = true;
-                    cerr << "error - line " << node.patterns[i]->line_no << ": expected ";
+                    stringstream error;
+                    Printer printer(error);
+                    error << "error - line " << node.patterns[i]->line_no << ": expected ";
                     current_func->types[i]->accept(printer);
-                    cerr << " but was ";
+                    error << " but was ";
                     node.patterns[i]->node_type->accept(printer);
-                    cerr << "." << endl;
+                    error << "." << endl;
                     node.patterns[i]->accept(printer);
-                    cerr << endl;
-                    return;
-                    // TODO Exit pattern
+                    throw error.str();
                 }
             }
         } else {
             is_valid = false;
-            error = true;
-            cerr << "error - line " << node.line_no << ": expected " << current_func->types.size() - 1;
-            cerr << " patterns, but only " << node.patterns.size() << " was specified." << endl;
-            cerr << "| ";
+            stringstream error;
+            Printer printer(error);
+            error << "error - line " << node.line_no << ": expected " << current_func->types.size() - 1;
+            error << " patterns, but only " << node.patterns.size() << " was specified." << endl;
+            error << "| ";
             for (auto pattern : node.patterns) {
                 pattern->accept(printer);
-                cerr << " ";
+                error << " ";
             }
-            cerr << "=" << endl;
-            return;
-            // TODO Exit case
+            error << "=" << endl;
+            throw error.str();
         }
     }
 
@@ -93,9 +92,6 @@ namespace semantics
         /* Visit children */
         node.left->accept(*this);
         node.right->accept(*this);
-
-        if (error)
-            return;
         /* Visit stops here */
 
         /* Code goes here */
@@ -103,17 +99,16 @@ namespace semantics
             node.node_type = node.left->node_type;
         } else {
             is_valid = false;
-            error = true;
-            cerr << "error - line " << node.line_no << ": \"&&\" operator can only operate on Bool typed children.";
-            cerr << " Left type: ";
+            stringstream error;
+            Printer printer(error);
+            error << "error - line " << node.line_no << ": \"&&\" operator can only operate on Bool typed children.";
+            error << " Left type: ";
             node.left->node_type->accept(printer);
-            cerr << ". Right type: ";
+            error << ". Right type: ";
             node.right->node_type->accept(printer);
-            cerr << endl;
+            error << endl;
             node.accept(printer);
-            cerr << endl;
-            return;
-            // TODO Exit case
+            throw error.str();
         }
 
         /* Code stops here */
@@ -128,9 +123,6 @@ namespace semantics
         /* Visit children */
         node.left->accept(*this);
         node.right->accept(*this);
-
-        if (error)
-            return;
         /* Visit stops here */
 
         /* Code goes here */
@@ -138,17 +130,16 @@ namespace semantics
             node.node_type = node.left->node_type;
         } else {
             is_valid = false;
-            error = true;
-            cerr << "error - line " << node.line_no << ": \"&&\" operator can only operate on Bool typed children.";
-            cerr << " Left type: ";
+            stringstream error;
+            Printer printer(error);
+            error << "error - line " << node.line_no << ": \"&&\" operator can only operate on Bool typed children.";
+            error << " Left type: ";
             node.left->node_type->accept(printer);
-            cerr << ". Right type: ";
+            error << ". Right type: ";
             node.right->node_type->accept(printer);
-            cerr << endl;
+            error << endl;
             node.accept(printer);
-            cerr << endl;
-            return;
-            // TODO Exit case
+            throw error.str();
         }
 
         /* Code stops here */
@@ -163,9 +154,6 @@ namespace semantics
         /* Visit children */
         node.left->accept(*this);
         node.right->accept(*this);
-
-        if (error)
-            return;
         /* Visit stops here */
 
         /* Code goes here */
@@ -174,17 +162,16 @@ namespace semantics
             garbage.push_back(node.node_type);
         } else {
             is_valid = false;
-            error = true;
-            cerr << "error - line " << node.line_no << ": \"==\" operator can only operate on children of the same type.";
-            cerr << " Left type: ";
+            stringstream error;
+            Printer printer(error);
+            error << "error - line " << node.line_no << ": \"==\" operator can only operate on children of the same type.";
+            error << " Left type: ";
             node.left->node_type->accept(printer);
-            cerr << ". Right type: ";
+            error << ". Right type: ";
             node.right->node_type->accept(printer);
-            cerr << endl;
+            error << endl;
             node.accept(printer);
-            cerr << endl;
-            return;
-            // TODO Exit case
+            throw error.str();
         }
         /* Code stops here */
     }
@@ -198,9 +185,6 @@ namespace semantics
         /* Visit children */
         node.left->accept(*this);
         node.right->accept(*this);
-
-        if (error)
-            return;
         /* Visit stops here */
 
         /* Code goes here */
@@ -209,17 +193,17 @@ namespace semantics
             garbage.push_back(node.node_type);
         } else {
             is_valid = false;
-            error = true;
-            cerr << "error - line " << node.line_no << ": \"!=\" operator can only operate on children of the same type.";
-            cerr << " Left type: ";
+            stringstream error;
+            Printer printer(error);
+            error << "error - line " << node.line_no << ": \"!=\" operator can only operate on children of the same type.";
+            error << " Left type: ";
             node.left->node_type->accept(printer);
-            cerr << ". Right type: ";
+            error << ". Right type: ";
             node.right->node_type->accept(printer);
-            cerr << endl;
+            error << endl;
             node.accept(printer);
-            cerr << endl;
-            return;
-            // TODO Exit case
+            error << endl;
+            throw error.str();
         }
 
         /* Code stops here */
@@ -234,9 +218,6 @@ namespace semantics
         /* Visit children */
         node.left->accept(*this);
         node.right->accept(*this);
-
-        if (error)
-            return;
         /* Visit stops here */
 
         /* Code goes here */
@@ -246,17 +227,16 @@ namespace semantics
             garbage.push_back(node.node_type);
         } else {
             is_valid = false;
-            error = true;
-            cerr << "error - line " << node.line_no << ": \"<\" operator can only operate on Int children or Float children.";
-            cerr << " Left type: ";
+            stringstream error;
+            Printer printer(error);
+            error << "error - line " << node.line_no << ": \"<\" operator can only operate on Int children or Float children.";
+            error << " Left type: ";
             node.left->node_type->accept(printer);
-            cerr << ". Right type: ";
+            error << ". Right type: ";
             node.right->node_type->accept(printer);
-            cerr << endl;
+            error << endl;
             node.accept(printer);
-            cerr << endl;
-            return;
-            // TODO Exit case
+            throw error.str();
         }
 
         /* Code stops here */
@@ -271,9 +251,6 @@ namespace semantics
         /* Visit children */
         node.left->accept(*this);
         node.right->accept(*this);
-
-        if (error)
-            return;
         /* Visit stops here */
 
         /* Code goes here */
@@ -283,17 +260,17 @@ namespace semantics
             garbage.push_back(node.node_type);
         } else {
             is_valid = false;
-            error = true;
-            cerr << "error - line " << node.line_no << ": \">\" operator can only operate on Int children or Float children.";
-            cerr << " Left type: ";
+            stringstream error;
+            Printer printer(error);
+            error << "error - line " << node.line_no << ": \">\" operator can only operate on Int children or Float children.";
+            error << " Left type: ";
             node.left->node_type->accept(printer);
-            cerr << ". Right type: ";
+            error << ". Right type: ";
             node.right->node_type->accept(printer);
-            cerr << endl;
+            error << endl;
             node.accept(printer);
-            cerr << endl;
-            return;
-            // TODO Exit case
+            error << endl;
+            throw error.str();
         }
         /* Code stops here */
     }
@@ -307,9 +284,6 @@ namespace semantics
         /* Visit children */
         node.left->accept(*this);
         node.right->accept(*this);
-
-        if (error)
-            return;
         /* Visit stops here */
 
         /* Code goes here */
@@ -319,17 +293,16 @@ namespace semantics
             garbage.push_back(node.node_type);
         } else {
             is_valid = false;
-            error = true;
-            cerr << "error - line " << node.line_no << ": \"<=\" operator can only operate on Int children or Float children.";
-            cerr << " Left type: ";
+            stringstream error;
+            Printer printer(error);
+            error << "error - line " << node.line_no << ": \"<=\" operator can only operate on Int children or Float children.";
+            error << " Left type: ";
             node.left->node_type->accept(printer);
-            cerr << ". Right type: ";
+            error << ". Right type: ";
             node.right->node_type->accept(printer);
-            cerr << endl;
+            error << endl;
             node.accept(printer);
-            cerr << endl;
-            return;
-            // TODO Exit case
+            throw error.str();
         }
 
         /* Code stops here */
@@ -344,9 +317,6 @@ namespace semantics
         /* Visit children */
         node.left->accept(*this);
         node.right->accept(*this);
-
-        if (error)
-            return;
         /* Visit stops here */
 
         /* Code goes here */
@@ -356,17 +326,16 @@ namespace semantics
             garbage.push_back(node.node_type);
         } else {
             is_valid = false;
-            error = true;
-            cerr << "error - line " << node.line_no << ": \">=\" operator can only operate on Int children or Float children.";
-            cerr << " Left type: ";
+            stringstream error;
+            Printer printer(error);
+            error << "error - line " << node.line_no << ": \">=\" operator can only operate on Int children or Float children.";
+            error << " Left type: ";
             node.left->node_type->accept(printer);
-            cerr << ". Right type: ";
+            error << ". Right type: ";
             node.right->node_type->accept(printer);
-            cerr << endl;
+            error << endl;
             node.accept(printer);
-            cerr << endl;
-            return;
-            // TODO Exit case
+            throw error.str();
         }
 
         /* Code stops here */
@@ -381,9 +350,6 @@ namespace semantics
         /* Visit children */
         node.left->accept(*this);
         node.right->accept(*this);
-
-        if (error)
-            return;
         /* Visit stops here */
 
         /* Code goes here */
@@ -392,17 +358,16 @@ namespace semantics
             node.node_type = node.left->node_type;
         } else {
             is_valid = false;
-            error = true;
-            cerr << "error - line " << node.line_no << ": \"+\" operator can only operate on Int children or Float children.";
-            cerr << " Left type: ";
+            stringstream error;
+            Printer printer(error);
+            error << "error - line " << node.line_no << ": \"+\" operator can only operate on Int children or Float children.";
+            error << " Left type: ";
             node.left->node_type->accept(printer);
-            cerr << ". Right type: ";
+            error << ". Right type: ";
             node.right->node_type->accept(printer);
-            cerr << endl;
+            error << endl;
             node.accept(printer);
-            cerr << endl;
-            return;
-            // TODO Exit case
+            throw error.str();
         }
 
         /* Code stops here */
@@ -417,9 +382,6 @@ namespace semantics
         /* Visit children */
         node.left->accept(*this);
         node.right->accept(*this);
-
-        if (error)
-            return;
         /* Visit stops here */
 
         /* Code goes here */
@@ -428,17 +390,16 @@ namespace semantics
             node.node_type = node.left->node_type;
         } else {
             is_valid = false;
-            error = true;
-            cerr << "error - line " << node.line_no << ": \"-\" operator can only operate on Int children or Float children.";
-            cerr << " Left type: ";
+            stringstream error;
+            Printer printer(error);
+            error << "error - line " << node.line_no << ": \"-\" operator can only operate on Int children or Float children.";
+            error << " Left type: ";
             node.left->node_type->accept(printer);
-            cerr << ". Right type: ";
+            error << ". Right type: ";
             node.right->node_type->accept(printer);
-            cerr << endl;
+            error << endl;
             node.accept(printer);
-            cerr << endl;
-            return;
-            // TODO Exit case
+            throw error.str();
         }
 
         /* Code stops here */
@@ -453,9 +414,6 @@ namespace semantics
         /* Visit children */
         node.left->accept(*this);
         node.right->accept(*this);
-
-        if (error)
-            return;
         /* Visit stops here */
 
         /* Code goes here */
@@ -464,17 +422,16 @@ namespace semantics
             node.node_type = node.left->node_type;
         } else {
             is_valid = false;
-            error = true;
-            cerr << "error - line " << node.line_no << ": \"*\" operator can only operate on Int children or Float children.";
-            cerr << " Left type: ";
+            stringstream error;
+            Printer printer(error);
+            error << "error - line " << node.line_no << ": \"*\" operator can only operate on Int children or Float children.";
+            error << " Left type: ";
             node.left->node_type->accept(printer);
-            cerr << ". Right type: ";
+            error << ". Right type: ";
             node.right->node_type->accept(printer);
-            cerr << endl;
+            error << endl;
             node.accept(printer);
-            cerr << endl;
-            return;
-            // TODO Exit case
+            throw error.str();
         }
 
         /* Code stops here */
@@ -489,9 +446,6 @@ namespace semantics
         /* Visit children */
         node.left->accept(*this);
         node.right->accept(*this);
-
-        if (error)
-            return;
         /* Visit stops here */
 
         /* Code goes here */
@@ -500,17 +454,16 @@ namespace semantics
             node.node_type = node.left->node_type;
         } else {
             is_valid = false;
-            error = true;
-            cerr << "error - line " << node.line_no << ": \"/\" operator can only operate on Int children or Float children.";
-            cerr << " Left type: ";
+            stringstream error;
+            Printer printer(error);
+            error << "error - line " << node.line_no << ": \"/\" operator can only operate on Int children or Float children.";
+            error << " Left type: ";
             node.left->node_type->accept(printer);
-            cerr << ". Right type: ";
+            error << ". Right type: ";
             node.right->node_type->accept(printer);
-            cerr << endl;
+            error << endl;
             node.accept(printer);
-            cerr << endl;
-            return;
-            // TODO Exit case
+            throw error.str();
         }
 
         /* Code stops here */
@@ -525,9 +478,6 @@ namespace semantics
         /* Visit children */
         node.left->accept(*this);
         node.right->accept(*this);
-
-        if (error)
-            return;
         /* Visit stops here */
 
         /* Code goes here */
@@ -536,17 +486,16 @@ namespace semantics
             node.node_type = node.left->node_type;
         } else {
             is_valid = false;
-            error = true;
-            cerr << "error - line " << node.line_no << ": \"%\" operator can only operate on Int children or Float children.";
-            cerr << " Left type: ";
+            stringstream error;
+            Printer printer(error);
+            error << "error - line " << node.line_no << ": \"%\" operator can only operate on Int children or Float children.";
+            error << " Left type: ";
             node.left->node_type->accept(printer);
-            cerr << ". Right type: ";
+            error << ". Right type: ";
             node.right->node_type->accept(printer);
-            cerr << endl;
+            error << endl;
             node.accept(printer);
-            cerr << endl;
-            return;
-            // TODO Exit case
+            throw error.str();
         }
 
         /* Code stops here */
@@ -561,9 +510,6 @@ namespace semantics
         /* Visit children */
         node.left->accept(*this);
         node.right->accept(*this);
-
-        if (error)
-            return;
         /* Visit stops here */
 
         /* Code goes here */
@@ -572,34 +518,32 @@ namespace semantics
                 node.node_type = node.right->node_type;
             } else {
                 is_valid = false;
-                error = true;
-                cerr << "error - line " << node.line_no << ": Left side of \":\" must be of the same type as the right sides items.";
-                cerr << " Left type: ";
+                stringstream error;
+                Printer printer(error);
+                error << "error - line " << node.line_no << ": Left side of \":\" must be of the same type as the right sides items.";
+                error << " Left type: ";
                 node.left->node_type->accept(printer);
-                cerr << ". Right type: ";
+                error << ". Right type: ";
                 node.right->node_type->accept(printer);
-                cerr << endl;
+                error << endl;
                 node.accept(printer);
-                cerr << endl;
-                return;
-                // TODO Exit case
+                throw error.str();
             }
         } else if (node.right->node_type->type == Types::STRING) {
             if (node.left->node_type->type == Types::CHAR) {
                 node.node_type = node.right->node_type;
             } else {
                 is_valid = false;
-                error = true;
-                cerr << "error - line " << node.line_no << ": Left side of \":\" must be type Char, when right side is String.";
-                cerr << " Left type: ";
+                stringstream error;
+                Printer printer(error);
+                error << "error - line " << node.line_no << ": Left side of \":\" must be type Char, when right side is String.";
+                error << " Left type: ";
                 node.left->node_type->accept(printer);
-                cerr << ". Right type: ";
+                error << ". Right type: ";
                 node.right->node_type->accept(printer);
-                cerr << endl;
+                error << endl;
                 node.accept(printer);
-                cerr << endl;
-                return;
-                // TODO Exit case
+                throw error.str();
             }
         }  else if (node.right->node_type->type == Types::EMPTYLIST) {
             node.node_type = new Type(Types::LIST);
@@ -608,15 +552,14 @@ namespace semantics
             garbage.push_back(node.node_type);
         } else {
             is_valid = false;
-            error = true;
-            cerr << "error - line " << node.line_no << ": \":\" operators right side must be a list.";
-            cerr << " Right type: ";
+            stringstream error;
+            Printer printer(error);
+            error << "error - line " << node.line_no << ": \":\" operators right side must be a list.";
+            error << " Right type: ";
             node.right->node_type->accept(printer);
-            cerr << endl;
+            error << endl;
             node.accept(printer);
-            cerr << endl;
-            return;
-            // TODO Exit case
+            throw error.str();
         }
 
         /* Code stops here */
@@ -630,9 +573,6 @@ namespace semantics
 
         /* Visit children */
         node.child->accept(*this);
-
-        if (error)
-            return;
         /* Visit stops here */
 
         /* Code goes here */
@@ -648,9 +588,6 @@ namespace semantics
 
         /* Visit children */
         node.child->accept(*this);
-
-        if (error)
-            return;
         /* Visit stops here */
 
         /* Code goes here */
@@ -658,15 +595,14 @@ namespace semantics
             node.node_type = node.child->node_type;
         } else {
             is_valid = false;
-            error = true;
-            cerr << "error - line " << node.line_no << ": \"!\" operator can only operate on a Bool typed child.";
-            cerr << " Child type: ";
+            stringstream error;
+            Printer printer(error);
+            error << "error - line " << node.line_no << ": \"!\" operator can only operate on a Bool typed child.";
+            error << " Child type: ";
             node.child->node_type->accept(printer);
-            cerr << endl;
+            error << endl;
             node.accept(printer);
-            cerr << endl;
-            return;
-            // TODO Exit case
+            throw error.str();
         }
         /* Code stops here */
     }
@@ -722,9 +658,6 @@ namespace semantics
         for (auto pattern : node.patterns) {
             pattern->accept(*this);
         }
-
-        if (error)
-            return;
         /* Visit stops here */
 
         /* Code goes here */
@@ -735,17 +668,16 @@ namespace semantics
             for (size_t i = 0; i < node.patterns.size() - 1; ++i) {
                 if (!equal(node.patterns[i]->node_type, node.patterns[i + 1]->node_type)) {
                     is_valid = false;
-                    error = true;
-                    cerr << "error - line " << node.line_no << ": All items in a list must be of the same type.";
-                    cerr << " List type: ";
+                    stringstream error;
+                    Printer printer(error);
+                    error << "error - line " << node.line_no << ": All items in a list must be of the same type.";
+                    error << " List type: ";
                     node.patterns[i]->node_type->accept(printer);
-                    cerr << ". Child type: ";
+                    error << ". Child type: ";
                     node.patterns[i + 1]->node_type->accept(printer);
-                    cerr << endl;
+                    error << endl;
                     node.accept(printer);
-                    cerr << endl;
-                    return;
-                    // TODO Exit case
+                    throw error.str();
                 }
             }
 
@@ -766,9 +698,6 @@ namespace semantics
         for (auto pattern : node.patterns) {
             pattern->accept(*this);
         }
-
-        if (error)
-            return;
         /* Visit stops here */
 
         /* Code goes here */
@@ -790,9 +719,6 @@ namespace semantics
         /* Visit children */
         node.left->accept(*this);
         node.right->accept(*this);
-
-        if (error)
-            return;
         /* Visit stops here */
 
         /* Code goes here */
@@ -801,34 +727,32 @@ namespace semantics
                 node.node_type = node.right->node_type;
             } else {
                 is_valid = false;
-                error = true;
-                cerr << "error - line " << node.line_no << ": Left side of \":\" must be of the same type as the right sides items.";
-                cerr << " Left type: ";
+                stringstream error;
+                Printer printer(error);
+                error << "error - line " << node.line_no << ": Left side of \":\" must be of the same type as the right sides items.";
+                error << " Left type: ";
                 node.left->node_type->accept(printer);
-                cerr << ". Right type: ";
+                error << ". Right type: ";
                 node.right->node_type->accept(printer);
-                cerr << endl;
+                error << endl;
                 node.accept(printer);
-                cerr << endl;
-                return;
-                // TODO Exit case
+                throw error.str();
             }
         } else if (node.right->node_type->type == Types::STRING) {
             if (node.left->node_type->type == Types::CHAR) {
                 node.node_type = node.right->node_type;
             } else {
                 is_valid = false;
-                error = true;
-                cerr << "error - line " << node.line_no << ": Left side of \":\" must be type Char, when right side is String.";
-                cerr << " Left type: ";
+                stringstream error;
+                Printer printer(error);
+                error << "error - line " << node.line_no << ": Left side of \":\" must be type Char, when right side is String.";
+                error << " Left type: ";
                 node.left->node_type->accept(printer);
-                cerr << ". Right type: ";
+                error << ". Right type: ";
                 node.right->node_type->accept(printer);
-                cerr << endl;
+                error << endl;
                 node.accept(printer);
-                cerr << endl;
-                return;
-                // TODO Exit case
+                throw error.str();
             }
         } else if (node.right->node_type->type == Types::EMPTYLIST) {
             node.node_type = new Type(Types::LIST);
@@ -836,15 +760,14 @@ namespace semantics
             garbage.push_back(node.node_type);
         } else {
             is_valid = false;
-            error = true;
-            cerr << "error - line " << node.line_no << ": \":\" operators right side must be a list.";
-            cerr << " Right type: ";
+            stringstream error;
+            Printer printer(error);
+            error << "error - line " << node.line_no << ": \":\" operators right side must be a list.";
+            error << " Right type: ";
             node.right->node_type->accept(printer);
-            cerr << endl;
+            error << endl;
             node.accept(printer);
-            cerr << endl;
-            return;
-            // TODO Exit case
+            throw error.str();
         }
         /* Code stops here */
     }
@@ -859,9 +782,6 @@ namespace semantics
         for (auto expr : node.exprs) {
             expr->accept(*this);
         }
-
-        if (error)
-            return;
         /* Visit stops here */
 
         /* Code goes here */
@@ -872,17 +792,16 @@ namespace semantics
             for (size_t i = 0; i < node.exprs.size() - 1; ++i) {
                 if (!equal(node.exprs[i]->node_type, node.exprs[i + 1]->node_type)) {
                     is_valid = false;
-                    error = true;
-                    cerr << "error - line " << node.line_no << ": All items in a list must be of the same type.";
-                    cerr << " List type: ";
+                    stringstream error;
+                    Printer printer(error);
+                    error << "error - line " << node.line_no << ": All items in a list must be of the same type.";
+                    error << " List type: ";
                     node.exprs[i]->node_type->accept(printer);
-                    cerr << ". Child type: ";
+                    error << ". Child type: ";
                     node.exprs[i + 1]->node_type->accept(printer);
-                    cerr << endl;
+                    error << endl;
                     node.accept(printer);
-                    cerr << endl;
-                    return;
-                    // TODO Exit case
+                    throw error.str();
                 }
             }
             node.node_type = new Type(Types::LIST);
@@ -903,9 +822,6 @@ namespace semantics
         for (auto expr : node.exprs) {
             expr->accept(*this);
         }
-
-        if (error)
-            return;
         /* Visit stops here */
 
         /* Code goes here */
@@ -925,13 +841,12 @@ namespace semantics
             node.node_type = node.scope->get_type(node.id);
         } else {
             is_valid = false;
-            error = true;
-            cerr << "error - line " << node.line_no << ": Id does not exist in the current scope.";
-            cerr << endl;
+            stringstream error;
+            Printer printer(error);
+            error << "error - line " << node.line_no << ": Id does not exist in the current scope.";
+            error << endl;
             node.accept(printer);
-            cerr << endl;
-            return;
-            // TODO Exit case
+            throw error.str();
         }
 
         /* Code stops here */
@@ -948,9 +863,6 @@ namespace semantics
         for (auto expr : node.exprs) {
             expr->accept(*this);
         }
-
-        if (error)
-            return;
         /* Visit stops here */
 
         /* Code goes here */
@@ -959,42 +871,39 @@ namespace semantics
                 for (size_t i = 0; i < node.exprs.size(); ++i) {
                     if (!equal(node.exprs[i]->node_type, node.callee->node_type->types[i])) {
                         is_valid = false;
-                        error = true;
-                        cerr << "error - line " << node.line_no << ": Function was called with an invalid argument.";
-                        cerr << " Expected type: ";
+                        stringstream error;
+                        Printer printer(error);
+                        error << "error - line " << node.line_no << ": Function was called with an invalid argument.";
+                        error << " Expected type: ";
                         node.callee->node_type->types[i]->accept(printer);
-                        cerr << ". Argument type: ";
+                        error << ". Argument type: ";
                         node.exprs[i]->node_type->accept(printer);
-                        cerr << endl;
+                        error << endl;
                         node.accept(printer);
-                        cerr << endl;
-                        return;
-                        // TODO Exit case
+                        throw error.str();
                     }
                 }
             } else {
                 is_valid = false;
-                error = true;
-                cerr << "error - line " << node.line_no << ": Wrong number of arguments. Expected ";
-                cerr << node.callee->node_type->types.size() - 1 << " arguments but was called with";
-                cerr << node.exprs.size() << "." << endl;
+                stringstream error;
+                Printer printer(error);
+                error << "error - line " << node.line_no << ": Wrong number of arguments. Expected ";
+                error << node.callee->node_type->types.size() - 1 << " arguments but was called with";
+                error << node.exprs.size() << "." << endl;
                 node.accept(printer);
-                cerr << endl;
-                return;
-                // TODO Exit case
+                throw error.str();
             }
             node.node_type = node.callee->node_type->types.back();
         } else {
             is_valid = false;
-            error = true;
-            cerr << "error - line " << node.line_no << ": Can't call a type that is not a Signature.";
-            cerr << " Callee type: ";
+            stringstream error;
+            Printer printer(error);
+            error << "error - line " << node.line_no << ": Can't call a type that is not a Signature.";
+            error << " Callee type: ";
             node.callee->node_type->accept(printer);
-            cerr << endl;
+            error << endl;
             node.accept(printer);
-            cerr << endl;
-            return;
-            // TODO Exit case
+            throw error.str();
         }
 
         /* Code stops here */
@@ -1010,9 +919,6 @@ namespace semantics
         for (auto type : node.types) {
             type->accept(*this);
         }
-
-        if (error)
-            return;
         /* Visit stops here */
 
         /* Code goes here */

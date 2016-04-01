@@ -82,8 +82,6 @@ namespace semantics {
         virtual void visit(Type &node);
 
     private:
-        Printer printer;
-        bool error;
         Function *current_func;
         vector<void *> garbage;
 

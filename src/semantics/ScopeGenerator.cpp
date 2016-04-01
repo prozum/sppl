@@ -1,10 +1,11 @@
 
 #include "Scope.h"
 #include <iostream>
+#include <sstream>
 #include "ScopeGenerator.h"
 
 namespace semantics {
-    ScopeGenerator::ScopeGenerator() : is_valid(true), printer(cerr), error(false) {
+    ScopeGenerator::ScopeGenerator() : is_valid(true) {
 
     }
 
@@ -20,7 +21,11 @@ namespace semantics {
 
         /* Visit all children */
         for (auto func : node.funcs) {
-            func->accept(*this);
+            try {
+                func->accept(*this);
+            } catch (string s) {
+                cerr << s << endl;
+            }
         }
         /* Visit stops here */
     }
@@ -39,16 +44,20 @@ namespace semantics {
                 type->accept(*this);
             }
             for (auto cse : node.cases) {
-                cse->accept(*this);
-                error = false;
+                try {
+                    cse->accept(*this);
+                } catch (string s) {
+                    cerr << s << endl;
+                }
             }
             /* Visit stops here */
         } else {
             is_valid = false;
-            cerr << "error - line " << node.line_no << ": " << node.id << " has already been declared.";
+            stringstream error;
+            Printer printer(error);
+            error << "error - line " << node.line_no << ": " << node.id << " has already been declared.";
             node.accept(printer);
-            cerr << endl;
-            return;
+            throw error.str();
         }
     }
 
@@ -73,12 +82,13 @@ namespace semantics {
             node.expr->accept(*this);
         } else {
             is_valid = false;
-            cerr << "error - line " << node.line_no << ": Case didn't have the correct number of patterns.";
-            cerr << " Expected patterns: " << current_func->types.size() - 1 << ".";
-            cerr << " Actual patterns: " << node.patterns.size() << "." << endl;
+            stringstream error;
+            Printer printer(error);
+            error << "error - line " << node.line_no << ": Case didn't have the correct number of patterns.";
+            error << " Expected patterns: " << current_func->types.size() - 1 << ".";
+            error << " Actual patterns: " << node.patterns.size() << "." << endl;
             node.accept(printer);
-            cerr << endl;
-            return;
+            throw error.str();
         }
 
         current_scope = current_scope->parent;
@@ -88,9 +98,6 @@ namespace semantics {
         /* Visit children */
         node.left->accept(*this);
         node.right->accept(*this);
-
-        if (error)
-            return;
         /* Visit stops here */
     }
 
@@ -98,9 +105,6 @@ namespace semantics {
         /* Visit children */
         node.left->accept(*this);
         node.right->accept(*this);
-
-        if (error)
-            return;
         /* Visit stops here */
     }
 
@@ -108,9 +112,6 @@ namespace semantics {
         /* Visit children */
         node.left->accept(*this);
         node.right->accept(*this);
-
-        if (error)
-            return;
         /* Visit stops here */
     }
 
@@ -118,9 +119,6 @@ namespace semantics {
         /* Visit children */
         node.left->accept(*this);
         node.right->accept(*this);
-
-        if (error)
-            return;
         /* Visit stops here */
     }
 
@@ -128,9 +126,6 @@ namespace semantics {
         /* Visit children */
         node.left->accept(*this);
         node.right->accept(*this);
-
-        if (error)
-            return;
         /* Visit stops here */
     }
 
@@ -138,9 +133,6 @@ namespace semantics {
         /* Visit children */
         node.left->accept(*this);
         node.right->accept(*this);
-
-        if (error)
-            return;
         /* Visit stops here */
     }
 
@@ -148,9 +140,6 @@ namespace semantics {
         /* Visit children */
         node.left->accept(*this);
         node.right->accept(*this);
-
-        if (error)
-            return;
         /* Visit stops here */
     }
 
@@ -158,9 +147,6 @@ namespace semantics {
         /* Visit children */
         node.left->accept(*this);
         node.right->accept(*this);
-
-        if (error)
-            return;
         /* Visit stops here */
     }
 
@@ -168,9 +154,6 @@ namespace semantics {
         /* Visit children */
         node.left->accept(*this);
         node.right->accept(*this);
-
-        if (error)
-            return;
         /* Visit stops here */
     }
 
@@ -178,9 +161,6 @@ namespace semantics {
         /* Visit children */
         node.left->accept(*this);
         node.right->accept(*this);
-
-        if (error)
-            return;
         /* Visit stops here */
     }
 
@@ -188,9 +168,6 @@ namespace semantics {
         /* Visit children */
         node.left->accept(*this);
         node.right->accept(*this);
-
-        if (error)
-            return;
         /* Visit stops here */
     }
 
@@ -198,9 +175,6 @@ namespace semantics {
         /* Visit children */
         node.left->accept(*this);
         node.right->accept(*this);
-
-        if (error)
-            return;
         /* Visit stops here */
     }
 
@@ -208,9 +182,6 @@ namespace semantics {
         /* Visit children */
         node.left->accept(*this);
         node.right->accept(*this);
-
-        if (error)
-            return;
         /* Visit stops here */
     }
 
@@ -218,27 +189,18 @@ namespace semantics {
         /* Visit children */
         node.left->accept(*this);
         node.right->accept(*this);
-
-        if (error)
-            return;
         /* Visit stops here */
     }
 
     void ScopeGenerator::visit(Par &node) {
         /* Visit children */
         node.child->accept(*this);
-
-        if (error)
-            return;
         /* Visit stops here */
     }
 
     void ScopeGenerator::visit(Not &node) {
         /* Visit children */
         node.child->accept(*this);
-
-        if (error)
-            return;
         /* Visit stops here */
     }
 
@@ -269,23 +231,20 @@ namespace semantics {
             /* Visit children */
             for (auto pattern : node.patterns) {
                 pattern->accept(*this);
-
-                if (error)
-                    return;
             }
             /* Visit stops here */
 
             type_stack.pop();
         } else {
             is_valid = false;
-            error = true;
-            cerr << "error - line " << node.line_no << ": Pattern is not consistent with the function signature.";
-            cerr << " Expected: ";
+            stringstream error;
+            Printer printer(error);
+            error << "error - line " << node.line_no << ": Pattern is not consistent with the function signature.";
+            error << " Expected: ";
             type_stack.top()->accept(printer);
-            cerr << ", not a List pattern." << endl;
+            error << ", not a List pattern." << endl;
             node.accept(printer);
-            cerr << endl;
-            return;
+            throw error.str();
         }
 
     }
@@ -298,30 +257,27 @@ namespace semantics {
                     type_stack.push(type_stack.top()->types[i]);
                     node.patterns[i]->accept(*this);
                     type_stack.pop();
-
-                    if (error)
-                        return;
                 }
             } else {
                 is_valid = false;
-                error = true;
-                cerr << "error - line " << node.line_no << ": Tuple pattern did not specify the correct number of items.";
-                cerr << " Expected size: " << type_stack.top()->types.size();
-                cerr << " Actual size: " << node.patterns.size() << endl;
+                stringstream error;
+                Printer printer(error);
+                error << "error - line " << node.line_no << ": Tuple pattern did not specify the correct number of items.";
+                error << " Expected size: " << type_stack.top()->types.size();
+                error << " Actual size: " << node.patterns.size() << endl;
                 node.accept(printer);
-                cerr << endl;
-                return;
+                throw error.str();
             }
         } else {
             is_valid = false;
-            error = true;
-            cerr << "error - line " << node.line_no << ": Pattern is not consistent with the function signature.";
-            cerr << " Expected: ";
+            stringstream error;
+            Printer printer(error);
+            error << "error - line " << node.line_no << ": Pattern is not consistent with the function signature.";
+            error << " Expected: ";
             type_stack.top()->accept(printer);
-            cerr << ", not a Tuple pattern." << endl;
+            error << ", not a Tuple pattern." << endl;
             node.accept(printer);
-            cerr << endl;
-            return;
+            throw error.str();
         }
     }
 
@@ -333,9 +289,6 @@ namespace semantics {
             node.left->accept(*this);
             type_stack.pop();
             node.right->accept(*this);
-
-            if (error)
-                return;
             /* Visit stops here */
         } else if (type_stack.top()->type == Types::STRING){
             auto _char = new Type(Types::CHAR);
@@ -346,19 +299,16 @@ namespace semantics {
             node.left->accept(*this);
             type_stack.pop();
             node.right->accept(*this);
-
-            if (error)
-                return;
             /* Visit stops here */
         } else {
             is_valid = false;
-            error = true;
-            cerr << "error - line " << node.line_no << ": Can't split type ";
+            stringstream error;
+            Printer printer(error);
+            error << "error - line " << node.line_no << ": Can't split type ";
             type_stack.top()->accept(printer);
-            cerr << "." << endl;
+            error << "." << endl;
             node.accept(printer);
-            cerr << endl;
-            return;
+            throw error.str();
         }
     }
 
@@ -366,9 +316,6 @@ namespace semantics {
         /* Visit children */
         for (auto expr : node.exprs) {
             expr->accept(*this);
-
-            if (error)
-                return;
         }
         /* Visit stops here */
     }
@@ -377,9 +324,6 @@ namespace semantics {
         /* Visit children */
         for (auto expr : node.exprs) {
             expr->accept(*this);
-
-            if (error)
-                return;
         }
         /* Visit stops here */
     }
@@ -392,11 +336,12 @@ namespace semantics {
                 current_scope->decls.insert({node.id, type_stack.top()});
             } else {
                 is_valid = false;
-                error = true;
-                cerr << "error - line " << node.line_no << ": Can't declare an id twice in same scope." << endl;
+                stringstream error;
+                Printer printer(error);
+                error << "error - line " << node.line_no << ": Can't declare an id twice in same scope." << endl;
                 node.accept(printer);
-                cerr << endl;
-                return;
+                error << endl;
+                throw error.str();
             }
         }
     }
@@ -406,9 +351,6 @@ namespace semantics {
         node.callee->accept(*this);
         for (auto expr : node.exprs) {
             expr->accept(*this);
-
-            if (error)
-                return;
         }
         /* Visit stops here */
     }
