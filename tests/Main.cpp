@@ -13,9 +13,10 @@
 #include <cppunit/TestRunner.h>
 #include <cppunit/BriefTestProgressListener.h>
 #include <cppunit/CompilerOutputter.h>
+#include "TestMaster.h"
 
 //*****************************************************
-
+/*
 class MathClass {
 public:
 int adder(int a, int b);
@@ -29,9 +30,9 @@ int MathClass::adder(int a, int b) {
 int MathClass::subber(int a, int b) {
 	return a - b;
 }
-
+*/
 //******************************************************
-
+/*
 class MathTester : public CppUnit::TestFixture {
 	CPPUNIT_TEST_SUITE(MathTester);
 	CPPUNIT_TEST(testAdd);
@@ -65,10 +66,11 @@ void MathTester::setUp(void) {
 void MathTester::tearDown(void) {
 	delete testObject;
 }
-
+*/
 //***********************************************************
 
-CPPUNIT_TEST_SUITE_REGISTRATION(MathTester);
+// Set test class here
+CPPUNIT_TEST_SUITE_REGISTRATION(TestMaster);
 
 int main(){
 	CPPUNIT_NS::TestResult test_result;

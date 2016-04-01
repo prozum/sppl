@@ -53,7 +53,7 @@ namespace compiler {
         semantics::TypeChecker type_checker;
         parser::Driver driver;
 
-        void compile();
+        int compile();
         Function * parse_anon_expr();
 
         void set_backend(Backend backend);
