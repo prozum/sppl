@@ -237,3 +237,100 @@ void TestMaster::subMixFloatInt() {
 void TestMaster::subMixIntFloat() {
     buildSimple("Int", "2", "-", "2.0", false);
 }
+
+/*
+ * Multiplication
+ */
+
+// Multiplication - Integer
+
+void TestMaster::mulIntPosPos() {
+    buildSimple("Int", "2", "*", "2", true);
+}
+
+void TestMaster::mulIntZeroZero() {
+    buildSimple("Int", "0", "*", "0", true);
+}
+
+void TestMaster::mulIntPosNeg() {
+    buildSimple("Int", "2", "*", "-2", true);
+}
+
+void TestMaster::mulIntNegPos() {
+    buildSimple("Int", "-2", "*", "2", true);
+}
+
+void TestMaster::mulIntNegNeg() {
+    buildSimple("Int", "-2", "*", "-2", true);
+}
+
+// Multiplication - Float
+
+void TestMaster::mulFloatPosPos() {
+    buildSimple("Float", "2.0", "*", "2.0", true);
+}
+
+void TestMaster::mulFloatZeroZero() {
+    buildSimple("Float", "0.0", "*", "0.0", true);
+}
+
+void TestMaster::mulFloatPosNeg() {
+    buildSimple("Float", "2.0", "*", "-2.0", true);
+}
+
+void TestMaster::mulFloatNegPos() {
+    buildSimple("Float", "-2.0", "*", "2.0", true);
+}
+
+void TestMaster::mulFloatNegNeg() {
+    buildSimple("Float", "-2.0", "*", "-2.0", true);
+}
+
+// Multiplication - Boolean
+
+void TestMaster::mulBoolTrueTrue() {
+    buildSimple("Bool", "True", "*", "True", false);
+}
+
+void TestMaster::mulBoolTrueFalse() {
+    buildSimple("Bool", "True", "*", "False", false);
+}
+
+void TestMaster::mulBoolFalseTrue() {
+    buildSimple("Bool", "False", "*", "True", false);
+}
+
+void TestMaster::mulBoolFalseFalse() {
+    buildSimple("Bool", "False", "*", "False", false);
+}
+
+// Multiplication - Character
+
+void TestMaster::mulCharStrStr() {
+    buildSimple("String", "\"string\"", "*", "\"string\"", false);
+}
+
+void TestMaster::mulCharStrChar() {
+    buildSimple("String", "\"string\"", "*", "'c'", false);
+
+}
+
+void TestMaster::mulCharCharStr() {
+    buildSimple("Char", "'c'", "*", "\"string\"", false);
+
+}
+
+void TestMaster::mulCharCharChar() {
+    buildSimple("Char", "'c'", "*", "'c'", false);
+
+}
+
+// Multiplication - Mix
+
+void TestMaster::mulMixFloatInt() {
+    buildSimple("Float", "2.0", "*", "2", false);
+}
+
+void TestMaster::mulMixIntFloat() {
+    buildSimple("Int", "2", "*", "2.0", false);
+}

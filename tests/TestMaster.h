@@ -66,6 +66,32 @@ class TestMaster : public CppUnit::TestFixture{
     CPPUNIT_TEST(subMixFloatInt);
     CPPUNIT_TEST(subMixIntFloat);
 
+    // Multiplication - Integer
+    CPPUNIT_TEST(mulIntPosPos);
+    CPPUNIT_TEST(mulIntZeroZero);
+    CPPUNIT_TEST(mulIntNegPos);
+    CPPUNIT_TEST(mulIntPosNeg);
+    CPPUNIT_TEST(mulIntNegNeg);
+    // Multiplication - Float
+    CPPUNIT_TEST(mulFloatPosPos);
+    CPPUNIT_TEST(mulFloatZeroZero);
+    CPPUNIT_TEST(mulFloatPosNeg);
+    CPPUNIT_TEST(mulFloatNegPos);
+    CPPUNIT_TEST(mulFloatNegNeg);
+    // Multiplication - Boolean
+    CPPUNIT_TEST(mulBoolTrueTrue);
+    CPPUNIT_TEST(mulBoolTrueFalse);
+    CPPUNIT_TEST(mulBoolFalseTrue);
+    CPPUNIT_TEST(mulBoolFalseFalse);
+    // Multiplication - Character
+    CPPUNIT_TEST(mulCharStrStr);
+    CPPUNIT_TEST(mulCharStrChar);
+    CPPUNIT_TEST(mulCharCharStr);
+    CPPUNIT_TEST(mulCharCharChar);
+    // Multiplication - Mix
+    CPPUNIT_TEST(mulMixFloatInt);
+    CPPUNIT_TEST(mulMixIntFloat);
+
     CPPUNIT_TEST_SUITE_END();
 public:
     ifstream in;
@@ -136,6 +162,36 @@ protected:
     // Subtraction - Mix
     void subMixIntFloat();
     void subMixFloatInt();
+
+    // Multiplication - Integer
+    void mulIntPosPos();
+    void mulIntZeroZero();
+    void mulIntPosNeg();
+    void mulIntNegPos();
+    void mulIntNegNeg();
+
+    // Multiplication - Float
+    void mulFloatPosPos();
+    void mulFloatZeroZero();
+    void mulFloatPosNeg();
+    void mulFloatNegPos();
+    void mulFloatNegNeg();
+
+    // Multiplication - Boolean
+    void mulBoolTrueTrue();
+    void mulBoolTrueFalse();
+    void mulBoolFalseTrue();
+    void mulBoolFalseFalse();
+
+    // Multiplication - Character
+    void mulCharStrStr();
+    void mulCharStrChar();
+    void mulCharCharStr();
+    void mulCharCharChar();
+
+    // Multiplication - Mix
+    void mulMixIntFloat();
+    void mulMixFloatInt();
     
     void compileChecker(bool success);
     void buildSimple(std::string pattern, std::string left, std::string op, std::string right, bool status);
