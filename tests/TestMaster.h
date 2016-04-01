@@ -14,11 +14,18 @@
 
 class TestMaster : public CppUnit::TestFixture{
     CPPUNIT_TEST_SUITE(TestMaster);
-    CPPUNIT_TEST(addPosPos);
-    CPPUNIT_TEST(addZeroZero);
-    CPPUNIT_TEST(addNegPos);
-    CPPUNIT_TEST(addPosNeg);
-    CPPUNIT_TEST(addNegNeg);
+    // Addition - Integer
+    CPPUNIT_TEST(addIntPosPos);
+    CPPUNIT_TEST(addIntZeroZero);
+    CPPUNIT_TEST(addIntNegPos);
+    CPPUNIT_TEST(addIntPosNeg);
+    CPPUNIT_TEST(addIntNegNeg);
+    // Addition - Float
+    CPPUNIT_TEST(addFloatPosPos);
+    CPPUNIT_TEST(addFloatZeroZero);
+    CPPUNIT_TEST(addFloatPosNeg);
+    CPPUNIT_TEST(addFloatNegPos);
+    CPPUNIT_TEST(addFloatNegNeg);
     CPPUNIT_TEST_SUITE_END();
 public:
     ifstream in;
@@ -30,11 +37,19 @@ public:
     void setUp();
     void tearDown();
 protected:
-    void addPosPos();
-    void addZeroZero();
-    void addPosNeg();
-    void addNegPos();
-    void addNegNeg();
+    // Addition - Integers
+    void addIntPosPos();
+    void addIntZeroZero();
+    void addIntPosNeg();
+    void addIntNegPos();
+    void addIntNegNeg();
 
-    void internal(bool success);
+    // Addition - Floats
+    void addFloatPosPos();
+    void addFloatZeroZero();
+    void addFloatPosNeg();
+    void addFloatNegPos();
+    void addFloatNegNeg();
+
+    void compileChecker(bool success);
 };

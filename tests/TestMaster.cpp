@@ -11,7 +11,7 @@ void TestMaster::tearDown() {
     status = 0;
 }
 
-void TestMaster::internal(bool success) {
+void TestMaster::compileChecker(bool success) {
     in = ifstream("source.sppl");
     out = ofstream("target.body");
     out = ofstream("target.header");
@@ -31,40 +31,83 @@ void TestMaster::internal(bool success) {
     } else {
         CPPUNIT_ASSERT(true);
     }
+
+    remove("source.sppl");
+    remove("target.body");
+    remove("target.head");
 }
 
-void TestMaster::addPosPos() {
+// Addition - Integer
+
+void TestMaster::addIntPosPos() {
     ofstream sourceFile("source.sppl");
     sourceFile << "def main : Int | = 2 + 2";
     sourceFile.close();
-    internal(true);
+    compileChecker(true);
 }
 
-void TestMaster::addZeroZero() {
+void TestMaster::addIntZeroZero() {
     ofstream sourceFile("source.sppl");
     sourceFile << "def main : Int | = 0 + 0";
     sourceFile.close();
-    internal(true);
+    compileChecker(true);
 }
 
-void TestMaster::addPosNeg() {
+void TestMaster::addIntPosNeg() {
     ofstream sourceFile("source.sppl");
     sourceFile << "def main : Int | = 2 + -2";
     sourceFile.close();
-    internal(true);
+    compileChecker(true);
 }
 
-void TestMaster::addNegPos() {
+void TestMaster::addIntNegPos() {
     ofstream sourceFile("source.sppl");
     sourceFile << "def main : Int | = -2 + 2";
     sourceFile.close();
-    internal(true);
+    compileChecker(true);
 }
 
-void TestMaster::addNegNeg() {
+void TestMaster::addIntNegNeg() {
     ofstream sourceFile("source.sppl");
     sourceFile << "def main : Int | = -2 + -2";
     sourceFile.close();
-    internal(true);
+    compileChecker(true);
+}
+
+// Addition - Float
+
+void TestMaster::addFloatPosPos() {
+    ofstream sourceFile("source.sppl");
+    sourceFile << "def main : Float | = 2.0 + 2.0";
+    sourceFile.close();
+    compileChecker(true);
+}
+
+void TestMaster::addFloatZeroZero() {
+    ofstream sourceFile("source.sppl");
+    sourceFile << "def main : Float | = 0.0 + 0.0";
+    sourceFile.close();
+    compileChecker(true);
+}
+
+void TestMaster::addFloatPosNeg() {
+    ofstream sourceFile("source.sppl");
+    sourceFile << "def main : Float | = 2.0 + -2.0";
+    sourceFile.close();
+    compileChecker(true);
+}
+
+void TestMaster::addFloatNegPos() {
+    ofstream sourceFile("source.sppl");
+    sourceFile << "def main : Float | = -2.0 + 2.0";
+    sourceFile.close();
+    compileChecker(true);
+}
+
+void TestMaster::addFloatNegNeg() {
+    ofstream sourceFile("source.sppl");
+    sourceFile << "def main : Float | = -2.0 + -2.0";
+    sourceFile.close();
+    compileChecker(true);
 }
 
