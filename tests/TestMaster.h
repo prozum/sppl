@@ -26,6 +26,11 @@ class TestMaster : public CppUnit::TestFixture{
     CPPUNIT_TEST(addFloatPosNeg);
     CPPUNIT_TEST(addFloatNegPos);
     CPPUNIT_TEST(addFloatNegNeg);
+    // Addition - Boolean
+    CPPUNIT_TEST(addBoolTrueTrue);
+    CPPUNIT_TEST(addBoolTrueFalse);
+    CPPUNIT_TEST(addBoolFalseTrue);
+    CPPUNIT_TEST(addBoolFalseFalse);
     CPPUNIT_TEST_SUITE_END();
 public:
     ifstream in;
@@ -37,19 +42,25 @@ public:
     void setUp();
     void tearDown();
 protected:
-    // Addition - Integers
+    // Addition - Integer
     void addIntPosPos();
     void addIntZeroZero();
     void addIntPosNeg();
     void addIntNegPos();
     void addIntNegNeg();
 
-    // Addition - Floats
+    // Addition - Float
     void addFloatPosPos();
     void addFloatZeroZero();
     void addFloatPosNeg();
     void addFloatNegPos();
     void addFloatNegNeg();
+
+    // Addition - Boolean
+    void addBoolTrueTrue();
+    void addBoolTrueFalse();
+    void addBoolFalseTrue();
+    void addBoolFalseFalse();
 
     void compileChecker(bool success);
 };

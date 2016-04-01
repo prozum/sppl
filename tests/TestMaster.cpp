@@ -111,3 +111,33 @@ void TestMaster::addFloatNegNeg() {
     compileChecker(true);
 }
 
+// Addition - Boolean
+
+void TestMaster::addBoolTrueTrue() {
+    ofstream sourceFile("source.sppl");
+    sourceFile << "def main : Bool | = True + True";
+    sourceFile.close();
+    compileChecker(false);
+}
+
+void TestMaster::addBoolTrueFalse() {
+    ofstream sourceFile("source.sppl");
+    sourceFile << "def main : Bool | = True + False";
+    sourceFile.close();
+    compileChecker(false);
+}
+
+void TestMaster::addBoolFalseTrue() {
+    ofstream sourceFile("source.sppl");
+    sourceFile << "def main : Bool | = False + True";
+    sourceFile.close();
+    compileChecker(false);
+}
+
+void TestMaster::addBoolFalseFalse() {
+    ofstream sourceFile("source.sppl");
+    sourceFile << "def main : Bool | = False + False";
+    sourceFile.close();
+    compileChecker(false);
+}
+
