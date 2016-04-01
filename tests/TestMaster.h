@@ -92,6 +92,58 @@ class TestMaster : public CppUnit::TestFixture{
     CPPUNIT_TEST(mulMixFloatInt);
     CPPUNIT_TEST(mulMixIntFloat);
 
+    // Division - Integer
+    CPPUNIT_TEST(divIntPosPos);
+    CPPUNIT_TEST(divIntZeroZero);
+    CPPUNIT_TEST(divIntNegPos);
+    CPPUNIT_TEST(divIntPosNeg);
+    CPPUNIT_TEST(divIntNegNeg);
+    // Division - Float
+    CPPUNIT_TEST(divFloatPosPos);
+    CPPUNIT_TEST(divFloatZeroZero);
+    CPPUNIT_TEST(divFloatPosNeg);
+    CPPUNIT_TEST(divFloatNegPos);
+    CPPUNIT_TEST(divFloatNegNeg);
+    // Division - Boolean
+    CPPUNIT_TEST(divBoolTrueTrue);
+    CPPUNIT_TEST(divBoolTrueFalse);
+    CPPUNIT_TEST(divBoolFalseTrue);
+    CPPUNIT_TEST(divBoolFalseFalse);
+    // Division - Character
+    CPPUNIT_TEST(divCharStrStr);
+    CPPUNIT_TEST(divCharStrChar);
+    CPPUNIT_TEST(divCharCharStr);
+    CPPUNIT_TEST(divCharCharChar);
+    // Division - Mix
+    CPPUNIT_TEST(divMixFloatInt);
+    CPPUNIT_TEST(divMixIntFloat);
+
+    // Modulo - Integer
+    CPPUNIT_TEST(modIntPosPos);
+    CPPUNIT_TEST(modIntZeroZero);
+    CPPUNIT_TEST(modIntNegPos);
+    CPPUNIT_TEST(modIntPosNeg);
+    CPPUNIT_TEST(modIntNegNeg);
+    // Modulo - Float
+    CPPUNIT_TEST(modFloatPosPos);
+    CPPUNIT_TEST(modFloatZeroZero);
+    CPPUNIT_TEST(modFloatPosNeg);
+    CPPUNIT_TEST(modFloatNegPos);
+    CPPUNIT_TEST(modFloatNegNeg);
+    // Modulo - Boolean
+    CPPUNIT_TEST(modBoolTrueTrue);
+    CPPUNIT_TEST(modBoolTrueFalse);
+    CPPUNIT_TEST(modBoolFalseTrue);
+    CPPUNIT_TEST(modBoolFalseFalse);
+    // Modulo - Character
+    CPPUNIT_TEST(modCharStrStr);
+    CPPUNIT_TEST(modCharStrChar);
+    CPPUNIT_TEST(modCharCharStr);
+    CPPUNIT_TEST(modCharCharChar);
+    // Modulo - Mix
+    CPPUNIT_TEST(modMixFloatInt);
+    CPPUNIT_TEST(modMixIntFloat);
+
     CPPUNIT_TEST_SUITE_END();
 public:
     ifstream in;
@@ -193,6 +245,66 @@ protected:
     void mulMixIntFloat();
     void mulMixFloatInt();
     
+    // Division - Integer
+    void divIntPosPos();
+    void divIntZeroZero();
+    void divIntPosNeg();
+    void divIntNegPos();
+    void divIntNegNeg();
+
+    // Division - Float
+    void divFloatPosPos();
+    void divFloatZeroZero();
+    void divFloatPosNeg();
+    void divFloatNegPos();
+    void divFloatNegNeg();
+
+    // Division - Boolean
+    void divBoolTrueTrue();
+    void divBoolTrueFalse();
+    void divBoolFalseTrue();
+    void divBoolFalseFalse();
+
+    // Division - Character
+    void divCharStrStr();
+    void divCharStrChar();
+    void divCharCharStr();
+    void divCharCharChar();
+
+    // Division - Mix
+    void divMixIntFloat();
+    void divMixFloatInt();
+
+    // Modulo - Integer
+    void modIntPosPos();
+    void modIntZeroZero();
+    void modIntPosNeg();
+    void modIntNegPos();
+    void modIntNegNeg();
+
+    // Modulo - Float
+    void modFloatPosPos();
+    void modFloatZeroZero();
+    void modFloatPosNeg();
+    void modFloatNegPos();
+    void modFloatNegNeg();
+
+    // Modulo - Boolean
+    void modBoolTrueTrue();
+    void modBoolTrueFalse();
+    void modBoolFalseTrue();
+    void modBoolFalseFalse();
+
+    // Modulo - Character
+    void modCharStrStr();
+    void modCharStrChar();
+    void modCharCharStr();
+    void modCharCharChar();
+
+    // Modulo - Mix
+    void modMixIntFloat();
+    void modMixFloatInt();
+
     void compileChecker(bool success);
     void buildSimple(std::string pattern, std::string left, std::string op, std::string right, bool status);
 };

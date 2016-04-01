@@ -334,3 +334,197 @@ void TestMaster::mulMixFloatInt() {
 void TestMaster::mulMixIntFloat() {
     buildSimple("Int", "2", "*", "2.0", false);
 }
+
+/*
+ * Division
+ */
+
+// Division - Integer
+
+void TestMaster::divIntPosPos() {
+    buildSimple("Int", "2", "/", "2", true);
+}
+
+void TestMaster::divIntZeroZero() {
+    buildSimple("Int", "0", "/", "0", true);
+}
+
+void TestMaster::divIntPosNeg() {
+    buildSimple("Int", "2", "/", "-2", true);
+}
+
+void TestMaster::divIntNegPos() {
+    buildSimple("Int", "-2", "/", "2", true);
+}
+
+void TestMaster::divIntNegNeg() {
+    buildSimple("Int", "-2", "/", "-2", true);
+}
+
+// Division - Float
+
+void TestMaster::divFloatPosPos() {
+    buildSimple("Float", "2.0", "/", "2.0", true);
+}
+
+void TestMaster::divFloatZeroZero() {
+    buildSimple("Float", "0.0", "/", "0.0", true);
+}
+
+void TestMaster::divFloatPosNeg() {
+    buildSimple("Float", "2.0", "/", "-2.0", true);
+}
+
+void TestMaster::divFloatNegPos() {
+    buildSimple("Float", "-2.0", "/", "2.0", true);
+}
+
+void TestMaster::divFloatNegNeg() {
+    buildSimple("Float", "-2.0", "/", "-2.0", true);
+}
+
+// Division - Boolean
+
+void TestMaster::divBoolTrueTrue() {
+    buildSimple("Bool", "True", "/", "True", false);
+}
+
+void TestMaster::divBoolTrueFalse() {
+    buildSimple("Bool", "True", "/", "False", false);
+}
+
+void TestMaster::divBoolFalseTrue() {
+    buildSimple("Bool", "False", "/", "True", false);
+}
+
+void TestMaster::divBoolFalseFalse() {
+    buildSimple("Bool", "False", "/", "False", false);
+}
+
+// Division - Character
+
+void TestMaster::divCharStrStr() {
+    buildSimple("String", "\"string\"", "/", "\"string\"", false);
+}
+
+void TestMaster::divCharStrChar() {
+    buildSimple("String", "\"string\"", "/", "'c'", false);
+
+}
+
+void TestMaster::divCharCharStr() {
+    buildSimple("Char", "'c'", "/", "\"string\"", false);
+
+}
+
+void TestMaster::divCharCharChar() {
+    buildSimple("Char", "'c'", "/", "'c'", false);
+
+}
+
+// Division - Mix
+
+void TestMaster::divMixFloatInt() {
+    buildSimple("Float", "2.0", "/", "2", false);
+}
+
+void TestMaster::divMixIntFloat() {
+    buildSimple("Int", "2", "/", "2.0", false);
+}
+
+/*
+ * Modulo
+ */
+
+// Modulo - Integer
+
+void TestMaster::modIntPosPos() {
+    buildSimple("Int", "2", "%", "2", true);
+}
+
+void TestMaster::modIntZeroZero() {
+    buildSimple("Int", "0", "%", "0", true);
+}
+
+void TestMaster::modIntPosNeg() {
+    buildSimple("Int", "2", "%", "-2", true);
+}
+
+void TestMaster::modIntNegPos() {
+    buildSimple("Int", "-2", "%", "2", true);
+}
+
+void TestMaster::modIntNegNeg() {
+    buildSimple("Int", "-2", "%", "-2", true);
+}
+
+// Modulo - Float
+
+void TestMaster::modFloatPosPos() {
+    buildSimple("Float", "2.0", "%", "2.0", true);
+}
+
+void TestMaster::modFloatZeroZero() {
+    buildSimple("Float", "0.0", "%", "0.0", true);
+}
+
+void TestMaster::modFloatPosNeg() {
+    buildSimple("Float", "2.0", "%", "-2.0", true);
+}
+
+void TestMaster::modFloatNegPos() {
+    buildSimple("Float", "-2.0", "%", "2.0", true);
+}
+
+void TestMaster::modFloatNegNeg() {
+    buildSimple("Float", "-2.0", "%", "-2.0", true);
+}
+
+// Modulo - Boolean
+
+void TestMaster::modBoolTrueTrue() {
+    buildSimple("Bool", "True", "%", "True", false);
+}
+
+void TestMaster::modBoolTrueFalse() {
+    buildSimple("Bool", "True", "%", "False", false);
+}
+
+void TestMaster::modBoolFalseTrue() {
+    buildSimple("Bool", "False", "%", "True", false);
+}
+
+void TestMaster::modBoolFalseFalse() {
+    buildSimple("Bool", "False", "%", "False", false);
+}
+
+// Modulo - Character
+
+void TestMaster::modCharStrStr() {
+    buildSimple("String", "\"string\"", "%", "\"string\"", false);
+}
+
+void TestMaster::modCharStrChar() {
+    buildSimple("String", "\"string\"", "%", "'c'", false);
+
+}
+
+void TestMaster::modCharCharStr() {
+    buildSimple("Char", "'c'", "%", "\"string\"", false);
+
+}
+
+void TestMaster::modCharCharChar() {
+    buildSimple("Char", "'c'", "%", "'c'", false);
+
+}
+
+// Modulo - Mix
+
+void TestMaster::modMixFloatInt() {
+    buildSimple("Float", "2.0", "%", "2", false);
+}
+
+void TestMaster::modMixIntFloat() {
+    buildSimple("Int", "2", "%", "2.0", false);
+}
