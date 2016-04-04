@@ -530,10 +530,10 @@ void TestMaster::modMixIntFloat() {
 }
 
 /*
- * Binary Operators
+ * Binary/Bool Operators
  */
 
-// Binary - Equal
+// Binary/Bool - Equal
 
 void TestMaster::binEqualTrueTrue() {
     buildSimple("Bool", "True", "==", "True", true);
@@ -551,7 +551,7 @@ void TestMaster::binEqualFalseFalse() {
     buildSimple("Bool", "False", "==", "False", true);
 }
 
-// Binary - NotEqual
+// Binary/Bool - NotEqual
 
 void TestMaster::binNotEqualTrueTrue() {
     buildSimple("Bool", "True", "!=", "True", true);
@@ -569,7 +569,7 @@ void TestMaster::binNotEqualFalseFalse() {
     buildSimple("Bool", "False", "!=", "False", true);
 }
 
-// Binary - And
+// Binary/Bool - And
 
 void TestMaster::binAndTrueTrue() {
     buildSimple("Bool", "True", "&&", "True", true);
@@ -587,7 +587,7 @@ void TestMaster::binAndFalseFalse() {
     buildSimple("Bool", "False", "&&", "False", true);
 }
 
-// Binary - Or
+// Binary/Bool - Or
 
 void TestMaster::binOrTrueTrue() {
     buildSimple("Bool", "True", "||", "True", true);
@@ -605,7 +605,7 @@ void TestMaster::binOrFalseFalse() {
     buildSimple("Bool", "False", "||", "False", true);
 }
 
-// Binary - GrEq
+// Binary/Bool - GrEq
 
 void TestMaster::binGrEqTrueTrue() {
     buildSimple("Bool", "True", ">=", "True", false);
@@ -623,7 +623,7 @@ void TestMaster::binGrEqFalseFalse() {
     buildSimple("Bool", "False", ">=", "False", false);
 }
 
-// Binary - LeEq
+// Binary/Bool - LeEq
 
 void TestMaster::binLeEqTrueTrue() {
     buildSimple("Bool", "True", "<=", "True", false);
@@ -641,7 +641,7 @@ void TestMaster::binLeEqFalseFalse() {
     buildSimple("Bool", "False", "<=", "False", false);
 }
 
-// Binary - Great
+// Binary/Bool - Great
 
 void TestMaster::binGreatTrueTrue() {
     buildSimple("Bool", "True", ">", "True", false);
@@ -659,7 +659,7 @@ void TestMaster::binGreatFalseFalse() {
     buildSimple("Bool", "False", ">", "False", false);
 }
 
-// Binary - Less
+// Binary/Bool - Less
 
 void TestMaster::binLessTrueTrue() {
     buildSimple("Bool", "True", "<", "True", false);
@@ -675,4 +675,70 @@ void TestMaster::binLessFalseTrue() {
 
 void TestMaster::binLessFalseFalse() {
     buildSimple("Bool", "False", "<", "False", false);
+}
+
+/*
+ * Binary/Int
+ */
+
+// Binary/Int
+void TestMaster::binEqualInt() {
+    buildSimple("Bool", "2", "==", "2", true);
+}
+
+void TestMaster::binNotEqualInt() {
+    buildSimple("Bool", "2", "!=", "2", true);
+}
+void TestMaster::binAndInt() {
+    buildSimple("Bool", "2", "&&", "2", false);
+}
+void TestMaster::binOrInt() {
+    buildSimple("Bool", "2", "||", "2", false);
+}
+
+void TestMaster::binLeEqInt() {
+    buildSimple("Bool", "2", "<=", "2", true);
+}
+
+void TestMaster::binGrEqInt() {
+    buildSimple("Bool", "2", ">=", "2", true);
+}
+
+void TestMaster::binLessInt() {
+    buildSimple("Bool", "2", "<", "2", true);
+}
+
+void TestMaster::binGreatInt() {
+    buildSimple("Bool", "2", ">", "2", true);
+}
+
+// Binary/Float
+void TestMaster::binEqualFloat() {
+    buildSimple("Bool", "2", "==", "2", true);
+}
+
+void TestMaster::binNotEqualFloat() {
+    buildSimple("Bool", "2", "!=", "2", true);
+}
+void TestMaster::binAndFloat() {
+    buildSimple("Bool", "2", "&&", "2", false);
+}
+void TestMaster::binOrFloat() {
+    buildSimple("Bool", "2", "||", "2", false);
+}
+
+void TestMaster::binLeEqFloat() {
+    buildSimple("Bool", "2", "<=", "2", true);
+}
+
+void TestMaster::binGrEqFloat() {
+    buildSimple("Bool", "2", ">=", "2", true);
+}
+
+void TestMaster::binLessFloat() {
+    buildSimple("Bool", "2", "<", "2", true);
+}
+
+void TestMaster::binGreatFloat() {
+    buildSimple("Bool", "2", ">", "2", true);
 }

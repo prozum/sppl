@@ -143,46 +143,67 @@ class TestMaster : public CppUnit::TestFixture{
     // Modulo - Mix
     CPPUNIT_TEST(modMixFloatInt);
     CPPUNIT_TEST(modMixIntFloat);
-    // Binary - Equal
+    // Binary/Bool - Equal
     CPPUNIT_TEST(binEqualTrueTrue);
     CPPUNIT_TEST(binEqualTrueFalse);
     CPPUNIT_TEST(binEqualFalseTrue);
     CPPUNIT_TEST(binEqualFalseFalse);
-    // Binary - NotEqual
+    // Binary/Bool - NotEqual
     CPPUNIT_TEST(binNotEqualTrueTrue);
     CPPUNIT_TEST(binNotEqualTrueFalse);
     CPPUNIT_TEST(binNotEqualFalseTrue);
     CPPUNIT_TEST(binNotEqualFalseFalse);
-    // Binary - And
+    // Binary/Bool - And
     CPPUNIT_TEST(binAndTrueTrue);
     CPPUNIT_TEST(binAndTrueFalse);
     CPPUNIT_TEST(binAndFalseTrue);
     CPPUNIT_TEST(binAndFalseFalse);
-    // Binary - Or
+    // Binary/Bool - Or
     CPPUNIT_TEST(binOrTrueTrue);
     CPPUNIT_TEST(binOrTrueFalse);
     CPPUNIT_TEST(binOrFalseTrue);
     CPPUNIT_TEST(binOrFalseFalse);
-    // Binary - GrEq
+    // Binary/Bool - GrEq
     CPPUNIT_TEST(binGrEqTrueTrue);
     CPPUNIT_TEST(binGrEqTrueFalse);
     CPPUNIT_TEST(binGrEqFalseTrue);
     CPPUNIT_TEST(binGrEqFalseFalse);
-    // Binary - LeEq
+    // Binary/Bool - LeEq
     CPPUNIT_TEST(binLeEqTrueTrue);
     CPPUNIT_TEST(binLeEqTrueFalse);
     CPPUNIT_TEST(binLeEqFalseTrue);
     CPPUNIT_TEST(binLeEqFalseFalse);
-    // Binary - Great
+    // Binary/Bool - Great
     CPPUNIT_TEST(binGreatTrueTrue);
     CPPUNIT_TEST(binGreatTrueFalse);
     CPPUNIT_TEST(binGreatFalseTrue);
     CPPUNIT_TEST(binGreatFalseFalse);
-    // Binary - Less
+    // Binary/Bool - Less
     CPPUNIT_TEST(binLessTrueTrue);
     CPPUNIT_TEST(binLessTrueFalse);
     CPPUNIT_TEST(binLessFalseTrue);
     CPPUNIT_TEST(binLessFalseFalse);
+    
+    // Binary/Int
+    CPPUNIT_TEST(binEqualInt);
+    CPPUNIT_TEST(binNotEqualInt);
+    CPPUNIT_TEST(binAndInt);
+    CPPUNIT_TEST(binOrInt);
+    CPPUNIT_TEST(binGrEqInt);
+    CPPUNIT_TEST(binLeEqInt);
+    CPPUNIT_TEST(binLessInt);
+    CPPUNIT_TEST(binGreatInt);
+
+    // Binary/Float
+    CPPUNIT_TEST(binEqualFloat);
+    CPPUNIT_TEST(binNotEqualFloat);
+    CPPUNIT_TEST(binAndFloat);
+    CPPUNIT_TEST(binOrFloat);
+    CPPUNIT_TEST(binGrEqFloat);
+    CPPUNIT_TEST(binLeEqFloat);
+    CPPUNIT_TEST(binLessFloat);
+    CPPUNIT_TEST(binGreatFloat);
+
     CPPUNIT_TEST_SUITE_END();
 public:
     ifstream in;
@@ -344,54 +365,74 @@ protected:
     void modMixIntFloat();
     void modMixFloatInt();
 
-    // Binary - Equal
+    // Binary/Bool - Equal
     void binEqualTrueTrue();
     void binEqualTrueFalse();
     void binEqualFalseTrue();
     void binEqualFalseFalse();
 
-    // Binary - NotEqual
+    // Binary/Bool - NotEqual
     void binNotEqualTrueTrue();
     void binNotEqualTrueFalse();
     void binNotEqualFalseTrue();
     void binNotEqualFalseFalse();
 
-    // Binary - And
+    // Binary/Bool - And
     void binAndTrueTrue();
     void binAndTrueFalse();
     void binAndFalseTrue();
     void binAndFalseFalse();
 
-    // Binary - Or
+    // Binary/Bool - Or
     void binOrTrueTrue();
     void binOrTrueFalse();
     void binOrFalseTrue();
     void binOrFalseFalse();
 
-    // Binary - GrEq
+    // Binary/Bool - GrEq
     void binGrEqTrueTrue();
     void binGrEqTrueFalse();
     void binGrEqFalseTrue();
     void binGrEqFalseFalse();
 
-    // Binary - LeEq
+    // Binary/Bool - LeEq
     void binLeEqTrueTrue();
     void binLeEqTrueFalse();
     void binLeEqFalseTrue();
     void binLeEqFalseFalse();
 
-    // Binary - Less
+    // Binary/Bool - Less
     void binLessTrueTrue();
     void binLessTrueFalse();
     void binLessFalseTrue();
     void binLessFalseFalse();
 
-    // Binary - Great
+    // Binary/Bool - Great
     void binGreatTrueTrue();
     void binGreatTrueFalse();
     void binGreatFalseTrue();
     void binGreatFalseFalse();
 
+    // Binary/Int
+    void binEqualInt();
+    void binNotEqualInt();
+    void binAndInt();
+    void binOrInt();
+    void binLeEqInt();
+    void binGrEqInt();
+    void binLessInt();
+    void binGreatInt();
+
+    // Binary/Float
+    void binEqualFloat();
+    void binNotEqualFloat();
+    void binAndFloat();
+    void binOrFloat();
+    void binLeEqFloat();
+    void binGrEqFloat();
+    void binLessFloat();
+    void binGreatFloat();
+    
     void compileChecker(bool success);
     void buildSimple(std::string pattern, std::string left, std::string op, std::string right, bool status);
 };
