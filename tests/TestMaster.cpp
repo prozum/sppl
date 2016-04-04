@@ -5,10 +5,6 @@ void TestMaster::setUp() {
 }
 
 void TestMaster::tearDown() {
-    remove("source.sppl");
-    remove("target.body");
-    remove("target.head");
-    status = 0;
 }
 
 void TestMaster::compileChecker(bool success) {
@@ -35,6 +31,7 @@ void TestMaster::compileChecker(bool success) {
     remove("source.sppl");
     remove("target.body");
     remove("target.head");
+    status = 0;
 }
 
 void TestMaster::buildSimple(std::string pattern, std::string left, std::string op, std::string right, bool status) {
@@ -689,9 +686,11 @@ void TestMaster::binEqualInt() {
 void TestMaster::binNotEqualInt() {
     buildSimple("Bool", "2", "!=", "2", true);
 }
+
 void TestMaster::binAndInt() {
     buildSimple("Bool", "2", "&&", "2", false);
 }
+
 void TestMaster::binOrInt() {
     buildSimple("Bool", "2", "||", "2", false);
 }
@@ -720,9 +719,11 @@ void TestMaster::binEqualFloat() {
 void TestMaster::binNotEqualFloat() {
     buildSimple("Bool", "2", "!=", "2", true);
 }
+
 void TestMaster::binAndFloat() {
     buildSimple("Bool", "2", "&&", "2", false);
 }
+
 void TestMaster::binOrFloat() {
     buildSimple("Bool", "2", "||", "2", false);
 }
@@ -741,4 +742,9 @@ void TestMaster::binLessFloat() {
 
 void TestMaster::binGreatFloat() {
     buildSimple("Bool", "2", ">", "2", true);
+}
+
+// Single line comment test
+void TestMaster::comment() {
+    buildSimple("Int", "2", "+", "2 # This is a comment", true);
 }
