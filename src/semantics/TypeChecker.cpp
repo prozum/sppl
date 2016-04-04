@@ -6,6 +6,7 @@
 #include <unordered_map>
 #include <iostream>
 #include <sstream>
+#include <cstring>
 #include "Scope.h"
 
 using namespace std;
@@ -48,6 +49,10 @@ namespace semantics
         /* Visit stops here */
 
         /* code starts here*/
+        if (current_func->id.compare(ANON_FUNC_NAME) == 0) {
+            current_func->node_type = node.expr->node_type;
+            current_func->types.push_back(node.expr->node_type);
+        }
         if (node.patterns.size() + 1 == current_func->types.size()) {
             for (size_t i = 0; i < node.patterns.size(); ++i) {
                 if (node.patterns[i]->node_type->type == Types::EMPTYLIST) {
@@ -79,6 +84,7 @@ namespace semantics
                 error << " ";
             }
             error << "=" << endl;
+
             throw error.str();
         }
     }

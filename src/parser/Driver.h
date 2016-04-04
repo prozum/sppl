@@ -28,5 +28,6 @@ class Driver
         class Scanner* lexer;
         common::Program *program;
 
+    void accept(common::Visitor &visitor);
 };
 }

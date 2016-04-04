@@ -140,6 +140,16 @@ namespace common {
             Node(line_no),
             funcs(funcs) { }
 
+    Program::Program(string id,
+                       Expr *expr,
+                       int line_no) :
+            Node(line_no),
+            funcs() {
+
+        funcs.push_back(new Function(id, vector<Type *>(), vector<Case *>()));
+        funcs[0]->cases.push_back(new Case(expr, vector<Pattern *>()));
+    }
+
     Function::Function() { }
 
     Function::Function(string id) :

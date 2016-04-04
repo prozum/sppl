@@ -29,11 +29,20 @@ using namespace llvm::orc;
 
 class SpplJit {
 public:
+    SpplJit(ostream *out);
+
+    void Eval(string str);
+    static void Init_llvm() {
+        InitializeNativeTarget();
+        InitializeNativeTargetAsmPrinter();
+        InitializeNativeTargetAsmParser();
+    }
+
+private:
     typedef ObjectLinkingLayer<> ObjLayerT;
     typedef IRCompileLayer<ObjLayerT> CompileLayerT;
     typedef CompileLayerT::ModuleSetHandleT ModuleHandleT;
 
-    SpplJit(istream *in, ostream *out);
 
     ModuleHandleT add_module(std::unique_ptr<llvm::Module> m);
     void remove_module(ModuleHandleT handler);
@@ -64,13 +73,4 @@ public:
         Vec.push_back(std::move(t));
         return Vec;
     }
-
-    void eval(string str);
-
-    static void init_llvm() {
-        InitializeNativeTarget();
-        InitializeNativeTargetAsmPrinter();
-        InitializeNativeTargetAsmParser();
-    }
-
 };

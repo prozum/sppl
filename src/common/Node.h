@@ -7,6 +7,8 @@
 
 using namespace std;
 
+#define ANON_FUNC_NAME "__anon_func"
+
 namespace common {
 
     enum class Types {
@@ -21,7 +23,6 @@ namespace common {
 		EMPTYLIST,
 		UNKNOWN
 	};
-
 
 
 	// Forward declare Scope
@@ -106,14 +107,13 @@ namespace common {
 
 	class Program : public Node {
 	public:
-		vector<Function*> funcs;
 
-		// for debuggin only
-		Expr *debug_expr = nullptr;
+		vector<Function*> funcs;
 
 		Program();
 		Program(vector<Function*>);
 		Program(vector<Function*>, int);
+		Program(string id, Expr *expr, int line_no);
 
 		virtual void accept(Visitor &);
 	};

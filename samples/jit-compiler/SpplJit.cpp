@@ -1,7 +1,7 @@
 #include "SpplJit.h"
 
 
-SpplJit::SpplJit(istream *in, ostream *out) : Machine(EngineBuilder().selectTarget()),
+SpplJit::SpplJit(ostream *out) : Machine(EngineBuilder().selectTarget()),
                                               Layout(Machine->createDataLayout()),
                                               CompileLayer(ObjectLayer, SimpleCompiler(*Machine)),
                                               Generator(*out)
@@ -59,11 +59,11 @@ std::string SpplJit::mangle(const std::string &name) {
 }
 
 void SpplJit::init_module_passmanager() {
-    // Open a new module.
+    // Open a new module
     Generator.Module = llvm::make_unique<llvm::Module>("SpplJit", getGlobalContext());
     Generator.Module->setDataLayout(Machine->createDataLayout());
 
-    // Create a new pass manager attached to it.
+    // Create a new pass manager attached to it
     PassManager = llvm::make_unique<legacy::FunctionPassManager>(Generator.Module.get());
 
     // Optimization
@@ -127,36 +127,24 @@ string SpplJit::get_tuple_output(intptr_t addr, vector<common::Type *> node_type
 }
 
 
-void SpplJit::eval(std::string str)
+void SpplJit::Eval(std::string str)
 {
-    Driver.parse_string(str);
-    common::Type *type;
-    string func_id;
-    llvm::Function *func_ir;
+    if (!Driver.parse_string(str))
+        return;
 
-    if (Driver.program->debug_expr) {
-        auto expr_node = Driver.program->debug_expr;
-        func_id = "__anon_func";
-
-        expr_node->accept(ScopeGenerator);
-        try { expr_node->accept(TypeChecker); }
-        catch (string error) { cout << error << endl; return; }
-        type = expr_node->node_type;
-
-        func_ir = Generator.GreateAnonymousFunction(expr_node);
-    } else {
-        auto func_node = Driver.program->funcs[0];
-        func_id = func_node->id;
-
-        func_node->accept(ScopeGenerator);
-        try { func_node->accept(TypeChecker); }
-        catch (string error) { cout << error << endl; return; }
-        type = func_node->node_type;
-
-        func_node->accept(Generator);
-        func_ir = Generator.Module->getFunction(func_node->id);
+    try {
+        Driver.accept(TypeChecker);
+        Driver.accept(ScopeGenerator);
+    }
+    catch (string error) {
+        cout << error << endl;
+        return;
     }
 
+    // Generate ir_func
+    auto func_node = Driver.program->funcs[0];
+    Driver.accept(Generator);
+    auto func_ir = Generator.Module->getFunction(func_node->id);
     PassManager->run(*func_ir);
 
     // Print module
@@ -168,10 +156,10 @@ void SpplJit::eval(std::string str)
     auto handler = add_module(std::move(Generator.Module));
     init_module_passmanager();
 
-    auto func = find_symbol(func_id);
+    auto func = find_symbol(func_node->id);
     auto func_jit = (size_t (*)())func.getAddress();
 
-    string output = get_output(func_jit(), type);
+    string output = get_output(func_jit(), func_node->node_type);
     cout << "output: " << output << endl;
 
     remove_module(handler);

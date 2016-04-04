@@ -14,20 +14,9 @@ namespace semantics {
         current_scope = res;
         garbage.push_back(current_scope);
 
-#ifdef JIT
-        if (node.debug_expr) {
-            node.debug_expr->accept(*this);
-            return;
-        }
-#endif
-
         /* Visit all children */
         for (auto func : node.funcs) {
-            try {
-                func->accept(*this);
-            } catch (string s) {
-                cerr << s << endl;
-            }
+            func->accept(*this);
         }
         /* Visit stops here */
     }

@@ -38,6 +38,11 @@ Driver::Driver()
         return parse_stream(iss, sname);
     }
 
+    void Driver::accept(common::Visitor &visitor)
+    {
+        program->accept(visitor);
+    }
+
     void Driver::error(const class location& l,
                        const std::string& m)
     {

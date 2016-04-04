@@ -9,18 +9,16 @@
 
 int main(int argc, char *argv[]) {
 
-    SpplJit::init_llvm();
+    SpplJit::Init_llvm();
 
-    std::stringstream input;
+    SpplJit jit(&cout);
 
-    SpplJit jit(&input, &cout);
-
-    string tmp("");
-    while (tmp.compare("q") != 0)
+    string input("");
+    while (input.compare("q") != 0)
     {
         cout << "input: ";
-        cin >> tmp;
-        jit.eval(tmp);
+        cin >> input;
+        jit.Eval(input);
         cout << endl << endl;
     }
 }
