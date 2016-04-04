@@ -25,10 +25,7 @@ namespace codegen {
         for (auto &func : node.funcs) {
             func->accept(*this);
         }
-
-        Module->dump();
     }
-
 
     llvm::Type *LLVMCodeGenerator::get_type(common::Type *node_type, bool ptr)
     {

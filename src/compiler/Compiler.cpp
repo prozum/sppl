@@ -44,21 +44,21 @@ namespace compiler {
     int Compiler::compile() {
 
         driver.parse_stream(*input);
-        if (driver.main == nullptr)
+        if (driver.program == nullptr)
             return 1;
 
-        //case_checker.visit(*driver.main);
-        scope_generator.visit(*driver.main);
+        //case_checker.visit(*driver.program);
+        scope_generator.visit(*driver.program);
 
         if (!scope_generator.is_valid)
             return 2;
 
-        type_checker.visit(*driver.main);
+        type_checker.visit(*driver.program);
 
         if (!type_checker.is_valid)
             return 3;
 
-        generator->visit(*driver.main);
+        generator->visit(*driver.program);
         return 0;
     }
 

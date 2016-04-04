@@ -88,8 +88,8 @@ using namespace std;
 
 %%
 
-program:	funcs_ne                                        { driver.main = new Program(* $1, line_no); delete $1; }
-    |       expr                                            { driver.main = new Program(); driver.main->debug_expr = $1; };
+program:	funcs_ne                                        { driver.program = new Program(* $1, line_no); delete $1; }
+    |       expr                                            { driver.program = new Program(); driver.program->debug_expr = $1; };
 funcs_ne:	funcs_ne func                                   { $$ = $1; $$->push_back($2); }
 	| func                                                  { $$ = new std::vector<Function *>(); $$->push_back($1); } ;
 func:		decl cases_ne                                   { $$ = $1; $$->cases = * $2; delete $2; }

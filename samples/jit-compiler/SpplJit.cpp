@@ -126,35 +126,53 @@ string SpplJit::get_tuple_output(intptr_t addr, vector<common::Type *> node_type
     return out;
 }
 
+
 void SpplJit::eval(std::string str)
 {
-    // Parse jit expression
     Driver.parse_string(str);
-    auto expr = Driver.main->debug_expr;
-    expr->accept(ScopeGenerator);
-    expr->accept(TypeChecker);
+    common::Type *type;
+    string func_id;
+    llvm::Function *func_ir;
 
-    // Generate ir code for jit function
-    auto ir_func = Generator.GreateAnonymousFunction(expr);
+    if (Driver.program->debug_expr) {
+        auto expr_node = Driver.program->debug_expr;
+        func_id = "__anon_func";
 
-    // Verify ir code
-    PassManager->run(*ir_func);
+        expr_node->accept(ScopeGenerator);
+        try { expr_node->accept(TypeChecker); }
+        catch (string error) { cout << error << endl; return; }
+        type = expr_node->node_type;
 
-    // Print ir code
-    Generator.Module->dump();
+        func_ir = Generator.GreateAnonymousFunction(expr_node);
+    } else {
+        auto func_node = Driver.program->funcs[0];
+        func_id = func_node->id;
 
-    // Setup new module for jit function
+        func_node->accept(ScopeGenerator);
+        try { func_node->accept(TypeChecker); }
+        catch (string error) { cout << error << endl; return; }
+        type = func_node->node_type;
+
+        func_node->accept(Generator);
+        func_ir = Generator.Module->getFunction(func_node->id);
+    }
+
+    PassManager->run(*func_ir);
+
+    // Print module
+    string module_str;
+    raw_string_ostream out(module_str);
+    out << *Generator.Module.get();
+    cout << out.str();
+
     auto handler = add_module(std::move(Generator.Module));
     init_module_passmanager();
 
-    // Get jit function
-    auto anon_func = find_symbol("__anon_func");
-    auto func_ptr = (size_t (*)())anon_func.getAddress();
+    auto func = find_symbol(func_id);
+    auto func_jit = (size_t (*)())func.getAddress();
 
-    string output = get_output(func_ptr(), expr->node_type);
+    string output = get_output(func_jit(), type);
     cout << "output: " << output << endl;
 
     remove_module(handler);
 }
-
-
