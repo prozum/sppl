@@ -143,7 +143,46 @@ class TestMaster : public CppUnit::TestFixture{
     // Modulo - Mix
     CPPUNIT_TEST(modMixFloatInt);
     CPPUNIT_TEST(modMixIntFloat);
-
+    // Binary - Equal
+    CPPUNIT_TEST(binEqualTrueTrue);
+    CPPUNIT_TEST(binEqualTrueFalse);
+    CPPUNIT_TEST(binEqualFalseTrue);
+    CPPUNIT_TEST(binEqualFalseFalse);
+    // Binary - NotEqual
+    CPPUNIT_TEST(binNotEqualTrueTrue);
+    CPPUNIT_TEST(binNotEqualTrueFalse);
+    CPPUNIT_TEST(binNotEqualFalseTrue);
+    CPPUNIT_TEST(binNotEqualFalseFalse);
+    // Binary - And
+    CPPUNIT_TEST(binAndTrueTrue);
+    CPPUNIT_TEST(binAndTrueFalse);
+    CPPUNIT_TEST(binAndFalseTrue);
+    CPPUNIT_TEST(binAndFalseFalse);
+    // Binary - Or
+    CPPUNIT_TEST(binOrTrueTrue);
+    CPPUNIT_TEST(binOrTrueFalse);
+    CPPUNIT_TEST(binOrFalseTrue);
+    CPPUNIT_TEST(binOrFalseFalse);
+    // Binary - GrEq
+    CPPUNIT_TEST(binGrEqTrueTrue);
+    CPPUNIT_TEST(binGrEqTrueFalse);
+    CPPUNIT_TEST(binGrEqFalseTrue);
+    CPPUNIT_TEST(binGrEqFalseFalse);
+    // Binary - LeEq
+    CPPUNIT_TEST(binLeEqTrueTrue);
+    CPPUNIT_TEST(binLeEqTrueFalse);
+    CPPUNIT_TEST(binLeEqFalseTrue);
+    CPPUNIT_TEST(binLeEqFalseFalse);
+    // Binary - Great
+    CPPUNIT_TEST(binGreatTrueTrue);
+    CPPUNIT_TEST(binGreatTrueFalse);
+    CPPUNIT_TEST(binGreatFalseTrue);
+    CPPUNIT_TEST(binGreatFalseFalse);
+    // Binary - Less
+    CPPUNIT_TEST(binLessTrueTrue);
+    CPPUNIT_TEST(binLessTrueFalse);
+    CPPUNIT_TEST(binLessFalseTrue);
+    CPPUNIT_TEST(binLessFalseFalse);
     CPPUNIT_TEST_SUITE_END();
 public:
     ifstream in;
@@ -304,6 +343,54 @@ protected:
     // Modulo - Mix
     void modMixIntFloat();
     void modMixFloatInt();
+
+    // Binary - Equal
+    void binEqualTrueTrue();
+    void binEqualTrueFalse();
+    void binEqualFalseTrue();
+    void binEqualFalseFalse();
+
+    // Binary - NotEqual
+    void binNotEqualTrueTrue();
+    void binNotEqualTrueFalse();
+    void binNotEqualFalseTrue();
+    void binNotEqualFalseFalse();
+
+    // Binary - And
+    void binAndTrueTrue();
+    void binAndTrueFalse();
+    void binAndFalseTrue();
+    void binAndFalseFalse();
+
+    // Binary - Or
+    void binOrTrueTrue();
+    void binOrTrueFalse();
+    void binOrFalseTrue();
+    void binOrFalseFalse();
+
+    // Binary - GrEq
+    void binGrEqTrueTrue();
+    void binGrEqTrueFalse();
+    void binGrEqFalseTrue();
+    void binGrEqFalseFalse();
+
+    // Binary - LeEq
+    void binLeEqTrueTrue();
+    void binLeEqTrueFalse();
+    void binLeEqFalseTrue();
+    void binLeEqFalseFalse();
+
+    // Binary - Less
+    void binLessTrueTrue();
+    void binLessTrueFalse();
+    void binLessFalseTrue();
+    void binLessFalseFalse();
+
+    // Binary - Great
+    void binGreatTrueTrue();
+    void binGreatTrueFalse();
+    void binGreatFalseTrue();
+    void binGreatFalseFalse();
 
     void compileChecker(bool success);
     void buildSimple(std::string pattern, std::string left, std::string op, std::string right, bool status);
