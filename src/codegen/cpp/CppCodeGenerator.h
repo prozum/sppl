@@ -120,6 +120,7 @@ namespace codegen {
             unordered_map<Type, string> tuples;
             unordered_map<Type, string> lists;
             unordered_map<Type, string> signatures;
+            unordered_map<string, int> listnames_offset;
             vector<string> arg_names;
             vector<string> get_value_builder;
             vector<string> assignments;

@@ -28,17 +28,14 @@ namespace codegen
         output << "#include \"test.h\" \n"
                   " \n"
                   "int main(int argc, char** argv) { \n"
-                  "    func_stack stack; \n"
-                  "    stack.head = 0; \n"
-                  "    " << lists[string_list] << " *args = " << g_generated << g_create << lists[string_list] << "(&stack, 0); \n"
+                  "    " << lists[string_list] << " *args = " << g_generated << g_create << lists[string_list] << "(0); \n"
                   "    int i; \n"
                   " \n"
                   "    for(i = argc - 1; i >= 0; i--) { \n"
-                  "        " << g_generated << g_push << lists[string_list] << "(args, " << g_generated << g_create << g_string << "(argv[i], &stack), &stack); \n"
+                  "        " << g_generated << g_push << lists[string_list] << "(args, " << g_generated << g_create << g_string << "(argv[i])); \n"
                   "    } \n"
                   " \n"
                   "    printf(\"%d\\n\", " << g_user << g_main << "(args)); \n"
-                  "    stack_pop(&stack); \n"
                   "    return 0; \n"
                   "} \n"
                   " \n";
@@ -81,10 +78,7 @@ namespace codegen
         header << endl;
 
         // generate function in output
-        output << function.str() << " { \n"
-                  "    func_stack stack; \n"
-                  "    stack.head = 0; \n"
-                  " \n";
+        output << function.str() << " { \n";
 
         // generate cases
         for (auto c : node.cases) {
@@ -92,12 +86,12 @@ namespace codegen
             output << endl;
 
             // clear assigments specific for current case
+            listnames_offset.clear();
             assignments.clear();
         }
 
         // generate error, for when program doesn't realize a case
-        output << "    stack_pop(&stack); \n"
-                  "    printf(\"No cases realized!\\n\"); \n"
+        output << "    printf(\"No cases realized!\\n\"); \n"
                   "    exit(1); \n"
                   "} \n"
                   " \n";
@@ -161,8 +155,7 @@ namespace codegen
         node.expr->accept(*this);
         output << ";" << endl;
 
-        output <<  "        stack_pop(&stack); \n"
-                   "        return res; \n"
+        output <<  "        return res; \n"
                    "    } \n"
                    " \n";
     }
@@ -208,7 +201,7 @@ namespace codegen
                 break;
             case Types::LIST:
             case Types::STRING:
-                got = tuples.find(*node.left->node_type);
+                got = lists.find(*node.left->node_type);
 
                 if (got == tuples.end()) {
                     name = generate_list(*node.left->node_type);
@@ -584,7 +577,7 @@ namespace codegen
         // else, just output value
         } else {
             // gcreate_string is generate by generate_std. It creates string base on a char*
-            output << g_generated << g_create << g_string << "(\"" << node.value << "\", &stack)";
+            output << g_generated << g_create << g_string << "(\"" << node.value << "\")";
         }
     }
 
@@ -603,7 +596,7 @@ namespace codegen
         }
 
         // create list
-        output << g_generated << g_create << name << "(&stack, " << node.exprs.size() << ", ";
+        output << g_generated << g_create << name << "(" << node.exprs.size() << ", ";
         for (int i = node.exprs.size() - 1; i >= 0; i--) {
             node.exprs[i]->accept(*this);
 
@@ -659,11 +652,12 @@ namespace codegen
             // if id is of a type that is allocated on the heap (aka strings and lists)
             // then make a copy of it, since the language should have no sideeffects
             // there could also be an offset, the lists and string should be copied with
-            if (node.node_type->type == Types::LIST || node.node_type->type == Types::STRING) {
-                assign << g_generated << g_clone << lists[*node.node_type] << "(" << name << ", " << list_offsets.back() << ", &stack);";
-            } else {
+            //if (node.node_type->type == Types::LIST || node.node_type->type == Types::STRING) {
+            //    assign << g_generated << g_clone << lists[*node.node_type] << "(" << name << ", " << list_offsets.back() << ");";
+            //} else {
                 assign << name << ";";
-            }
+                listnames_offset.insert({node.id, list_offsets.back()});
+            //}
 
             // save the assigment untill after the pattern has been generated
             assignments.push_back(assign.str());
@@ -677,7 +671,7 @@ namespace codegen
                 // sideeffects occur in the program.
                 case Types::LIST:
                 case Types::STRING:
-                    output << g_generated << g_clone << lists[*node.node_type] << "(" << g_user << node.id << ", 0, &stack)";
+                    output << g_generated << g_clone << lists[*node.node_type] << "(" << g_user << node.id << ", " << listnames_offset[node.id] << ")";
                     break;
                 default:
                     output << g_user << node.id;
@@ -796,11 +790,10 @@ namespace codegen
         /* generation of list ends here */
 
         /* generation of list push starts here */
-        result << name << "* " << g_generated << g_push << name << "(" << name << "* this, " << last_type << " item, func_stack* stack) { \n"
-                  "    if (this->" << g_head << " >= this->" << g_size << ") { \n"
-                  "        int prev = this->" << g_size << " * sizeof(\" << last_type << \"); \n"
+        result << name << "* " << g_generated << g_push << name << "(" << name << "* this, " << last_type << " item) { \n"
+                  "    if (this->" << g_head << " >= this->" << g_size << " - 1) { \n"
                   "        this->" << g_size << " *= 2; \n"
-                  "        this->" << g_items << " = func_realloc(stack, this->" << g_items << ", prev, this->" << g_size << " * sizeof(" << last_type << ")); \n"
+                  "        this->" << g_items << " = realloc(this->" << g_items << ", this->" << g_size << " * sizeof(" << last_type << ")); \n"
                   "    } \n"
                   " \n"
                   "    this->" << g_items << "[this->" << g_head << "++] = item; \n"
@@ -810,19 +803,19 @@ namespace codegen
         /* generation of list push ends here */
 
         /* generation of list constructer starts here */
-        result << name << "* " << g_generated << g_create << name << "(func_stack* stack, int count, ...) { \n"
+        result << name << "* " << g_generated << g_create << name << "(int count, ...) { \n"
                   "    int i, size = " << g_generated << g_nearpow2 << "(count); \n"
-                  "    " << name << "* res = func_alloc(stack, sizeof(" << name << ")); \n"
+                  "    " << name << "* res = malloc(sizeof(" << name << ")); \n"
                   " \n"
                   "    res->" << g_head << " = 0; \n"
                   "    res->" << g_size << " = size; \n"
-                  "    res->" << g_items << " = func_alloc(stack, sizeof(" << name << ")); \n"
+                  "    res->" << g_items << " = malloc(sizeof(" << name << ")); \n"
                   " \n"
                   "    va_list args; \n"
                   "    va_start(args, count); \n"
                   " \n"
                   "    for(i = 0; i < count; i++) { \n"
-                  "        " << g_generated << g_push << name << "(res, va_arg(args, " << last_type << "), stack); \n"
+                  "        " << g_generated << g_push << name << "(res, va_arg(args, " << last_type << ")); \n"
                   "    } \n"
                   " \n"
                   "    va_end(args); \n"
@@ -845,12 +838,12 @@ namespace codegen
         /* generation of at function ends here */
 
         /* generation of list constructer starts here */
-        result << name << "* " << g_generated << g_clone << name << "(" << name << "* list, int offset, func_stack* stack) { \n"
-                  "    " << name << "* res = func_alloc(stack, sizeof(" << name << ")); \n"
+        result << name << "* " << g_generated << g_clone << name << "(" << name << "* list, int offset) { \n"
+                  "    " << name << "* res = malloc(sizeof(" << name << ")); \n"
                   " \n"
                   "    res->" << g_head << " = list->" << g_head << " - offset; \n"
                   "    res->" << g_size << " = list->" << g_size << "; \n"
-                  "    res->" << g_items << " = func_alloc(stack, list->" << g_size << " * sizeof(" << last_type << ")); \n"
+                  "    res->" << g_items << " = malloc(list->" << g_size << " * sizeof(" << last_type << ")); \n"
                   " \n"
                   "    memcpy(res->" << g_items << ", list->" << g_items << ", res->" << g_head << " * sizeof(" << last_type << ")); \n"
                   " \n"
@@ -1032,45 +1025,6 @@ namespace codegen
                   "#include <string.h> \n"
                   " \n";
 
-        /* generating function stack starts here */
-        header << "#define FUNC_STACK_SIZE 64 \n"
-                  " \n";
-
-        header << "typedef struct func_stack { \n"
-                  "    void* allocs[FUNC_STACK_SIZE]; \n"
-                  "    int head; \n"
-                  "} func_stack; \n"
-                  " \n";
-
-        header << "void* func_alloc(func_stack* stack, int size) { \n"
-                  "    if (stack->head >= FUNC_STACK_SIZE) { \n"
-                  "        printf(\"Local stack overflow!\\n\"); \n"
-                  "        exit(1); \n"
-                  "    } \n"
-                  " \n"
-                  "    void* res = malloc(size); \n"
-                  "    stack->allocs[stack->head++] = res; \n"
-                  "    return res; \n"
-                  "} \n"
-                  " \n";
-
-        header << "void *func_realloc(func_stack* stack, void* mem, int prevsize, int newsize) { \n"
-                  "    void* res = func_alloc(stack, newsize); \n"
-                  "    memcpy(res, mem, prevsize); \n"
-                  "    return res; \n"
-                  "} \n"
-                  " \n";
-
-        header << "void stack_pop(func_stack* stack) { \n"
-                  "    int i;"
-                  "    for (i = 0; i < stack->head; i++) { \n"
-                  "        free(stack->allocs[i]); \n"
-                  "    } \n"
-                  "} \n"
-                  " \n";
-        /* generating function stack stops here */
-
-
         /* generating to nearest power of 2 function starts here */
         header << "int " << g_generated << g_nearpow2 << "(int num) { \n"
                   "    num--; \n"
@@ -1091,16 +1045,16 @@ namespace codegen
         generate_list(string_list);
 
         /* generation of string constructer starts here */
-        header << string_type_name << "* " << g_generated << g_create << g_string << "(char* values, func_stack* stack) { \n"
+        header << string_type_name << "* " << g_generated << g_create << g_string << "(char* values) { \n"
                   "    int i, str_length = strlen(values), size = " << g_generated << g_nearpow2 << "(str_length); \n"
-                  "    " << string_type_name << "* res = func_alloc(stack, sizeof(" << string_type_name << ")); \n"
+                  "    " << string_type_name << "* res = malloc(sizeof(" << string_type_name << ")); \n"
                   " \n"
                   "    res->" << g_head << " = 0; \n"
                   "    res->" << g_size << " = size; \n"
-                  "    res->" << g_items << " = func_alloc(stack, size * sizeof(" << g_char << ")); \n"
+                  "    res->" << g_items << " = malloc(size * sizeof(" << g_char << ")); \n"
                   " \n"
                   "    for (i = str_length - 1; i >= 0; i--) { \n"
-                  "        " << g_generated << g_push << string_type_name << "(res, values[i], stack); \n"
+                  "        " << g_generated << g_push << string_type_name << "(res, values[i]); \n"
                   "    } \n"
                   " \n"
                   "    return res; \n"
@@ -1113,7 +1067,7 @@ namespace codegen
                   "    int i, j, size = strlen(values); \n"
                   " \n"
                   "    if (size == string->" << g_head << " - offset) { \n"
-                  "        for (i = 0, i = size - 1; i < size; i++, j--) { \n"
+                  "        for (i = 0, j = size - 1; i < size; i++, j--) { \n"
                   "            if (string->" << g_items << "[j] != values[i]) \n"
                   "                return 0; \n"
                   "        } \n"
