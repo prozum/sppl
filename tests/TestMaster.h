@@ -203,7 +203,34 @@ class TestMaster : public CppUnit::TestFixture{
         CPPUNIT_TEST(binLeEqFloat);
         CPPUNIT_TEST(binLessFloat);
         CPPUNIT_TEST(binGreatFloat);
+/*
+        CPPUNIT_TEST(sigLengthZeroInt);
+        CPPUNIT_TEST(sigLengthOneInt);
+        CPPUNIT_TEST(sigLengthTwoInt);
+        CPPUNIT_TEST(sigLengthThreeInt);
+        CPPUNIT_TEST(sigLengthFourInt);
+        CPPUNIT_TEST(sigLengthFiveInt);
+        CPPUNIT_TEST(sigLengthSixInt);
+        CPPUNIT_TEST(sigLengthSevenInt);
+        CPPUNIT_TEST(sigLengthEightInt);
+        CPPUNIT_TEST(sigLengthNineInt);
+        CPPUNIT_TEST(sigLengthTenInt);
 
+        CPPUNIT_TEST(casLengthSameInt);
+        CPPUNIT_TEST(casLengthMoreInt);
+        CPPUNIT_TEST(casLengthLessInt);
+*//*
+        CPPUNIT_TEST(casOneCaseInt);
+        CPPUNIT_TEST(casTwoCaseInt);
+        CPPUNIT_TEST(casThreeCaseInt);
+        CPPUNIT_TEST(casFourCaseInt);
+        CPPUNIT_TEST(casFiveCaseInt);
+        CPPUNIT_TEST(casSixCaseInt);
+        CPPUNIT_TEST(casSevenCaseInt);
+        CPPUNIT_TEST(casEightCaseInt);
+        CPPUNIT_TEST(casNineCaseInt);
+        CPPUNIT_TEST(casTenCaseInt);
+*/
         // Single line comment test
         CPPUNIT_TEST(comment);
     CPPUNIT_TEST_SUITE_END();
@@ -217,6 +244,7 @@ public:
     void setUp();
     void tearDown();
 protected:
+    // Addition
     // Addition - Integer
     void addIntPosPos();
     void addIntZeroZero();
@@ -247,6 +275,7 @@ protected:
     void addMixIntFloat();
     void addMixFloatInt();
 
+    // Subtraction
     // Subtraction - Integer
     void subIntPosPos();
     void subIntZeroZero();
@@ -277,6 +306,7 @@ protected:
     void subMixIntFloat();
     void subMixFloatInt();
 
+    //Multiplication
     // Multiplication - Integer
     void mulIntPosPos();
     void mulIntZeroZero();
@@ -306,7 +336,8 @@ protected:
     // Multiplication - Mix
     void mulMixIntFloat();
     void mulMixFloatInt();
-    
+
+    // Division
     // Division - Integer
     void divIntPosPos();
     void divIntZeroZero();
@@ -337,6 +368,7 @@ protected:
     void divMixIntFloat();
     void divMixFloatInt();
 
+    // Modulo
     // Modulo - Integer
     void modIntPosPos();
     void modIntZeroZero();
@@ -367,6 +399,7 @@ protected:
     void modMixIntFloat();
     void modMixFloatInt();
 
+    // Binary/Bool
     // Binary/Bool - Equal
     void binEqualTrueTrue();
     void binEqualTrueFalse();
@@ -416,6 +449,7 @@ protected:
     void binGreatFalseFalse();
 
     // Binary/Int
+    // Binary/Int
     void binEqualInt();
     void binNotEqualInt();
     void binAndInt();
@@ -426,6 +460,7 @@ protected:
     void binGreatInt();
 
     // Binary/Float
+    // Binary/Float
     void binEqualFloat();
     void binNotEqualFloat();
     void binAndFloat();
@@ -435,9 +470,50 @@ protected:
     void binLessFloat();
     void binGreatFloat();
 
+    // List
+    // TODO
+
+    // Tuple
+    // TODO
+
+    // Case & Pattern
+    // TODO
+
+    // Signature Length
+    void sigLengthZeroInt();
+    void sigLengthOneInt();
+    void sigLengthTwoInt();
+    void sigLengthThreeInt();
+    void sigLengthFourInt();
+    void sigLengthFiveInt();
+    void sigLengthSixInt();
+    void sigLengthSevenInt();
+    void sigLengthEightInt();
+    void sigLengthNineInt();
+    void sigLengthTenInt();
+
+    void casLengthSameInt();
+    void casLengthMoreInt();
+    void casLengthLessInt();
+
+    void casOneCaseInt();
+    void casTwoCaseInt();
+    void casThreeCaseInt();
+    void casFourCaseInt();
+    void casFiveCaseInt();
+    void casSixCaseInt();
+    void casSevenCaseInt();
+    void casEightCaseInt();
+    void casNineCaseInt();
+    void casTenCaseInt();
+
+    // Function Call
+    // TODO
+
     // Single line comment test
     void comment();
 
-    void compileChecker(bool success);
-    void buildSimple(std::string pattern, std::string left, std::string op, std::string right, bool status);
+    bool compileChecker();
+    void buildSimple(std::string pattern, std::string left, std::string op, std::string right);
+    void clearUp();
 };
