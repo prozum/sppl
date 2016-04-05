@@ -216,11 +216,11 @@ class TestMaster : public CppUnit::TestFixture{
         CPPUNIT_TEST(sigLengthEightInt);
         CPPUNIT_TEST(sigLengthNineInt);
         CPPUNIT_TEST(sigLengthTenInt);
+
+        CPPUNIT_TEST(patLengthSameInt);
+        CPPUNIT_TEST(patLengthMoreInt);
+        CPPUNIT_TEST(patLengthLessInt);
 /*
-        CPPUNIT_TEST(casLengthSameInt);
-        CPPUNIT_TEST(casLengthMoreInt);
-        CPPUNIT_TEST(casLengthLessInt);
-*//*
         CPPUNIT_TEST(casOneCaseInt);
         CPPUNIT_TEST(casTwoCaseInt);
         CPPUNIT_TEST(casThreeCaseInt);
@@ -502,9 +502,9 @@ protected:
     void sigLengthNineInt();
     void sigLengthTenInt();
 
-    void casLengthSameInt();
-    void casLengthMoreInt();
-    void casLengthLessInt();
+    void patLengthSameInt();
+    void patLengthMoreInt();
+    void patLengthLessInt();
 
     void casOneCaseInt();
     void casTwoCaseInt();

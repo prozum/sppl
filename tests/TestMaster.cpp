@@ -1070,6 +1070,8 @@ void TestMaster::binGreatFloat() {
  * Case & Signature test
  */
 
+// SIgnature length
+
 void TestMaster::sigLengthZeroInt() {
 
     std::vector<string> signature;
@@ -1267,6 +1269,50 @@ void TestMaster::sigLengthTenInt() {
     CPPUNIT_ASSERT(status == true);
 }
 
+// Pattern Match
+
+void TestMaster::patLengthSameInt() {
+    std::vector<string> signature;
+    std::vector<string> cas;
+
+    signature.push_back("Int");
+    signature.push_back("Int");
+
+    cas.push_back("2");
+
+    std::stringstream source = buildMultiCase(signature, "Int", "a b", cas);
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::patLengthLessInt() {
+    std::vector<string> signature;
+    std::vector<string> cas;
+
+    signature.push_back("Int");
+    signature.push_back("Int");
+
+    cas.push_back("2");
+
+    std::stringstream source = buildMultiCase(signature, "Int", "a", cas);
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
+}
+
+void TestMaster::patLengthMoreInt() {
+    std::vector<string> signature;
+    std::vector<string> cas;
+
+    signature.push_back("Int");
+    signature.push_back("Int");
+
+    cas.push_back("2");
+
+    std::stringstream source = buildMultiCase(signature, "Int", "a b c", cas);
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
+}
+
 /*
  * Keyword Test
  */
@@ -1357,7 +1403,7 @@ void TestMaster::keywordMain() {
 void TestMaster::comment() {
     std::stringstream source = buildSimple("Int", "2", "+", "2 # This is a comment");
     bool status = compileChecker(&source);
-    CPPUNIT_ASSERT(status == true);
+    CPPUNIT_ASSERT (status == true);
 }
 
 /*
