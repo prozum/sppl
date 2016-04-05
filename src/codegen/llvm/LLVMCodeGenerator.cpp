@@ -436,5 +436,12 @@ namespace codegen {
         cur_val = new GlobalVariable(*Module.get(), const_val->getType(), true, GlobalVariable::ExternalLinkage, const_val);
     }
 
+    string LLVMCodeGenerator::ModuleString() {
+        string module_str;
+        raw_string_ostream out(module_str);
+        out << *Module.get();
+        return out.str();
+    }
+
 
 }

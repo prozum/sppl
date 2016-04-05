@@ -30,6 +30,10 @@ namespace semantics
         for (auto type : node.types) {
             type->accept(*this);
         }
+
+        if (node.types.size() > 0)
+            node.node_type = node.types[0];
+
         for (auto cse : node.cases) {
             try {
                 cse->accept(*this);

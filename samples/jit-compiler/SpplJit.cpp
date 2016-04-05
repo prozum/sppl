@@ -147,20 +147,20 @@ void SpplJit::Eval(std::string str)
     auto func_ir = Generator.Module->getFunction(func_node->id);
     PassManager->run(*func_ir);
 
-    // Print module
-    string module_str;
-    raw_string_ostream out(module_str);
-    out << *Generator.Module.get();
-    cout << out.str();
+    // Print LLVM Module
+    cout << Generator.ModuleString();
 
     auto handler = add_module(std::move(Generator.Module));
     init_module_passmanager();
 
-    auto func = find_symbol(func_node->id);
-    auto func_jit = (size_t (*)())func.getAddress();
+    // Only run anonymous functions
+    if (func_node->id.compare(ANON_FUNC_NAME) == 0) {
+        auto func = find_symbol(func_node->id);
+        auto func_jit = (size_t (*)()) func.getAddress();
 
-    string output = get_output(func_jit(), func_node->node_type);
-    cout << "output: " << output << endl;
+        string output = get_output(func_jit(), func_node->node_type);
+        cout << "output: " << output << endl;
+    }
 
     remove_module(handler);
 }
