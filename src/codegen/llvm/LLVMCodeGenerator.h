@@ -8,6 +8,8 @@
 #include <llvm/IR/TypeFinder.h>
 #include <llvm/IR/TypeBuilder.h>
 
+#include <llvm/Support/raw_os_ostream.h>
+
 #include <unordered_map>
 #include <iostream>
 
@@ -31,6 +33,8 @@ class LLVMCodeGenerator : public common::CodeGenerator {
     llvm::IRBuilder<> Builder;
     unique_ptr<llvm::Module> Module;
     std::map<std::string, llvm::Value *> ContextValues;
+
+	string ModuleString();
 
 private:
 
