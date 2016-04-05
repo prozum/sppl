@@ -220,7 +220,7 @@ class TestMaster : public CppUnit::TestFixture{
         CPPUNIT_TEST(patLengthSameInt);
         CPPUNIT_TEST(patLengthMoreInt);
         CPPUNIT_TEST(patLengthLessInt);
-/*
+
         CPPUNIT_TEST(casOneCaseInt);
         CPPUNIT_TEST(casTwoCaseInt);
         CPPUNIT_TEST(casThreeCaseInt);
@@ -231,7 +231,7 @@ class TestMaster : public CppUnit::TestFixture{
         CPPUNIT_TEST(casEightCaseInt);
         CPPUNIT_TEST(casNineCaseInt);
         CPPUNIT_TEST(casTenCaseInt);
-*/
+
         // keyword
 
         CPPUNIT_TEST(keywordInt);
@@ -535,7 +535,20 @@ protected:
     void comment();
 
     bool compileChecker(std::stringstream *source);
-    std::stringstream buildSimple(std::string pattern, std::string left, std::string op, std::string right);
-    std::stringstream *buildCase(std::stringstream *source, std::string pattern, std::string body);
-    std::stringstream buildMultiCase(std::vector<string> signature, std::string ret, std::string pattern, std::vector<string> cas);
+    std::stringstream buildSimple(std::string pattern,
+                                  std::string left,
+                                  std::string op,
+                                  std::string right);
+    std::stringstream *buildCase(std::stringstream *source,
+                                 std::string pattern,
+                                 std::string body);
+    std::stringstream buildMultiCase(std::vector<string>
+                                     signature,
+                                     std::string ret,
+                                     std::string pattern,
+                                     std::string cas);
+    std::stringstream buildMultiCase(std::string signature,
+                                     std::string ret,
+                                     std::vector<std::string> pattern,
+                                     std::string cas);
 };

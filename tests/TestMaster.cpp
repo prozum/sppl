@@ -40,22 +40,32 @@ std::stringstream TestMaster::buildSimple(std::string pattern,
 }
 
 std::stringstream *TestMaster::buildCase(std::stringstream *source, std::string pattern, std::string body) {
-    *source << "| " << pattern << " = " << body << "\n";
+    *source << "| " << pattern << " = " << body << endl;
     return source;
 }
 /*
 std::stringstream *TestMaster::buildMultiCase(std::stringstream *source, std::vector<string> signature, std::string ret, std::vector<std::vector<string>> pattern, std::vector<string> cas) {
 
 }
-
-std::stringstream *TestMaster::buildMultiCase(std::stringstream *source, std::vector<string> signature, std::string ret, std::vector<string> pattern, std::vector<string> cas) {
-
-}
 */
+
+std::stringstream TestMaster::buildMultiCase(string signature,
+                                             std::string ret,
+                                             std::vector<string> pattern,
+                                             std::string cas) {
+    std::stringstream source;
+    source << "def main : " << signature << "->" << ret << endl;
+
+    for(auto p : pattern) {
+        buildCase(&source, p, cas);
+    }
+    
+    return source;
+}
 std::stringstream TestMaster::buildMultiCase(std::vector<string> signature,
                                              std::string ret,
                                              std::string pattern,
-                                             std::vector<string> cas) {
+                                             std::string cas) {
     std::stringstream source;
 
     source << "def main : ";
@@ -64,9 +74,8 @@ std::stringstream TestMaster::buildMultiCase(std::vector<string> signature,
     }
     source << ret << endl;
 
-    for (auto c : cas) {
-        buildCase(&source, pattern, c);
-    }
+    buildCase(&source, pattern, cas);
+    
     return source;
 }
 
@@ -1073,83 +1082,57 @@ void TestMaster::binGreatFloat() {
 // SIgnature length
 
 void TestMaster::sigLengthZeroInt() {
-
     std::vector<string> signature;
-    std::vector<string> cas;
 
-    cas.push_back("2");
-
-    std::stringstream source = buildMultiCase(signature, "Int", "", cas);
+    std::stringstream source = buildMultiCase(signature, "Int", "", "2");
     bool status = compileChecker(&source);
     CPPUNIT_ASSERT(status == true);
 }
 
 void TestMaster::sigLengthOneInt() {
-
     std::vector<string> signature;
-    std::vector<string> cas;
-
     signature.push_back("Int");
 
-    cas.push_back("2");
-
-    std::stringstream source = buildMultiCase(signature, "Int", "a", cas);
+    std::stringstream source = buildMultiCase(signature, "Int", "a", "2");
     bool status = compileChecker(&source);
     CPPUNIT_ASSERT(status == true);
 }
 
 void TestMaster::sigLengthTwoInt() {
-
     std::vector<string> signature;
-    std::vector<string> cas;
-
     signature.push_back("Int");
     signature.push_back("Int");
 
-    cas.push_back("2");
-
-    std::stringstream source = buildMultiCase(signature, "Int", "a b", cas);
+    std::stringstream source = buildMultiCase(signature, "Int", "a b", "2");
     bool status = compileChecker(&source);
     CPPUNIT_ASSERT(status == true);
 }
 
 void TestMaster::sigLengthThreeInt() {
-
     std::vector<string> signature;
-    std::vector<string> cas;
-
     signature.push_back("Int");
     signature.push_back("Int");
     signature.push_back("Int");
 
-    cas.push_back("2");
-
-    std::stringstream source = buildMultiCase(signature, "Int", "a b c", cas);
+    std::stringstream source = buildMultiCase(signature, "Int", "a b c", "2");
     bool status = compileChecker(&source);
     CPPUNIT_ASSERT(status == true);
 }
 
 void TestMaster::sigLengthFourInt() {
-
     std::vector<string> signature;
-    std::vector<string> cas;
-
     signature.push_back("Int");
     signature.push_back("Int");
     signature.push_back("Int");
     signature.push_back("Int");
 
-    cas.push_back("2");
-
-    std::stringstream source = buildMultiCase(signature, "Int", "a b c d", cas);
+    std::stringstream source = buildMultiCase(signature, "Int", "a b c d", "2");
     bool status = compileChecker(&source);
     CPPUNIT_ASSERT(status == true);
 }
 
 void TestMaster::sigLengthFiveInt() {
-
     std::vector<string> signature;
-    std::vector<string> cas;
 
     signature.push_back("Int");
     signature.push_back("Int");
@@ -1157,18 +1140,13 @@ void TestMaster::sigLengthFiveInt() {
     signature.push_back("Int");
     signature.push_back("Int");
 
-    cas.push_back("2");
-
-    std::stringstream source = buildMultiCase(signature, "Int", "a b c d e", cas);
+    std::stringstream source = buildMultiCase(signature, "Int", "a b c d e", "2");
     bool status = compileChecker(&source);
     CPPUNIT_ASSERT(status == true);
 }
 
 void TestMaster::sigLengthSixInt() {
-
     std::vector<string> signature;
-    std::vector<string> cas;
-
     signature.push_back("Int");
     signature.push_back("Int");
     signature.push_back("Int");
@@ -1176,18 +1154,13 @@ void TestMaster::sigLengthSixInt() {
     signature.push_back("Int");
     signature.push_back("Int");
 
-    cas.push_back("2");
-
-    std::stringstream source = buildMultiCase(signature, "Int", "a b c d e f", cas);
+    std::stringstream source = buildMultiCase(signature, "Int", "a b c d e f", "2");
     bool status = compileChecker(&source);
     CPPUNIT_ASSERT(status == true);
 }
 
 void TestMaster::sigLengthSevenInt() {
-
     std::vector<string> signature;
-    std::vector<string> cas;
-
     signature.push_back("Int");
     signature.push_back("Int");
     signature.push_back("Int");
@@ -1196,17 +1169,13 @@ void TestMaster::sigLengthSevenInt() {
     signature.push_back("Int");
     signature.push_back("Int");
 
-    cas.push_back("2");
-
-    std::stringstream source = buildMultiCase(signature, "Int", "a b c d e f g", cas);
+    std::stringstream source = buildMultiCase(signature, "Int", "a b c d e f g", "2");
     bool status = compileChecker(&source);
     CPPUNIT_ASSERT(status == true);
 }
 
 void TestMaster::sigLengthEightInt() {
-
     std::vector<string> signature;
-    std::vector<string> cas;
 
     signature.push_back("Int");
     signature.push_back("Int");
@@ -1217,18 +1186,13 @@ void TestMaster::sigLengthEightInt() {
     signature.push_back("Int");
     signature.push_back("Int");
 
-    cas.push_back("2");
-
-    std::stringstream source = buildMultiCase(signature, "Int", "a b c d e f g h", cas);
+    std::stringstream source = buildMultiCase(signature, "Int", "a b c d e f g h", "2");
     bool status = compileChecker(&source);
     CPPUNIT_ASSERT(status == true);
 }
 
 void TestMaster::sigLengthNineInt() {
-
     std::vector<string> signature;
-    std::vector<string> cas;
-
     signature.push_back("Int");
     signature.push_back("Int");
     signature.push_back("Int");
@@ -1239,18 +1203,13 @@ void TestMaster::sigLengthNineInt() {
     signature.push_back("Int");
     signature.push_back("Int");
 
-    cas.push_back("2");
-
-    std::stringstream source = buildMultiCase(signature, "Int", "a b c d e f g h i", cas);
+    std::stringstream source = buildMultiCase(signature, "Int", "a b c d e f g h i", "2");
     bool status = compileChecker(&source);
     CPPUNIT_ASSERT(status == true);
 }
 
 void TestMaster::sigLengthTenInt() {
-
     std::vector<string> signature;
-    std::vector<string> cas;
-
     signature.push_back("Int");
     signature.push_back("Int");
     signature.push_back("Int");
@@ -1262,9 +1221,7 @@ void TestMaster::sigLengthTenInt() {
     signature.push_back("Int");
     signature.push_back("Int");
 
-    cas.push_back("2");
-
-    std::stringstream source = buildMultiCase(signature, "Int", "a b c d e f g h i j", cas);
+    std::stringstream source = buildMultiCase(signature, "Int", "a b c d e f g h i j", "2");
     bool status = compileChecker(&source);
     CPPUNIT_ASSERT(status == true);
 }
@@ -1273,45 +1230,175 @@ void TestMaster::sigLengthTenInt() {
 
 void TestMaster::patLengthSameInt() {
     std::vector<string> signature;
-    std::vector<string> cas;
 
     signature.push_back("Int");
     signature.push_back("Int");
 
-    cas.push_back("2");
-
-    std::stringstream source = buildMultiCase(signature, "Int", "a b", cas);
+    std::stringstream source = buildMultiCase(signature, "Int", "a b", "2");
     bool status = compileChecker(&source);
     CPPUNIT_ASSERT(status == true);
 }
 
 void TestMaster::patLengthLessInt() {
     std::vector<string> signature;
-    std::vector<string> cas;
 
     signature.push_back("Int");
     signature.push_back("Int");
 
-    cas.push_back("2");
-
-    std::stringstream source = buildMultiCase(signature, "Int", "a", cas);
+    std::stringstream source = buildMultiCase(signature, "Int", "a", "2");
     bool status = compileChecker(&source);
     CPPUNIT_ASSERT(status == false);
 }
 
 void TestMaster::patLengthMoreInt() {
     std::vector<string> signature;
-    std::vector<string> cas;
 
     signature.push_back("Int");
     signature.push_back("Int");
 
-    cas.push_back("2");
-
-    std::stringstream source = buildMultiCase(signature, "Int", "a b c", cas);
+    std::stringstream source = buildMultiCase(signature, "Int", "a b c", "2");
     bool status = compileChecker(&source);
     CPPUNIT_ASSERT(status == false);
 }
+
+// Case Count
+
+void TestMaster::casOneCaseInt() {
+    std::vector<string> pattern;
+    pattern.push_back("1");
+
+    std::stringstream source = buildMultiCase("Int","Int",pattern, "2");
+    bool status = compileChecker(&source);
+    string prog = source.str();
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::casTwoCaseInt() {
+    std::vector<string> pattern;
+    pattern.push_back("1");
+    pattern.push_back("2");
+
+    std::stringstream source = buildMultiCase("Int","Int",pattern, "2");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::casThreeCaseInt() {
+    std::vector<string> pattern;
+    pattern.push_back("1");
+    pattern.push_back("2");
+    pattern.push_back("3");
+
+    std::stringstream source = buildMultiCase("Int","Int",pattern, "2");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::casFourCaseInt() {
+    std::vector<string> pattern;
+    pattern.push_back("1");
+    pattern.push_back("2");
+    pattern.push_back("3");
+    pattern.push_back("4");
+
+    std::stringstream source = buildMultiCase("Int","Int",pattern, "2");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::casFiveCaseInt() {
+    std::vector<string> pattern;
+    pattern.push_back("1");
+    pattern.push_back("2");
+    pattern.push_back("3");
+    pattern.push_back("4");
+    pattern.push_back("5");
+
+    std::stringstream source = buildMultiCase("Int","Int",pattern, "2");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::casSixCaseInt() {
+    std::vector<string> pattern;
+    pattern.push_back("1");
+    pattern.push_back("2");
+    pattern.push_back("3");
+    pattern.push_back("4");
+    pattern.push_back("5");
+    pattern.push_back("6");
+
+    std::stringstream source = buildMultiCase("Int","Int",pattern, "2");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::casSevenCaseInt() {
+    std::vector<string> pattern;
+    pattern.push_back("1");
+    pattern.push_back("2");
+    pattern.push_back("3");
+    pattern.push_back("4");
+    pattern.push_back("5");
+    pattern.push_back("6");
+    pattern.push_back("7");
+
+    std::stringstream source = buildMultiCase("Int","Int",pattern, "2");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::casEightCaseInt() {
+    std::vector<string> pattern;
+    pattern.push_back("1");
+    pattern.push_back("2");
+    pattern.push_back("3");
+    pattern.push_back("4");
+    pattern.push_back("5");
+    pattern.push_back("6");
+    pattern.push_back("7");
+    pattern.push_back("8");
+
+    std::stringstream source = buildMultiCase("Int","Int",pattern, "2");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::casNineCaseInt() {
+    std::vector<string> pattern;
+    pattern.push_back("1");
+    pattern.push_back("2");
+    pattern.push_back("3");
+    pattern.push_back("4");
+    pattern.push_back("5");
+    pattern.push_back("6");
+    pattern.push_back("7");
+    pattern.push_back("8");
+    pattern.push_back("9");
+
+    std::stringstream source = buildMultiCase("Int","Int",pattern, "2");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::casTenCaseInt() {
+    std::vector<string> pattern;
+    pattern.push_back("1");
+    pattern.push_back("2");
+    pattern.push_back("3");
+    pattern.push_back("4");
+    pattern.push_back("5");
+    pattern.push_back("6");
+    pattern.push_back("7");
+    pattern.push_back("8");
+    pattern.push_back("9");
+    pattern.push_back("n");
+
+    std::stringstream source = buildMultiCase("Int","Int",pattern, "2");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
 
 /*
  * Keyword Test
