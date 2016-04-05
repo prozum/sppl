@@ -204,7 +204,7 @@ class TestMaster : public CppUnit::TestFixture{
         CPPUNIT_TEST(binLeEqFloat);
         CPPUNIT_TEST(binLessFloat);
         CPPUNIT_TEST(binGreatFloat);
-/*
+
         CPPUNIT_TEST(sigLengthZeroInt);
         CPPUNIT_TEST(sigLengthOneInt);
         CPPUNIT_TEST(sigLengthTwoInt);
@@ -216,7 +216,7 @@ class TestMaster : public CppUnit::TestFixture{
         CPPUNIT_TEST(sigLengthEightInt);
         CPPUNIT_TEST(sigLengthNineInt);
         CPPUNIT_TEST(sigLengthTenInt);
-
+/*
         CPPUNIT_TEST(casLengthSameInt);
         CPPUNIT_TEST(casLengthMoreInt);
         CPPUNIT_TEST(casLengthLessInt);
@@ -537,4 +537,5 @@ protected:
     bool compileChecker(std::stringstream *source);
     std::stringstream buildSimple(std::string pattern, std::string left, std::string op, std::string right);
     std::stringstream *buildCase(std::stringstream *source, std::string pattern, std::string body);
+    std::stringstream buildMultiCase(std::vector<string> signature, std::string ret, std::string pattern, std::vector<string> cas);
 };
