@@ -11,6 +11,7 @@
 #include "Compiler.h"
 #include <fstream>
 #include <cstring>
+#include <iostream>
 
 class TestMaster : public CppUnit::TestFixture{
     CPPUNIT_TEST_SUITE(TestMaster);
@@ -235,9 +236,6 @@ class TestMaster : public CppUnit::TestFixture{
         CPPUNIT_TEST(comment);
     CPPUNIT_TEST_SUITE_END();
 public:
-    ifstream in;
-    ofstream out;
-    ofstream hout;
     compiler::Backend backend = compiler::Backend::CPP ;
     int status = 0;
 
@@ -513,7 +511,7 @@ protected:
     // Single line comment test
     void comment();
 
-    bool compileChecker();
-    void buildSimple(std::string pattern, std::string left, std::string op, std::string right);
+    bool compileChecker(std::stringstream *source);
+    std::stringstream buildSimple(std::string pattern, std::string left, std::string op, std::string right);
     void clearUp();
 };
