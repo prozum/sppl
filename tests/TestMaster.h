@@ -232,6 +232,18 @@ class TestMaster : public CppUnit::TestFixture{
         CPPUNIT_TEST(casNineCaseInt);
         CPPUNIT_TEST(casTenCaseInt);
 */
+        // keyword
+
+        CPPUNIT_TEST(keywordInt);
+        CPPUNIT_TEST(keywordFloat);
+        CPPUNIT_TEST(keywordChar);
+        CPPUNIT_TEST(keywordString);
+        CPPUNIT_TEST(keywordBool);
+        CPPUNIT_TEST(keywordTrue);
+        CPPUNIT_TEST(keywordFalse);
+        CPPUNIT_TEST(keywordMain);
+        CPPUNIT_TEST(keywordDef);
+
         // Single line comment test
         CPPUNIT_TEST(comment);
     CPPUNIT_TEST_SUITE_END();
@@ -505,6 +517,17 @@ protected:
     void casNineCaseInt();
     void casTenCaseInt();
 
+    // Keywords
+    void keywordTrue();
+    void keywordFalse();
+    void keywordInt();
+    void keywordFloat();
+    void keywordBool();
+    void keywordChar();
+    void keywordString();
+    void keywordDef();
+    void keywordMain();
+
     // Function Call
     // TODO
 
@@ -513,5 +536,5 @@ protected:
 
     bool compileChecker(std::stringstream *source);
     std::stringstream buildSimple(std::string pattern, std::string left, std::string op, std::string right);
-    void clearUp();
+    std::stringstream *buildCase(std::stringstream *source, std::string pattern, std::string body);
 };

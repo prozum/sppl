@@ -8,12 +8,6 @@ void TestMaster::tearDown() {
     // Final test cleanup
 }
 
-void TestMaster::clearUp() {
-    remove("source.sppl");
-    remove("target.body");
-    remove("target.header");
-}
-
 bool TestMaster::compileChecker(std::stringstream *source) {
 
     ostream out(0);
@@ -41,10 +35,12 @@ std::stringstream TestMaster::buildSimple(std::string pattern,
                              std::string op,
                              std::string right) {
     std::stringstream source;
-    //ofstream sourceFile("source.sppl");
-    //sourceFile << "def main : " << pattern << " | = " << left << " " << op << " " << right;
-    //sourceFile.close();
     source << "def main : " << pattern << " | = " << left << " " << op << " " << right;
+    return source;
+}
+
+std::stringstream *TestMaster::buildCase(std::stringstream *source, std::string pattern, std::string body) {
+    *source << "| " << pattern << " = " << body << "\n";
     return source;
 }
 
@@ -1041,6 +1037,91 @@ void TestMaster::binGreatFloat() {
     std::stringstream source = buildSimple("Bool", "2", ">", "2");
     bool status = compileChecker(&source);
     CPPUNIT_ASSERT(status == true);
+}
+
+/*
+ * Keyword Test
+ */
+
+void TestMaster::keywordInt() {
+    std::stringstream source;
+    source << "def main : Int->Int" << endl;
+    buildCase(&source, "Int", "2");
+
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
+}
+
+void TestMaster::keywordFloat() {
+    std::stringstream source;
+    source << "def main : Float->Int" << endl;
+    buildCase(&source, "Float", "2");
+
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
+}
+
+void TestMaster::keywordBool() {
+    std::stringstream source;
+    source << "def main : Bool->Int" << endl;
+    buildCase(&source, "Bool", "2");
+
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
+}
+
+void TestMaster::keywordChar() {
+    std::stringstream source;
+    source << "def main : Char->Int" << endl;
+    buildCase(&source, "Char", "2");
+
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
+}
+
+void TestMaster::keywordString() {
+    std::stringstream source;
+    source << "def main : String->Int" << endl;
+    buildCase(&source, "String", "2");
+
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
+}
+
+void TestMaster::keywordTrue() {
+    std::stringstream source;
+    source << "def main : Int->Int" << endl;
+    buildCase(&source, "True", "2");
+
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
+}
+
+void TestMaster::keywordFalse() {
+    std::stringstream source;
+    source << "def main : Int->Int" << endl;
+    buildCase(&source, "False", "2");
+
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
+}
+
+void TestMaster::keywordDef() {
+    std::stringstream source;
+    source << "def main : Int->Int" << endl;
+    buildCase(&source, "def", "2");
+
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
+}
+
+void TestMaster::keywordMain() {
+    std::stringstream source;
+    source << "def main : Int->Int" << endl;
+    buildCase(&source, "main", "2");
+
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
 }
 
 // Single line comment test
