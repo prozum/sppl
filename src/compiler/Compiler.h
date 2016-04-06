@@ -1,12 +1,12 @@
 #pragma once
 
-#include <iostream>
-#include <memory>
-#include <CaseChecker.h>
 #include "Driver.h"
 #include "CodeGenerator.h"
 #include "TypeChecker.h"
 #include "ScopeGenerator.h"
+
+#include <iostream>
+#include <memory>
 
 #ifdef CCPP
 #include "CppCodeGenerator.h"
@@ -44,11 +44,10 @@ namespace compiler {
         Compiler(istream *in, ostream *out);
         Compiler(istream *in, ostream *out, ostream *hout);
 
-        std::istream* input;
-        std::ostream* output;
-        std::ostream* header_output;
+        shared_ptr<std::istream> input;
+        shared_ptr<std::ostream> output;
+        shared_ptr<std::ostream> header_output;
         std::unique_ptr<CodeGenerator> generator;
-        semantics::CaseChecker case_checker;
         semantics::ScopeGenerator scope_generator;
         semantics::TypeChecker type_checker;
         parser::Driver driver;

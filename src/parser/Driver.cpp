@@ -1,8 +1,10 @@
 #include <fstream>
 #include <sstream>
+#include <ostream>
 
 #include "Driver.h"
 #include "Scanner.h"
+#include "Error.h"
 
 namespace parser {
 
@@ -12,9 +14,9 @@ Driver::Driver()
     {
     }
 
-    bool Driver::parse_stream(std::istream& in, const std::string& sname)
+    bool Driver::parse_stream(std::istream &in, const std::string &sname)
     {
-        streamname = sname;
+        source = sname;
 
         Scanner scanner(&in);
         scanner.set_debug(trace_scanning);
@@ -32,7 +34,7 @@ Driver::Driver()
         return parse_stream(in, filename);
     }
 
-    bool Driver::parse_string(const std::string &input, const std::string& sname)
+    bool Driver::parse_string(const std::string &input, const std::string &sname)
     {
         std::istringstream iss(input);
         return parse_stream(iss, sname);
@@ -43,14 +45,14 @@ Driver::Driver()
         program->accept(visitor);
     }
 
-    void Driver::error(const class location& l,
-                       const std::string& m)
+    void Driver::error(const common::Location& loc,
+                       const std::string &msg)
     {
-        std::cerr << l << ": " << m << std::endl;
+        std::cerr << loc << msg << std::endl;
     }
 
-    void Driver::error(const std::string& m)
+    void Driver::error(const std::string &msg)
     {
-        std::cerr << m << std::endl;
+        std::cerr << msg << std::endl;
     }
 }

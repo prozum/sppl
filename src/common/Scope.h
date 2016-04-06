@@ -1,9 +1,4 @@
-//
-// Created by hejsil on 3/4/16.
-//
-
-#ifndef SPPL_SCOPE_H
-#define SPPL_SCOPE_H
+#pragma once
 
 #include <vector>
 #include <unordered_map>
@@ -24,6 +19,3 @@ namespace common {
         Type *get_type(std::string id);
     };
 }
-
-
-#endif //SPPL_SCOPE_H

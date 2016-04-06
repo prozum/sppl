@@ -1,5 +1,4 @@
 #include "Compiler.h"
-#include "Printer.h"
 namespace compiler {
 
     Compiler::Compiler(istream* in, ostream* out) : input(in), output(out)
@@ -31,11 +30,11 @@ namespace compiler {
 #endif
 #ifdef CLLVM
             case Backend::LLVM:
-                generator = make_unique<codegen::LLVMCodeGenerator>(*output);
+                generator = make_unique<codegen::LLVMCodeGenerator>(output);
                 break;
 #endif
             case Backend::PPRINTER:
-                generator = make_unique<codegen::Printer>(*output);
+                generator = make_unique<codegen::Printer>(output);
             default:
                 throw "Not a valid backend";
         }
@@ -49,13 +48,11 @@ namespace compiler {
 
         //case_checker.visit(*driver.program);
         scope_generator.visit(*driver.program);
-
-        if (!scope_generator.is_valid)
+        if (scope_generator.HasError())
             return 2;
 
         type_checker.visit(*driver.program);
-
-        if (!type_checker.is_valid)
+        if (type_checker.HasError())
             return 3;
 
         generator->visit(*driver.program);
