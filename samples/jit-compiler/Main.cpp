@@ -1,11 +1,7 @@
 #include "Compiler.h"
 #include "SpplJit.h"
 
-#include <iostream>
-#include <memory>
-#include <istream>
-#include <sstream>
-#include <string>
+#include <regex>
 
 using namespace jit;
 
@@ -17,22 +13,22 @@ int main(int argc, char *argv[]) {
     SpplJit jit(ptr);
 
     string input("");
-    string input_case;
-    jit.Eval("def test: Int\n| = 2*2");
+    string input_case("");
+    string eval_str;
+    //jit.Eval("def test: Int\n| = 2*2");
     while (input.compare("q") != 0)
     {
         cout << ">>> ";
-        cin >> input;
+        getline(cin, input);
 
         if (!input.compare(0, 3, "def")) {
             do
             {
+                input += input_case;
                 cout << "... ";
-                cin >> input_case;
-
+                getline(cin, input_case);
             }
-            while(!input_case.compare(0, 2, "\t|"));
-
+            while(!(input_case.compare(0, 1, "|") && input_case.compare(0, 2, "\t|")));
         }
 
         //jit.Eval(input);
