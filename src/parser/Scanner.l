@@ -37,7 +37,8 @@ using namespace std;
     yylloc->c = 1;
 }
 
-"#".*\n	{ }
+"#"[^\n]* {
+}
 
 "def" {
     return token::DEF;

@@ -26,7 +26,7 @@ class Driver
         void error(const std::string &msg);
 
         class Scanner* lexer;
-        common::Program *program;
+        common::Program *program = nullptr;
         common::Program *global_scope;
 
     void accept(common::Visitor &visitor);

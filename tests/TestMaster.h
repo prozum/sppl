@@ -11,6 +11,7 @@
 #include "Compiler.h"
 #include <fstream>
 #include <cstring>
+#include <iostream>
 
 class TestMaster : public CppUnit::TestFixture{
     CPPUNIT_TEST_SUITE(TestMaster);
@@ -204,19 +205,117 @@ class TestMaster : public CppUnit::TestFixture{
         CPPUNIT_TEST(binLessFloat);
         CPPUNIT_TEST(binGreatFloat);
 
+        CPPUNIT_TEST(sigLengthZeroInt);
+        CPPUNIT_TEST(sigLengthOneInt);
+        CPPUNIT_TEST(sigLengthTwoInt);
+        CPPUNIT_TEST(sigLengthThreeInt);
+        CPPUNIT_TEST(sigLengthFourInt);
+        CPPUNIT_TEST(sigLengthFiveInt);
+        CPPUNIT_TEST(sigLengthSixInt);
+        CPPUNIT_TEST(sigLengthSevenInt);
+        CPPUNIT_TEST(sigLengthEightInt);
+        CPPUNIT_TEST(sigLengthNineInt);
+        CPPUNIT_TEST(sigLengthTenInt);
+
+        CPPUNIT_TEST(patLengthSameInt);
+        CPPUNIT_TEST(patLengthMoreInt);
+        CPPUNIT_TEST(patLengthLessInt);
+
+        CPPUNIT_TEST(casOneCaseInt);
+        CPPUNIT_TEST(casTwoCaseInt);
+        CPPUNIT_TEST(casThreeCaseInt);
+        CPPUNIT_TEST(casFourCaseInt);
+        CPPUNIT_TEST(casFiveCaseInt);
+        CPPUNIT_TEST(casSixCaseInt);
+        CPPUNIT_TEST(casSevenCaseInt);
+        CPPUNIT_TEST(casEightCaseInt);
+        CPPUNIT_TEST(casNineCaseInt);
+        CPPUNIT_TEST(casTenCaseInt);
+
+        // List
+
+        CPPUNIT_TEST(listCasEmpty);
+        CPPUNIT_TEST(listAppendEmpty);
+
+        CPPUNIT_TEST(listInt);
+        CPPUNIT_TEST(listFloat);
+        CPPUNIT_TEST(listBool);
+        CPPUNIT_TEST(listChar);
+        CPPUNIT_TEST(listString);
+
+        CPPUNIT_TEST(listLongInt);
+        CPPUNIT_TEST(listNestedDifLengthInt);
+
+        // List In List
+
+        CPPUNIT_TEST(listListInt);
+        CPPUNIT_TEST(listListFloat);
+        CPPUNIT_TEST(listListBool);
+        CPPUNIT_TEST(listListChar);
+        CPPUNIT_TEST(listListString);
+
+        CPPUNIT_TEST(listListListInt);
+
+        // List Append
+
+        CPPUNIT_TEST(listAppendInt);
+        CPPUNIT_TEST(listAppendFloat);
+        CPPUNIT_TEST(listAppendBool);
+        CPPUNIT_TEST(listAppendChar);
+        CPPUNIT_TEST(listAppendString);
+
+        // List Incorrect Type
+
+        CPPUNIT_TEST(listFloatInInt);
+        CPPUNIT_TEST(listBoolInInt);
+        CPPUNIT_TEST(listCharInInt);
+        CPPUNIT_TEST(listStringInInt);
+
+        CPPUNIT_TEST(listIntInFloat);
+        CPPUNIT_TEST(listBoolInFloat);
+        CPPUNIT_TEST(listCharInFloat);
+        CPPUNIT_TEST(listStringInFloat);
+
+        CPPUNIT_TEST(listIntInBool);
+        CPPUNIT_TEST(listFloatInBool);
+        CPPUNIT_TEST(listCharInBool);
+        CPPUNIT_TEST(listStringInBool);
+
+        CPPUNIT_TEST(listIntInChar);
+        CPPUNIT_TEST(listFloatInChar);
+        CPPUNIT_TEST(listBoolInChar);
+        CPPUNIT_TEST(listStringInChar);
+
+        CPPUNIT_TEST(listIntInString);
+        CPPUNIT_TEST(listFloatInString);
+        CPPUNIT_TEST(listBoolInString);
+        CPPUNIT_TEST(listCharInString);
+
+        CPPUNIT_TEST(listMixTypes);
+        // keyword
+
+        CPPUNIT_TEST(keywordInt);
+        CPPUNIT_TEST(keywordFloat);
+        CPPUNIT_TEST(keywordChar);
+        CPPUNIT_TEST(keywordString);
+        CPPUNIT_TEST(keywordBool);
+        CPPUNIT_TEST(keywordTrue);
+        CPPUNIT_TEST(keywordFalse);
+        CPPUNIT_TEST(keywordMain);
+        CPPUNIT_TEST(keywordDef);
+
         // Single line comment test
         CPPUNIT_TEST(comment);
+    /**/
     CPPUNIT_TEST_SUITE_END();
 public:
-    ifstream in;
-    ofstream out;
-    ofstream hout;
     compiler::Backend backend = compiler::Backend::CPP ;
     int status = 0;
 
     void setUp();
     void tearDown();
 protected:
+    // Addition
     // Addition - Integer
     void addIntPosPos();
     void addIntZeroZero();
@@ -247,6 +346,7 @@ protected:
     void addMixIntFloat();
     void addMixFloatInt();
 
+    // Subtraction
     // Subtraction - Integer
     void subIntPosPos();
     void subIntZeroZero();
@@ -277,6 +377,7 @@ protected:
     void subMixIntFloat();
     void subMixFloatInt();
 
+    //Multiplication
     // Multiplication - Integer
     void mulIntPosPos();
     void mulIntZeroZero();
@@ -306,7 +407,8 @@ protected:
     // Multiplication - Mix
     void mulMixIntFloat();
     void mulMixFloatInt();
-    
+
+    // Division
     // Division - Integer
     void divIntPosPos();
     void divIntZeroZero();
@@ -337,6 +439,7 @@ protected:
     void divMixIntFloat();
     void divMixFloatInt();
 
+    // Modulo
     // Modulo - Integer
     void modIntPosPos();
     void modIntZeroZero();
@@ -367,6 +470,7 @@ protected:
     void modMixIntFloat();
     void modMixFloatInt();
 
+    // Binary/Bool
     // Binary/Bool - Equal
     void binEqualTrueTrue();
     void binEqualTrueFalse();
@@ -416,6 +520,7 @@ protected:
     void binGreatFalseFalse();
 
     // Binary/Int
+    // Binary/Int
     void binEqualInt();
     void binNotEqualInt();
     void binAndInt();
@@ -426,6 +531,7 @@ protected:
     void binGreatInt();
 
     // Binary/Float
+    // Binary/Float
     void binEqualFloat();
     void binNotEqualFloat();
     void binAndFloat();
@@ -435,9 +541,131 @@ protected:
     void binLessFloat();
     void binGreatFloat();
 
+    // Tuple
+    // TODO
+
+    // Signature Length
+    void sigLengthZeroInt();
+    void sigLengthOneInt();
+    void sigLengthTwoInt();
+    void sigLengthThreeInt();
+    void sigLengthFourInt();
+    void sigLengthFiveInt();
+    void sigLengthSixInt();
+    void sigLengthSevenInt();
+    void sigLengthEightInt();
+    void sigLengthNineInt();
+    void sigLengthTenInt();
+
+    // Pattern Length
+    void patLengthSameInt();
+    void patLengthMoreInt();
+    void patLengthLessInt();
+
+    // Case Count
+    void casOneCaseInt();
+    void casTwoCaseInt();
+    void casThreeCaseInt();
+    void casFourCaseInt();
+    void casFiveCaseInt();
+    void casSixCaseInt();
+    void casSevenCaseInt();
+    void casEightCaseInt();
+    void casNineCaseInt();
+    void casTenCaseInt();
+
+    //List
+    void listCasEmpty();
+    void listAppendEmpty();
+
+    void listInt();
+    void listFloat();
+    void listBool();
+    void listChar();
+    void listString();
+
+    void listListInt();
+    void listListFloat();
+    void listListBool();
+    void listListChar();
+    void listListString();
+    void listListListInt();
+
+    void listAppendInt();
+    void listAppendFloat();
+    void listAppendBool();
+    void listAppendChar();
+    void listAppendString();
+    
+    void listLongInt();
+
+    void listFloatInInt();
+    void listBoolInInt();
+    void listCharInInt();
+    void listStringInInt();
+
+    void listIntInFloat();
+    void listBoolInFloat();
+    void listCharInFloat();
+    void listStringInFloat();
+
+    void listIntInBool();
+    void listFloatInBool();
+    void listCharInBool();
+    void listStringInBool();
+
+    void listIntInChar();
+    void listFloatInChar();
+    void listBoolInChar();
+    void listStringInChar();
+
+    void listIntInString();
+    void listFloatInString();
+    void listBoolInString();
+    void listCharInString();
+
+    void listMixTypes();
+
+    void listNestedDifLengthInt();
+
+
+    // Keywords
+    void keywordTrue();
+    void keywordFalse();
+    void keywordInt();
+    void keywordFloat();
+    void keywordBool();
+    void keywordChar();
+    void keywordString();
+    void keywordDef();
+    void keywordMain();
+
+    // Function Call
+    // TODO
+
     // Single line comment test
     void comment();
 
-    void compileChecker(bool success);
-    void buildSimple(std::string pattern, std::string left, std::string op, std::string right, bool status);
+    bool compileChecker(std::stringstream *source);
+    std::stringstream buildSimple(std::string signature,
+                                  std::string body);
+    std::stringstream buildSimple(std::string signature,
+                                  std::string pattern,
+                                  std::string body);
+    std::stringstream buildSimple(std::string pattern,
+                                  std::string left,
+                                  std::string op,
+                                  std::string right);
+    std::stringstream *buildCase(std::stringstream *source,
+                                 std::string pattern,
+                                 std::string body);
+    std::stringstream buildMultiCase(std::vector<string>
+                                     signature,
+                                     std::string ret,
+                                     std::string pattern,
+                                     std::string cas);
+    std::stringstream buildMultiCase(std::string signature,
+                                     std::string ret,
+                                     std::vector<std::string> pattern,
+                                     std::string cas);
 };

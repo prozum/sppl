@@ -1,45 +1,101 @@
 #include "TestMaster.h"
 
 void TestMaster::setUp() {
-
+    // First test setup
 }
 
 void TestMaster::tearDown() {
+    // Final test cleanup
 }
 
-void TestMaster::compileChecker(bool success) {
-    in = ifstream("source.sppl");
-    out = ofstream("target.body");
-    out = ofstream("target.header");
+bool TestMaster::compileChecker(std::stringstream *source) {
+
+    ostream out(0);
+    ostream hout(0);
 
     try {
-        compiler::Compiler compiler(&in, &out, &hout);
+        compiler::Compiler compiler(source, &out, &hout);
         compiler.set_backend(backend);
         status = compiler.compile();
     }
     catch (...)
     {
-        CPPUNIT_ASSERT(false);  // Exceptions should never be thrown by the compiler
+        return false;
     }
 
-    if ((status != 0) == success) {
-        CPPUNIT_ASSERT(false);
+    if (status != 0) {
+        return false;
     } else {
-        CPPUNIT_ASSERT(true);
+        return true;
     }
-
-    remove("source.sppl");
-    remove("target.body");
-    remove("target.head");
-    status = 0;
 }
 
-void TestMaster::buildSimple(std::string pattern, std::string left, std::string op, std::string right, bool status) {
-    ofstream sourceFile("source.sppl");
-    sourceFile << "def main : " << pattern << " | = " << left << " " << op << " " << right;
-    sourceFile.close();
-    compileChecker(status);
+std::stringstream TestMaster::buildSimple(std::string signature,
+                                          std::string body) {
+    std::stringstream source;
+    source << "def main : " << signature << endl << "| = " << body << endl;
+    return source;
 }
+
+std::stringstream TestMaster::buildSimple(std::string signature,
+                                          std::string pattern,
+                                          std::string body) {
+    std::stringstream source;
+    source << "def main : " << signature << endl << "| " << pattern << " = " << body << endl;
+    return source;
+}
+
+std::stringstream TestMaster::buildSimple(std::string pattern,
+                             std::string left,
+                             std::string op,
+                             std::string right) {
+    std::stringstream source;
+    source << "def main : " << pattern << " | = " << left << " " << op << " " << right;
+    return source;
+}
+
+std::stringstream *TestMaster::buildCase(std::stringstream *source,
+                                         std::string pattern,
+                                         std::string body) {
+    *source << "| " << pattern << " = " << body << endl;
+    return source;
+}
+/*
+std::stringstream *TestMaster::buildMultiCase(std::stringstream *source, std::vector<string> signature, std::string ret, std::vector<std::vector<string>> pattern, std::vector<string> cas) {
+
+}
+*/
+
+std::stringstream TestMaster::buildMultiCase(string signature,
+                                             std::string ret,
+                                             std::vector<string> pattern,
+                                             std::string cas) {
+    std::stringstream source;
+    source << "def main : " << signature << "->" << ret << endl;
+
+    for(auto p : pattern) {
+        buildCase(&source, p, cas);
+    }
+    
+    return source;
+}
+std::stringstream TestMaster::buildMultiCase(std::vector<string> signature,
+                                             std::string ret,
+                                             std::string pattern,
+                                             std::string cas) {
+    std::stringstream source;
+
+    source << "def main : ";
+    for (auto s : signature) {
+        source << s << "->";
+    }
+    source << ret << endl;
+
+    buildCase(&source, pattern, cas);
+    
+    return source;
+}
+
 
 /*
  * ADDITION
@@ -48,94 +104,131 @@ void TestMaster::buildSimple(std::string pattern, std::string left, std::string 
 // Addition - Integer
 
 void TestMaster::addIntPosPos() {
-    buildSimple("Int", "2", "+", "2", true);
+    std::stringstream source = buildSimple("Int", "2", "+", "2");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
 }
 
 void TestMaster::addIntZeroZero() {
-    buildSimple("Int", "0", "+", "0", true);
+    std::stringstream source = buildSimple("Int", "0", "+", "0");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
 }
 
 void TestMaster::addIntPosNeg() {
-    buildSimple("Int", "2", "+", "-2", true);
+    std::stringstream source = buildSimple("Int", "2", "+", "-2");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
 }
 
 void TestMaster::addIntNegPos() {
-    buildSimple("Int", "-2", "+", "2", true);
+    std::stringstream source = buildSimple("Int", "-2", "+", "2");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
 }
 
 void TestMaster::addIntNegNeg() {
-    buildSimple("Int", "-2", "+", "-2", true);
+    std::stringstream source = buildSimple("Int", "-2", "+", "-2");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
 }
 
 // Addition - Float
 
 void TestMaster::addFloatPosPos() {
-    buildSimple("Float", "2.0", "+", "2.0", true);
+    std::stringstream source = buildSimple("Float", "2.0", "+", "2.0");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
 }
 
 void TestMaster::addFloatZeroZero() {
-    buildSimple("Float", "0.0", "+", "0.0", true);
+    std::stringstream source = buildSimple("Float", "0.0", "+", "0.0");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
 }
 
 void TestMaster::addFloatPosNeg() {
-    buildSimple("Float", "2.0", "+", "-2.0", true);
+    std::stringstream source = buildSimple("Float", "2.0", "+", "-2.0");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
 }
 
 void TestMaster::addFloatNegPos() {
-    buildSimple("Float", "-2.0", "+", "2.0", true);
+    std::stringstream source = buildSimple("Float", "-2.0", "+", "2.0");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
 }
 
 void TestMaster::addFloatNegNeg() {
-    buildSimple("Float", "-2.0", "+", "-2.0", true);
+    std::stringstream source = buildSimple("Float", "-2.0", "+", "-2.0");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
 }
 
 // Addition - Boolean
 
 void TestMaster::addBoolTrueTrue() {
-    buildSimple("Bool", "True", "+", "True", false);
+    std::stringstream source = buildSimple("Bool", "True", "+", "True");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
 }
 
 void TestMaster::addBoolTrueFalse() {
-    buildSimple("Bool", "True", "+", "False", false);
+    std::stringstream source = buildSimple("Bool", "True", "+", "False");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
 }
 
 void TestMaster::addBoolFalseTrue() {
-    buildSimple("Bool", "False", "+", "True", false);
+    std::stringstream source = buildSimple("Bool", "False", "+", "True");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
 }
 
 void TestMaster::addBoolFalseFalse() {
-    buildSimple("Bool", "False", "+", "False", false);
+    std::stringstream source = buildSimple("Bool", "False", "+", "False");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
 }
 
 // Addition - Character
 
 void TestMaster::addCharStrStr() {
-    buildSimple("String", "\"string\"", "+", "\"string\"", false);
+    std::stringstream source = buildSimple("String", "\"string\"", "+", "\"string\"");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
 }
 
 void TestMaster::addCharStrChar() {
-    buildSimple("String", "\"string\"", "+", "'c'", false);
-
+    std::stringstream source = buildSimple("String", "\"string\"", "+", "'c'");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
 }
 
 void TestMaster::addCharCharStr() {
-    buildSimple("Char", "'c'", "+", "\"string\"", false);
-
+    std::stringstream source = buildSimple("Char", "'c'", "+", "\"string\"");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
 }
 
 void TestMaster::addCharCharChar() {
-    buildSimple("Char", "'c'", "+", "'c'", false);
-
+    std::stringstream source = buildSimple("Char", "'c'", "+", "'c'");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
 }
 
 // Addition - Mix
 
 void TestMaster::addMixFloatInt() {
-    buildSimple("Float", "2.0", "+", "2", false);
+    std::stringstream source = buildSimple("Float", "2.0", "+", "2");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
 }
 
 void TestMaster::addMixIntFloat() {
-    buildSimple("Int", "2", "+", "2.0", false);
+    std::stringstream source = buildSimple("Int", "2", "+", "2.0");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
 }
 
 /*
@@ -145,94 +238,131 @@ void TestMaster::addMixIntFloat() {
 // Subtraction - Integer
 
 void TestMaster::subIntPosPos() {
-    buildSimple("Int", "2", "-", "2", true);
+    std::stringstream source = buildSimple("Int", "2", "-", "2");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
 }
 
 void TestMaster::subIntZeroZero() {
-    buildSimple("Int", "0", "-", "0", true);
+    std::stringstream source = buildSimple("Int", "0", "-", "0");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
 }
 
 void TestMaster::subIntPosNeg() {
-    buildSimple("Int", "2", "-", "-2", true);
+    std::stringstream source = buildSimple("Int", "2", "-", "-2");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
 }
 
 void TestMaster::subIntNegPos() {
-    buildSimple("Int", "-2", "-", "2", true);
+    std::stringstream source = buildSimple("Int", "-2", "-", "2");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
 }
 
 void TestMaster::subIntNegNeg() {
-    buildSimple("Int", "-2", "-", "-2", true);
+    std::stringstream source = buildSimple("Int", "-2", "-", "-2");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
 }
 
 // Subtraction - Float
 
 void TestMaster::subFloatPosPos() {
-    buildSimple("Float", "2.0", "-", "2.0", true);
+    std::stringstream source = buildSimple("Float", "2.0", "-", "2.0");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
 }
 
 void TestMaster::subFloatZeroZero() {
-    buildSimple("Float", "0.0", "-", "0.0", true);
+    std::stringstream source = buildSimple("Float", "0.0", "-", "0.0");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
 }
 
 void TestMaster::subFloatPosNeg() {
-    buildSimple("Float", "2.0", "-", "-2.0", true);
+    std::stringstream source = buildSimple("Float", "2.0", "-", "-2.0");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
 }
 
 void TestMaster::subFloatNegPos() {
-    buildSimple("Float", "-2.0", "-", "2.0", true);
+    std::stringstream source = buildSimple("Float", "-2.0", "-", "2.0");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
 }
 
 void TestMaster::subFloatNegNeg() {
-    buildSimple("Float", "-2.0", "-", "-2.0", true);
+    std::stringstream source = buildSimple("Float", "-2.0", "-", "-2.0");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
 }
 
 // Subtraction - Boolean
 
 void TestMaster::subBoolTrueTrue() {
-    buildSimple("Bool", "True", "-", "True", false);
+    std::stringstream source = buildSimple("Bool", "True", "-", "True");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
 }
 
 void TestMaster::subBoolTrueFalse() {
-    buildSimple("Bool", "True", "-", "False", false);
+    std::stringstream source = buildSimple("Bool", "True", "-", "False");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
 }
 
 void TestMaster::subBoolFalseTrue() {
-    buildSimple("Bool", "False", "-", "True", false);
+    std::stringstream source = buildSimple("Bool", "False", "-", "True");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
 }
 
 void TestMaster::subBoolFalseFalse() {
-    buildSimple("Bool", "False", "-", "False", false);
+    std::stringstream source = buildSimple("Bool", "False", "-", "False");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
 }
 
 // Subtraction - Character
 
 void TestMaster::subCharStrStr() {
-    buildSimple("String", "\"string\"", "-", "\"string\"", false);
+    std::stringstream source = buildSimple("String", "\"string\"", "-", "\"string\"");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
 }
 
 void TestMaster::subCharStrChar() {
-    buildSimple("String", "\"string\"", "-", "'c'", false);
-
+    std::stringstream source = buildSimple("String", "\"string\"", "-", "'c'");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
 }
 
 void TestMaster::subCharCharStr() {
-    buildSimple("Char", "'c'", "-", "\"string\"", false);
-
+    std::stringstream source = buildSimple("Char", "'c'", "-", "\"string\"");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
 }
 
 void TestMaster::subCharCharChar() {
-    buildSimple("Char", "'c'", "-", "'c'", false);
-
+    std::stringstream source = buildSimple("Char", "'c'", "-", "'c'");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
 }
 
 // Subtraction - Mix
 
 void TestMaster::subMixFloatInt() {
-    buildSimple("Float", "2.0", "-", "2", false);
+    std::stringstream source = buildSimple("Float", "2.0", "-", "2");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
 }
 
 void TestMaster::subMixIntFloat() {
-    buildSimple("Int", "2", "-", "2.0", false);
+    std::stringstream source = buildSimple("Int", "2", "-", "2.0");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
 }
 
 /*
@@ -242,94 +372,134 @@ void TestMaster::subMixIntFloat() {
 // Multiplication - Integer
 
 void TestMaster::mulIntPosPos() {
-    buildSimple("Int", "2", "*", "2", true);
+    std::stringstream source = buildSimple("Int", "2", "*", "2");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
 }
 
 void TestMaster::mulIntZeroZero() {
-    buildSimple("Int", "0", "*", "0", true);
+    std::stringstream source = buildSimple("Int", "0", "*", "0");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
 }
 
 void TestMaster::mulIntPosNeg() {
-    buildSimple("Int", "2", "*", "-2", true);
+    std::stringstream source = buildSimple("Int", "2", "*", "-2");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
 }
 
 void TestMaster::mulIntNegPos() {
-    buildSimple("Int", "-2", "*", "2", true);
+    std::stringstream source = buildSimple("Int", "-2", "*", "2");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
 }
 
 void TestMaster::mulIntNegNeg() {
-    buildSimple("Int", "-2", "*", "-2", true);
+    std::stringstream source = buildSimple("Int", "-2", "*", "-2");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
 }
 
 // Multiplication - Float
 
 void TestMaster::mulFloatPosPos() {
-    buildSimple("Float", "2.0", "*", "2.0", true);
+    std::stringstream source = buildSimple("Float", "2.0", "*", "2.0");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
 }
 
 void TestMaster::mulFloatZeroZero() {
-    buildSimple("Float", "0.0", "*", "0.0", true);
+    std::stringstream source = buildSimple("Float", "0.0", "*", "0.0");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
 }
 
 void TestMaster::mulFloatPosNeg() {
-    buildSimple("Float", "2.0", "*", "-2.0", true);
+    std::stringstream source = buildSimple("Float", "2.0", "*", "-2.0");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
 }
 
 void TestMaster::mulFloatNegPos() {
-    buildSimple("Float", "-2.0", "*", "2.0", true);
+    std::stringstream source = buildSimple("Float", "-2.0", "*", "2.0");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
 }
 
 void TestMaster::mulFloatNegNeg() {
-    buildSimple("Float", "-2.0", "*", "-2.0", true);
+    std::stringstream source = buildSimple("Float", "-2.0", "*", "-2.0");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
 }
 
 // Multiplication - Boolean
 
 void TestMaster::mulBoolTrueTrue() {
-    buildSimple("Bool", "True", "*", "True", false);
+    std::stringstream source = buildSimple("Bool", "True", "*", "True");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
 }
 
 void TestMaster::mulBoolTrueFalse() {
-    buildSimple("Bool", "True", "*", "False", false);
+    std::stringstream source = buildSimple("Bool", "True", "*", "False");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
 }
 
 void TestMaster::mulBoolFalseTrue() {
-    buildSimple("Bool", "False", "*", "True", false);
+    std::stringstream source = buildSimple("Bool", "False", "*", "True");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
 }
 
 void TestMaster::mulBoolFalseFalse() {
-    buildSimple("Bool", "False", "*", "False", false);
+    std::stringstream source = buildSimple("Bool", "False", "*", "False");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
 }
 
 // Multiplication - Character
 
 void TestMaster::mulCharStrStr() {
-    buildSimple("String", "\"string\"", "*", "\"string\"", false);
+    std::stringstream source = buildSimple("String", "\"string\"", "*", "\"string\"");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
 }
 
 void TestMaster::mulCharStrChar() {
-    buildSimple("String", "\"string\"", "*", "'c'", false);
+    std::stringstream source = buildSimple("String", "\"string\"", "*", "'c'");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
 
 }
 
 void TestMaster::mulCharCharStr() {
-    buildSimple("Char", "'c'", "*", "\"string\"", false);
+    std::stringstream source = buildSimple("Char", "'c'", "*", "\"string\"");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
 
 }
 
 void TestMaster::mulCharCharChar() {
-    buildSimple("Char", "'c'", "*", "'c'", false);
+    std::stringstream source = buildSimple("Char", "'c'", "*", "'c'");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
 
 }
 
 // Multiplication - Mix
 
 void TestMaster::mulMixFloatInt() {
-    buildSimple("Float", "2.0", "*", "2", false);
+    std::stringstream source = buildSimple("Float", "2.0", "*", "2");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
 }
 
 void TestMaster::mulMixIntFloat() {
-    buildSimple("Int", "2", "*", "2.0", false);
+    std::stringstream source = buildSimple("Int", "2", "*", "2.0");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
 }
 
 /*
@@ -339,94 +509,134 @@ void TestMaster::mulMixIntFloat() {
 // Division - Integer
 
 void TestMaster::divIntPosPos() {
-    buildSimple("Int", "2", "/", "2", true);
+    std::stringstream source = buildSimple("Int", "2", "/", "2");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
 }
 
 void TestMaster::divIntZeroZero() {
-    buildSimple("Int", "0", "/", "0", true);
+    std::stringstream source = buildSimple("Int", "0", "/", "0");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
 }
 
 void TestMaster::divIntPosNeg() {
-    buildSimple("Int", "2", "/", "-2", true);
+    std::stringstream source = buildSimple("Int", "2", "/", "-2");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
 }
 
 void TestMaster::divIntNegPos() {
-    buildSimple("Int", "-2", "/", "2", true);
+    std::stringstream source = buildSimple("Int", "-2", "/", "2");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
 }
 
 void TestMaster::divIntNegNeg() {
-    buildSimple("Int", "-2", "/", "-2", true);
+    std::stringstream source = buildSimple("Int", "-2", "/", "-2");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
 }
 
 // Division - Float
 
 void TestMaster::divFloatPosPos() {
-    buildSimple("Float", "2.0", "/", "2.0", true);
+    std::stringstream source = buildSimple("Float", "2.0", "/", "2.0");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
 }
 
 void TestMaster::divFloatZeroZero() {
-    buildSimple("Float", "0.0", "/", "0.0", true);
+    std::stringstream source = buildSimple("Float", "0.0", "/", "0.0");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
 }
 
 void TestMaster::divFloatPosNeg() {
-    buildSimple("Float", "2.0", "/", "-2.0", true);
+    std::stringstream source = buildSimple("Float", "2.0", "/", "-2.0");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
 }
 
 void TestMaster::divFloatNegPos() {
-    buildSimple("Float", "-2.0", "/", "2.0", true);
+    std::stringstream source = buildSimple("Float", "-2.0", "/", "2.0");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
 }
 
 void TestMaster::divFloatNegNeg() {
-    buildSimple("Float", "-2.0", "/", "-2.0", true);
+    std::stringstream source = buildSimple("Float", "-2.0", "/", "-2.0");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
 }
 
 // Division - Boolean
 
 void TestMaster::divBoolTrueTrue() {
-    buildSimple("Bool", "True", "/", "True", false);
+    std::stringstream source = buildSimple("Bool", "True", "/", "True");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
 }
 
 void TestMaster::divBoolTrueFalse() {
-    buildSimple("Bool", "True", "/", "False", false);
+    std::stringstream source = buildSimple("Bool", "True", "/", "False");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
 }
 
 void TestMaster::divBoolFalseTrue() {
-    buildSimple("Bool", "False", "/", "True", false);
+    std::stringstream source = buildSimple("Bool", "False", "/", "True");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
 }
 
 void TestMaster::divBoolFalseFalse() {
-    buildSimple("Bool", "False", "/", "False", false);
+    std::stringstream source = buildSimple("Bool", "False", "/", "False");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
 }
 
 // Division - Character
 
 void TestMaster::divCharStrStr() {
-    buildSimple("String", "\"string\"", "/", "\"string\"", false);
+    std::stringstream source = buildSimple("String", "\"string\"", "/", "\"string\"");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
 }
 
 void TestMaster::divCharStrChar() {
-    buildSimple("String", "\"string\"", "/", "'c'", false);
+    std::stringstream source = buildSimple("String", "\"string\"", "/", "'c'");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
 
 }
 
 void TestMaster::divCharCharStr() {
-    buildSimple("Char", "'c'", "/", "\"string\"", false);
+    std::stringstream source = buildSimple("Char", "'c'", "/", "\"string\"");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
 
 }
 
 void TestMaster::divCharCharChar() {
-    buildSimple("Char", "'c'", "/", "'c'", false);
+    std::stringstream source = buildSimple("Char", "'c'", "/", "'c'");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
 
 }
 
 // Division - Mix
 
 void TestMaster::divMixFloatInt() {
-    buildSimple("Float", "2.0", "/", "2", false);
+    std::stringstream source = buildSimple("Float", "2.0", "/", "2");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
 }
 
 void TestMaster::divMixIntFloat() {
-    buildSimple("Int", "2", "/", "2.0", false);
+    std::stringstream source = buildSimple("Int", "2", "/", "2.0");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
 }
 
 /*
@@ -436,94 +646,134 @@ void TestMaster::divMixIntFloat() {
 // Modulo - Integer
 
 void TestMaster::modIntPosPos() {
-    buildSimple("Int", "2", "%", "2", true);
+    std::stringstream source = buildSimple("Int", "2", "%", "2");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
 }
 
 void TestMaster::modIntZeroZero() {
-    buildSimple("Int", "0", "%", "0", true);
+    std::stringstream source = buildSimple("Int", "0", "%", "0");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
 }
 
 void TestMaster::modIntPosNeg() {
-    buildSimple("Int", "2", "%", "-2", true);
+    std::stringstream source = buildSimple("Int", "2", "%", "-2");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
 }
 
 void TestMaster::modIntNegPos() {
-    buildSimple("Int", "-2", "%", "2", true);
+    std::stringstream source = buildSimple("Int", "-2", "%", "2");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
 }
 
 void TestMaster::modIntNegNeg() {
-    buildSimple("Int", "-2", "%", "-2", true);
+    std::stringstream source = buildSimple("Int", "-2", "%", "-2");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
 }
 
 // Modulo - Float
 
 void TestMaster::modFloatPosPos() {
-    buildSimple("Float", "2.0", "%", "2.0", true);
+    std::stringstream source = buildSimple("Float", "2.0", "%", "2.0");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
 }
 
 void TestMaster::modFloatZeroZero() {
-    buildSimple("Float", "0.0", "%", "0.0", true);
+    std::stringstream source = buildSimple("Float", "0.0", "%", "0.0");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
 }
 
 void TestMaster::modFloatPosNeg() {
-    buildSimple("Float", "2.0", "%", "-2.0", true);
+    std::stringstream source = buildSimple("Float", "2.0", "%", "-2.0");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
 }
 
 void TestMaster::modFloatNegPos() {
-    buildSimple("Float", "-2.0", "%", "2.0", true);
+    std::stringstream source = buildSimple("Float", "-2.0", "%", "2.0");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
 }
 
 void TestMaster::modFloatNegNeg() {
-    buildSimple("Float", "-2.0", "%", "-2.0", true);
+    std::stringstream source = buildSimple("Float", "-2.0", "%", "-2.0");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
 }
 
 // Modulo - Boolean
 
 void TestMaster::modBoolTrueTrue() {
-    buildSimple("Bool", "True", "%", "True", false);
+    std::stringstream source = buildSimple("Bool", "True", "%", "True");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
 }
 
 void TestMaster::modBoolTrueFalse() {
-    buildSimple("Bool", "True", "%", "False", false);
+    std::stringstream source = buildSimple("Bool", "True", "%", "False");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
 }
 
 void TestMaster::modBoolFalseTrue() {
-    buildSimple("Bool", "False", "%", "True", false);
+    std::stringstream source = buildSimple("Bool", "False", "%", "True");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
 }
 
 void TestMaster::modBoolFalseFalse() {
-    buildSimple("Bool", "False", "%", "False", false);
+    std::stringstream source = buildSimple("Bool", "False", "%", "False");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
 }
 
 // Modulo - Character
 
 void TestMaster::modCharStrStr() {
-    buildSimple("String", "\"string\"", "%", "\"string\"", false);
+    std::stringstream source = buildSimple("String", "\"string\"", "%", "\"string\"");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
 }
 
 void TestMaster::modCharStrChar() {
-    buildSimple("String", "\"string\"", "%", "'c'", false);
+    std::stringstream source = buildSimple("String", "\"string\"", "%", "'c'");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
 
 }
 
 void TestMaster::modCharCharStr() {
-    buildSimple("Char", "'c'", "%", "\"string\"", false);
+    std::stringstream source = buildSimple("Char", "'c'", "%", "\"string\"");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
 
 }
 
 void TestMaster::modCharCharChar() {
-    buildSimple("Char", "'c'", "%", "'c'", false);
+    std::stringstream source = buildSimple("Char", "'c'", "%", "'c'");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
 
 }
 
 // Modulo - Mix
 
 void TestMaster::modMixFloatInt() {
-    buildSimple("Float", "2.0", "%", "2", false);
+    std::stringstream source = buildSimple("Float", "2.0", "%", "2");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
 }
 
 void TestMaster::modMixIntFloat() {
-    buildSimple("Int", "2", "%", "2.0", false);
+    std::stringstream source = buildSimple("Int", "2", "%", "2.0");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
 }
 
 /*
@@ -533,145 +783,209 @@ void TestMaster::modMixIntFloat() {
 // Binary/Bool - Equal
 
 void TestMaster::binEqualTrueTrue() {
-    buildSimple("Bool", "True", "==", "True", true);
+    std::stringstream source = buildSimple("Bool", "True", "==", "True");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
 }
 
 void TestMaster::binEqualTrueFalse() {
-    buildSimple("Bool", "True", "==", "False", true);
+    std::stringstream source = buildSimple("Bool", "True", "==", "False");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
 }
 
 void TestMaster::binEqualFalseTrue() {
-    buildSimple("Bool", "False", "==", "True", true);
+    std::stringstream source = buildSimple("Bool", "False", "==", "True");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
 }
 
 void TestMaster::binEqualFalseFalse() {
-    buildSimple("Bool", "False", "==", "False", true);
+    std::stringstream source = buildSimple("Bool", "False", "==", "False");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
 }
 
 // Binary/Bool - NotEqual
 
 void TestMaster::binNotEqualTrueTrue() {
-    buildSimple("Bool", "True", "!=", "True", true);
+    std::stringstream source = buildSimple("Bool", "True", "!=", "True");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
 }
 
 void TestMaster::binNotEqualTrueFalse() {
-    buildSimple("Bool", "True", "!=", "False", true);
+    std::stringstream source = buildSimple("Bool", "True", "!=", "False");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
 }
 
 void TestMaster::binNotEqualFalseTrue() {
-    buildSimple("Bool", "False", "!=", "True", true);
+    std::stringstream source = buildSimple("Bool", "False", "!=", "True");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
 }
 
 void TestMaster::binNotEqualFalseFalse() {
-    buildSimple("Bool", "False", "!=", "False", true);
+    std::stringstream source = buildSimple("Bool", "False", "!=", "False");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
 }
 
 // Binary/Bool - And
 
 void TestMaster::binAndTrueTrue() {
-    buildSimple("Bool", "True", "&&", "True", true);
+    std::stringstream source = buildSimple("Bool", "True", "&&", "True");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
 }
 
 void TestMaster::binAndTrueFalse() {
-    buildSimple("Bool", "True", "&&", "False", true);
+    std::stringstream source = buildSimple("Bool", "True", "&&", "False");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
 }
 
 void TestMaster::binAndFalseTrue() {
-    buildSimple("Bool", "False", "&&", "True", true);
+    std::stringstream source = buildSimple("Bool", "False", "&&", "True");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
 }
 
 void TestMaster::binAndFalseFalse() {
-    buildSimple("Bool", "False", "&&", "False", true);
+    std::stringstream source = buildSimple("Bool", "False", "&&", "False");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
 }
 
 // Binary/Bool - Or
 
 void TestMaster::binOrTrueTrue() {
-    buildSimple("Bool", "True", "||", "True", true);
+    std::stringstream source = buildSimple("Bool", "True", "||", "True");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
 }
 
 void TestMaster::binOrTrueFalse() {
-    buildSimple("Bool", "True", "||", "False", true);
+    std::stringstream source = buildSimple("Bool", "True", "||", "False");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
 }
 
 void TestMaster::binOrFalseTrue() {
-    buildSimple("Bool", "False", "||", "True", true);
+    std::stringstream source = buildSimple("Bool", "False", "||", "True");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
 }
 
 void TestMaster::binOrFalseFalse() {
-    buildSimple("Bool", "False", "||", "False", true);
+    std::stringstream source = buildSimple("Bool", "False", "||", "False");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
 }
 
 // Binary/Bool - GrEq
 
 void TestMaster::binGrEqTrueTrue() {
-    buildSimple("Bool", "True", ">=", "True", false);
+    std::stringstream source = buildSimple("Bool", "True", ">=", "True");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
 }
 
 void TestMaster::binGrEqTrueFalse() {
-    buildSimple("Bool", "True", ">=", "False", false);
+    std::stringstream source = buildSimple("Bool", "True", ">=", "False");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
 }
 
 void TestMaster::binGrEqFalseTrue() {
-    buildSimple("Bool", "False", ">=", "True", false);
+    std::stringstream source = buildSimple("Bool", "False", ">=", "True");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
 }
 
 void TestMaster::binGrEqFalseFalse() {
-    buildSimple("Bool", "False", ">=", "False", false);
+    std::stringstream source = buildSimple("Bool", "False", ">=", "False");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
 }
 
 // Binary/Bool - LeEq
 
 void TestMaster::binLeEqTrueTrue() {
-    buildSimple("Bool", "True", "<=", "True", false);
+    std::stringstream source = buildSimple("Bool", "True", "<=", "True");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
 }
 
 void TestMaster::binLeEqTrueFalse() {
-    buildSimple("Bool", "True", "<=", "False", false);
+    std::stringstream source = buildSimple("Bool", "True", "<=", "False");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
 }
 
 void TestMaster::binLeEqFalseTrue() {
-    buildSimple("Bool", "False", "<=", "True", false);
+    std::stringstream source = buildSimple("Bool", "False", "<=", "True");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
 }
 
 void TestMaster::binLeEqFalseFalse() {
-    buildSimple("Bool", "False", "<=", "False", false);
+    std::stringstream source = buildSimple("Bool", "False", "<=", "False");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
 }
 
 // Binary/Bool - Great
 
 void TestMaster::binGreatTrueTrue() {
-    buildSimple("Bool", "True", ">", "True", false);
+    std::stringstream source = buildSimple("Bool", "True", ">", "True");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
 }
 
 void TestMaster::binGreatTrueFalse() {
-    buildSimple("Bool", "True", ">", "False", false);
+    std::stringstream source = buildSimple("Bool", "True", ">", "False");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
 }
 
 void TestMaster::binGreatFalseTrue() {
-    buildSimple("Bool", "False", ">", "True", false);
+    std::stringstream source = buildSimple("Bool", "False", ">", "True");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
 }
 
 void TestMaster::binGreatFalseFalse() {
-    buildSimple("Bool", "False", ">", "False", false);
+    std::stringstream source = buildSimple("Bool", "False", ">", "False");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
 }
 
 // Binary/Bool - Less
 
 void TestMaster::binLessTrueTrue() {
-    buildSimple("Bool", "True", "<", "True", false);
+    std::stringstream source = buildSimple("Bool", "True", "<", "True");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
 }
 
 void TestMaster::binLessTrueFalse() {
-    buildSimple("Bool", "True", "<", "False", false);
+    std::stringstream source = buildSimple("Bool", "True", "<", "False");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
 }
 
 void TestMaster::binLessFalseTrue() {
-    buildSimple("Bool", "False", "<", "True", false);
+    std::stringstream source = buildSimple("Bool", "False", "<", "True");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
 }
 
 void TestMaster::binLessFalseFalse() {
-    buildSimple("Bool", "False", "<", "False", false);
+    std::stringstream source = buildSimple("Bool", "False", "<", "False");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
 }
 
 /*
@@ -679,72 +993,779 @@ void TestMaster::binLessFalseFalse() {
  */
 
 // Binary/Int
+
 void TestMaster::binEqualInt() {
-    buildSimple("Bool", "2", "==", "2", true);
+    std::stringstream source = buildSimple("Bool", "2", "==", "2");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
 }
 
 void TestMaster::binNotEqualInt() {
-    buildSimple("Bool", "2", "!=", "2", true);
+    std::stringstream source = buildSimple("Bool", "2", "!=", "2");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
 }
 
 void TestMaster::binAndInt() {
-    buildSimple("Bool", "2", "&&", "2", false);
+    std::stringstream source = buildSimple("Bool", "2", "&&", "2");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
 }
 
 void TestMaster::binOrInt() {
-    buildSimple("Bool", "2", "||", "2", false);
+    std::stringstream source = buildSimple("Bool", "2", "||", "2");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
 }
 
 void TestMaster::binLeEqInt() {
-    buildSimple("Bool", "2", "<=", "2", true);
+    std::stringstream source = buildSimple("Bool", "2", "<=", "2");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
 }
 
 void TestMaster::binGrEqInt() {
-    buildSimple("Bool", "2", ">=", "2", true);
+    std::stringstream source = buildSimple("Bool", "2", ">=", "2");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
 }
 
 void TestMaster::binLessInt() {
-    buildSimple("Bool", "2", "<", "2", true);
+    std::stringstream source = buildSimple("Bool", "2", "<", "2");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
 }
 
 void TestMaster::binGreatInt() {
-    buildSimple("Bool", "2", ">", "2", true);
+    std::stringstream source = buildSimple("Bool", "2", ">", "2");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
 }
 
 // Binary/Float
+
 void TestMaster::binEqualFloat() {
-    buildSimple("Bool", "2", "==", "2", true);
+    std::stringstream source = buildSimple("Bool", "2", "==", "2");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
 }
 
 void TestMaster::binNotEqualFloat() {
-    buildSimple("Bool", "2", "!=", "2", true);
+    std::stringstream source = buildSimple("Bool", "2", "!=", "2");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
 }
 
 void TestMaster::binAndFloat() {
-    buildSimple("Bool", "2", "&&", "2", false);
+    std::stringstream source = buildSimple("Bool", "2", "&&", "2");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
 }
 
 void TestMaster::binOrFloat() {
-    buildSimple("Bool", "2", "||", "2", false);
+    std::stringstream source = buildSimple("Bool", "2", "||", "2");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
 }
 
 void TestMaster::binLeEqFloat() {
-    buildSimple("Bool", "2", "<=", "2", true);
+    std::stringstream source = buildSimple("Bool", "2", "<=", "2");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
 }
 
 void TestMaster::binGrEqFloat() {
-    buildSimple("Bool", "2", ">=", "2", true);
+    std::stringstream source = buildSimple("Bool", "2", ">=", "2");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
 }
 
 void TestMaster::binLessFloat() {
-    buildSimple("Bool", "2", "<", "2", true);
+    std::stringstream source = buildSimple("Bool", "2", "<", "2");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
 }
 
 void TestMaster::binGreatFloat() {
-    buildSimple("Bool", "2", ">", "2", true);
+    std::stringstream source = buildSimple("Bool", "2", ">", "2");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+/*
+ * Case & Signature test
+ */
+
+// SIgnature length
+
+void TestMaster::sigLengthZeroInt() {
+    std::vector<string> signature;
+
+    std::stringstream source = buildMultiCase(signature, "Int", "", "2");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::sigLengthOneInt() {
+    std::vector<string> signature;
+    signature.push_back("Int");
+
+    std::stringstream source = buildMultiCase(signature, "Int", "a", "2");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::sigLengthTwoInt() {
+    std::vector<string> signature;
+    signature.push_back("Int");
+    signature.push_back("Int");
+
+    std::stringstream source = buildMultiCase(signature, "Int", "a b", "2");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::sigLengthThreeInt() {
+    std::vector<string> signature;
+    signature.push_back("Int");
+    signature.push_back("Int");
+    signature.push_back("Int");
+
+    std::stringstream source = buildMultiCase(signature, "Int", "a b c", "2");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::sigLengthFourInt() {
+    std::vector<string> signature;
+    signature.push_back("Int");
+    signature.push_back("Int");
+    signature.push_back("Int");
+    signature.push_back("Int");
+
+    std::stringstream source = buildMultiCase(signature, "Int", "a b c d", "2");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::sigLengthFiveInt() {
+    std::vector<string> signature;
+
+    signature.push_back("Int");
+    signature.push_back("Int");
+    signature.push_back("Int");
+    signature.push_back("Int");
+    signature.push_back("Int");
+
+    std::stringstream source = buildMultiCase(signature, "Int", "a b c d e", "2");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::sigLengthSixInt() {
+    std::vector<string> signature;
+    signature.push_back("Int");
+    signature.push_back("Int");
+    signature.push_back("Int");
+    signature.push_back("Int");
+    signature.push_back("Int");
+    signature.push_back("Int");
+
+    std::stringstream source = buildMultiCase(signature, "Int", "a b c d e f", "2");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::sigLengthSevenInt() {
+    std::vector<string> signature;
+    signature.push_back("Int");
+    signature.push_back("Int");
+    signature.push_back("Int");
+    signature.push_back("Int");
+    signature.push_back("Int");
+    signature.push_back("Int");
+    signature.push_back("Int");
+
+    std::stringstream source = buildMultiCase(signature, "Int", "a b c d e f g", "2");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::sigLengthEightInt() {
+    std::vector<string> signature;
+
+    signature.push_back("Int");
+    signature.push_back("Int");
+    signature.push_back("Int");
+    signature.push_back("Int");
+    signature.push_back("Int");
+    signature.push_back("Int");
+    signature.push_back("Int");
+    signature.push_back("Int");
+
+    std::stringstream source = buildMultiCase(signature, "Int", "a b c d e f g h", "2");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::sigLengthNineInt() {
+    std::vector<string> signature;
+    signature.push_back("Int");
+    signature.push_back("Int");
+    signature.push_back("Int");
+    signature.push_back("Int");
+    signature.push_back("Int");
+    signature.push_back("Int");
+    signature.push_back("Int");
+    signature.push_back("Int");
+    signature.push_back("Int");
+
+    std::stringstream source = buildMultiCase(signature, "Int", "a b c d e f g h i", "2");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::sigLengthTenInt() {
+    std::vector<string> signature;
+    signature.push_back("Int");
+    signature.push_back("Int");
+    signature.push_back("Int");
+    signature.push_back("Int");
+    signature.push_back("Int");
+    signature.push_back("Int");
+    signature.push_back("Int");
+    signature.push_back("Int");
+    signature.push_back("Int");
+    signature.push_back("Int");
+
+    std::stringstream source = buildMultiCase(signature, "Int", "a b c d e f g h i j", "2");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+// Pattern Match
+
+void TestMaster::patLengthSameInt() {
+    std::vector<string> signature;
+
+    signature.push_back("Int");
+    signature.push_back("Int");
+
+    std::stringstream source = buildMultiCase(signature, "Int", "a b", "2");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::patLengthLessInt() {
+    std::vector<string> signature;
+
+    signature.push_back("Int");
+    signature.push_back("Int");
+
+    std::stringstream source = buildMultiCase(signature, "Int", "a", "2");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
+}
+
+void TestMaster::patLengthMoreInt() {
+    std::vector<string> signature;
+
+    signature.push_back("Int");
+    signature.push_back("Int");
+
+    std::stringstream source = buildMultiCase(signature, "Int", "a b c", "2");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
+}
+
+// Case Count
+
+void TestMaster::casOneCaseInt() {
+    std::vector<string> pattern;
+    pattern.push_back("1");
+
+    std::stringstream source = buildMultiCase("Int","Int",pattern, "2");
+    bool status = compileChecker(&source);
+    string prog = source.str();
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::casTwoCaseInt() {
+    std::vector<string> pattern;
+    pattern.push_back("1");
+    pattern.push_back("2");
+
+    std::stringstream source = buildMultiCase("Int","Int",pattern, "2");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::casThreeCaseInt() {
+    std::vector<string> pattern;
+    pattern.push_back("1");
+    pattern.push_back("2");
+    pattern.push_back("3");
+
+    std::stringstream source = buildMultiCase("Int","Int",pattern, "2");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::casFourCaseInt() {
+    std::vector<string> pattern;
+    pattern.push_back("1");
+    pattern.push_back("2");
+    pattern.push_back("3");
+    pattern.push_back("4");
+
+    std::stringstream source = buildMultiCase("Int","Int",pattern, "2");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::casFiveCaseInt() {
+    std::vector<string> pattern;
+    pattern.push_back("1");
+    pattern.push_back("2");
+    pattern.push_back("3");
+    pattern.push_back("4");
+    pattern.push_back("5");
+
+    std::stringstream source = buildMultiCase("Int","Int",pattern, "2");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::casSixCaseInt() {
+    std::vector<string> pattern;
+    pattern.push_back("1");
+    pattern.push_back("2");
+    pattern.push_back("3");
+    pattern.push_back("4");
+    pattern.push_back("5");
+    pattern.push_back("6");
+
+    std::stringstream source = buildMultiCase("Int","Int",pattern, "2");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::casSevenCaseInt() {
+    std::vector<string> pattern;
+    pattern.push_back("1");
+    pattern.push_back("2");
+    pattern.push_back("3");
+    pattern.push_back("4");
+    pattern.push_back("5");
+    pattern.push_back("6");
+    pattern.push_back("7");
+
+    std::stringstream source = buildMultiCase("Int","Int",pattern, "2");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::casEightCaseInt() {
+    std::vector<string> pattern;
+    pattern.push_back("1");
+    pattern.push_back("2");
+    pattern.push_back("3");
+    pattern.push_back("4");
+    pattern.push_back("5");
+    pattern.push_back("6");
+    pattern.push_back("7");
+    pattern.push_back("8");
+
+    std::stringstream source = buildMultiCase("Int","Int",pattern, "2");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::casNineCaseInt() {
+    std::vector<string> pattern;
+    pattern.push_back("1");
+    pattern.push_back("2");
+    pattern.push_back("3");
+    pattern.push_back("4");
+    pattern.push_back("5");
+    pattern.push_back("6");
+    pattern.push_back("7");
+    pattern.push_back("8");
+    pattern.push_back("9");
+
+    std::stringstream source = buildMultiCase("Int","Int",pattern, "2");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::casTenCaseInt() {
+    std::vector<string> pattern;
+    pattern.push_back("1");
+    pattern.push_back("2");
+    pattern.push_back("3");
+    pattern.push_back("4");
+    pattern.push_back("5");
+    pattern.push_back("6");
+    pattern.push_back("7");
+    pattern.push_back("8");
+    pattern.push_back("9");
+    pattern.push_back("n");
+
+    std::stringstream source = buildMultiCase("Int","Int",pattern, "2");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+/*
+ * List
+ */
+
+void TestMaster::listCasEmpty() {
+    std::stringstream source = buildSimple("[Int]->Int", "[]", "2");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::listAppendEmpty() {
+    std::stringstream source = buildSimple("[Int]", "1:[]");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::listInt() {
+    std::stringstream source = buildSimple("[Int]", "[2]");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::listFloat() {
+    std::stringstream source = buildSimple("[Float]", "[2.0]");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::listBool() {
+    std::stringstream source = buildSimple("[Bool]", "[True]");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::listChar() {
+    std::stringstream source = buildSimple("[Char", "['c']");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::listString() {
+    std::stringstream source = buildSimple("[String]", "[\"string\"]");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::listListInt() {
+    std::stringstream source = buildSimple("[[Int]]", "[[2]]");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::listListFloat() {
+    std::stringstream source = buildSimple("[[Float]]", "[[2.0]]");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::listListBool() {
+    std::stringstream source = buildSimple("[[Bool]]", "[[True]]");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::listListChar() {
+    std::stringstream source = buildSimple("[[Char]]", "[['c']]");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::listListString() {
+    std::stringstream source = buildSimple("[[String]]", "[[\"string\"]]");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::listListListInt() {
+    std::stringstream source = buildSimple("[[[Int]]]", "[[[2]]]");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::listAppendInt() {
+    std::stringstream source = buildSimple("[Int]", "1:[2,3]");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::listAppendFloat() {
+    std::stringstream source = buildSimple("[Float]", "1.0:[2.0,3.0]");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::listAppendBool() {
+    std::stringstream source = buildSimple("[Bool]","True:[True,False]");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::listAppendChar() {
+    std::stringstream source = buildSimple("[Char]", "'c':['h','a','r']");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::listAppendString() {
+    std::stringstream source = buildSimple("[String]", "\"String\":[\"Int\",\"Float\",\"Bool\",\"Char\"]");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::listLongInt() {
+    std::stringstream source = buildSimple("[Int]","[0,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0]");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::listFloatInInt() {
+    std::stringstream source = buildSimple("[Int]","[2.0]");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
+}
+
+void TestMaster::listBoolInInt() {
+    std::stringstream source = buildSimple("[Int]","[True]");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
+}
+
+void TestMaster::listCharInInt() {
+    std::stringstream source = buildSimple("[Int]","['c']");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
+}
+
+void TestMaster::listStringInInt() {
+    std::stringstream source = buildSimple("[Int]","[\"string\"]");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
+}
+
+void TestMaster::listIntInFloat() {
+    std::stringstream source = buildSimple("[Float]","[2]");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
+}
+
+void TestMaster::listBoolInFloat() {
+    std::stringstream source = buildSimple("[Float]","[True]");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
+}
+
+void TestMaster::listCharInFloat() {
+    std::stringstream source = buildSimple("[Float]","['c']");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
+}
+
+void TestMaster::listStringInFloat() {
+    std::stringstream source = buildSimple("[Float]","[\"string\"]");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
+}
+
+void TestMaster::listIntInBool() {
+    std::stringstream source = buildSimple("[Bool]","[2]");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
+}
+
+void TestMaster::listFloatInBool() {
+    std::stringstream source = buildSimple("[Bool]","[2.0]");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
+}
+
+void TestMaster::listCharInBool() {
+    std::stringstream source = buildSimple("[Bool]","['c']");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
+}
+
+void TestMaster::listStringInBool() {
+    std::stringstream source = buildSimple("[Bool]","[\"string\"]");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
+}
+
+void TestMaster::listIntInChar() {
+    std::stringstream source = buildSimple("[Char]","[2]");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
+}
+
+void TestMaster::listFloatInChar() {
+    std::stringstream source = buildSimple("[Char]","[2.0]");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
+}
+
+void TestMaster::listBoolInChar() {
+    std::stringstream source = buildSimple("[Char]","[True]");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
+}
+
+void TestMaster::listStringInChar() {
+    std::stringstream source = buildSimple("[Char]","[\"string\"]");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
+}
+
+void TestMaster::listIntInString() {
+    std::stringstream source = buildSimple("[String]","[2]");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
+}
+
+void TestMaster::listFloatInString() {
+    std::stringstream source = buildSimple("[String]","[2.0]");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
+}
+
+void TestMaster::listBoolInString() {
+    std::stringstream source = buildSimple("[String]","[True]");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
+}
+
+void TestMaster::listCharInString() {
+    std::stringstream source = buildSimple("[String]","['c']");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
+}
+
+void TestMaster::listMixTypes() {
+    std::stringstream source = buildSimple("[Int]", "[2,2.0,False,'c',\"string\"]");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
+}
+
+void TestMaster::listNestedDifLengthInt() {
+    std::stringstream source = buildSimple("[[Int]]","[[1,2,3],[1,2,3,4,5,6,7,8,9,0]]");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+/*
+ * Keyword Test
+ */
+
+void TestMaster::keywordInt() {
+    std::stringstream source;
+    source << "def main : Int->Int" << endl;
+    buildCase(&source, "Int", "2");
+
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
+}
+
+void TestMaster::keywordFloat() {
+    std::stringstream source;
+    source << "def main : Float->Int" << endl;
+    buildCase(&source, "Float", "2");
+
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
+}
+
+void TestMaster::keywordBool() {
+    std::stringstream source;
+    source << "def main : Bool->Int" << endl;
+    buildCase(&source, "Bool", "2");
+
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
+}
+
+void TestMaster::keywordChar() {
+    std::stringstream source;
+    source << "def main : Char->Int" << endl;
+    buildCase(&source, "Char", "2");
+
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
+}
+
+void TestMaster::keywordString() {
+    std::stringstream source;
+    source << "def main : String->Int" << endl;
+    buildCase(&source, "String", "2");
+
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
+}
+
+void TestMaster::keywordTrue() {
+    std::stringstream source;
+    source << "def main : Int->Int" << endl;
+    buildCase(&source, "True", "2");
+
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
+}
+
+void TestMaster::keywordFalse() {
+    std::stringstream source;
+    source << "def main : Int->Int" << endl;
+    buildCase(&source, "False", "2");
+
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
+}
+
+void TestMaster::keywordDef() {
+    std::stringstream source;
+    source << "def main : Int->Int" << endl;
+    buildCase(&source, "def", "2");
+
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
+}
+
+void TestMaster::keywordMain() {
+    std::stringstream source;
+    source << "def main : Int->Int" << endl;
+    buildCase(&source, "main", "2");
+
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
 }
 
 // Single line comment test
+
 void TestMaster::comment() {
-    buildSimple("Int", "2", "+", "2 # This is a comment", true);
+    std::stringstream source = buildSimple("Int", "2", "+", "2 # This is a comment");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT (status == true);
 }
+
+/*
+* COMPILER TEST
+* TODO: List
+* TODO: Tuple
+* TODO: Case & Pattern - Partially done
+* TODO: Function Calls
+*
+* CODE TEST
+* TODO: Test if generated code perform correct calculations
+*/
