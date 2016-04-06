@@ -30,6 +30,21 @@ bool TestMaster::compileChecker(std::stringstream *source) {
     }
 }
 
+std::stringstream TestMaster::buildSimple(std::string signature,
+                                          std::string body) {
+    std::stringstream source;
+    source << "def main : " << signature << endl << "| = " << body << endl;
+    return source;
+}
+
+std::stringstream TestMaster::buildSimple(std::string signature,
+                                          std::string pattern,
+                                          std::string body) {
+    std::stringstream source;
+    source << "def main : " << signature << endl << "| " << pattern << " = " << body << endl;
+    return source;
+}
+
 std::stringstream TestMaster::buildSimple(std::string pattern,
                              std::string left,
                              std::string op,
@@ -39,7 +54,9 @@ std::stringstream TestMaster::buildSimple(std::string pattern,
     return source;
 }
 
-std::stringstream *TestMaster::buildCase(std::stringstream *source, std::string pattern, std::string body) {
+std::stringstream *TestMaster::buildCase(std::stringstream *source,
+                                         std::string pattern,
+                                         std::string body) {
     *source << "| " << pattern << " = " << body << endl;
     return source;
 }
@@ -1399,6 +1416,255 @@ void TestMaster::casTenCaseInt() {
     CPPUNIT_ASSERT(status == true);
 }
 
+/*
+ * List
+ */
+
+void TestMaster::listCasEmpty() {
+    std::stringstream source = buildSimple("[Int]->Int", "[]", "2");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::listAppendEmpty() {
+    std::stringstream source = buildSimple("[Int]", "1:[]");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::listInt() {
+    std::stringstream source = buildSimple("[Int]", "[2]");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::listFloat() {
+    std::stringstream source = buildSimple("[Float]", "[2.0]");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::listBool() {
+    std::stringstream source = buildSimple("[Bool]", "[True]");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::listChar() {
+    std::stringstream source = buildSimple("[Char", "['c']");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::listString() {
+    std::stringstream source = buildSimple("[String]", "[\"string\"]");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::listListInt() {
+    std::stringstream source = buildSimple("[[Int]]", "[[2]]");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::listListFloat() {
+    std::stringstream source = buildSimple("[[Float]]", "[[2.0]]");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::listListBool() {
+    std::stringstream source = buildSimple("[[Bool]]", "[[True]]");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::listListChar() {
+    std::stringstream source = buildSimple("[[Char]]", "[['c']]");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::listListString() {
+    std::stringstream source = buildSimple("[[String]]", "[[\"string\"]]");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::listListListInt() {
+    std::stringstream source = buildSimple("[[[Int]]]", "[[[2]]]");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::listAppendInt() {
+    std::stringstream source = buildSimple("[Int]", "1:[2,3]");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::listAppendFloat() {
+    std::stringstream source = buildSimple("[Float]", "1.0:[2.0,3.0]");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::listAppendBool() {
+    std::stringstream source = buildSimple("[Bool]","True:[True,False]");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::listAppendChar() {
+    std::stringstream source = buildSimple("[Char]", "'c':['h','a','r']");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::listAppendString() {
+    std::stringstream source = buildSimple("[String]", "\"String\":[\"Int\",\"Float\",\"Bool\",\"Char\"]");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::listLongInt() {
+    std::stringstream source = buildSimple("[Int]","[0,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0]");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::listFloatInInt() {
+    std::stringstream source = buildSimple("[Int]","[2.0]");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
+}
+
+void TestMaster::listBoolInInt() {
+    std::stringstream source = buildSimple("[Int]","[True]");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
+}
+
+void TestMaster::listCharInInt() {
+    std::stringstream source = buildSimple("[Int]","['c']");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
+}
+
+void TestMaster::listStringInInt() {
+    std::stringstream source = buildSimple("[Int]","[\"string\"]");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
+}
+
+void TestMaster::listIntInFloat() {
+    std::stringstream source = buildSimple("[Float]","[2]");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
+}
+
+void TestMaster::listBoolInFloat() {
+    std::stringstream source = buildSimple("[Float]","[True]");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
+}
+
+void TestMaster::listCharInFloat() {
+    std::stringstream source = buildSimple("[Float]","['c']");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
+}
+
+void TestMaster::listStringInFloat() {
+    std::stringstream source = buildSimple("[Float]","[\"string\"]");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
+}
+
+void TestMaster::listIntInBool() {
+    std::stringstream source = buildSimple("[Bool]","[2]");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
+}
+
+void TestMaster::listFloatInBool() {
+    std::stringstream source = buildSimple("[Bool]","[2.0]");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
+}
+
+void TestMaster::listCharInBool() {
+    std::stringstream source = buildSimple("[Bool]","['c']");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
+}
+
+void TestMaster::listStringInBool() {
+    std::stringstream source = buildSimple("[Bool]","[\"string\"]");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
+}
+
+void TestMaster::listIntInChar() {
+    std::stringstream source = buildSimple("[Char]","[2]");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
+}
+
+void TestMaster::listFloatInChar() {
+    std::stringstream source = buildSimple("[Char]","[2.0]");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
+}
+
+void TestMaster::listBoolInChar() {
+    std::stringstream source = buildSimple("[Char]","[True]");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
+}
+
+void TestMaster::listStringInChar() {
+    std::stringstream source = buildSimple("[Char]","[\"string\"]");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
+}
+
+void TestMaster::listIntInString() {
+    std::stringstream source = buildSimple("[String]","[2]");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
+}
+
+void TestMaster::listFloatInString() {
+    std::stringstream source = buildSimple("[String]","[2.0]");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
+}
+
+void TestMaster::listBoolInString() {
+    std::stringstream source = buildSimple("[String]","[True]");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
+}
+
+void TestMaster::listCharInString() {
+    std::stringstream source = buildSimple("[String]","['c']");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
+}
+
+void TestMaster::listMixTypes() {
+    std::stringstream source = buildSimple("[Int]", "[2,2.0,False,'c',\"string\"]");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
+}
+
+void TestMaster::listNestedDifLengthInt() {
+    std::stringstream source = buildSimple("[[Int]]","[[1,2,3],[1,2,3,4,5,6,7,8,9,0]]");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
 
 /*
  * Keyword Test
@@ -1497,7 +1763,7 @@ void TestMaster::comment() {
 * COMPILER TEST
 * TODO: List
 * TODO: Tuple
-* TODO: Case & Pattern
+* TODO: Case & Pattern - Partially done
 * TODO: Function Calls
 *
 * CODE TEST
