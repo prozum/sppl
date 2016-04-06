@@ -15,7 +15,7 @@ namespace compiler {
         {
 #ifdef CCPP
             case Backend::CPP:
-                generator = make_unique<codegen::CCodeGenerator>(*output, *header_output);
+                generator = make_unique<codegen::CCodeGenerator>(output, header_output);
                 break;
 #endif
 #ifdef CGNUASM

@@ -21,7 +21,7 @@ namespace codegen {
     class CCodeGenerator: public CodeGenerator
     {
         public:
-            CCodeGenerator(std::ostream &, std::ostream &);
+            CCodeGenerator(std::shared_ptr<std::ostream>, std::shared_ptr<std::ostream>);
 
             void visit(Program &node);
 
@@ -112,7 +112,7 @@ namespace codegen {
             const string g_nearpow2 = "nearest_power_of_two";
 
 
-            std::ostream &header;
+            std::shared_ptr<std::ostream> header;
 
             int tuple_count = 0;
             int list_count = 0;
