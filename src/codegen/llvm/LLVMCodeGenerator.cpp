@@ -3,7 +3,7 @@
 using namespace llvm;
 
 namespace codegen {
-    LLVMCodeGenerator::LLVMCodeGenerator(std::ostream &out)
+    LLVMCodeGenerator::LLVMCodeGenerator(shared_ptr<std::ostream> out)
             : common::CodeGenerator::CodeGenerator(out),
               Builder(getGlobalContext()),
               Module(std::make_unique<llvm::Module>("SpplModule", getGlobalContext())) {}

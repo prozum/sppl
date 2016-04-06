@@ -1,71 +1,42 @@
 #include "Node.h"
+#include "Visitor.h"
 using namespace std;
 
 namespace common {
 
     void Program::accept(Visitor &v) { v.visit(*this); }
-
     void Function::accept(Visitor &v) { v.visit(*this); }
-
     void Case::accept(Visitor &v) { v.visit(*this); }
-
     void Or::accept(Visitor &v) { v.visit(*this); }
-
     void And::accept(Visitor &v) { v.visit(*this); }
-
     void Equal::accept(Visitor &v) { v.visit(*this); }
-
     void NotEqual::accept(Visitor &v) { v.visit(*this); }
-
     void Lesser::accept(Visitor &v) { v.visit(*this); }
-
     void Greater::accept(Visitor &v) { v.visit(*this); }
-
     void LesserEq::accept(Visitor &v) { v.visit(*this); }
-
     void GreaterEq::accept(Visitor &v) { v.visit(*this); }
-
     void Add::accept(Visitor &v) { v.visit(*this); }
-
     void Sub::accept(Visitor &v) { v.visit(*this); }
-
     void Mul::accept(Visitor &v) { v.visit(*this); }
-
     void Div::accept(Visitor &v) { v.visit(*this); }
-
     void Mod::accept(Visitor &v) { v.visit(*this); }
-
     void ListAdd::accept(Visitor &v) { v.visit(*this); }
-
     void Par::accept(Visitor &v) { v.visit(*this); }
-
     void Not::accept(Visitor &v) { v.visit(*this); }
-
     void Int::accept(Visitor &v) { v.visit(*this); }
-
     void Float::accept(Visitor &v) { v.visit(*this); }
-
     void Bool::accept(Visitor &v) { v.visit(*this); }
-
     void Char::accept(Visitor &v) { v.visit(*this); }
-
     void String::accept(Visitor &v) { v.visit(*this); }
-
     void List::accept(Visitor &v) { v.visit(*this); }
-
     void Tuple::accept(Visitor &v) { v.visit(*this); }
-
     void Id::accept(Visitor &v) { v.visit(*this); }
-
     void Call::accept(Visitor &v) { v.visit(*this); }
-
     void ListPattern::accept(Visitor &v) { v.visit(*this); }
-
     void TuplePattern::accept(Visitor &v) { v.visit(*this); }
-
     void ListSplit::accept(Visitor &v) { v.visit(*this); }
-
     void Type::accept(Visitor &v) { v.visit(*this); }
+
 
     bool Type::operator==(const Type &other) const {
         if (this->type == other.type){
@@ -78,7 +49,7 @@ namespace common {
                         return false;
 
                     for (unsigned int i = 0; i < this->types.size(); ++i) {
-                        if (!(*this->types[i] == *other.types[i])){
+                        if (*this->types[i] != *other.types[i]){
                             return false;
                         }
                     }
@@ -90,16 +61,20 @@ namespace common {
         }
     }
 
-    Node::Node() :
-            line_no(0) { }
+    bool Type::operator!=(const Type &other) const {
+        return !(*this == other);
+    }
 
-    Node::Node(int line_no) :
-            line_no(line_no) { }
+    Node::Node()
+            { }
+
+    Node::Node(Location loc) :
+            loc(loc) { }
 
     Expr::Expr() { }
 
-    Expr::Expr(int line_no) :
-            Node(line_no) { }
+    Expr::Expr(Location loc) :
+            Node(loc) { }
 
     BinaryOp::BinaryOp() { }
 
@@ -110,8 +85,8 @@ namespace common {
 
     BinaryOp::BinaryOp(Expr *left,
                        Expr *right,
-                       int line_no) :
-            Expr(line_no),
+                       Location loc) :
+            Expr(loc),
             left(left),
             right(right) { }
 
@@ -121,14 +96,14 @@ namespace common {
             child(child) { }
 
     UnaryOp::UnaryOp(Expr *child,
-                     int line_no) :
-            Expr(line_no),
+                     Location loc) :
+            Expr(loc),
             child(child) { }
 
     Pattern::Pattern() { }
 
-    Pattern::Pattern(int line_no) :
-            Expr(line_no) { }
+    Pattern::Pattern(Location loc) :
+            Expr(loc) { }
 
     Program::Program() { }
 
@@ -136,14 +111,14 @@ namespace common {
             funcs(funcs) { }
 
     Program::Program(vector<Function *> funcs,
-                     int line_no) :
-            Node(line_no),
+                     Location loc) :
+            Node(loc),
             funcs(funcs) { }
 
     Program::Program(string id,
                        Expr *expr,
-                       int line_no) :
-            Node(line_no),
+                       Location loc) :
+            Node(loc),
             funcs() {
 
         funcs.push_back(new Function(id, vector<Type *>(), vector<Case *>()));
@@ -162,8 +137,8 @@ namespace common {
 
     Function::Function(string id,
                        vector<Type *> types,
-                       int line_no) :
-            Node(line_no),
+                       Location loc) :
+            Node(loc),
             id(id),
             types(types) { }
 
@@ -177,8 +152,8 @@ namespace common {
     Function::Function(string id,
                        vector<Type *> types,
                        vector<Case *> cases,
-                       int line_no) :
-            Node(line_no),
+                       Location loc) :
+            Node(loc),
             id(id),
             types(types),
             cases(cases) { }
@@ -194,221 +169,221 @@ namespace common {
 
     Case::Case(Expr *expr,
                vector<Pattern *> patterns,
-               int line_no) :
-            Node(line_no),
+               Location loc) :
+            Node(loc),
             expr(expr),
             patterns(patterns) { }
 
     Or::Or() { }
 
-    Or::Or(Expr *left, 
-           Expr *right) : 
+    Or::Or(Expr *left,
+           Expr *right) :
             BinaryOp(left, right) { }
 
-    Or::Or(Expr *left, 
-           Expr *right, 
-           int line_no) : 
-            BinaryOp(left, right, line_no) { }
+    Or::Or(Expr *left,
+           Expr *right,
+           Location loc) :
+            BinaryOp(left, right, loc) { }
 
     And::And() { }
 
-    And::And(Expr *left, 
+    And::And(Expr *left,
              Expr *right) :
             BinaryOp(left, right) { }
 
-    And::And(Expr *left, 
-             Expr *right, 
-             int line_no) :
-            BinaryOp(left, right, line_no) { }
+    And::And(Expr *left,
+             Expr *right,
+             Location loc) :
+            BinaryOp(left, right, loc) { }
 
     Equal::Equal() { }
 
-    Equal::Equal(Expr *left, 
+    Equal::Equal(Expr *left,
                  Expr *right) :
             BinaryOp(left, right) { }
 
-    Equal::Equal(Expr *left, 
-                 Expr *right, 
-                 int line_no) :
-            BinaryOp(left, right, line_no) { }
+    Equal::Equal(Expr *left,
+                 Expr *right,
+                 Location loc) :
+            BinaryOp(left, right, loc) { }
 
     NotEqual::NotEqual() { }
 
-    NotEqual::NotEqual(Expr *left, 
+    NotEqual::NotEqual(Expr *left,
                        Expr *right) :
             BinaryOp(left, right) { }
 
-    NotEqual::NotEqual(Expr *left, 
-                       Expr *right, 
-                       int line_no) :
-            BinaryOp(left, right, line_no) { }
+    NotEqual::NotEqual(Expr *left,
+                       Expr *right,
+                       Location loc) :
+            BinaryOp(left, right, loc) { }
 
     Lesser::Lesser() { }
 
-    Lesser::Lesser(Expr *left, 
+    Lesser::Lesser(Expr *left,
                    Expr *right) :
             BinaryOp(left, right) { }
 
-    Lesser::Lesser(Expr *left, 
-                   Expr *right, 
-                   int line_no) :
-            BinaryOp(left, right, line_no) { }
+    Lesser::Lesser(Expr *left,
+                   Expr *right,
+                   Location loc) :
+            BinaryOp(left, right, loc) { }
 
     Greater::Greater() { }
 
-    Greater::Greater(Expr *left, 
+    Greater::Greater(Expr *left,
                      Expr *right) :
             BinaryOp(left, right) { }
 
-    Greater::Greater(Expr *left, 
-                     Expr *right, 
-                     int line_no) :
-            BinaryOp(left, right, line_no) { }
+    Greater::Greater(Expr *left,
+                     Expr *right,
+                     Location loc) :
+            BinaryOp(left, right, loc) { }
 
     LesserEq::LesserEq() { }
 
-    LesserEq::LesserEq(Expr *left, 
+    LesserEq::LesserEq(Expr *left,
                        Expr *right) :
             BinaryOp(left, right) { }
 
-    LesserEq::LesserEq(Expr *left, 
-                       Expr *right, 
-                       int line_no) :
-            BinaryOp(left, right, line_no) { }
+    LesserEq::LesserEq(Expr *left,
+                       Expr *right,
+                       Location loc) :
+            BinaryOp(left, right, loc) { }
 
     GreaterEq::GreaterEq() { }
 
-    GreaterEq::GreaterEq(Expr *left, 
+    GreaterEq::GreaterEq(Expr *left,
                          Expr *right) :
             BinaryOp(left, right) { }
 
-    GreaterEq::GreaterEq(Expr *left, 
-                         Expr *right, 
-                         int line_no) :
-            BinaryOp(left, right, line_no) { }
+    GreaterEq::GreaterEq(Expr *left,
+                         Expr *right,
+                         Location loc) :
+            BinaryOp(left, right, loc) { }
 
     Add::Add() { }
 
-    Add::Add(Expr *left, 
+    Add::Add(Expr *left,
              Expr *right) :
             BinaryOp(left, right) { }
 
-    Add::Add(Expr *left, 
-             Expr *right, 
-             int line_no) :
-            BinaryOp(left, right, line_no) { }
+    Add::Add(Expr *left,
+             Expr *right,
+             Location loc) :
+            BinaryOp(left, right, loc) { }
 
     Sub::Sub() { }
 
-    Sub::Sub(Expr *left, 
+    Sub::Sub(Expr *left,
              Expr *right) :
             BinaryOp(left, right) { }
 
-    Sub::Sub(Expr *left, 
-             Expr *right, 
-             int line_no) :
-            BinaryOp(left, right, line_no) { }
+    Sub::Sub(Expr *left,
+             Expr *right,
+             Location loc) :
+            BinaryOp(left, right, loc) { }
 
     Mul::Mul() { }
 
-    Mul::Mul(Expr *left, 
+    Mul::Mul(Expr *left,
              Expr *right) :
             BinaryOp(left, right) { }
 
-    Mul::Mul(Expr *left, 
-             Expr *right, 
-             int line_no) :
-            BinaryOp(left, right, line_no) { }
+    Mul::Mul(Expr *left,
+             Expr *right,
+             Location loc) :
+            BinaryOp(left, right, loc) { }
 
     Div::Div() { }
 
-    Div::Div(Expr *left, 
+    Div::Div(Expr *left,
              Expr *right) :
             BinaryOp(left, right) { }
 
-    Div::Div(Expr *left, 
-             Expr *right, 
-             int line_no) :
-            BinaryOp(left, right, line_no) { }
+    Div::Div(Expr *left,
+             Expr *right,
+             Location loc) :
+            BinaryOp(left, right, loc) { }
 
     Mod::Mod() { }
 
-    Mod::Mod(Expr *left, 
+    Mod::Mod(Expr *left,
              Expr *right) :
             BinaryOp(left, right) { }
 
-    Mod::Mod(Expr *left, 
-             Expr *right, 
-             int line_no) :
-            BinaryOp(left, right, line_no) { }
+    Mod::Mod(Expr *left,
+             Expr *right,
+             Location loc) :
+            BinaryOp(left, right, loc) { }
 
     ListAdd::ListAdd() { }
 
-    ListAdd::ListAdd(Expr *left, 
+    ListAdd::ListAdd(Expr *left,
                      Expr *right) :
             BinaryOp(left, right) { }
 
-    ListAdd::ListAdd(Expr *left, 
-                     Expr *right, 
-                     int line_no) :
-            BinaryOp(left, right, line_no) { }
-    
+    ListAdd::ListAdd(Expr *left,
+                     Expr *right,
+                     Location loc) :
+            BinaryOp(left, right, loc) { }
+
     Par::Par() { }
 
-    Par::Par(Expr *child) : 
+    Par::Par(Expr *child) :
             UnaryOp(child) { }
 
-    Par::Par(Expr *child, 
-             int line_no) : 
-            UnaryOp(child, line_no) { }
+    Par::Par(Expr *child,
+             Location loc) :
+            UnaryOp(child, loc) { }
 
     Not::Not() { }
 
     Not::Not(Expr *child) :
             UnaryOp(child) { }
 
-    Not::Not(Expr *child, 
-             int line_no) :
-            UnaryOp(child, line_no) { }
+    Not::Not(Expr *child,
+             Location loc) :
+            UnaryOp(child, loc) { }
 
-    Int::Int(long value) : 
+    Int::Int(long value) :
             value(value) { }
 
-    Int::Int(long value, 
-             int line_no) : 
-            Pattern(line_no),
+    Int::Int(long value,
+             Location loc) :
+            Pattern(loc),
             value(value) { }
 
     Float::Float(double value) :
             value(value) { }
 
     Float::Float(double value,
-                 int line_no) :
-            Pattern(line_no),
+                 Location loc) :
+            Pattern(loc),
             value(value) { }
 
     Bool::Bool(bool value) :
             value(value) { }
 
     Bool::Bool(bool value,
-               int line_no) :
-            Pattern(line_no),
+               Location loc) :
+            Pattern(loc),
             value(value) { }
 
     Char::Char(char value) :
             value(value) { }
 
     Char::Char(char value,
-               int line_no) :
-            Pattern(line_no),
+               Location loc) :
+            Pattern(loc),
             value(value) { }
 
     String::String(string value) :
             value(value) { }
 
     String::String(string value,
-                   int line_no) :
-            Pattern(line_no),
+                   Location loc) :
+            Pattern(loc),
             value(value) { }
 
     ListPattern::ListPattern() { }
@@ -417,8 +392,8 @@ namespace common {
             : patterns(patterns) { }
 
     ListPattern::ListPattern(vector<Pattern *> patterns,
-                             int line_no) :
-            Pattern(line_no),
+                             Location loc) :
+            Pattern(loc),
             patterns(patterns) { }
 
     TuplePattern::TuplePattern() { }
@@ -427,8 +402,8 @@ namespace common {
             : patterns(patterns) { }
 
     TuplePattern::TuplePattern(vector<Pattern *> patterns,
-                               int line_no) :
-            Pattern(line_no),
+                               Location loc) :
+            Pattern(loc),
             patterns(patterns) { }
 
     ListSplit::ListSplit() { }
@@ -440,8 +415,8 @@ namespace common {
 
     ListSplit::ListSplit(Pattern *left,
                          Pattern *right,
-                         int line_no) :
-            Pattern(line_no),
+                         Location loc) :
+            Pattern(loc),
             left(left),
             right(right) { }
 
@@ -451,8 +426,8 @@ namespace common {
             exprs(exprs) { }
 
     List::List(vector<Expr *> exprs,
-               int line_no) :
-            Expr(line_no),
+               Location loc) :
+            Expr(loc),
             exprs(exprs) { }
 
     Tuple::Tuple() { }
@@ -461,8 +436,8 @@ namespace common {
             exprs(exprs) { }
 
     Tuple::Tuple(vector<Expr *> exprs,
-                 int line_no) :
-            Expr(line_no),
+                 Location loc) :
+            Expr(loc),
             exprs(exprs) { }
 
     Id::Id() { }
@@ -471,8 +446,8 @@ namespace common {
             id(id) { }
 
     Id::Id(string id,
-           int line_no) :
-            Pattern(line_no),
+           Location loc) :
+            Pattern(loc),
             id(id) { }
 
     Call::Call() { }
@@ -487,8 +462,8 @@ namespace common {
 
     Call::Call(Expr *callee,
                vector<Expr *> exprs,
-               int line_no) :
-            Expr(line_no),
+               Location loc) :
+            Expr(loc),
             callee(callee),
             exprs(exprs) { }
 
@@ -498,8 +473,8 @@ namespace common {
             type(type) { }
 
     Type::Type(Types type,
-               int line_no) :
-            Node(line_no),
+               Location loc) :
+            Node(loc),
             type(type) { }
 
     Type::Type(Types type,
@@ -509,10 +484,233 @@ namespace common {
 
     Type::Type(Types type,
                vector<Type *> types,
-               int line_no) :
-            Node(line_no),
+               Location loc) :
+            Node(loc),
             type(type),
             types(types) { }
 
     Type::~Type() { }
+
+    string Program::str() {
+        string str;
+        for (auto& func: funcs) {
+            str += func->str();
+        }
+
+        return str;
+    }
+
+    string Function::str() {
+        string str("def " + id + " : ");
+
+        for (auto &type: types) {
+            str += type->str();
+            if (type != types.back())
+                str += " -> ";
+        }
+
+        str += '\n';
+
+        for (auto &cse : cases) {
+            str += cse->str() + "\n";
+        }
+
+        return str + "\n";
+    }
+
+    string Case::str() {
+        string str("\t| ");
+
+        for (auto &pattern: patterns) {
+            str += pattern->str();
+            if (pattern != patterns.back())
+                str += ' ';
+        }
+
+        return str + " = " + expr->str();
+    }
+
+    string ListPattern::str() {
+        string str("[");
+
+        for (auto &pattern: patterns) {
+            str += pattern->str();
+            if (pattern != patterns.back())
+                str += ", ";
+        }
+
+        return str + "]";
+    }
+
+    string TuplePattern::str() {
+        string str("(");
+
+        for (auto &pattern: patterns) {
+            str += pattern->str();
+            if (pattern != patterns.back())
+                str += ", ";
+        }
+
+        return str + ")";
+    }
+
+    string ListSplit::str() {
+        return "(" + left->str() + " : " + right->str() + ")";
+    }
+
+    string Or::str() {
+        return left->str() + " || " + right->str();
+    }
+
+    string And::str() {
+        return left->str() + " && " + right->str();
+    }
+
+    string Equal::str() {
+        return left->str() + " == " + right->str();
+    }
+
+    string NotEqual::str() {
+        return left->str() + " != " + right->str();
+    }
+
+    string Lesser::str() {
+        return left->str() + " < " + right->str();
+    }
+
+    string Greater::str() {
+        return left->str() + " > " + right->str();
+    }
+
+    string LesserEq::str() {
+        return left->str() + " <= " + right->str();
+    }
+
+    string GreaterEq::str() {
+        return left->str() + " >= " + right->str();
+    }
+
+    string Add::str() {
+        return left->str() + " + " + right->str();
+    }
+
+    string Sub::str() {
+        return left->str() + " - " + right->str();
+    }
+
+    string Mul::str() {
+        return left->str() + " * " + right->str();
+    }
+
+    string Div::str() {
+        return left->str() + " / " + right->str();
+    }
+
+    string Mod::str() {
+        return left->str() + " % " + right->str();
+    }
+
+    string ListAdd::str() {
+        return left->str() + " : " + right->str();
+    }
+
+    string Par::str() {
+        return "(" + child->str() + ")";
+    }
+
+    string Not::str() {
+        return "!" + child->str();
+    }
+
+    string Int::str() {
+        return to_string(value);
+    }
+
+    string Float::str() {
+        return value == (long)value ? to_string(value) + ".0" : to_string(value);
+    }
+
+    string Bool::str() {
+        return value ? "True" : "False";
+    }
+
+    string Char::str() {
+        return "\'" + to_string(value) + "\'";
+    }
+
+    string String::str() {
+        return "\"" + value + "\"";
+    }
+
+    string List::str() {
+        string str("[");
+
+        for (auto &expr: exprs) {
+            str += expr->str();
+            if (expr != exprs.back())
+                str += ", ";
+        }
+
+        return str + "]";
+    }
+
+    string Tuple::str() {
+        string str("(");
+
+        for (auto &expr: exprs) {
+            str += expr->str();
+            if (expr != exprs.back())
+                str += ", ";
+        }
+
+        return str + ")";
+    }
+
+    string Id::str() {
+        return id;
+    }
+
+    string Call::str() {
+        string str(callee->str() + "(");
+
+        for (auto &expr: exprs) {
+            str += expr->str();
+            if (expr != exprs.back())
+                str += ", ";
+        }
+
+        return str + ")";
+    }
+
+    string Type::str() {
+        switch (type) {
+            case Types::INT:
+                return "Int";
+            case Types::FLOAT:
+                return "Float";
+            case Types::BOOL:
+                return "Bool";
+            case Types::CHAR:
+                return "Char";
+            case Types::STRING:
+                return "String";
+            case Types::LIST:
+                return "[" + types[0]->str() + "]";
+            case Types::TUPLE:
+                return "(" + collection_str(*this, ", ") + ")";
+            case Types::SIGNATURE:
+                return  "(" + collection_str(*this, " -> ") + ")";
+            default:
+                break;
+        }
+    }
+
+    string collection_str(Type &node, const std::string split) {
+        string str;
+        for (auto &type: node.types) {
+            str += type->str();
+            if (type != node.types.back())
+                str += split;
+        }
+    }
 }

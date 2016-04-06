@@ -1,6 +1,6 @@
 #include <iostream>
 #include "CaseChecker.h"
-
+/*
 namespace semantics {
     void CaseChecker::visit(common::Program &node) {
         for (auto func : node.funcs) {
@@ -23,13 +23,11 @@ namespace semantics {
                 c->accept(*this);
             }
         } else {
-            hasError = true;
-            std::cerr << "Error: No cases found @ " << currentFunction << " line " << to_string(node.line_no) << " => a general case is required" << endl;
+            add_error("No cases found in" + node.id, node.pos);
         }
 
         if(hasDefault == false) {
-            hasError = true;
-            cerr << "Error: No default case @ " << currentFunction << " line " << to_string(node.line_no) << " => should catch general case for " << to_string(node.types.size() -1) << " patterns" << endl;
+            add_error("Error: No default case in" + node.id, node.pos);
         }
     }
 
@@ -84,3 +82,4 @@ namespace semantics {
         isId = true;
     }
 }
+*/

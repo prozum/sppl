@@ -27,50 +27,57 @@
 using namespace llvm;
 using namespace llvm::orc;
 
-class SpplJit {
-public:
-    SpplJit(ostream *out);
+namespace jit {
+    class SpplJit {
+    public:
+        SpplJit(shared_ptr<ostream> out);
 
-    void Eval(string str);
-    static void Init_llvm() {
-        InitializeNativeTarget();
-        InitializeNativeTargetAsmPrinter();
-        InitializeNativeTargetAsmParser();
-    }
+        void Eval(string str);
 
-private:
-    typedef ObjectLinkingLayer<> ObjLayerT;
-    typedef IRCompileLayer<ObjLayerT> CompileLayerT;
-    typedef CompileLayerT::ModuleSetHandleT ModuleHandleT;
+        static void Init_llvm() {
+            InitializeNativeTarget();
+            InitializeNativeTargetAsmPrinter();
+            InitializeNativeTargetAsmParser();
+        }
 
+    private:
+        typedef ObjectLinkingLayer<> ObjLayerT;
+        typedef IRCompileLayer<ObjLayerT> CompileLayerT;
+        typedef CompileLayerT::ModuleSetHandleT ModuleHandleT;
 
-    ModuleHandleT add_module(std::unique_ptr<llvm::Module> m);
-    void remove_module(ModuleHandleT handler);
-    JITSymbol find_symbol(const std::string name);
-    JITSymbol find_mangled_symbol(const std::string &name);
-    std::string mangle(const std::string &name);
+        void init_module_passmanager();
 
-    void init_module_passmanager();
+        ModuleHandleT add_module(std::unique_ptr<llvm::Module> m);
 
-    std::unique_ptr<TargetMachine> Machine;
-    const DataLayout Layout;
-    ObjLayerT ObjectLayer;
-    CompileLayerT CompileLayer;
-    std::vector<ModuleHandleT> ModuleHandles;
-    std::unique_ptr<legacy::FunctionPassManager> PassManager;
-    semantics::CaseChecker CaseChecker;
-    semantics::ScopeGenerator ScopeGenerator;
-    semantics::TypeChecker TypeChecker;
+        void remove_module(ModuleHandleT handler);
 
-    codegen::LLVMCodeGenerator Generator;
-    parser::Driver Driver;
+        JITSymbol find_symbol(const std::string name);
 
-    string get_output(intptr_t data, common::Type *node_type);
-    string get_tuple_output(intptr_t addr, vector<common::Type *> node_type);
+        JITSymbol find_mangled_symbol(const std::string &name);
 
-    template <typename T> static std::vector<T> singletonSet(T t) {
-        std::vector<T> Vec;
-        Vec.push_back(std::move(t));
-        return Vec;
-    }
-};
+        std::string mangle(const std::string &name);
+
+        std::unique_ptr<TargetMachine> Machine;
+        const DataLayout Layout;
+        ObjLayerT ObjectLayer;
+        CompileLayerT CompileLayer;
+        std::vector<ModuleHandleT> ModuleHandles;
+        std::unique_ptr<legacy::FunctionPassManager> PassManager;
+
+        semantics::ScopeGenerator ScopeGenerator;
+        semantics::TypeChecker TypeChecker;
+        codegen::LLVMCodeGenerator Generator;
+        parser::Driver Driver;
+
+        string get_output(intptr_t data, common::Type *node_type);
+
+        string get_tuple_output(intptr_t addr, vector<common::Type *> node_type);
+
+        template<typename T>
+        static std::vector<T> singletonSet(T t) {
+            std::vector<T> Vec;
+            Vec.push_back(std::move(t));
+            return Vec;
+        }
+    };
+}

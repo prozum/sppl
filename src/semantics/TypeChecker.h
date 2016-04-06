@@ -1,20 +1,17 @@
 #pragma once
 
 #include "Visitor.h"
-#include "Printer.h"
+
 #include <stack>
 #include <vector>
 #include <Node.h>
 
 using namespace common;
 using namespace std;
-using namespace codegen;
 
 namespace semantics {
     class TypeChecker : public Visitor {
     public:
-        bool is_valid;
-
         TypeChecker();
 
         virtual void visit(Program &node);
