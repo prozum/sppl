@@ -1666,6 +1666,227 @@ void TestMaster::listNestedDifLengthInt() {
     CPPUNIT_ASSERT(status == true);
 }
 
+void TestMaster::listTupleInt() {
+    std::stringstream source = buildSimple("[(Int,Int)]","[(1,2),(3,4),(5,6)]");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::listTupleFloat() {
+    std::stringstream source = buildSimple("[(Float,Float)]","[(1.0,2.0),(3.0,4.0),(5.0,6.0)]");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::listTupleBool() {
+    std::stringstream source = buildSimple("[(Bool,Bool)]","[(True,True),(True,False),(False,True),(False,False)]");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::listTupleChar() {
+    std::stringstream source = buildSimple("[(Char,Char)]","[('c','h'),('a','r')]");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::listTupleString() {
+    std::stringstream source = buildSimple("[(String,String)]","[(\"string\",\"string\")]");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+
+/*
+ * Tuple
+ */
+
+void TestMaster::tupleEmpty() {
+    std::stringstream source = buildSimple("()","()");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
+}
+
+void TestMaster::tupleEmptyInt() {
+    std::stringstream source = buildSimple("(Int)","()");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
+}
+
+void TestMaster::tupleEmptyFloat() {
+    std::stringstream source = buildSimple("(Float)","()");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
+}
+
+void TestMaster::tupleEmptyBool() {
+    std::stringstream source = buildSimple("(Bool)","()");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
+}
+
+void TestMaster::tupleEmptyChar() {
+    std::stringstream source = buildSimple("(Char)","()");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
+}
+
+void TestMaster::tupleEmptyString() {
+    std::stringstream source = buildSimple("(String)","()");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
+}
+
+void TestMaster::tupleOneInt() {
+    std::stringstream source = buildSimple("(Int)","(2)");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
+}
+
+void TestMaster::tupleOneFloat() {
+    std::stringstream source = buildSimple("(Float)","(2.0)");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
+}
+
+void TestMaster::tupleOneBool() {
+    std::stringstream source = buildSimple("(Bool)","(True)");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
+}
+
+void TestMaster::tupleOneChar() {
+    std::stringstream source = buildSimple("(Char)","('c')");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
+}
+
+void TestMaster::tupleOneString() {
+    std::stringstream source = buildSimple("(String)","(\"string\")");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
+}
+
+void TestMaster::tupleTwoInt() {
+    std::stringstream source = buildSimple("(Int,Int)","(2,2)");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::tupleTwoFloat() {
+    std::stringstream source = buildSimple("(Float,Float)","(2.0,2.0)");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::tupleTwoBool() {
+    std::stringstream source = buildSimple("(Bool,Bool)","(True,False)");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::tupleTwoChar() {
+    std::stringstream source = buildSimple("(Char,Char)","('c','h')");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::tupleTwoString() {
+    std::stringstream source = buildSimple("(String,String)","(\"string\",\"string\")");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::tupleThreeInt() {
+    std::stringstream source = buildSimple("(Int,Int,Int)","(1,2,3)");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::tupleThreeFloat() {
+    std::stringstream source = buildSimple("(Float,Float,Float)","(1.0,2.0,3.0.)");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::tupleThreeBool() {
+    std::stringstream source = buildSimple("(Bool,Bool,Bool)","(True,False,True)");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::tupleThreeChar() {
+    std::stringstream source = buildSimple("(Char,Char,Char)","('c','h','a')");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::tupleThreeString() {
+    std::stringstream source = buildSimple("(String,String,String)","(\"string\",\"string\",\"string\")");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::tupleMixed() {
+    std::stringstream source = buildSimple("(Int,Float,Bool,Char,Char,Char,Char,String)","(1,2.0,True,'c','h','a','r',\"string\")");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::tupleListInt() {
+    std::stringstream source = buildSimple("([Int],[Int])","([1],[1,2])");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::tupleListFloat() {
+    std::stringstream source = buildSimple("([Float],[Float])","([1.0],[1.0,2.0])");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::tupleListBool() {
+    std::stringstream source = buildSimple("([Bool],[Bool])","([True],[True,False])");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::tupleListChar() {
+    std::stringstream source = buildSimple("([Char],[Char])","(['c'],['h','a'])");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::tupleListString() {
+    std::stringstream source = buildSimple("([String],[String])","([\"string\"],[\"string\",\"string\"])");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::tupleNested() {
+    std::stringstream source = buildSimple("((Int,Int),(Int,Int))","((1,2),(3,4))");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::tupleTwoNested() {
+    std::stringstream source = buildSimple("((Int,Float),(Bool,(Char,String)))","((1,2.0),(True,('c',\"har\")))");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::tupleSuperNested() {
+    std::stringstream source = buildSimple("(Char,(Char,(Char,(Char,(Char,(Char,(Char,(Char,(Char,(Char,(Char,Char)))))))))))","('h',('e',('l',('l',('o',(' ',('w',('o',('r',('l',('d','!')))))))))))");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::tupleWrongType() {
+    std::stringstream source = buildSimple("(Int,Float,Bool,Char;String)","(1.2,True,'c',\"string\",1)");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == false);
+}
+
 /*
  * Keyword Test
  */

@@ -292,6 +292,54 @@ class TestMaster : public CppUnit::TestFixture{
         CPPUNIT_TEST(listCharInString);
 
         CPPUNIT_TEST(listMixTypes);
+
+        CPPUNIT_TEST(listTupleInt);
+        CPPUNIT_TEST(listTupleFloat);
+        CPPUNIT_TEST(listTupleBool);
+        CPPUNIT_TEST(listTupleChar);
+        CPPUNIT_TEST(listTupleString);
+        
+        // Tuple
+
+        CPPUNIT_TEST(tupleEmpty);
+        CPPUNIT_TEST(tupleEmptyInt);
+        CPPUNIT_TEST(tupleEmptyFloat);
+        CPPUNIT_TEST(tupleEmptyBool);
+        CPPUNIT_TEST(tupleEmptyChar);
+        CPPUNIT_TEST(tupleEmptyString);
+
+        CPPUNIT_TEST(tupleOneInt);
+        CPPUNIT_TEST(tupleOneFloat);
+        CPPUNIT_TEST(tupleOneBool);
+        CPPUNIT_TEST(tupleOneChar);
+        CPPUNIT_TEST(tupleOneString);
+
+        CPPUNIT_TEST(tupleTwoInt);
+        CPPUNIT_TEST(tupleTwoFloat);
+        CPPUNIT_TEST(tupleTwoBool);
+        CPPUNIT_TEST(tupleTwoChar);
+        CPPUNIT_TEST(tupleTwoString);
+
+        CPPUNIT_TEST(tupleThreeInt);
+        CPPUNIT_TEST(tupleThreeFloat);
+        CPPUNIT_TEST(tupleThreeBool);
+        CPPUNIT_TEST(tupleThreeChar);
+        CPPUNIT_TEST(tupleThreeString);
+
+        CPPUNIT_TEST(tupleMixed);
+
+        CPPUNIT_TEST(tupleListInt);
+        CPPUNIT_TEST(tupleListFloat);
+        CPPUNIT_TEST(tupleListBool);
+        CPPUNIT_TEST(tupleListChar);
+        CPPUNIT_TEST(tupleListString);
+
+        CPPUNIT_TEST(tupleNested);
+        CPPUNIT_TEST(tupleTwoNested);
+        CPPUNIT_TEST(tupleSuperNested);
+
+        CPPUNIT_TEST(tupleWrongType);
+
         // keyword
 
         CPPUNIT_TEST(keywordInt);
@@ -628,6 +676,52 @@ protected:
 
     void listNestedDifLengthInt();
 
+    void listTupleInt();
+    void listTupleFloat();
+    void listTupleBool();
+    void listTupleChar();
+    void listTupleString();
+
+    // Tuple
+
+    void tupleEmpty();
+    void tupleEmptyInt();
+    void tupleEmptyFloat();
+    void tupleEmptyBool();
+    void tupleEmptyChar();
+    void tupleEmptyString();
+
+    void tupleOneInt();
+    void tupleOneFloat();
+    void tupleOneBool();
+    void tupleOneChar();
+    void tupleOneString();
+
+    void tupleTwoInt();
+    void tupleTwoFloat();
+    void tupleTwoBool();
+    void tupleTwoChar();
+    void tupleTwoString();
+
+    void tupleThreeInt();
+    void tupleThreeFloat();
+    void tupleThreeBool();
+    void tupleThreeChar();
+    void tupleThreeString();
+
+    void tupleMixed();
+
+    void tupleListInt();
+    void tupleListFloat();
+    void tupleListBool();
+    void tupleListChar();
+    void tupleListString();
+
+    void tupleNested();
+    void tupleTwoNested();
+    void tupleSuperNested();
+
+    void tupleWrongType();
 
     // Keywords
     void keywordTrue();
