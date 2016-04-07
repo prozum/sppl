@@ -41,12 +41,11 @@ namespace compiler {
 
     class Compiler {
     public:
-        Compiler(istream *in, ostream *out);
-        Compiler(istream *in, ostream *out, ostream *hout);
+        Compiler(istream &in, ostream &out, ostream &hout);
 
-        shared_ptr<std::istream> input;
-        shared_ptr<std::ostream> output;
-        shared_ptr<std::ostream> header_output;
+        std::istream &input;
+        std::ostream &output;
+        std::ostream &header_output;
         std::unique_ptr<CodeGenerator> generator;
         semantics::ScopeGenerator scope_generator;
         semantics::TypeChecker type_checker;

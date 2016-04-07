@@ -91,7 +91,7 @@ int main(int argc, char *argv[])
     ofstream out(output);
     ofstream hout(header_output);
 
-    compiler::Compiler compiler(&in, &out, &hout);
+    compiler::Compiler compiler(in, out, hout);
     compiler.set_backend(backend);
 
     compiler.compile();

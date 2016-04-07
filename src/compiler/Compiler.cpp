@@ -1,11 +1,6 @@
 #include "Compiler.h"
 namespace compiler {
-
-    Compiler::Compiler(istream* in, ostream* out) : input(in), output(out)
-    {
-    }
-
-    Compiler::Compiler(istream *in, ostream *out, ostream *hout) : input(in), output(out), header_output(hout) {
+    Compiler::Compiler(istream &in, ostream &out, ostream &hout) : input(in), output(out), header_output(hout) {
 
     }
 
@@ -42,7 +37,7 @@ namespace compiler {
 
     int Compiler::compile() {
 
-        driver.parse_stream(*input);
+        driver.parse_stream(input);
         if (driver.program == nullptr)
             return 1;
 
@@ -58,6 +53,4 @@ namespace compiler {
         generator->visit(*driver.program);
         return 0;
     }
-
-
 }

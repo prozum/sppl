@@ -26,7 +26,7 @@ namespace codegen {
 
 class LLVMCodeGenerator : public common::CodeGenerator {
   public:
-    LLVMCodeGenerator(shared_ptr<std::ostream>);
+    LLVMCodeGenerator(std::ostream&);
 
     void visit(common::Program &node);
 

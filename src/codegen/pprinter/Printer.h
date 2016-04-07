@@ -9,7 +9,7 @@ using namespace std;
 namespace codegen {
     class Printer : public CodeGenerator {
     public:
-        Printer(shared_ptr<ostream> out);
+        Printer(ostream &out);
 
         virtual void visit(Program &node);
     };

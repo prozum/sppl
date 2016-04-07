@@ -9,12 +9,12 @@ void TestMaster::tearDown() {
 }
 
 bool TestMaster::compileChecker(std::stringstream *source) {
-    ostream out(0);
-    ostream hout(0);
     int status;
+    std::stringstream out;
+    std::stringstream hout;
 
     try {
-        compiler::Compiler compiler(source, &out, &hout);
+        compiler::Compiler compiler(*source, out, hout);
         compiler.set_backend(backend);
         status = compiler.compile();
     }

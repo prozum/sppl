@@ -5,10 +5,10 @@ using namespace std;
 
 namespace codegen {
 
-    Printer::Printer(shared_ptr<ostream> out)
+    Printer::Printer(ostream &out)
         : CodeGenerator(out) { }
 
     void Printer::visit(Program &node) {
-        *output << node.str();
+        output << node.str();
     }
 }

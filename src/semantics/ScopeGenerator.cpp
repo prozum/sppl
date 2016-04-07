@@ -44,26 +44,24 @@ namespace semantics {
         }
     }
 
+
     void ScopeGenerator::visit(Case &node) {
         auto case_scope = new Scope(current_scope);
         current_scope->children.push_back(case_scope);
         current_scope = case_scope;
         garbage.push_back(current_scope);
 
-        if (node.patterns.size() == current_func->types.size() - 1) {
+        // Visit children
+        context = ScopeContext::PATTERN;
 
-            // Visit children
-            context = ScopeContext::PATTERN;
-
-            for (size_t i = 0; i < node.patterns.size(); i++) {
-                type_stack.push(current_func->types[i]);
-                node.patterns[i]->accept(*this);
-                type_stack.pop();
-            }
-
-            context = ScopeContext::EXPR;
-            node.expr->accept(*this);
+        for (size_t i = 0; i < node.patterns.size(); i++) {
+            type_stack.push(current_func->types[i]);
+            node.patterns[i]->accept(*this);
+            type_stack.pop();
         }
+
+        context = ScopeContext::EXPR;
+        node.expr->accept(*this);
 
         current_scope = current_scope->parent;
     }
@@ -245,6 +243,7 @@ namespace semantics {
 
     void ScopeGenerator::visit(Id &node) {
         node.scope = current_scope;
+        node.visited = true;
 
         if (context == ScopeContext::PATTERN) {
             if (!current_scope->exists(node.id)) {
