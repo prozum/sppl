@@ -12,9 +12,9 @@ namespace common {
     class CodeGenerator : public Visitor {
     public:
 
-        CodeGenerator(ostream &out);
+        CodeGenerator(shared_ptr<ostream> out);
 
-        std::ostream &output;
+        shared_ptr<ostream> output;
     };
 
 }

@@ -2,6 +2,6 @@
 
 namespace common {
 
-    CodeGenerator::CodeGenerator(ostream &out) : output(out) {
+    CodeGenerator::CodeGenerator(shared_ptr<ostream> out) : output(out) {
     }
 }

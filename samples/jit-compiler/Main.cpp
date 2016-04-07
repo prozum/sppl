@@ -14,7 +14,6 @@ int main(int argc, char *argv[]) {
 
     string input("");
     string input_case("");
-    string eval_str;
     //jit.Eval("def test: Int\n| = 2*2");
     while (input.compare("q") != 0)
     {
@@ -31,7 +30,7 @@ int main(int argc, char *argv[]) {
             while(!(input_case.compare(0, 1, "|") && input_case.compare(0, 2, "\t|")));
         }
 
-        //jit.Eval(input);
+        jit.Eval(input);
         cout << endl << endl;
     }
 }
