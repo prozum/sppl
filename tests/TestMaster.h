@@ -40,7 +40,6 @@ class TestMaster : public CppUnit::TestFixture{
         // Addition - Mix
         CPPUNIT_TEST(addMixFloatInt);
         CPPUNIT_TEST(addMixIntFloat);
-
         // Subtraction - Integer
         CPPUNIT_TEST(subIntPosPos);
         CPPUNIT_TEST(subIntZeroZero);
@@ -66,7 +65,6 @@ class TestMaster : public CppUnit::TestFixture{
         // Subtraction - Mix
         CPPUNIT_TEST(subMixFloatInt);
         CPPUNIT_TEST(subMixIntFloat);
-
         // Multiplication - Integer
         CPPUNIT_TEST(mulIntPosPos);
         CPPUNIT_TEST(mulIntZeroZero);
@@ -92,7 +90,6 @@ class TestMaster : public CppUnit::TestFixture{
         // Multiplication - Mix
         CPPUNIT_TEST(mulMixFloatInt);
         CPPUNIT_TEST(mulMixIntFloat);
-
         // Division - Integer
         CPPUNIT_TEST(divIntPosPos);
         CPPUNIT_TEST(divIntZeroZero);
@@ -118,7 +115,6 @@ class TestMaster : public CppUnit::TestFixture{
         // Division - Mix
         CPPUNIT_TEST(divMixFloatInt);
         CPPUNIT_TEST(divMixIntFloat);
-
         // Modulo - Integer
         CPPUNIT_TEST(modIntPosPos);
         CPPUNIT_TEST(modIntZeroZero);
@@ -184,7 +180,6 @@ class TestMaster : public CppUnit::TestFixture{
         CPPUNIT_TEST(binLessTrueFalse);
         CPPUNIT_TEST(binLessFalseTrue);
         CPPUNIT_TEST(binLessFalseFalse);
-
         // Binary/Int
         CPPUNIT_TEST(binEqualInt);
         CPPUNIT_TEST(binNotEqualInt);
@@ -194,7 +189,6 @@ class TestMaster : public CppUnit::TestFixture{
         CPPUNIT_TEST(binLeEqInt);
         CPPUNIT_TEST(binLessInt);
         CPPUNIT_TEST(binGreatInt);
-
         // Binary/Float
         CPPUNIT_TEST(binEqualFloat);
         CPPUNIT_TEST(binNotEqualFloat);
@@ -204,7 +198,7 @@ class TestMaster : public CppUnit::TestFixture{
         CPPUNIT_TEST(binLeEqFloat);
         CPPUNIT_TEST(binLessFloat);
         CPPUNIT_TEST(binGreatFloat);
-
+        // Signature - Length
         CPPUNIT_TEST(sigLengthZeroInt);
         CPPUNIT_TEST(sigLengthOneInt);
         CPPUNIT_TEST(sigLengthTwoInt);
@@ -216,11 +210,11 @@ class TestMaster : public CppUnit::TestFixture{
         CPPUNIT_TEST(sigLengthEightInt);
         CPPUNIT_TEST(sigLengthNineInt);
         CPPUNIT_TEST(sigLengthTenInt);
-
+        // Pattern - Length
         CPPUNIT_TEST(patLengthSameInt);
         CPPUNIT_TEST(patLengthMoreInt);
         CPPUNIT_TEST(patLengthLessInt);
-
+        // Case - Count
         CPPUNIT_TEST(casOneCaseInt);
         CPPUNIT_TEST(casTwoCaseInt);
         CPPUNIT_TEST(casThreeCaseInt);
@@ -231,117 +225,103 @@ class TestMaster : public CppUnit::TestFixture{
         CPPUNIT_TEST(casEightCaseInt);
         CPPUNIT_TEST(casNineCaseInt);
         CPPUNIT_TEST(casTenCaseInt);
-
         // List
-
         CPPUNIT_TEST(listCasEmpty);
         CPPUNIT_TEST(listAppendEmpty);
-
+        // List - Type
         CPPUNIT_TEST(listInt);
         CPPUNIT_TEST(listFloat);
         CPPUNIT_TEST(listBool);
         CPPUNIT_TEST(listChar);
         CPPUNIT_TEST(listString);
-
         CPPUNIT_TEST(listLongInt);
-        CPPUNIT_TEST(listNestedDifLengthInt);
-
         // List In List
-
         CPPUNIT_TEST(listListInt);
         CPPUNIT_TEST(listListFloat);
         CPPUNIT_TEST(listListBool);
         CPPUNIT_TEST(listListChar);
         CPPUNIT_TEST(listListString);
-
         CPPUNIT_TEST(listListListInt);
-
+        CPPUNIT_TEST(listNestedDifLengthInt);
         // List Append
-
         CPPUNIT_TEST(listAppendInt);
         CPPUNIT_TEST(listAppendFloat);
         CPPUNIT_TEST(listAppendBool);
         CPPUNIT_TEST(listAppendChar);
         CPPUNIT_TEST(listAppendString);
-
-        // List Incorrect Type
-
+        // List Incorrect Type - Int
         CPPUNIT_TEST(listFloatInInt);
         CPPUNIT_TEST(listBoolInInt);
         CPPUNIT_TEST(listCharInInt);
         CPPUNIT_TEST(listStringInInt);
-
+        // List Incorrect Type - Float
         CPPUNIT_TEST(listIntInFloat);
         CPPUNIT_TEST(listBoolInFloat);
         CPPUNIT_TEST(listCharInFloat);
         CPPUNIT_TEST(listStringInFloat);
-
+        // List Incorrect Type - Bool
         CPPUNIT_TEST(listIntInBool);
         CPPUNIT_TEST(listFloatInBool);
         CPPUNIT_TEST(listCharInBool);
         CPPUNIT_TEST(listStringInBool);
-
+        // List Incorrect Type - Char
         CPPUNIT_TEST(listIntInChar);
         CPPUNIT_TEST(listFloatInChar);
         CPPUNIT_TEST(listBoolInChar);
         CPPUNIT_TEST(listStringInChar);
-
+        // List Incorrect Type - String
         CPPUNIT_TEST(listIntInString);
         CPPUNIT_TEST(listFloatInString);
         CPPUNIT_TEST(listBoolInString);
         CPPUNIT_TEST(listCharInString);
-
+        // List - Mix
         CPPUNIT_TEST(listMixTypes);
-
+        // List - Tuple
         CPPUNIT_TEST(listTupleInt);
         CPPUNIT_TEST(listTupleFloat);
         CPPUNIT_TEST(listTupleBool);
         CPPUNIT_TEST(listTupleChar);
         CPPUNIT_TEST(listTupleString);
-        
-        // Tuple
-
+        // Tuple - Empty
         CPPUNIT_TEST(tupleEmpty);
         CPPUNIT_TEST(tupleEmptyInt);
         CPPUNIT_TEST(tupleEmptyFloat);
         CPPUNIT_TEST(tupleEmptyBool);
         CPPUNIT_TEST(tupleEmptyChar);
         CPPUNIT_TEST(tupleEmptyString);
-
+        // Tuple - One
         CPPUNIT_TEST(tupleOneInt);
         CPPUNIT_TEST(tupleOneFloat);
         CPPUNIT_TEST(tupleOneBool);
         CPPUNIT_TEST(tupleOneChar);
         CPPUNIT_TEST(tupleOneString);
-
+        // Tuple - Two
         CPPUNIT_TEST(tupleTwoInt);
         CPPUNIT_TEST(tupleTwoFloat);
         CPPUNIT_TEST(tupleTwoBool);
         CPPUNIT_TEST(tupleTwoChar);
         CPPUNIT_TEST(tupleTwoString);
-
+        // Tuple - Three
         CPPUNIT_TEST(tupleThreeInt);
         CPPUNIT_TEST(tupleThreeFloat);
         CPPUNIT_TEST(tupleThreeBool);
         CPPUNIT_TEST(tupleThreeChar);
         CPPUNIT_TEST(tupleThreeString);
-
+        // Tuple - Mix
         CPPUNIT_TEST(tupleMixed);
-
+        // Tuple - List
         CPPUNIT_TEST(tupleListInt);
         CPPUNIT_TEST(tupleListFloat);
         CPPUNIT_TEST(tupleListBool);
         CPPUNIT_TEST(tupleListChar);
         CPPUNIT_TEST(tupleListString);
-
+        // Tuple - Nested
         CPPUNIT_TEST(tupleNested);
         CPPUNIT_TEST(tupleTwoNested);
         CPPUNIT_TEST(tupleSuperNested);
-
+        // Tuple - Wrong
         CPPUNIT_TEST(tupleWrongType);
-
         // keyword
-
         CPPUNIT_TEST(keywordInt);
         CPPUNIT_TEST(keywordFloat);
         CPPUNIT_TEST(keywordChar);
@@ -351,15 +331,50 @@ class TestMaster : public CppUnit::TestFixture{
         CPPUNIT_TEST(keywordFalse);
         CPPUNIT_TEST(keywordMain);
         CPPUNIT_TEST(keywordDef);
-
+        // Functions - Ret Empty
+        CPPUNIT_TEST(funcRetInt);
+        CPPUNIT_TEST(funcRetFloat);
+        CPPUNIT_TEST(funcRetBool);
+        CPPUNIT_TEST(funcRetChar);
+        CPPUNIT_TEST(funcRetString);
+        // Functions - One Input
+        CPPUNIT_TEST(funcIntRetInt);
+        CPPUNIT_TEST(funcFloatRetFloat);
+        CPPUNIT_TEST(funcBoolRetBool);
+        CPPUNIT_TEST(funcCharRetChar);
+        CPPUNIT_TEST(funcStringRetString);
+        // Function - MultipleInput
+        CPPUNIT_TEST(funcIntIntRetInt);
+        CPPUNIT_TEST(funcFloatFloatRetFloat);
+        CPPUNIT_TEST(funcBoolBoolRetBool);
+        CPPUNIT_TEST(funcCharCharRetChar);
+        CPPUNIT_TEST(funcStringStringRetString);
+        // Function - Data Structures
+        CPPUNIT_TEST(funcListIntRetListInt);
+        CPPUNIT_TEST(funcListFloatRetListFloat);
+        CPPUNIT_TEST(funcListBoolRetListBool);
+        CPPUNIT_TEST(funcListCharRetListChar);
+        CPPUNIT_TEST(funcListStringRetListString);
+        CPPUNIT_TEST(funcTupleIntIntRetTupleIntInt);
+        CPPUNIT_TEST(funcTupleFloatFloatRetTupleFloatFloat);
+        CPPUNIT_TEST(funcTupleBoolBoolRetTupleBoolBool);
+        CPPUNIT_TEST(funcTupleCharCharRetTupleCharChar);
+        CPPUNIT_TEST(funcTupleStringStringRetTupleStringString);
+        // Function - Function As Params
+        CPPUNIT_TEST(funcIntToIntRetInt);
+        CPPUNIT_TEST(funcFloatToFloatRetFloat);
+        CPPUNIT_TEST(funcBoolToBoolRetBool);
+        CPPUNIT_TEST(funcCharToCharRetChar);
+        CPPUNIT_TEST(funcStringToStringRetString);
+        CPPUNIT_TEST(funcListIntToListIntRetListInt);
+        CPPUNIT_TEST(funcTupleIntIntToTupleIntIntRetInt);
+        CPPUNIT_TEST(funcIntToIntRetToIntRetToInt);
         // Single line comment test
         CPPUNIT_TEST(comment);
     /**/
     CPPUNIT_TEST_SUITE_END();
 public:
     compiler::Backend backend = compiler::Backend::CPP ;
-    int status = 0;
-
     void setUp();
     void tearDown();
 protected:
@@ -589,9 +604,6 @@ protected:
     void binLessFloat();
     void binGreatFloat();
 
-    // Tuple
-    // TODO
-
     // Signature Length
     void sigLengthZeroInt();
     void sigLengthOneInt();
@@ -625,13 +637,14 @@ protected:
     //List
     void listCasEmpty();
     void listAppendEmpty();
-
     void listInt();
     void listFloat();
     void listBool();
     void listChar();
     void listString();
+    void listLongInt();
 
+    // List - Nested
     void listListInt();
     void listListFloat();
     void listListBool();
@@ -639,14 +652,14 @@ protected:
     void listListString();
     void listListListInt();
 
+    // List - Append
     void listAppendInt();
     void listAppendFloat();
     void listAppendBool();
     void listAppendChar();
     void listAppendString();
     
-    void listLongInt();
-
+    // List - Wrong Type
     void listFloatInInt();
     void listBoolInInt();
     void listCharInInt();
@@ -674,6 +687,7 @@ protected:
 
     void listMixTypes();
 
+    // List - Other
     void listNestedDifLengthInt();
 
     void listTupleInt();
@@ -682,8 +696,7 @@ protected:
     void listTupleChar();
     void listTupleString();
 
-    // Tuple
-
+    // Tuple - Empty
     void tupleEmpty();
     void tupleEmptyInt();
     void tupleEmptyFloat();
@@ -691,37 +704,40 @@ protected:
     void tupleEmptyChar();
     void tupleEmptyString();
 
+    // Tuple - One
     void tupleOneInt();
     void tupleOneFloat();
     void tupleOneBool();
     void tupleOneChar();
     void tupleOneString();
 
+    // Tuple - Two
     void tupleTwoInt();
     void tupleTwoFloat();
     void tupleTwoBool();
     void tupleTwoChar();
     void tupleTwoString();
 
+    // Tuple - Three
     void tupleThreeInt();
     void tupleThreeFloat();
     void tupleThreeBool();
     void tupleThreeChar();
     void tupleThreeString();
 
-    void tupleMixed();
-
+    // Tuple - List
     void tupleListInt();
     void tupleListFloat();
     void tupleListBool();
     void tupleListChar();
     void tupleListString();
 
+    // Tuple - Other
     void tupleNested();
     void tupleTwoNested();
     void tupleSuperNested();
-
     void tupleWrongType();
+    void tupleMixed();
 
     // Keywords
     void keywordTrue();
@@ -734,8 +750,48 @@ protected:
     void keywordDef();
     void keywordMain();
 
-    // Function Call
-    // TODO
+    // Functions - Ret Empty
+    void funcRetInt();
+    void funcRetFloat();
+    void funcRetBool();
+    void funcRetChar();
+    void funcRetString();
+
+    // Functions - One Input
+    void funcIntRetInt();
+    void funcFloatRetFloat();
+    void funcBoolRetBool();
+    void funcCharRetChar();
+    void funcStringRetString();
+
+    // Function - MultipleInput
+    void funcIntIntRetInt();
+    void funcFloatFloatRetFloat();
+    void funcBoolBoolRetBool();
+    void funcCharCharRetChar();
+    void funcStringStringRetString();
+
+    // Function - Data Structures
+    void funcListIntRetListInt();
+    void funcListFloatRetListFloat();
+    void funcListBoolRetListBool();
+    void funcListCharRetListChar();
+    void funcListStringRetListString();
+    void funcTupleIntIntRetTupleIntInt();
+    void funcTupleFloatFloatRetTupleFloatFloat();
+    void funcTupleBoolBoolRetTupleBoolBool();
+    void funcTupleCharCharRetTupleCharChar();
+    void funcTupleStringStringRetTupleStringString();
+
+    // Function - Function As Params
+    void funcIntToIntRetInt();
+    void funcFloatToFloatRetFloat();
+    void funcBoolToBoolRetBool();
+    void funcCharToCharRetChar();
+    void funcStringToStringRetString();
+    void funcListIntToListIntRetListInt();
+    void funcTupleIntIntToTupleIntIntRetInt();
+    void funcIntToIntRetToIntRetToInt();
 
     // Single line comment test
     void comment();
@@ -762,4 +818,13 @@ protected:
                                      std::string ret,
                                      std::vector<std::string> pattern,
                                      std::string cas);
+    std::stringstream buildMultiFunc(std::string mainSig,  std::string mainPat,  std::string mainBody,
+                                     std::string funcSig,  std::string funcPat,  std::string funcBody);
+    std::stringstream buildMultiFunc(std::string mainSig,  std::string mainPat,  std::string mainBody,
+                                     std::string func1Sig, std::string func1Pat, std::string func1Body,
+                                     std::string func2Sig, std::string func2Pat, std::string func2Body);
+    std::stringstream buildMultiFunc(std::string mainSig,  std::string mainPat,  std::string mainBody,
+                                     std::string func1Sig, std::string func1Pat, std::string func1Body,
+                                     std::string func2Sig, std::string func2Pat, std::string func2Body, 
+                                     std::string func3Sig, std::string func3Pat, std::string func3Body);
 };
