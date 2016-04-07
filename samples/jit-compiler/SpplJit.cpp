@@ -91,6 +91,8 @@ namespace jit {
                 return out;
             case common::Types::TUPLE:
                 return get_tuple_output(data, node_type->types);
+            default:
+                throw Error::NotImplemented("Cannot convert to C data: " + node_type->str());
         }
     }
 
@@ -114,6 +116,8 @@ namespace jit {
                     out += get_tuple_output(*(intptr_t *) addr, node_type->types);
                     addr += sizeof(intptr_t *);
                     break;
+                default:
+                    throw Error::NotImplemented("Cannot convert to C data: " + node_type->str());
             }
             if (node_type != node_types.back())
                 out += ",";
