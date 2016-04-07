@@ -9,7 +9,14 @@
 namespace common {
 	class Error {
 	public:
+		Error(string msg);
 		Error(string msg, Location loc);
+
+		static Error NotImplemented(string msg)
+		{
+			return Error ("NotImplemented: " + msg);
+		}
+
 		static Error Expected(string msg, string expected, string actual, Location loc)
 		{
 			return Error(msg + ": Expected: '" + expected + "' Actual: '" + actual + "'", loc);

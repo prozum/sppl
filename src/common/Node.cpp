@@ -701,7 +701,7 @@ namespace common {
             case Types::SIGNATURE:
                 return  "(" + collection_str(*this, " -> ") + ")";
             default:
-                break;
+                throw Error::NotImplemented("");
         }
     }
 
@@ -712,5 +712,7 @@ namespace common {
             if (type != node.types.back())
                 str += split;
         }
+
+        return str;
     }
 }
