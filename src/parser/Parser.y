@@ -2,7 +2,11 @@
 %name-prefix "parser"
 %define "parser_class_name" {Parser}
 %locations
-%initial-action { @$.begin->source = @$.end->source = driver.source; }
+%initial-action {
+    @$.begin = new Location();
+    @$.end = new Location();
+    @$.begin->source = @$.end->source = driver.source;
+}
 %debug
 %parse-param { class Driver& driver }
 %error-verbose

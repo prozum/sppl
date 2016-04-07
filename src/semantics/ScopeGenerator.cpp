@@ -261,4 +261,21 @@ namespace semantics {
         }
         // Visit stops here
     }
+
+    void ScopeGenerator::visit(Type &node) { }
+
+    void ScopeGenerator::visit(Int &node) {
+    }
+
+    void ScopeGenerator::visit(Float &node) {
+    }
+
+    void ScopeGenerator::visit(Bool &node) {
+    }
+
+    void ScopeGenerator::visit(Char &node) {
+    }
+
+    void ScopeGenerator::visit(String &node) {
+    }
 }

@@ -38,6 +38,11 @@ namespace semantics {
         void visit(Div &node);
         void visit(Mod &node);
         void visit(ListAdd &node);
+        void visit(Int &node);
+        void visit(Float &node);
+        void visit(Bool &node);
+        void visit(Char &node);
+        void visit(String &node);
         void visit(Par &node);
         void visit(Not &node);
         void visit(ListPattern &node);
@@ -47,6 +52,7 @@ namespace semantics {
         void visit(Tuple &node);
         void visit(Id &node);
         void visit(Call &node);
+        void visit(Type &node);
 
     private:
         Scope *current_scope;

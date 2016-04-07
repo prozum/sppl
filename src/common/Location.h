@@ -11,16 +11,16 @@ namespace common {
 	public:
 		Location();
 
-		Location(size_t l, size_t c, std::string source);
+		Location(int l, int c, string src);
 
-		size_t l = 0;
-		size_t c = 0;
-		std::string source;
+		int lines = 0;
+		int columns = 0;
+		string source;
 
 		Location *begin;
 		Location *end;
 
 	};
 
-	std::ostream &operator<<(ostream &o, const Location &s);
+	ostream &operator<<(ostream &o, const Location &s);
 }
