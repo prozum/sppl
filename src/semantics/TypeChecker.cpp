@@ -68,6 +68,14 @@ namespace semantics
                         node.loc));
             return;
         }
+
+        if (!equal(current_func->types.back(), node.expr->node_type)) {
+            AddError(Error::Expected("Wrong return type",
+                                     current_func->types.back()->str(),
+                                     node.expr->node_type->str(),
+                                     node.loc));
+            return;
+        }
     }
 
     void TypeChecker::visit(Or &node) {

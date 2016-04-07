@@ -73,7 +73,6 @@ namespace common {
 	class Node {
 	public:
 		Type* node_type = nullptr;
-		bool visited = false;
         // for the interpreter to save the children values of a Node
         // this should probably be moved into the visitor itself later
         Expr *val = nullptr;

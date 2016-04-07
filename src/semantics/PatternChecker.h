@@ -18,12 +18,6 @@ namespace semantics {
 
         void visit(Case &node);
 
-        void visit(ListPattern &node);
-
-        void visit(TuplePattern &node);
-
-        void visit(ListSplit &node);
-
     private:
         Function *cur_func;
     };

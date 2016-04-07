@@ -243,7 +243,6 @@ namespace semantics {
 
     void ScopeGenerator::visit(Id &node) {
         node.scope = current_scope;
-        node.visited = true;
 
         if (context == ScopeContext::PATTERN) {
             if (!current_scope->exists(node.id)) {

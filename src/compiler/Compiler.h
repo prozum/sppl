@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <memory>
+#include <PatternChecker.h>
 
 #ifdef CCPP
 #include "CppCodeGenerator.h"
@@ -49,6 +50,7 @@ namespace compiler {
         std::unique_ptr<CodeGenerator> generator;
         semantics::ScopeGenerator scope_generator;
         semantics::TypeChecker type_checker;
+        semantics::PatternChecker pattern_checker;
         parser::Driver driver;
 
         int compile();
