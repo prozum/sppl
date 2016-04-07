@@ -9,17 +9,16 @@ void TestMaster::tearDown() {
 }
 
 bool TestMaster::compileChecker(std::stringstream *source) {
-
     ostream out(0);
     ostream hout(0);
+    int status;
 
     try {
         compiler::Compiler compiler(source, &out, &hout);
         compiler.set_backend(backend);
         status = compiler.compile();
     }
-    catch (...)
-    {
+    catch (...) {
         return false;
     }
 
@@ -96,6 +95,39 @@ std::stringstream TestMaster::buildMultiCase(std::vector<string> signature,
     return source;
 }
 
+std::stringstream TestMaster::buildMultiFunc(std::string mainSig, 
+                                             std::string mainPat, 
+                                             std::string mainBody,
+                                             std::string funcSig, 
+                                             std::string funcPat, 
+                                             std::string funcBody) {
+    std::stringstream source;
+    source << "def main : " << mainSig << endl << buildCase(&source, mainPat, mainBody);
+    source << "def func : " << funcSig << endl << buildCase(&source, funcPat, funcBody);
+    return source;
+}
+
+std::stringstream TestMaster::buildMultiFunc(std::string mainSig, std::string mainPat, std::string mainBody,
+                                             std::string func1Sig, std::string func1Pat, std::string func1Body,
+                                             std::string func2Sig, std::string func2Pat, std::string func2Body) {
+    std::stringstream source;
+    source << "def main : " << mainSig << endl << buildCase(&source, mainPat, mainBody);
+    source << "def func1 : " << func1Sig << endl << buildCase(&source, func1Pat, func1Body);
+    source << "def func2 : " << func2Sig << endl << buildCase(&source, func2Pat, func2Body);
+    return source;
+}
+
+std::stringstream TestMaster::buildMultiFunc(std::string mainSig, std::string mainPat, std::string mainBody,
+                                             std::string func1Sig, std::string func1Pat, std::string func1Body,
+                                             std::string func2Sig, std::string func2Pat, std::string func2Body,
+                                             std::string func3Sig, std::string func3Pat, std::string func3Body) {
+    std::stringstream source;
+    source << "def main : " << mainSig << endl << buildCase(&source, mainPat, mainBody);
+    source << "def func1 : " << func1Sig << endl << buildCase(&source, func1Pat, func1Body);
+    source << "def func2 : " << func2Sig << endl << buildCase(&source, func2Pat, func2Body);
+    source << "def func3 : " << func3Sig << endl << buildCase(&source, func3Pat, func3Body);
+    return source;
+}
 
 /*
  * ADDITION
@@ -1882,9 +1914,253 @@ void TestMaster::tupleSuperNested() {
 }
 
 void TestMaster::tupleWrongType() {
-    std::stringstream source = buildSimple("(Int,Float,Bool,Char;String)","(1.2,True,'c',\"string\",1)");
+    std::stringstream source = buildSimple("(Int,Float,Bool,Char,String)","(1.2,True,'c',\"string\",1)");
     bool status = compileChecker(&source);
     CPPUNIT_ASSERT(status == false);
+}
+
+/*
+ * Function
+ */
+
+void TestMaster::funcRetInt() {
+    std::stringstream source = buildMultiFunc("Int","","func()",
+                                              "Int","","2");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::funcRetFloat() {
+    std::stringstream source = buildMultiFunc("Float", "", "func()", 
+                                              "Float", "", "2.0");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::funcRetBool() {
+    std::stringstream source = buildMultiFunc("Bool", "", "func()", 
+                                              "Bool", "", "True");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::funcRetChar() {
+    std::stringstream source = buildMultiFunc("Char", "", "func()", 
+                                              "Char", "", "'c'");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::funcRetString() {
+    std::stringstream source = buildMultiFunc("String", "", "func()", 
+                                              "String", "", "\"string\"");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::funcIntRetInt() {
+    std::stringstream source = buildMultiFunc("Int","","func(2)",
+                                              "Int->Int","n","n");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::funcFloatRetFloat() {
+    std::stringstream source = buildMultiFunc("Float","","func(2.0)",
+                                              "Float->Float","n","n");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::funcBoolRetBool() {
+    std::stringstream source = buildMultiFunc("Bool","","func(True)",
+                                              "Bool->Bool","n","n");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::funcCharRetChar() {
+    std::stringstream source = buildMultiFunc("Char","","func('c')",
+                                              "Char->Char","n","n");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::funcStringRetString() {
+    std::stringstream source = buildMultiFunc("String","","func(\"string\")",
+                                              "String->String","n","n");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::funcIntIntRetInt() {
+    std::stringstream source = buildMultiFunc("Int","","func(2,2)",
+                                              "Int->Int->Int","m n","m+n");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::funcFloatFloatRetFloat() {
+    std::stringstream source = buildMultiFunc("Float","","func(2.0,2.0)",
+                                              "Float->Float->Float","m n","m+n");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::funcBoolBoolRetBool() {
+    std::stringstream source = buildMultiFunc("Bool","","func(True,False)",
+                                              "Bool->Bool->Bool","m n","m||n");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::funcCharCharRetChar() {
+    std::stringstream source = buildMultiFunc("Char","","func('c','c')",
+                                              "Char->Char->Char","m n","'h'");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::funcStringStringRetString() {
+    std::stringstream source = buildMultiFunc("String","","func(\"string\",\"string\")",
+                                              "String->String->String","m n","\"string\"");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::funcListIntRetListInt() {
+    std::stringstream source = buildMultiFunc("[Int]","","func([1])",
+                                              "[Int]->[Int]","n","n");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::funcListFloatRetListFloat() {
+    std::stringstream source = buildMultiFunc("[Float]","","func([1.0])",
+                                              "[Float]->[Float]","n","n");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::funcListBoolRetListBool() {
+    std::stringstream source = buildMultiFunc("[Bool]","","func([True])",
+                                              "[Bool]->[Bool]","n","n");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::funcListCharRetListChar() {
+    std::stringstream source = buildMultiFunc("[Char]","","func(['c','h','a','r'])",
+                                              "[Char]->[Char]","n","n");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::funcListStringRetListString() {
+    std::stringstream source = buildMultiFunc("[String]","","func([\"string\"])",
+                                              "[String]->[String]","n","n");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::funcTupleIntIntRetTupleIntInt() {
+    std::stringstream source = buildMultiFunc("(Int,Int)","","func((2,2))",
+                                              "(Int,Int)->(Int,Int)","n","n");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::funcTupleFloatFloatRetTupleFloatFloat() {
+    std::stringstream source = buildMultiFunc("(Float,Float)","","func((2.0,2.0))",
+                                              "(Float,Float)->(Float,Float)","n","n");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::funcTupleBoolBoolRetTupleBoolBool() {
+    std::stringstream source = buildMultiFunc("(Bool,Bool)","","func((True,False))",
+                                              "(Bool,Bool)->(Bool,Bool)","n","n");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::funcTupleCharCharRetTupleCharChar() {
+    std::stringstream source = buildMultiFunc("(Char,Char)","","func(('c','h'))",
+                                              "(Char,Char)->(Char,Char)","n","n");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::funcTupleStringStringRetTupleStringString() {
+    std::stringstream source = buildMultiFunc("(String,String)","","func((\"string\",\"string\"))",
+                                              "(String,String)->(String,String)","n","n");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::funcIntToIntRetInt() {
+    std::stringstream source = buildMultiFunc("Int", "", "func1(func2)",
+                                              "(Int->Int)->Int", "f", "f(2)",
+                                              "Int->Int", "n", "n");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::funcFloatToFloatRetFloat() {
+    std::stringstream source = buildMultiFunc("Float", "", "func1(func2)",
+                                              "(Float->Float)->Float", "f", "f(2.0)",
+                                              "Float->Float", "n", "n");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::funcBoolToBoolRetBool() {
+    std::stringstream source = buildMultiFunc("Bool", "", "func1(func2)",
+                                              "(Bool->Bool)->Bool", "f", "f(True)",
+                                              "Bool->Bool", "n", "n");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::funcCharToCharRetChar() {
+    std::stringstream source = buildMultiFunc("Char", "", "func1(func2)",
+                                              "(Char->Char)->Char", "f", "f('c')",
+                                              "Char->Char", "n", "n");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::funcStringToStringRetString() {
+    std::stringstream source = buildMultiFunc("String", "", "func1(func2)",
+                                              "(String->String)->String", "f", "f(\"string\")",
+                                              "String->String", "n", "n");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::funcListIntToListIntRetListInt() {
+    std::stringstream source = buildMultiFunc("[Int]", "", "func1(func2)",
+                                              "([Int]->[Int])->[Int]", "f", "f([1])",
+                                              "[Int]->[Int]", "n", "n");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::funcTupleIntIntToTupleIntIntRetInt() {
+    std::stringstream source = buildMultiFunc("(Int,Int)", "", "func1(func2)",
+                                              "((Int,Int)->(Int,Int))->(Int,Int)", "f", "f((1,2))",
+                                              "(Int,Int)->(Int,Int)", "n", "n");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
+}
+
+void TestMaster::funcIntToIntRetToIntRetToInt() {
+    std::stringstream source = buildMultiFunc("Int","","func1(func2)",
+                                              "((Int->Int)->Int)->Int","f","f(func3)",
+                                              "(Int->Int)->Int","f","f(2)",
+                                              "Int->Int","n","n");
+    bool status = compileChecker(&source);
+    CPPUNIT_ASSERT(status == true);
 }
 
 /*
