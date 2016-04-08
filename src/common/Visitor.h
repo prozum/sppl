@@ -8,7 +8,7 @@
 
 namespace common {
 #define CheckPanic if (notsafe) return;
-#define Safe notsafe = true
+#define Safe notsafe = false
 
     class Visitor {
 		friend class Node;

@@ -94,7 +94,5 @@ int main(int argc, char *argv[])
     compiler::Compiler compiler(in, out, hout);
     compiler.set_backend(backend);
 
-    compiler.compile();
-
-    return 0;
+    return compiler.compile();
 }
