@@ -41,12 +41,6 @@ namespace compiler {
         if (driver.program == nullptr)
             return 1;
 
-        /*
-        pattern_checker.visit(*driver.program);
-        if (pattern_checker.HasError())
-            return 4;
-        */
-
         //case_checker.visit(*driver.program);
         scope_generator.visit(*driver.program);
         if (scope_generator.HasError())
