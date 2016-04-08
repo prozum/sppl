@@ -96,20 +96,20 @@ namespace jit {
         }
     }
 
-    string SpplJit::get_tuple_output(intptr_t addr, vector<common::Type *> node_types) {
+    string SpplJit::get_tuple_output(intptr_t addr, vector<shared_ptr<common::Type>> node_types) {
         string out("(");
         for (auto &node_type: node_types) {
             switch (node_type->type) {
                 case common::Types::INT:
-                    out += get_output(*(int64_t *) addr, node_type);
+                    out += get_output(*(int64_t *) addr, node_type.get());
                     addr += sizeof(int64_t);
                     break;
                 case common::Types::FLOAT:
-                    out += get_output(addr, node_type);
+                    out += get_output(addr, node_type.get());
                     addr += sizeof(double);
                     break;
                 case common::Types::STRING:
-                    out += get_output(*(intptr_t *) addr, node_type);
+                    out += get_output(*(intptr_t *) addr, node_type.get());
                     addr += sizeof(intptr_t *);
                     break;
                 case common::Types::TUPLE:
@@ -158,7 +158,7 @@ namespace jit {
             auto func = find_symbol(func_node->id);
             auto func_jit = (size_t (*)()) func.getAddress();
 
-            string output = get_output(func_jit(), func_node->node_type);
+            string output = get_output(func_jit(), func_node->node_type.get());
             cout << "output: " << output << endl;
         }
 
