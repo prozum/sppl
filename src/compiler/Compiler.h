@@ -44,6 +44,7 @@ namespace compiler {
     public:
         Compiler(shared_ptr<istream> in, shared_ptr<ostream> out, shared_ptr<ostream> hout);
 
+        parser::Driver driver;
         shared_ptr<istream> input;
         shared_ptr<ostream> output;
         shared_ptr<ostream> header_output;
@@ -51,7 +52,6 @@ namespace compiler {
         semantics::ScopeGenerator scope_generator;
         semantics::TypeChecker type_checker;
         semantics::PatternChecker pattern_checker;
-        parser::Driver driver;
 
         int compile();
 

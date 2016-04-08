@@ -1,6 +1,13 @@
 #include "Compiler.h"
+
 namespace compiler {
-    Compiler::Compiler(shared_ptr<istream> in, shared_ptr<ostream> out, shared_ptr<ostream> hout) : input(in), output(out), header_output(hout) {
+    Compiler::Compiler(shared_ptr<istream> in,
+                       shared_ptr<ostream> out,
+                       shared_ptr<ostream> hout)
+            : input(in),
+              output(out),
+              header_output(hout),
+              scope_generator(semantics::ScopeGenerator(driver.global.get())) {
 
     }
 

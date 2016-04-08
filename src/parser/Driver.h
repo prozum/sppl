@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "Node.h"
+#include "Scope.h"
 
 namespace parser {
 
@@ -12,6 +13,7 @@ class Driver
     public:
         Driver();
 
+        unique_ptr<common::Scope> global;
         bool trace_scanning;
         bool trace_parsing;
 
