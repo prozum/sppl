@@ -132,12 +132,11 @@ namespace common {
     Function::Function() { }
 
     Function::Function(string id, bool is_anon) :
-            id(id), is_anon(is_anon) { }
+            id(id) { this->is_anon = is_anon; }
 
     Function::Function(string id,
                        vector<Type *> types) :
-            id(id),
-            is_anon(false)
+            id(id)
     {
         for (auto i : types)
             this->types.push_back(shared_ptr<Type>(i));
@@ -147,8 +146,7 @@ namespace common {
                        vector<Type *> types,
                        Location loc) :
             Node(loc),
-            id(id),
-            is_anon(false)
+            id(id)
     {
         for (auto i : types)
             this->types.push_back(shared_ptr<Type>(i));
@@ -157,8 +155,7 @@ namespace common {
     Function::Function(string id,
                        vector<Type *> types,
                        vector<Case *> cases) :
-            id(id),
-            is_anon(false)
+            id(id)
     {
         for (auto i : types)
             this->types.push_back(shared_ptr<Type>(i));
@@ -172,8 +169,7 @@ namespace common {
                        vector<Case *> cases,
                        Location loc) :
             Node(loc),
-            id(id),
-            is_anon(false)
+            id(id)
     {
         for (auto i : types)
             this->types.push_back(shared_ptr<Type>(i));

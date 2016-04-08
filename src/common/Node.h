@@ -166,7 +166,7 @@ namespace common {
 	class Function : public Node {
 	public:
 		string id;
-		bool is_anon;
+        bool is_anon = false;
 		vector<shared_ptr<Type>> types;
         vector<shared_ptr<Case>> cases;
 		shared_ptr<Scope> scope;
