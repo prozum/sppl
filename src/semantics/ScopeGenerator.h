@@ -57,8 +57,7 @@ namespace semantics {
     private:
         Scope *current_scope;
         Function *current_func;
-        std::stack<Type *> type_stack;
+        std::stack<shared_ptr<Type>> type_stack;
         ScopeContext context;
-        vector<void *> garbage;
     };
 }

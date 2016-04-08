@@ -107,22 +107,27 @@ namespace common {
 
     Program::Program() { }
 
-    Program::Program(vector<Function *> funcs) :
-            funcs(funcs) { }
+    Program::Program(vector<Function *> funcs)
+    {
+        for (auto i : funcs)
+            this->funcs.push_back(shared_ptr<Function>(i));
+    }
 
     Program::Program(vector<Function *> funcs,
                      Location loc) :
-            Node(loc),
-            funcs(funcs) { }
+            Node(loc)
+    {
+        for (auto i : funcs)
+            this->funcs.push_back(shared_ptr<Function>(i));
+    }
 
     Program::Program(string id,
-                       Expr *expr,
-                       Location loc) :
-            Node(loc),
-            funcs() {
+                     Expr *expr,
+                     Location loc) :
+            Node(loc) {
 
-        funcs.push_back(new Function(id, vector<Type *>(), vector<Case *>()));
-        funcs[0]->cases.push_back(new Case(expr, vector<Pattern *>()));
+        funcs.push_back(shared_ptr<Function>(new Function(id)));
+        funcs[0]->cases.push_back(shared_ptr<Case>(new Case(expr)));
     }
 
     Function::Function() { }
@@ -132,31 +137,47 @@ namespace common {
 
     Function::Function(string id,
                        vector<Type *> types) :
-            id(id),
-            types(types) { }
+            id(id)
+    {
+        for (auto i : types)
+            this->types.push_back(shared_ptr<Type>(i));
+    }
 
     Function::Function(string id,
                        vector<Type *> types,
                        Location loc) :
             Node(loc),
-            id(id),
-            types(types) { }
+            id(id)
+    {
+        for (auto i : types)
+            this->types.push_back(shared_ptr<Type>(i));
+    }
 
     Function::Function(string id,
                        vector<Type *> types,
                        vector<Case *> cases) :
-            id(id),
-            types(types),
-            cases(cases) { }
+            id(id)
+    {
+        for (auto i : types)
+            this->types.push_back(shared_ptr<Type>(i));
+
+        for (auto i : cases)
+            this->cases.push_back(shared_ptr<Case>(i));
+    }
 
     Function::Function(string id,
                        vector<Type *> types,
                        vector<Case *> cases,
                        Location loc) :
             Node(loc),
-            id(id),
-            types(types),
-            cases(cases) { }
+            id(id)
+    {
+        for (auto i : types)
+            this->types.push_back(shared_ptr<Type>(i));
+
+        for (auto i : cases)
+            this->cases.push_back(shared_ptr<Case>(i));
+    }
 
     Case::Case() { }
 
@@ -164,15 +185,21 @@ namespace common {
 
     Case::Case(Expr *expr,
                vector<Pattern *> patterns) :
-            expr(expr),
-            patterns(patterns) { }
+            expr(expr)
+    {
+        for (auto i : patterns)
+            this->patterns.push_back(shared_ptr<Pattern>(i));
+    }
 
     Case::Case(Expr *expr,
                vector<Pattern *> patterns,
                Location loc) :
             Node(loc),
-            expr(expr),
-            patterns(patterns) { }
+            expr(expr)
+    {
+        for (auto i : patterns)
+            this->patterns.push_back(shared_ptr<Pattern>(i));
+    }
 
     Or::Or() { }
 
@@ -389,22 +416,34 @@ namespace common {
     ListPattern::ListPattern() { }
 
     ListPattern::ListPattern(vector<Pattern *> patterns)
-            : patterns(patterns) { }
+    {
+        for (auto i : patterns)
+            this->patterns.push_back(shared_ptr<Pattern>(i));
+    }
 
     ListPattern::ListPattern(vector<Pattern *> patterns,
                              Location loc) :
-            Pattern(loc),
-            patterns(patterns) { }
+            Pattern(loc)
+    {
+        for (auto i : patterns)
+            this->patterns.push_back(shared_ptr<Pattern>(i));
+    }
 
     TuplePattern::TuplePattern() { }
 
     TuplePattern::TuplePattern(vector<Pattern *> patterns)
-            : patterns(patterns) { }
+    {
+        for (auto i : patterns)
+            this->patterns.push_back(shared_ptr<Pattern>(i));
+    }
 
     TuplePattern::TuplePattern(vector<Pattern *> patterns,
                                Location loc) :
-            Pattern(loc),
-            patterns(patterns) { }
+            Pattern(loc)
+    {
+        for (auto i : patterns)
+            this->patterns.push_back(shared_ptr<Pattern>(i));
+    }
 
     ListSplit::ListSplit() { }
 
@@ -422,23 +461,35 @@ namespace common {
 
     List::List() { }
 
-    List::List(vector<Expr *> exprs) :
-            exprs(exprs) { }
+    List::List(vector<Expr *> exprs)
+    {
+        for (auto i : exprs)
+            this->exprs.push_back(shared_ptr<Expr>(i));
+    }
 
     List::List(vector<Expr *> exprs,
                Location loc) :
-            Expr(loc),
-            exprs(exprs) { }
+            Expr(loc)
+    {
+        for (auto i : exprs)
+            this->exprs.push_back(shared_ptr<Expr>(i));
+    }
 
     Tuple::Tuple() { }
 
-    Tuple::Tuple(vector<Expr *> exprs) :
-            exprs(exprs) { }
+    Tuple::Tuple(vector<Expr *> exprs)
+    {
+        for (auto i : exprs)
+            this->exprs.push_back(shared_ptr<Expr>(i));
+    }
 
     Tuple::Tuple(vector<Expr *> exprs,
                  Location loc) :
-            Expr(loc),
-            exprs(exprs) { }
+            Expr(loc)
+    {
+        for (auto i : exprs)
+            this->exprs.push_back(shared_ptr<Expr>(i));
+    }
 
     Id::Id() { }
 
@@ -457,15 +508,21 @@ namespace common {
 
     Call::Call(Expr *callee,
                vector<Expr *> exprs) :
-            callee(callee),
-            exprs(exprs) { }
+            callee(callee)
+    {
+        for (auto i : exprs)
+            this->exprs.push_back(shared_ptr<Expr>(i));
+    }
 
     Call::Call(Expr *callee,
                vector<Expr *> exprs,
                Location loc) :
             Expr(loc),
-            callee(callee),
-            exprs(exprs) { }
+            callee(callee)
+    {
+        for (auto i : exprs)
+            this->exprs.push_back(shared_ptr<Expr>(i));
+    }
 
     Type::Type() { }
 
@@ -479,15 +536,21 @@ namespace common {
 
     Type::Type(Types type,
                vector<Type *> types) :
-            type(type),
-            types(types) { }
+            type(type)
+    {
+        for (auto i : types)
+            this->types.push_back(shared_ptr<Type>(i));
+    }
 
     Type::Type(Types type,
                vector<Type *> types,
                Location loc) :
             Node(loc),
-            type(type),
-            types(types) { }
+            type(type)
+    {
+        for (auto i : types)
+            this->types.push_back(shared_ptr<Type>(i));
+    }
 
     Type::~Type() { }
 
@@ -517,6 +580,15 @@ namespace common {
 
         return str + "\n";
     }
+
+    Function::Function(string str, Type *type, Location loc)
+            : Node(loc),
+              id(str)
+    {
+        for (auto i : type->types)
+            this->types.push_back(i);
+    }
+
 
     string Case::str() {
         string str("\t| ");

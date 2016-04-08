@@ -72,10 +72,10 @@ namespace common {
 	// Abstract Nodes
 	class Node {
 	public:
-		Type* node_type = nullptr;
+		shared_ptr<Type> node_type;
         // for the interpreter to save the children values of a Node
         // this should probably be moved into the visitor itself later
-        Expr *val = nullptr;
+		shared_ptr<Expr> val;
 
 		Location loc;
 
@@ -89,7 +89,7 @@ namespace common {
 	class Type : public Node {
 	public:
 		Types type;
-		vector<Type *> types;
+		vector<shared_ptr<Type>> types;
 
 		Type();
 		Type(Types);
@@ -116,8 +116,8 @@ namespace common {
 
 	class BinaryOp : public Expr {
 	public:
-		Expr *left = nullptr;
-		Expr *right = nullptr;
+		shared_ptr<Expr> left;
+		shared_ptr<Expr> right;
 
 		BinaryOp();
 		BinaryOp(Expr *, Expr *);
@@ -128,7 +128,7 @@ namespace common {
 
 	class UnaryOp : public Expr {
 	public:
-		Expr *child = nullptr;
+		shared_ptr<Expr> child;
 
 		UnaryOp();
 		UnaryOp(Expr *);
@@ -151,7 +151,7 @@ namespace common {
 	class Program : public Node {
 	public:
 
-		vector<Function*> funcs;
+		vector<shared_ptr<Function>> funcs;
 
 		Program();
 		Program(vector<Function*>);
@@ -166,14 +166,15 @@ namespace common {
 	class Function : public Node {
 	public:
 		string id;
-		vector<Type*> types;
-        vector<Case*> cases;
-		Scope *scope = nullptr;
+		vector<shared_ptr<Type>> types;
+        vector<shared_ptr<Case>> cases;
+		shared_ptr<Scope> scope;
 
 		Function();
 		Function(std::string);
 		Function(string, vector<Type*>);
 		Function(string, vector<Type*>, Location);
+		Function(string, Type*, Location);
 		Function(string, vector<Type*>, vector<Case*>);
 		Function(string, vector<Type*>, vector<Case*>, Location);
 
@@ -184,8 +185,8 @@ namespace common {
 
 	class Case : public Node {
 	public:
-		Expr *expr = nullptr;
-		vector<Pattern *> patterns;
+		shared_ptr<Expr> expr;
+		vector<shared_ptr<Pattern>> patterns;
 
         // used by the profiler to determine growth for case
 		// the first element in the vector is for the first test
@@ -471,7 +472,7 @@ namespace common {
 
 	class ListPattern : public Pattern {
 	public:
-		vector<Pattern *> patterns;
+		vector<shared_ptr<Pattern>> patterns;
 
 		ListPattern();
 		ListPattern(vector<Pattern *>);
@@ -484,7 +485,7 @@ namespace common {
 
 	class TuplePattern : public Pattern {
 	public:
-		vector<Pattern *> patterns;
+		vector<shared_ptr<Pattern>> patterns;
 
 		TuplePattern();
 		TuplePattern(vector<Pattern *>);
@@ -497,8 +498,8 @@ namespace common {
 
 	class ListSplit : public Pattern {
 	public:
-		Pattern *left = nullptr;
-		Pattern *right = nullptr;
+		shared_ptr<Pattern> left;
+		shared_ptr<Pattern> right;
 
 		ListSplit();
 		ListSplit(Pattern *, Pattern *);
@@ -513,7 +514,7 @@ namespace common {
 
 	class List : public Expr {
 	public:
-		vector<Expr*> exprs;
+		vector<shared_ptr<Expr>> exprs;
 
 		List();
 		List(vector<Expr*>);
@@ -526,7 +527,7 @@ namespace common {
 
 	class Tuple : public Expr {
 	public:
-		vector<Expr*> exprs;
+		vector<shared_ptr<Expr>> exprs;
 
 		Tuple();
 		Tuple(vector<Expr*>);
@@ -540,7 +541,7 @@ namespace common {
 	class Id : public Pattern {
 	public:
 		string id;
-		Scope *scope = nullptr;
+		shared_ptr<Scope> scope;
 
 		Id();
 		Id(std::string);
@@ -553,8 +554,8 @@ namespace common {
 
 	class Call : public Expr {
 	public:
-		Expr *callee = nullptr;
-		vector<Expr*> exprs;
+		shared_ptr<Expr> callee;
+		vector<shared_ptr<Expr>> exprs;
 
         //indicates if the call should be parallelized
         bool par = false;

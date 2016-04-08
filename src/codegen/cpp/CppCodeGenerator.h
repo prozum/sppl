@@ -129,10 +129,10 @@ namespace codegen {
             string last_type;
             string string_type_name;
 
-            Type _char;
-            Type fake_string;
-            Type real_string;
-            Type string_list;
+            shared_ptr<Type> _char;
+            shared_ptr<Type> fake_string;
+            shared_ptr<Type> real_string;
+            shared_ptr<Type> string_list;
 
             Function* current_func;
 

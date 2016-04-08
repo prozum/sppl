@@ -96,18 +96,18 @@ program:	funcs_ne                                        { driver.program = new 
     |       expr                                            { driver.program = new Program(ANON_FUNC_NAME, $1, @1); };
 funcs_ne:	funcs_ne func                                   { $$ = $1; $$->push_back($2); }
 	| func                                                  { $$ = new std::vector<Function *>(); $$->push_back($1); } ;
-func:		decl cases_ne                                   { $$ = $1; $$->cases = * $2; delete $2; }
-decl:		DEF ID COLON signature                          { $$ = new Function(* $2, $4->types, @1); delete $2; delete $4; }
-signature:	signature ARROR type                            { $$ = $1; $$->types.push_back($3); }
-	| type                                                  { $$ = new Type(Types::SIGNATURE, @1); $$->types.push_back($1); } ;
+func:		decl cases_ne                                   { $$ = $1; for (auto i : *$2) $$->cases.push_back(shared_ptr<Case>(i)); delete $2; }
+decl:		DEF ID COLON signature                          { $$ = new Function(* $2, $4, @1);  delete $2; delete $4; }
+signature:	signature ARROR type                            { $$ = $1; $$->types.push_back(shared_ptr<Type>($3)); }
+	| type                                                  { $$ = new Type(Types::SIGNATURE, @1); $$->types.push_back(shared_ptr<Type>($1)); } ;
 type:		BOOLTYPE                                        { $$ = new Type(Types::BOOL, @1); }
 	|	INTTYPE                                             { $$ = new Type(Types::INT, @1); }
 	|	FLOATTYPE                                           { $$ = new Type(Types::FLOAT, @1); }
 	|	CHARTYPE                                            { $$ = new Type(Types::CHAR, @1); }
 	|	STRINGTYPE                                          { $$ = new Type(Types::STRING, @1); }
-	|	SQSTART type SQEND                                  { $$ = new Type(Types::LIST, @2); $$->types.push_back($2); }
+	|	SQSTART type SQEND                                  { $$ = new Type(Types::LIST, @2); $$->types.push_back(shared_ptr<Type>($2)); }
 	|	PARSTART signature PAREND                           { $$ = $2; }
-	|	PARSTART types_comma_ne COMMA type PAREND           { $$ = new Type(Types::TUPLE, * $2, @2); delete $2; $$->types.push_back($4); }
+	|	PARSTART types_comma_ne COMMA type PAREND           { $$ = new Type(Types::TUPLE, * $2, @2); delete $2; $$->types.push_back(shared_ptr<Type>($4)); }
 types_comma_ne: types_comma_ne COMMA type                   { $$ = $1; $$->push_back($3); }
 	|	type                                                { $$ = new vector<Type *>(); $$->push_back($1); };
 cases_ne:	cases_ne case                                   { $$ = $1; $$->push_back($2); }
@@ -118,7 +118,7 @@ patterns:	patterns pattern                                { $$ = $1; $$->push_ba
 pattern:    literal                                         { $$ = $1; }
 	| 	ID                                                  { $$ = new Id(* $1, @1); delete $1;  }
 	| 	PARSTART pattern COLON pattern PAREND               { $$ = new ListSplit($2, $4, @2);  }
-	| 	PARSTART patterns_comma_ne COMMA pattern PAREND     { TuplePattern *t = new TuplePattern(* $2, @2); delete $2; t->patterns.push_back($4); $$ = t; }
+	| 	PARSTART patterns_comma_ne COMMA pattern PAREND     { TuplePattern *t = new TuplePattern(* $2, @2); delete $2; t->patterns.push_back(shared_ptr<Pattern>($4)); $$ = t; }
     |   SQSTART patterns_comma SQEND                        { ListPattern *t = new ListPattern(* $2, @2); delete $2; $$ = t; }
 patterns_comma:    patterns_comma_ne                        { $$ = $1; }
 	|	                                                    { $$ = new vector<Pattern *>(); } ;
@@ -152,7 +152,7 @@ expr:	expr OR expr                                        { $$ = new Or($1, $3, 
 	|	expr PARSTART exprs_comma PAREND                    { Call *t = new Call($1, * $3, @2); delete $3; $$ = t; }
 	|	EXMARK expr                                         { $$ = new Not($2); } ;
 struct_inst:	SQSTART exprs_comma SQEND                   { List *t = new List(* $2, @1); delete $2; $$ = t; }
-	|	PARSTART exprs_comma_ne COMMA expr PAREND           { Tuple *t = new Tuple(* $2, @1); delete $2; t->exprs.push_back($4); $$ = t; }  ;
+	|	PARSTART exprs_comma_ne COMMA expr PAREND           { Tuple *t = new Tuple(* $2, @1); delete $2; t->exprs.push_back(shared_ptr<Expr>($4)); $$ = t; }  ;
 exprs_comma:    exprs_comma_ne                              { $$ = $1; }
 	|	                                                    { $$ = new vector<Expr *>(); } ;
 exprs_comma_ne: exprs_comma_ne COMMA expr                   { $$ = $1; $$->push_back($3);  }

@@ -8,7 +8,6 @@ namespace semantics {
     void ScopeGenerator::visit(Program &node) {
         res = new Scope();
         current_scope = res;
-        garbage.push_back(current_scope);
 
         // Visit children
         for (auto func : node.funcs) {
@@ -19,12 +18,15 @@ namespace semantics {
 
     void ScopeGenerator::visit(Function &node) {
         current_func = &node;
-        node.scope = current_scope;
+        node.scope = shared_ptr<Scope>(current_scope);
 
         if (!current_scope->exists(node.id)) {
-            auto type = new Type(Types::SIGNATURE, node.types);
+            auto type = make_shared<Type>(Types::SIGNATURE);
+
+            for (auto i : node.types)
+                type->types.push_back(i);
+
             current_scope->decls.insert({node.id, type});
-            garbage.push_back(type);
 
             // Visit children
             for (auto type : node.types) {
@@ -47,9 +49,8 @@ namespace semantics {
 
     void ScopeGenerator::visit(Case &node) {
         auto case_scope = new Scope(current_scope);
-        current_scope->children.push_back(case_scope);
+        current_scope->children.push_back(shared_ptr<Scope>(case_scope));
         current_scope = case_scope;
-        garbage.push_back(current_scope);
 
         // Visit children
         context = ScopeContext::PATTERN;
@@ -213,9 +214,8 @@ namespace semantics {
             node.right->accept(*this);
             // Visit stops here
         } else if (type_stack.top()->type == Types::STRING){
-            auto _char = new Type(Types::CHAR);
+            auto _char = make_shared<Type>(Types::CHAR);
             type_stack.push(_char);
-            garbage.push_back(_char);
 
             // Visit children
             node.left->accept(*this);
@@ -242,7 +242,7 @@ namespace semantics {
     }
 
     void ScopeGenerator::visit(Id &node) {
-        node.scope = current_scope;
+        node.scope = shared_ptr<Scope>(current_scope);
 
         if (context == ScopeContext::PATTERN) {
             if (!current_scope->exists(node.id)) {

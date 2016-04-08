@@ -80,8 +80,7 @@ namespace semantics {
 
     private:
         Function *current_func;
-        vector<void *> garbage;
 
-        bool equal(Type *type1, Type *type2);
+        bool equal(shared_ptr<Type> type1, shared_ptr<Type> type2);
     };
 }

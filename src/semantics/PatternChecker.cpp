@@ -18,7 +18,6 @@ namespace semantics {
 
     void PatternChecker::visit(Case &node) {
         if (node.patterns.size() != cur_func->types.size() - 1) {
-        {
             AddError(Error::Expected("Case didn't have the correct number of patterns",
                                      to_string(cur_func->types.size() - 1),
                                      to_string(node.patterns.size()),

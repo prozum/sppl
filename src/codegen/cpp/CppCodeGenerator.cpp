@@ -12,12 +12,12 @@ namespace codegen
     CCodeGenerator::CCodeGenerator(std::ostream &out, std::ostream &head)
             : CodeGenerator::CodeGenerator(out), header(head)
     {
-        _char = Type(Types::CHAR);
-        real_string = Type(Types::LIST);
-        fake_string = Type(Types::STRING);
-        string_list = Type(Types::LIST);
-        real_string.types.push_back(&_char);
-        string_list.types.push_back(&fake_string);
+        _char = make_shared<Type>(Types::CHAR);
+        real_string = make_shared<Type>(Types::LIST);
+        fake_string = make_shared<Type>(Types::STRING);
+        string_list = make_shared<Type>(Types::LIST);
+        real_string->types.push_back(_char);
+        string_list->types.push_back(fake_string);
         list_offsets.push_back(0);
     }
 
@@ -28,11 +28,11 @@ namespace codegen
         output << "#include \"test.h\" \n"
                   " \n"
                   "int main(int argc, char** argv) { \n"
-                  "    " << lists[string_list] << " *args = " << g_generated << g_create << lists[string_list] << "(0); \n"
+                  "    " << lists[*string_list] << " *args = " << g_generated << g_create << lists[*string_list] << "(0); \n"
                   "    int i; \n"
                   " \n"
                   "    for(i = argc - 1; i >= 0; i--) { \n"
-                  "        " << g_generated << g_push << lists[string_list] << "(args, " << g_generated << g_create << g_string << "(argv[i])); \n"
+                  "        " << g_generated << g_push << lists[*string_list] << "(args, " << g_generated << g_create << g_string << "(argv[i])); \n"
                   "    } \n"
                   " \n"
                   "    printf(\"%d\\n\", " << g_user << g_main << "(args)); \n"
@@ -227,7 +227,10 @@ namespace codegen
 
     void CCodeGenerator::visit(NotEqual &node)
     {
-        Equal eq = Equal(node.left, node.right);
+        Equal eq;
+        eq.left = node.left;
+        eq.right = node.right;
+
         output << "(!";
         eq.accept(*this);
         output << ")";
@@ -1040,9 +1043,9 @@ namespace codegen
                   " \n";
         /* generating to nearest power of 2 function ends here */
 
-        string_type_name = generate_list(real_string);
-        lists[fake_string] = string_type_name;
-        generate_list(string_list);
+        string_type_name = generate_list(*real_string);
+        lists[*fake_string] = string_type_name;
+        generate_list(*string_list);
 
         /* generation of string constructer starts here */
         header << string_type_name << "* " << g_generated << g_create << g_string << "(char* values) { \n"

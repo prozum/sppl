@@ -1,8 +1,7 @@
 #include "Scope.h"
 
-common::Scope::Scope(common::Scope *p) {
-    parent = p;
-}
+common::Scope::Scope(common::Scope *p)
+        : parent(p) { }
 
 bool common::Scope::exists(std::string id) {
     auto got = decls.find(id);
@@ -16,7 +15,7 @@ bool common::Scope::exists(std::string id) {
         return false;
 }
 
-common::Type *common::Scope::get_type(std::string id) {
+shared_ptr<common::Type> common::Scope::get_type(std::string id) {
     auto got = this->decls.find(id);
 
     if(got == this->decls.end()){

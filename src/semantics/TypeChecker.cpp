@@ -137,8 +137,7 @@ namespace semantics
 
         // Code starts here
         if (equal(node.left->node_type, node.right->node_type)) {
-            node.node_type = new Type(Types::BOOL);
-            garbage.push_back(node.node_type);
+            node.node_type = make_shared<Type>(Types::BOOL);
         } else {
             AddError(Error::Binary("Operator only operates on children of the same type",
                                    node));
@@ -160,8 +159,7 @@ namespace semantics
 
         // Code starts here
         if (equal(node.left->node_type, node.right->node_type)) {
-            node.node_type = new Type(Types::BOOL, vector<Type *>());
-            garbage.push_back(node.node_type);
+            node.node_type = make_shared<Type>(Types::BOOL, vector<Type *>());
         } else {
             AddError(Error::Binary("Operator only operates on children of the same type",
                                    node));
@@ -185,8 +183,7 @@ namespace semantics
         // Code starts here
         if ((node.left->node_type->type == Types::INT && node.right->node_type->type == Types::INT) ||
             (node.left->node_type->type == Types::FLOAT && node.right->node_type->type == Types::FLOAT)) {
-            node.node_type = new Type(Types::BOOL);
-            garbage.push_back(node.node_type);
+            node.node_type = make_shared<Type>(Types::BOOL);
         } else {
             AddError(Error::Binary("Operator only operates on children of the same type",
                                    node));
@@ -210,8 +207,7 @@ namespace semantics
         // Code starts here
         if ((node.left->node_type->type == Types::INT && node.right->node_type->type == Types::INT) ||
             (node.left->node_type->type == Types::FLOAT && node.right->node_type->type == Types::FLOAT)) {
-            node.node_type = new Type(Types::BOOL);
-            garbage.push_back(node.node_type);
+            node.node_type = make_shared<Type>(Types::BOOL);
         } else {
             AddError(Error::Binary("Operator only operates on Int or Float children",
                                    node));
@@ -234,8 +230,7 @@ namespace semantics
         // Code starts here
         if ((node.left->node_type->type == Types::INT && node.right->node_type->type == Types::INT) ||
             (node.left->node_type->type == Types::FLOAT && node.right->node_type->type == Types::FLOAT)) {
-            node.node_type = new Type(Types::BOOL);
-            garbage.push_back(node.node_type);
+            node.node_type = make_shared<Type>(Types::BOOL);
         } else {
             AddError(Error::Binary("Operator only operates on Int or Float children",
                                    node));
@@ -258,8 +253,7 @@ namespace semantics
         // Code starts here
         if ((node.left->node_type->type == Types::INT && node.right->node_type->type == Types::INT) ||
             (node.left->node_type->type == Types::FLOAT && node.right->node_type->type == Types::FLOAT)) {
-            node.node_type = new Type(Types::BOOL);
-            garbage.push_back(node.node_type);
+            node.node_type = make_shared<Type>(Types::BOOL);
         } else {
             AddError(Error::Binary("Operator only operates on Int or Float children",
                                    node));
@@ -418,10 +412,9 @@ namespace semantics
                 return;
             }
         }  else if (node.right->node_type->type == Types::EMPTYLIST) {
-            node.node_type = new Type(Types::LIST);
+            node.node_type = make_shared<Type>(Types::LIST);
             node.node_type->types.push_back(node.left->node_type);
             node.right->node_type = node.node_type;
-            garbage.push_back(node.node_type);
         } else {
             AddError(Error::Binary("Right must be a List",
                                    node));
@@ -469,32 +462,28 @@ namespace semantics
 
     void TypeChecker::visit(Int &node) {
         // Code starts here
-        node.node_type = new Type(Types::INT);
-        garbage.push_back(node.node_type);
+        node.node_type = make_shared<Type>(Types::INT);
 
         // Code stops here
     }
 
     void TypeChecker::visit(Float &node) {
         // Code starts here
-        node.node_type = new Type(Types::FLOAT);
-        garbage.push_back(node.node_type);
+        node.node_type = make_shared<Type>(Types::FLOAT);
 
         // Code stops here
     }
 
     void TypeChecker::visit(Bool &node) {
         // Code starts here
-        node.node_type = new Type(Types::BOOL);
-        garbage.push_back(node.node_type);
+        node.node_type = make_shared<Type>(Types::BOOL);
 
         // Code stops here
     }
 
     void TypeChecker::visit(Char &node) {
         // Code starts here
-        node.node_type = new Type(Types::CHAR);
-        garbage.push_back(node.node_type);
+        node.node_type = make_shared<Type>(Types::CHAR);
 
         // Code stops here
     }
@@ -502,8 +491,7 @@ namespace semantics
     void TypeChecker::visit(String &node) {
         // Code starts here
 
-        node.node_type = new Type(Types::STRING);
-        garbage.push_back(node.node_type);
+        node.node_type = make_shared<Type>(Types::STRING);
 
         // Code stops here
     }
@@ -522,8 +510,7 @@ namespace semantics
 
         // Code starts here
         if (node.patterns.size() == 0) {
-            node.node_type = new Type(Types::EMPTYLIST);
-            garbage.push_back(node.node_type);
+            node.node_type = make_shared<Type>(Types::EMPTYLIST);
         } else {
             for (size_t i = 0; i < node.patterns.size() - 1; ++i) {
                 if (!equal(node.patterns[i]->node_type, node.patterns[i + 1]->node_type)) {
@@ -535,9 +522,8 @@ namespace semantics
                 }
             }
 
-            node.node_type = new Type(Types::LIST);
+            node.node_type = make_shared<Type>(Types::LIST);
             node.node_type->types.push_back(node.patterns[0]->node_type);
-            garbage.push_back(node.node_type);
         }
         // Code stops here
     }
@@ -555,8 +541,7 @@ namespace semantics
         // Visit stops here
 
         // Code starts here
-        node.node_type = new Type(Types::TUPLE);
-        garbage.push_back(node.node_type);
+        node.node_type = make_shared<Type>(Types::TUPLE);
 
         for (auto pattern : node.patterns) {
             node.node_type->types.push_back(pattern->node_type);
@@ -597,9 +582,8 @@ namespace semantics
                 return;
             }
         } else if (node.right->node_type->type == Types::EMPTYLIST) {
-            node.node_type = new Type(Types::LIST);
+            node.node_type = make_shared<Type>(Types::LIST);
             node.node_type->types.push_back(node.left->node_type);
-            garbage.push_back(node.node_type);
         } else {
             AddError(Error::Expected("Right must be a List",
                                      "List",
@@ -624,8 +608,7 @@ namespace semantics
 
         // Code starts here
         if (node.exprs.size() == 0) {
-            node.node_type = new Type(Types::EMPTYLIST);
-            garbage.push_back(node.node_type);
+            node.node_type = make_shared<Type>(Types::EMPTYLIST);
         } else {
             for (size_t i = 0; i < node.exprs.size() - 1; ++i) {
                 if (!equal(node.exprs[i]->node_type, node.exprs[i + 1]->node_type)) {
@@ -636,9 +619,8 @@ namespace semantics
                     return;
                 }
             }
-            node.node_type = new Type(Types::LIST);
+            node.node_type = make_shared<Type>(Types::LIST);
             node.node_type->types.push_back(node.exprs[0]->node_type);
-            garbage.push_back(node.node_type);
         }
 
         // Code stops here
@@ -657,8 +639,7 @@ namespace semantics
         // Visit stops here
 
         // Code starts here
-        node.node_type = new Type(Types::TUPLE);
-        garbage.push_back(node.node_type);
+        node.node_type = make_shared<Type>(Types::TUPLE);
 
         for (size_t i = 0; i < node.exprs.size(); ++i) {
             node.node_type->types.push_back(node.exprs[i]->node_type);
@@ -725,24 +706,12 @@ namespace semantics
     }
 
     void TypeChecker::visit(Type &node) {
-        // Code starts here
-
-
-        // Code stops here
-
-        // Visit children
         for (auto type : node.types) {
             type->accept(*this);
         }
-        // Visit stops here
-
-        // Code starts here
-        node.node_type = &node;
-
-        // Code stops here
     }
 
-    bool TypeChecker::equal(Type *type1, Type *type2) {
+    bool TypeChecker::equal(shared_ptr<Type> type1, shared_ptr<Type> type2) {
         return *type1 == *type2;
     }
 }
