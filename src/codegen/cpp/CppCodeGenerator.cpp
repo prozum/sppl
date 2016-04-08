@@ -9,7 +9,7 @@ using namespace std;
 
 namespace codegen
 {
-    CCodeGenerator::CCodeGenerator(std::ostream &out, std::ostream &head)
+    CCodeGenerator::CCodeGenerator(shared_ptr<std::ostream> &out, shared_ptr<std::ostream> &head)
             : CodeGenerator::CodeGenerator(out), header(head)
     {
         _char = make_shared<Type>(Types::CHAR);
@@ -25,7 +25,7 @@ namespace codegen
     {
         generate_std();
 
-        output << "#include \"test.h\" \n"
+        *output << "#include \"test.h\" \n"
                   " \n"
                   "int main(int argc, char** argv) { \n"
                   "    " << lists[*string_list] << " *args = " << g_generated << g_create << lists[*string_list] << "(0); \n"
@@ -42,7 +42,7 @@ namespace codegen
 
         for (auto f : node.funcs) {
             f->accept(*this);
-            output << endl;
+            *output << endl;
         }
     }
 
@@ -74,16 +74,16 @@ namespace codegen
         function << ")";
 
         // generate function decleration in header
-        header << function.str() << ";" << endl;
-        header << endl;
+        *header << function.str() << ";" << endl;
+        *header << endl;
 
-        // generate function in output
-        output << function.str() << " { \n";
+        // generate function in *output
+        *output << function.str() << " { \n";
 
         // generate cases
         for (auto c : node.cases) {
             c->accept(*this);
-            output << endl;
+            *output << endl;
 
             // clear assigments specific for current case
             listnames_offset.clear();
@@ -91,7 +91,7 @@ namespace codegen
         }
 
         // generate error, for when program doesn't realize a case
-        output << "    printf(\"No cases realized!\\n\"); \n"
+        *output << "    printf(\"No cases realized!\\n\"); \n"
                   "    exit(1); \n"
                   "} \n"
                   " \n";
@@ -135,47 +135,47 @@ namespace codegen
 
         // only generate if statement, if the pattern wasn't empty
         if (!empty) {
-            output << pattern.str() << endl;
+            *output << pattern.str() << endl;
         }
 
-        output << "    { \n";
+        *output << "    { \n";
 
         // generate all nessesary assigments
         for (auto assign : assignments) {
-            output << "        " << assign << endl;
+            *output << "        " << assign << endl;
 
             if (assign == assignments.back())
-                output << endl;
+                *output << endl;
         }
 
         // generate return expression
         id_context = IdContext::EXPR;
         current_func->types.back()->accept(*this);
-        output << "        " << last_type << " res = ";
+        *output << "        " << last_type << " res = ";
         node.expr->accept(*this);
-        output << ";" << endl;
+        *output << ";" << endl;
 
-        output <<  "        return res; \n"
+        *output <<  "        return res; \n"
                    "    } \n"
                    " \n";
     }
 
     void CCodeGenerator::visit(Or &node)
     {
-        output << "(";
+        *output << "(";
         node.left->accept(*this);
-        output << "||";
+        *output << "||";
         node.right->accept(*this);
-        output << ")";
+        *output << ")";
     }
 
     void CCodeGenerator::visit(And &node)
     {
-        output << "(";
+        *output << "(";
         node.left->accept(*this);
-        output << "&&";
+        *output << "&&";
         node.right->accept(*this);
-        output << ")";
+        *output << ")";
     }
 
     void CCodeGenerator::visit(Equal &node)
@@ -193,11 +193,11 @@ namespace codegen
                     name = got->second;
                 }
 
-                output << g_generated << g_compare << name << "(";
+                *output << g_generated << g_compare << name << "(";
                 node.left->accept(*this);
-                output << ", ";
+                *output << ", ";
                 node.right->accept(*this);
-                output << ")";
+                *output << ")";
                 break;
             case Types::LIST:
             case Types::STRING:
@@ -209,18 +209,18 @@ namespace codegen
                     name = got->second;
                 }
 
-                output << g_generated << g_compare << name << "(";
+                *output << g_generated << g_compare << name << "(";
                 node.left->accept(*this);
-                output << ", ";
+                *output << ", ";
                 node.right->accept(*this);
-                output << ")";
+                *output << ")";
                 break;
             default:
-                output << "(";
+                *output << "(";
                 node.left->accept(*this);
-                output << "==";
+                *output << "==";
                 node.right->accept(*this);
-                output << ")";
+                *output << ")";
                 break;
         }
     }
@@ -231,90 +231,90 @@ namespace codegen
         eq.left = node.left;
         eq.right = node.right;
 
-        output << "(!";
+        *output << "(!";
         eq.accept(*this);
-        output << ")";
+        *output << ")";
     }
 
     void CCodeGenerator::visit(Lesser &node)
     {
-        output << "(";
+        *output << "(";
         node.left->accept(*this);
-        output << "<";
+        *output << "<";
         node.right->accept(*this);
-        output << ")";
+        *output << ")";
     }
 
     void CCodeGenerator::visit(LesserEq &node)
     {
-        output << "(";
+        *output << "(";
         node.left->accept(*this);
-        output << "<=";
+        *output << "<=";
         node.right->accept(*this);
-        output << ")";
+        *output << ")";
     }
 
     void CCodeGenerator::visit(Greater &node)
     {
-        output << "(";
+        *output << "(";
         node.left->accept(*this);
-        output << ">";
+        *output << ">";
         node.right->accept(*this);
-        output << ")";
+        *output << ")";
     }
 
     void CCodeGenerator::visit(GreaterEq &node)
     {
-        output << "(";
+        *output << "(";
         node.left->accept(*this);
-        output << ">=";
+        *output << ">=";
         node.right->accept(*this);
-        output << ")";
+        *output << ")";
     }
 
     void CCodeGenerator::visit(Add &node)
     {
-        output << "(";
+        *output << "(";
         node.left->accept(*this);
-        output << "+";
+        *output << "+";
         node.right->accept(*this);
-        output << ")";
+        *output << ")";
     }
 
     void CCodeGenerator::visit(Sub &node)
     {
-        output << "(";
+        *output << "(";
         node.left->accept(*this);
-        output << "-";
+        *output << "-";
         node.right->accept(*this);
-        output << ")";
+        *output << ")";
     }
 
     void CCodeGenerator::visit(Mul &node)
     {
-        output << "(";
+        *output << "(";
         node.left->accept(*this);
-        output << "*";
+        *output << "*";
         node.right->accept(*this);
-        output << ")";
+        *output << ")";
     }
 
     void CCodeGenerator::visit(Div &node)
     {
-        output << "(";
+        *output << "(";
         node.left->accept(*this);
-        output << "/";
+        *output << "/";
         node.right->accept(*this);
-        output << ")";
+        *output << ")";
     }
 
     void CCodeGenerator::visit(Mod &node)
     {
-        output << "(";
+        *output << "(";
         node.left->accept(*this);
-        output << "%";
+        *output << "%";
         node.right->accept(*this);
-        output << ")";
+        *output << ")";
     }
 
     void CCodeGenerator::visit(ListAdd &node)
@@ -331,26 +331,26 @@ namespace codegen
 
         // use pregenerated push function to push thing onto list
         // look at generate_list(Type &type) for the generation of this function
-        output << g_generated << g_push << name << "(";
+        *output << g_generated << g_push << name << "(";
         node.right->accept(*this);
-        output << ", ";
+        *output << ", ";
         node.left->accept(*this);
-        output << ")";
+        *output << ")";
     }
 
     void CCodeGenerator::visit(Par &node)
     {
-        output << "(";
+        *output << "(";
         node.child->accept(*this);
-        output << ")";
+        *output << ")";
     }
 
     void CCodeGenerator::visit(Not &node)
     {
-        output << "(";
-        output << "!";
+        *output << "(";
+        *output << "!";
         node.child->accept(*this);
-        output << ")";
+        *output << ")";
     }
 
     void CCodeGenerator::visit(ListPattern &node)
@@ -504,7 +504,7 @@ namespace codegen
 
         // else, just output value
         } else {
-            output << node.value;
+            *output << node.value;
         }
     }
 
@@ -522,7 +522,7 @@ namespace codegen
 
         // else, just output value
         } else {
-            output << node.value;
+            *output << node.value;
         }
 
     }
@@ -541,7 +541,7 @@ namespace codegen
 
         // else, just output value
         } else {
-            output << node.value;
+            *output << node.value;
         }
     }
 
@@ -559,7 +559,7 @@ namespace codegen
 
         // else, just output value
         } else {
-            output << "'" << node.value << "'";
+            *output << "'" << node.value << "'";
         }
     }
 
@@ -580,7 +580,7 @@ namespace codegen
         // else, just output value
         } else {
             // gcreate_string is generate by generate_std. It creates string base on a char*
-            output << g_generated << g_create << g_string << "(\"" << node.value << "\")";
+            *output << g_generated << g_create << g_string << "(\"" << node.value << "\")";
         }
     }
 
@@ -599,15 +599,15 @@ namespace codegen
         }
 
         // create list
-        output << g_generated << g_create << name << "(" << node.exprs.size() << ", ";
+        *output << g_generated << g_create << name << "(" << node.exprs.size() << ", ";
         for (int i = node.exprs.size() - 1; i >= 0; i--) {
             node.exprs[i]->accept(*this);
 
             if (i != 0)
-                output << ", ";
+                *output << ", ";
         }
 
-        output << ")";
+        *output << ")";
     }
 
     void CCodeGenerator::visit(Tuple &node)
@@ -625,14 +625,14 @@ namespace codegen
         }
 
         // create tuple
-        output << g_generated << g_create << name << "(";
+        *output << g_generated << g_create << name << "(";
         for (auto expr : node.exprs){
             expr->accept(*this);
 
             if (expr != node.exprs.back())
-                output << ", ";
+                *output << ", ";
         }
-        output << ")";
+        *output << ")";
     }
 
     void CCodeGenerator::visit(Id &node)
@@ -674,10 +674,10 @@ namespace codegen
                 // sideeffects occur in the program.
                 case Types::LIST:
                 case Types::STRING:
-                    output << g_generated << g_clone << lists[*node.node_type] << "(" << g_user << node.id << ", " << listnames_offset[node.id] << ")";
+                    *output << g_generated << g_clone << lists[*node.node_type] << "(" << g_user << node.id << ", " << listnames_offset[node.id] << ")";
                     break;
                 default:
-                    output << g_user << node.id;
+                    *output << g_user << node.id;
                     break;
             }
         }
@@ -685,21 +685,21 @@ namespace codegen
 
     void CCodeGenerator::visit(Call &node)
     {
-        output << "(";
+        *output << "(";
         // generate the callee (aka, the function being called)
         node.callee->accept(*this);
 
         // generate the arguments the function is being called with
-        output << "(";
+        *output << "(";
         for (auto expr : node.exprs){
             expr->accept(*this);
 
             if (expr != node.exprs.back())
-                output << ", ";
+                *output << ", ";
         }
-        output << ")";
+        *output << ")";
 
-        output << ")";
+        *output << ")";
     }
 
     void CCodeGenerator::visit(Type &node) {
@@ -889,7 +889,7 @@ namespace codegen
         /* TODO */
 
         // writing list to headerfile
-        header << result.str();
+        *header << result.str();
 
         // save list in signature hash map
         lists[type] = name;
@@ -922,7 +922,7 @@ namespace codegen
         result << endl;
 
         // writing signature to headerfile
-        header << result.str();
+        *header << result.str();
 
         // save signature in signature hash map
         signatures[type] = name;
@@ -1011,7 +1011,7 @@ namespace codegen
         /* generation of compare function ends here */
 
         // writing tuple to headerfile
-        header << result.str();
+        *header << result.str();
 
         // save tuple in tuple hash map
         tuples[type] = name;
@@ -1022,14 +1022,14 @@ namespace codegen
 
     void CCodeGenerator::generate_std() {
 
-        header << "#include <stdarg.h> \n"
+        *header << "#include <stdarg.h> \n"
                   "#include <stdio.h> \n"
                   "#include <stdlib.h> \n"
                   "#include <string.h> \n"
                   " \n";
 
         /* generating to nearest power of 2 function starts here */
-        header << "int " << g_generated << g_nearpow2 << "(int num) { \n"
+        *header << "int " << g_generated << g_nearpow2 << "(int num) { \n"
                   "    num--; \n"
                   "    num |= num >> 1; \n"
                   "    num |= num >> 2; \n"
@@ -1048,7 +1048,7 @@ namespace codegen
         generate_list(*string_list);
 
         /* generation of string constructer starts here */
-        header << string_type_name << "* " << g_generated << g_create << g_string << "(char* values) { \n"
+        *header << string_type_name << "* " << g_generated << g_create << g_string << "(char* values) { \n"
                   "    int i, str_length = strlen(values), size = " << g_generated << g_nearpow2 << "(str_length); \n"
                   "    " << string_type_name << "* res = malloc(sizeof(" << string_type_name << ")); \n"
                   " \n"
@@ -1066,7 +1066,7 @@ namespace codegen
         /* generation of string constructer ends here */
 
         /* generation of string compare here */
-        header << "int " << g_generated << g_compare << g_string << "(" << string_type_name << "* string, char* values, int offset) { \n"
+        *header << "int " << g_generated << g_compare << g_string << "(" << string_type_name << "* string, char* values, int offset) { \n"
                   "    int i, j, size = strlen(values); \n"
                   " \n"
                   "    if (size == string->" << g_head << " - offset) { \n"
