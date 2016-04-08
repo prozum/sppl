@@ -41,6 +41,7 @@ include_directories(
         src/codegen/llvm
         src/codegen/pprinter
         src/compiler
+        src/jit
 )
 
 add_subdirectory(src)
