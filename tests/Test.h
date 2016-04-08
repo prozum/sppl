@@ -14,20 +14,20 @@
 #include <iostream>
 
 class Test : public CppUnit::TestFixture{
-    CPPUNIT_TEST_SUITE(Test);/*
+    CPPUNIT_TEST_SUITE(Test);
         // Addition - Integer
         CPPUNIT_TEST(addIntPosPos);
         CPPUNIT_TEST(addIntZeroZero);
         CPPUNIT_TEST(addIntNegPos);
         CPPUNIT_TEST(addIntPosNeg);
         CPPUNIT_TEST(addIntNegNeg);
+
         // Addition - Float
         CPPUNIT_TEST(addFloatPosPos);
         CPPUNIT_TEST(addFloatZeroZero);
         CPPUNIT_TEST(addFloatPosNeg);
         CPPUNIT_TEST(addFloatNegPos);
         CPPUNIT_TEST(addFloatNegNeg);
-        */
         // Addition - Boolean
         CPPUNIT_TEST(addBoolTrueTrue);
         CPPUNIT_TEST(addBoolTrueFalse);
@@ -798,6 +798,7 @@ protected:
     void comment();
 
     bool compileChecker(shared_ptr<std::stringstream> source);
+    bool executeChecker(bool compStatus, std::string args, std::string expectedOutput);
     shared_ptr<std::stringstream> buildSimple(std::string signature,
                                   std::string body);
     shared_ptr<std::stringstream> buildSimple(std::string signature,
