@@ -9,6 +9,7 @@ option(CLLVM "LLVM Intermediate Representation Compiler" OFF)
 option(PROFILER "Profiler description" OFF)
 option(INTERPRETER "Interpreter description" OFF)
 option(JIT "LLVM JIT Compiler" OFF)
+option(TESTS "Tests" OFF)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
 if(DEBUG)
@@ -41,9 +42,12 @@ include_directories(
         src/codegen/llvm
         src/codegen/pprinter
         src/compiler
+        src/jit
 )
 
 add_subdirectory(src)
 add_subdirectory(samples)
 add_subdirectory(tools)
-add_subdirectory(tests)
+if (TESTS)
+    add_subdirectory(tests)
+endif()

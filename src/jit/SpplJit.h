@@ -71,7 +71,7 @@ namespace jit {
 
         string get_output(intptr_t data, common::Type *node_type);
 
-        string get_tuple_output(intptr_t addr, vector<common::Type *> node_type);
+        string get_tuple_output(intptr_t addr, vector<shared_ptr<common::Type>> node_type);
 
         template<typename T>
         static std::vector<T> singletonSet(T t) {
