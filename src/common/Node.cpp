@@ -121,23 +121,23 @@ namespace common {
             this->funcs.push_back(shared_ptr<Function>(i));
     }
 
-    Program::Program(string id,
-                     Expr *expr,
+    Program::Program(Expr *expr,
                      Location loc) :
             Node(loc) {
 
-        funcs.push_back(shared_ptr<Function>(new Function(id)));
+        funcs.push_back(shared_ptr<Function>(new Function(ANON_FUNC_NAME, true)));
         funcs[0]->cases.push_back(shared_ptr<Case>(new Case(expr)));
     }
 
     Function::Function() { }
 
-    Function::Function(string id) :
-            id(id) { }
+    Function::Function(string id, bool is_anon) :
+            id(id), is_anon(is_anon) { }
 
     Function::Function(string id,
                        vector<Type *> types) :
-            id(id)
+            id(id),
+            is_anon(false)
     {
         for (auto i : types)
             this->types.push_back(shared_ptr<Type>(i));
@@ -147,7 +147,8 @@ namespace common {
                        vector<Type *> types,
                        Location loc) :
             Node(loc),
-            id(id)
+            id(id),
+            is_anon(false)
     {
         for (auto i : types)
             this->types.push_back(shared_ptr<Type>(i));
@@ -156,7 +157,8 @@ namespace common {
     Function::Function(string id,
                        vector<Type *> types,
                        vector<Case *> cases) :
-            id(id)
+            id(id),
+            is_anon(false)
     {
         for (auto i : types)
             this->types.push_back(shared_ptr<Type>(i));
@@ -170,7 +172,8 @@ namespace common {
                        vector<Case *> cases,
                        Location loc) :
             Node(loc),
-            id(id)
+            id(id),
+            is_anon(false)
     {
         for (auto i : types)
             this->types.push_back(shared_ptr<Type>(i));

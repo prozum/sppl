@@ -154,7 +154,7 @@ namespace jit {
         init_module_passmanager();
 
         // Only run anonymous functions
-        if (func_node->id.compare(ANON_FUNC_NAME) == 0) {
+        if (func_node->is_anon) {
             auto func = find_symbol(func_node->id);
             auto func_jit = (size_t (*)()) func.getAddress();
 

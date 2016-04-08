@@ -45,7 +45,7 @@ namespace semantics
         node.expr->accept(*this);
         CheckPanic;
 
-        if (current_func->id.compare(ANON_FUNC_NAME) == 0) {
+        if (current_func->is_anon) {
             current_func->node_type = node.expr->node_type;
             current_func->types.push_back(node.expr->node_type);
         }
