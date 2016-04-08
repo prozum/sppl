@@ -1,6 +1,6 @@
 #include "Compiler.h"
 namespace compiler {
-    Compiler::Compiler(istream &in, ostream &out, ostream &hout) : input(in), output(out), header_output(hout) {
+    Compiler::Compiler(shared_ptr<istream> in, shared_ptr<ostream> out, shared_ptr<ostream> hout) : input(in), output(out), header_output(hout) {
 
     }
 
@@ -37,7 +37,7 @@ namespace compiler {
 
     int Compiler::compile() {
 
-        driver.parse_stream(input);
+        driver.parse_stream(*input);
         if (driver.program == nullptr)
             return 1;
 
