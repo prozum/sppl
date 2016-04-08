@@ -33,11 +33,7 @@ namespace semantics {
                 type->accept(*this);
             }
             for (auto cse : node.cases) {
-                try {
-                    cse->accept(*this);
-                } catch (string s) {
-                    cerr << s << endl;
-                }
+                cse->accept(*this);
             }
             // Visit stops here
         } else {

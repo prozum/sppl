@@ -13,6 +13,7 @@ namespace semantics
         // Visit children
         for (auto func : node.funcs) {
             func->accept(*this);
+            Safe;
         }
         // Visit stops here
     }
@@ -23,6 +24,7 @@ namespace semantics
         // Visit children
         for (auto type : node.types) {
             type->accept(*this);
+            Safe;
         }
 
         if (node.types.size() > 0)
@@ -30,6 +32,7 @@ namespace semantics
 
         for (auto cse : node.cases) {
             cse->accept(*this);
+            Safe;
         }
         // Visit stops here
     }
@@ -40,9 +43,9 @@ namespace semantics
             pattern->accept(*this);
         }
         node.expr->accept(*this);
+        CheckPanic;
         // Visit stops here
 
-        // Code starts here
         if (current_func->id.compare(ANON_FUNC_NAME) == 0) {
             current_func->node_type = node.expr->node_type;
             current_func->types.push_back(node.expr->node_type);
@@ -79,17 +82,13 @@ namespace semantics
     }
 
     void TypeChecker::visit(Or &node) {
-        // Code starts here
-
-
-        // Code stops here
 
         // Visit children
         node.left->accept(*this);
         node.right->accept(*this);
+        CheckPanic;
         // Visit stops here
 
-        // Code starts here
         if (node.left->node_type->type == Types::BOOL && node.right->node_type->type == Types::BOOL) {
             node.node_type = node.left->node_type;
         } else {
@@ -97,22 +96,16 @@ namespace semantics
                                    node));
             return;
         }
-
-        // Code stops here
     }
 
     void TypeChecker::visit(And &node) {
-        // Code starts here
-
-
-        // Code stops here
 
         // Visit children
         node.left->accept(*this);
         node.right->accept(*this);
+        CheckPanic;
         // Visit stops here
 
-        // Code starts here
         if (node.left->node_type->type == Types::BOOL && node.right->node_type->type == Types::BOOL) {
             node.node_type = node.left->node_type;
         } else {
@@ -120,22 +113,16 @@ namespace semantics
                                    node));
             return;
         }
-
-        // Code stops here
     }
 
     void TypeChecker::visit(Equal &node) {
-        // Code starts here
-
-
-        // Code stops here
 
         // Visit children
         node.left->accept(*this);
         node.right->accept(*this);
+        CheckPanic;
         // Visit stops here
 
-        // Code starts here
         if (equal(node.left->node_type, node.right->node_type)) {
             node.node_type = make_shared<Type>(Types::BOOL);
         } else {
@@ -143,21 +130,16 @@ namespace semantics
                                    node));
             return;
         }
-        // Code stops here
     }
 
     void TypeChecker::visit(NotEqual &node) {
-        // Code starts here
-
-
-        // Code stops here
 
         // Visit children
         node.left->accept(*this);
         node.right->accept(*this);
+        CheckPanic;
         // Visit stops here
 
-        // Code starts here
         if (equal(node.left->node_type, node.right->node_type)) {
             node.node_type = make_shared<Type>(Types::BOOL, vector<Type *>());
         } else {
@@ -165,22 +147,16 @@ namespace semantics
                                    node));
             return;
         }
-
-        // Code stops here
     }
 
     void TypeChecker::visit(Lesser &node) {
-        // Code starts here
-
-
-        // Code stops here
 
         // Visit children
         node.left->accept(*this);
         node.right->accept(*this);
+        CheckPanic;
         // Visit stops here
 
-        // Code starts here
         if ((node.left->node_type->type == Types::INT && node.right->node_type->type == Types::INT) ||
             (node.left->node_type->type == Types::FLOAT && node.right->node_type->type == Types::FLOAT)) {
             node.node_type = make_shared<Type>(Types::BOOL);
@@ -189,22 +165,16 @@ namespace semantics
                                    node));
             return;
         }
-
-        // Code stops here
     }
 
     void TypeChecker::visit(Greater &node) {
-        // Code starts here
-
-
-        // Code stops here
 
         // Visit children
         node.left->accept(*this);
         node.right->accept(*this);
+        CheckPanic;
         // Visit stops here
 
-        // Code starts here
         if ((node.left->node_type->type == Types::INT && node.right->node_type->type == Types::INT) ||
             (node.left->node_type->type == Types::FLOAT && node.right->node_type->type == Types::FLOAT)) {
             node.node_type = make_shared<Type>(Types::BOOL);
@@ -213,21 +183,15 @@ namespace semantics
                                    node));
             return;
         }
-        // Code stops here
     }
 
     void TypeChecker::visit(LesserEq &node) {
-        // Code starts here
-
-
-        // Code stops here
-
         // Visit children
         node.left->accept(*this);
         node.right->accept(*this);
+        CheckPanic;
         // Visit stops here
 
-        // Code starts here
         if ((node.left->node_type->type == Types::INT && node.right->node_type->type == Types::INT) ||
             (node.left->node_type->type == Types::FLOAT && node.right->node_type->type == Types::FLOAT)) {
             node.node_type = make_shared<Type>(Types::BOOL);
@@ -236,21 +200,15 @@ namespace semantics
                                    node));
             return;
         }
-        // Code stops here
     }
 
     void TypeChecker::visit(GreaterEq &node) {
-        // Code starts here
-
-
-        // Code stops here
-
         // Visit children
         node.left->accept(*this);
         node.right->accept(*this);
+        CheckPanic;
         // Visit stops here
 
-        // Code starts here
         if ((node.left->node_type->type == Types::INT && node.right->node_type->type == Types::INT) ||
             (node.left->node_type->type == Types::FLOAT && node.right->node_type->type == Types::FLOAT)) {
             node.node_type = make_shared<Type>(Types::BOOL);
@@ -259,22 +217,15 @@ namespace semantics
                                    node));
             return;
         }
-
-        // Code stops here
     }
 
     void TypeChecker::visit(Add &node) {
-        // Code starts here
-
-
-        // Code stops here
-
         // Visit children
         node.left->accept(*this);
         node.right->accept(*this);
+        CheckPanic;
         // Visit stops here
 
-        // Code starts here
         if ((node.left->node_type->type == Types::INT && node.right->node_type->type == Types::INT) ||
             (node.left->node_type->type == Types::FLOAT && node.right->node_type->type == Types::FLOAT)) {
             node.node_type = node.left->node_type;
@@ -283,22 +234,15 @@ namespace semantics
                                    node));
             return;
         }
-
-        // Code stops here
     }
 
     void TypeChecker::visit(Sub &node) {
-        // Code starts here
-
-
-        // Code stops here
-
         // Visit children
         node.left->accept(*this);
         node.right->accept(*this);
+        CheckPanic;
         // Visit stops here
 
-        // Code starts here
         if ((node.left->node_type->type == Types::INT && node.right->node_type->type == Types::INT) ||
             (node.left->node_type->type == Types::FLOAT && node.right->node_type->type == Types::FLOAT)) {
             node.node_type = node.left->node_type;
@@ -307,22 +251,15 @@ namespace semantics
                                    node));
             return;
         }
-
-        // Code stops here
     }
 
     void TypeChecker::visit(Mul &node) {
-        // Code starts here
-
-
-        // Code stops here
-
         // Visit children
         node.left->accept(*this);
         node.right->accept(*this);
+        CheckPanic;
         // Visit stops here
 
-        // Code starts here
         if ((node.left->node_type->type == Types::INT && node.right->node_type->type == Types::INT) ||
             (node.left->node_type->type == Types::FLOAT && node.right->node_type->type == Types::FLOAT)) {
             node.node_type = node.left->node_type;
@@ -331,22 +268,15 @@ namespace semantics
                                    node));
             return;
         }
-
-        // Code stops here
     }
 
     void TypeChecker::visit(Div &node) {
-        // Code starts here
-
-
-        // Code stops here
-
         // Visit children
         node.left->accept(*this);
         node.right->accept(*this);
+        CheckPanic;
         // Visit stops here
 
-        // Code starts here
         if ((node.left->node_type->type == Types::INT && node.right->node_type->type == Types::INT) ||
             (node.left->node_type->type == Types::FLOAT && node.right->node_type->type == Types::FLOAT)) {
             node.node_type = node.left->node_type;
@@ -355,22 +285,15 @@ namespace semantics
                                    node));
             return;
         }
-
-        // Code stops here
     }
 
     void TypeChecker::visit(Mod &node) {
-        // Code starts here
-
-
-        // Code stops here
-
         // Visit children
         node.left->accept(*this);
         node.right->accept(*this);
+        CheckPanic;
         // Visit stops here
 
-        // Code starts here
         if ((node.left->node_type->type == Types::INT && node.right->node_type->type == Types::INT) ||
             (node.left->node_type->type == Types::FLOAT && node.right->node_type->type == Types::FLOAT)) {
             node.node_type = node.left->node_type;
@@ -379,22 +302,15 @@ namespace semantics
                                    node));
             return;
         }
-
-        // Code stops here
     }
 
     void TypeChecker::visit(ListAdd &node) {
-        // Code starts here
-
-
-        // Code stops here
-
         // Visit children
         node.left->accept(*this);
         node.right->accept(*this);
+        CheckPanic;
         // Visit stops here
 
-        // Code starts here
         if (node.right->node_type->type == Types::LIST) {
             if (equal(node.left->node_type, node.right->node_type->types.front())) {
                 node.node_type = node.right->node_type;
@@ -420,18 +336,12 @@ namespace semantics
                                    node));
             return;
         }
-
-        // Code stops here
     }
 
     void TypeChecker::visit(Par &node) {
-        // Code starts here
-
-
-        // Code stops here
-
         // Visit children
         node.child->accept(*this);
+        CheckPanic;
         // Visit stops here
 
         // Code starts here
@@ -440,16 +350,11 @@ namespace semantics
     }
 
     void TypeChecker::visit(Not &node) {
-        // Code starts here
-
-
-        // Code stops here
-
         // Visit children
         node.child->accept(*this);
+        CheckPanic;
         // Visit stops here
 
-        // Code starts here
         if (node.child->node_type->type == Types::BOOL) {
             node.node_type = node.child->node_type;
         } else {
@@ -457,58 +362,36 @@ namespace semantics
                                    node));
             return;
         }
-        // Code stops here
     }
 
     void TypeChecker::visit(Int &node) {
-        // Code starts here
         node.node_type = make_shared<Type>(Types::INT);
-
-        // Code stops here
     }
 
     void TypeChecker::visit(Float &node) {
-        // Code starts here
         node.node_type = make_shared<Type>(Types::FLOAT);
-
-        // Code stops here
     }
 
     void TypeChecker::visit(Bool &node) {
-        // Code starts here
         node.node_type = make_shared<Type>(Types::BOOL);
-
-        // Code stops here
     }
 
     void TypeChecker::visit(Char &node) {
-        // Code starts here
         node.node_type = make_shared<Type>(Types::CHAR);
-
-        // Code stops here
     }
 
     void TypeChecker::visit(String &node) {
-        // Code starts here
-
         node.node_type = make_shared<Type>(Types::STRING);
-
-        // Code stops here
     }
 
     void TypeChecker::visit(ListPattern &node) {
-        // Code starts here
-
-
-        // Code stops here
-
         // Visit children
         for (auto pattern : node.patterns) {
             pattern->accept(*this);
         }
+        CheckPanic;
         // Visit stops here
 
-        // Code starts here
         if (node.patterns.size() == 0) {
             node.node_type = make_shared<Type>(Types::EMPTYLIST);
         } else {
@@ -525,42 +408,30 @@ namespace semantics
             node.node_type = make_shared<Type>(Types::LIST);
             node.node_type->types.push_back(node.patterns[0]->node_type);
         }
-        // Code stops here
     }
 
     void TypeChecker::visit(TuplePattern &node) {
-        // Code starts here
-
-
-        // Code stops here
-
         // Visit children
         for (auto pattern : node.patterns) {
             pattern->accept(*this);
         }
+        CheckPanic;
         // Visit stops here
 
-        // Code starts here
         node.node_type = make_shared<Type>(Types::TUPLE);
 
         for (auto pattern : node.patterns) {
             node.node_type->types.push_back(pattern->node_type);
         }
-        // Code stops here
     }
 
     void TypeChecker::visit(ListSplit &node) {
-        // Code starts here
-
-
-        // Code stops here
-
         // Visit children
         node.left->accept(*this);
         node.right->accept(*this);
+        CheckPanic;
         // Visit stops here
 
-        // Code starts here
         if (node.right->node_type->type == Types::LIST) {
             if (equal(node.left->node_type, node.right->node_type->types.front())) {
                 node.node_type = node.right->node_type;
@@ -591,22 +462,16 @@ namespace semantics
                                      node.loc));
             return;
         }
-        // Code stops here
     }
 
     void TypeChecker::visit(List &node) {
-        // Code starts here
-
-
-        // Code stops here
-
         // Visit children
         for (auto expr : node.exprs) {
             expr->accept(*this);
         }
+        CheckPanic;
         // Visit stops here
 
-        // Code starts here
         if (node.exprs.size() == 0) {
             node.node_type = make_shared<Type>(Types::EMPTYLIST);
         } else {
@@ -622,34 +487,25 @@ namespace semantics
             node.node_type = make_shared<Type>(Types::LIST);
             node.node_type->types.push_back(node.exprs[0]->node_type);
         }
-
-        // Code stops here
     }
 
     void TypeChecker::visit(Tuple &node) {
-        // Code starts here
-
-
-        // Code stops here
-
-        // Visit children
+          // Visit children
         for (auto expr : node.exprs) {
             expr->accept(*this);
         }
+        CheckPanic;
         // Visit stops here
 
-        // Code starts here
         node.node_type = make_shared<Type>(Types::TUPLE);
 
         for (size_t i = 0; i < node.exprs.size(); ++i) {
             node.node_type->types.push_back(node.exprs[i]->node_type);
         }
-        // Code stops here
     }
 
 
     void TypeChecker::visit(Id &node) {
-        // Code starts here
         if (node.scope->exists(node.id)) {
             node.node_type = node.scope->get_type(node.id);
         } else {
@@ -657,24 +513,18 @@ namespace semantics
                            node.loc));
             return;
         }
-
-        // Code stops here
     }
 
     void TypeChecker::visit(Call &node) {
-        // Code starts here
-
-
-        // Code stops here
 
         // Visit children
         node.callee->accept(*this);
         for (auto expr : node.exprs) {
             expr->accept(*this);
         }
+        CheckPanic;
         // Visit stops here
 
-        // Code starts here
         if (node.callee->node_type->type == Types::SIGNATURE) {
             if (node.exprs.size() + 1 == node.callee->node_type->types.size()) {
                 for (size_t i = 0; i < node.exprs.size(); ++i) {
@@ -701,8 +551,6 @@ namespace semantics
                                      node.callee->loc));
             return;
         }
-
-        // Code stops here
     }
 
     void TypeChecker::visit(Type &node) {

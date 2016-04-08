@@ -7,10 +7,13 @@
 #include <string>
 
 namespace common {
+#define CheckPanic if (notsafe) return;
+#define Safe notsafe = true
 
     class Visitor {
 		friend class Node;
 	public:
+		bool notsafe = false;
 		void AddError(Error error);
 		std::vector<Error> Errors;
 		bool HasError();

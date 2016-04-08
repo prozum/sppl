@@ -5,6 +5,7 @@ using namespace std;
 namespace common {
     void Visitor::AddError(Error err) {
         Errors.push_back(err);
+        notsafe = true;
     }
 
     bool Visitor::HasError() {

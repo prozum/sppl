@@ -87,9 +87,9 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    ifstream in(input[0]);
-    ofstream out(output);
-    ofstream hout(header_output);
+    auto in = make_shared<ifstream>(input[0]);
+    auto out = make_shared<ofstream>(output);
+    auto hout = make_shared<ofstream>(header_output);
 
     compiler::Compiler compiler(in, out, hout);
     compiler.set_backend(backend);
