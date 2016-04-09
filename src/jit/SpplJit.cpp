@@ -5,7 +5,8 @@ namespace jit {
     SpplJit::SpplJit(shared_ptr<ostream> out) : Machine(EngineBuilder().selectTarget()),
                                                 Layout(Machine->createDataLayout()),
                                                 CompileLayer(ObjectLayer, SimpleCompiler(*Machine)),
-                                                Generator(out) {
+                                                Generator(out),
+                                                ScopeGenerator(Driver.global.get()) {
         llvm::sys::DynamicLibrary::LoadLibraryPermanently(nullptr);
         init_module_passmanager();
     }
@@ -27,8 +28,7 @@ namespace jit {
     }
 
     void SpplJit::remove_module(ModuleHandleT handler) {
-        ModuleHandles.erase(
-                std::find(ModuleHandles.begin(), ModuleHandles.end(), handler));
+        ModuleHandles.erase(std::find(ModuleHandles.begin(), ModuleHandles.end(), handler));
         CompileLayer.removeModuleSet(handler);
     }
 
@@ -131,13 +131,11 @@ namespace jit {
         if (!Driver.parse_string(str))
             return;
 
-        Driver.accept(ScopeGenerator);
-        if (ScopeGenerator.HasError()) {
+        if (!Driver.accept(ScopeGenerator)) {
             return;
         }
 
-        Driver.accept(TypeChecker);
-        if (TypeChecker.HasError()) {
+        if (!Driver.accept(TypeChecker)) {
             return;
         }
 
@@ -150,8 +148,8 @@ namespace jit {
         // Print LLVM Module
         cout << Generator.ModuleString();
 
-        auto handler = add_module(std::move(Generator.Module));
-        init_module_passmanager();
+        //auto handler = add_module(std::move(Generator.Module));
+        //init_module_passmanager();
 
         // Only run anonymous functions
         if (func_node->is_anon) {
@@ -162,6 +160,6 @@ namespace jit {
             cout << "output: " << output << endl;
         }
 
-        remove_module(handler);
+        //remove_module(handler);
     }
 }
