@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Visitor.h"
+
 #include <stack>
 #include <vector>
 #include <Node.h>
@@ -11,7 +12,7 @@ using namespace std;
 namespace semantics {
     class TypeChecker : public Visitor {
     public:
-        bool is_valid = true;
+        TypeChecker();
 
         virtual void visit(Program &node);
 
@@ -79,8 +80,7 @@ namespace semantics {
 
     private:
         Function *current_func;
-        vector<Type *> garbage;
 
-        bool equal(Type *type1, Type *type2);
+        bool equal(shared_ptr<Type> type1, shared_ptr<Type> type2);
     };
 }

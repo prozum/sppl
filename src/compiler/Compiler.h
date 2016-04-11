@@ -1,11 +1,13 @@
 #pragma once
 
-#include <iostream>
-#include <memory>
 #include "Driver.h"
 #include "CodeGenerator.h"
 #include "TypeChecker.h"
 #include "ScopeGenerator.h"
+
+#include <iostream>
+#include <memory>
+#include <PatternChecker.h>
 
 #ifdef CCPP
 #include "CppCodeGenerator.h"
@@ -40,19 +42,18 @@ namespace compiler {
 
     class Compiler {
     public:
-        Compiler(istream *in, ostream *out);
-        Compiler(istream *in, ostream *out, ostream *hout);
+        Compiler(shared_ptr<istream> in, shared_ptr<ostream> out, shared_ptr<ostream> hout);
 
-        std::istream* input;
-        std::ostream* output;
-        std::ostream* header_output;
-        std::unique_ptr<CodeGenerator> generator;
+        parser::Driver driver;
+        shared_ptr<istream> input;
+        shared_ptr<ostream> output;
+        shared_ptr<ostream> header_output;
+        unique_ptr<CodeGenerator> generator;
         semantics::ScopeGenerator scope_generator;
         semantics::TypeChecker type_checker;
-        parser::Driver driver;
+        semantics::PatternChecker pattern_checker;
 
-        void compile();
-        Function * parse_anon_expr();
+        int compile();
 
         void set_backend(Backend backend);
     };

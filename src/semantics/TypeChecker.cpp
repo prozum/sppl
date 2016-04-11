@@ -1,638 +1,570 @@
-//
-// Created by hejsil on 3/4/16.
-//
-
 #include "TypeChecker.h"
-#include <unordered_map>
+#include "Error.h"
 #include "Scope.h"
 
-using namespace std;
+#include <iostream>
 
+using namespace std;
 namespace semantics
 {
+    TypeChecker::TypeChecker() { }
 
-void TypeChecker::visit(Program &node) {
-    /* Visit all children */
-    for (auto func : node.funcs) {
-        func->accept(*this);
-    }
-    /* Visit stops here */
-}
-
-void TypeChecker::visit(Function &node) {
-    current_func = &node;
-
-    /* Visit children */
-    for (auto type : node.types) {
-        type->accept(*this);
-    }
-    for (auto cse : node.cases) {
-        cse->accept(*this);
-    }
-    /* Visit stops here */
-}
-
-void TypeChecker::visit(Case &node) {
-    /* Visit children */
-    for (auto pattern : node.patterns) {
-        pattern->accept(*this);
-    }
-    node.expr->accept(*this);
-    /* Visit stops here */
-
-    /* code starts here*/
-    if (node.patterns.size() + 1 == current_func->types.size()) {
-        for (int i = 0; i < node.patterns.size(); ++i) {
-            if (!equal(node.patterns[i]->node_type, current_func->types[i])) {
-                throw "bad programmer exception";
-            }
+    void TypeChecker::visit(Program &node) {
+        // Visit children
+        for (auto func : node.funcs) {
+            func->accept(*this);
+            Safe;
         }
-    } else {
-        throw "bad programmer exception";
-    }
-}
-
-void TypeChecker::visit(Or &node) {
-    /* Code goes here */
-
-
-    /* Code stops here */
-
-    /* Visit children */
-    node.left->accept(*this);
-    node.right->accept(*this);
-    /* Visit stops here */
-
-    /* Code goes here */
-    if (node.left->node_type->type == Types::BOOL && node.right->node_type->type == Types::BOOL) {
-        node.node_type = node.left->node_type;
-    } else {
-        throw "Not good";
+        // Visit stops here
     }
 
-    /* Code stops here */
-}
-
-void TypeChecker::visit(And &node) {
-    /* Code goes here */
-
-
-    /* Code stops here */
-
-    /* Visit children */
-    node.left->accept(*this);
-    node.right->accept(*this);
-    /* Visit stops here */
-
-    /* Code goes here */
-    if (node.left->node_type->type == Types::BOOL && node.right->node_type->type == Types::BOOL) {
-        node.node_type = node.left->node_type;
-    } else {
-        throw "Not good";
-    }
-
-    /* Code stops here */
-}
-
-void TypeChecker::visit(Equal &node) {
-    /* Code goes here */
-
-
-    /* Code stops here */
-
-    /* Visit children */
-    node.left->accept(*this);
-    node.right->accept(*this);
-    /* Visit stops here */
-
-    /* Code goes here */
-    if (equal(node.left->node_type, node.right->node_type)) {
-        node.node_type = new Type(Types::BOOL);
-        garbage.push_back(node.node_type);
-    } else {
-        throw "Bad programmer exception";
-    }
-    /* Code stops here */
-}
-
-void TypeChecker::visit(NotEqual &node) {
-    /* Code goes here */
-
-
-    /* Code stops here */
-
-    /* Visit children */
-    node.left->accept(*this);
-    node.right->accept(*this);
-    /* Visit stops here */
-
-    /* Code goes here */
-    if (equal(node.left->node_type, node.right->node_type)) {
-        node.node_type = new Type(Types::BOOL);
-        garbage.push_back(node.node_type);
-    } else {
-        throw "Bad programmer exception";
-    }
-
-    /* Code stops here */
-}
-
-void TypeChecker::visit(Lesser &node) {
-    /* Code goes here */
-
-
-    /* Code stops here */
-
-    /* Visit children */
-    node.left->accept(*this);
-    node.right->accept(*this);
-    /* Visit stops here */
-
-    /* Code goes here */
-    if (node.left->node_type->type == Types::INT && node.right->node_type->type == Types::INT ||
-        node.left->node_type->type == Types::FLOAT && node.right->node_type->type == Types::FLOAT) {
-        node.node_type = new Type(Types::BOOL);
-        garbage.push_back(node.node_type);
-    } else {
-        throw "Bad programmer exception";
-    }
-
-    /* Code stops here */
-}
-
-void TypeChecker::visit(Greater &node) {
-    /* Code goes here */
-
-
-    /* Code stops here */
-
-    /* Visit children */
-    node.left->accept(*this);
-    node.right->accept(*this);
-    /* Visit stops here */
-
-    /* Code goes here */
-    if (node.left->node_type->type == Types::INT && node.right->node_type->type == Types::INT ||
-        node.left->node_type->type == Types::FLOAT && node.right->node_type->type == Types::FLOAT) {
-        node.node_type = new Type(Types::BOOL);
-        garbage.push_back(node.node_type);
-    } else {
-        throw "Bad programmer exception";
-    }
-    /* Code stops here */
-}
-
-void TypeChecker::visit(LesserEq &node) {
-    /* Code goes here */
-
-
-    /* Code stops here */
-
-    /* Visit children */
-    node.left->accept(*this);
-    node.right->accept(*this);
-    /* Visit stops here */
-
-    /* Code goes here */
-    if (node.left->node_type->type == Types::INT && node.right->node_type->type == Types::INT ||
-        node.left->node_type->type == Types::FLOAT && node.right->node_type->type == Types::FLOAT) {
-        node.node_type = new Type(Types::BOOL);
-        garbage.push_back(node.node_type);
-    } else {
-        throw "Bad programmer exception";
-    }
-
-    /* Code stops here */
-}
-
-void TypeChecker::visit(GreaterEq &node) {
-    /* Code goes here */
-
-
-    /* Code stops here */
-
-    /* Visit children */
-    node.left->accept(*this);
-    node.right->accept(*this);
-    /* Visit stops here */
-
-    /* Code goes here */
-    if (node.left->node_type->type == Types::INT && node.right->node_type->type == Types::INT ||
-        node.left->node_type->type == Types::FLOAT && node.right->node_type->type == Types::FLOAT) {
-        node.node_type = new Type(Types::BOOL);
-        garbage.push_back(node.node_type);
-    } else {
-        throw "Bad programmer exception";
-    }
-
-    /* Code stops here */
-}
-
-void TypeChecker::visit(Add &node) {
-    /* Code goes here */
-
-
-    /* Code stops here */
-
-    /* Visit children */
-    node.left->accept(*this);
-    node.right->accept(*this);
-    /* Visit stops here */
-
-    /* Code goes here */
-    if (node.left->node_type->type == Types::INT && node.right->node_type->type == Types::INT ||
-        node.left->node_type->type == Types::FLOAT && node.right->node_type->type == Types::FLOAT) {
-        node.node_type = node.left->node_type;
-    } else {
-        throw "Bad programmer exception";
-    }
-
-    /* Code stops here */
-}
-
-void TypeChecker::visit(Sub &node) {
-    /* Code goes here */
-
-
-    /* Code stops here */
-
-    /* Visit children */
-    node.left->accept(*this);
-    node.right->accept(*this);
-    /* Visit stops here */
-
-    /* Code goes here */
-    if (node.left->node_type->type == Types::INT && node.right->node_type->type == Types::INT ||
-        node.left->node_type->type == Types::FLOAT && node.right->node_type->type == Types::FLOAT) {
-        node.node_type = node.left->node_type;
-    } else {
-        throw "Bad programmer exception";
-    }
-
-    /* Code stops here */
-}
-
-void TypeChecker::visit(Mul &node) {
-    /* Code goes here */
-
-
-    /* Code stops here */
-
-    /* Visit children */
-    node.left->accept(*this);
-    node.right->accept(*this);
-    /* Visit stops here */
-
-    /* Code goes here */
-    if (node.left->node_type->type == Types::INT && node.right->node_type->type == Types::INT ||
-        node.left->node_type->type == Types::FLOAT && node.right->node_type->type == Types::FLOAT) {
-        node.node_type = node.left->node_type;
-    } else {
-        throw "Bad programmer exception";
-    }
-
-    /* Code stops here */
-}
-
-void TypeChecker::visit(Div &node) {
-    /* Code goes here */
-
-
-    /* Code stops here */
-
-    /* Visit children */
-    node.left->accept(*this);
-    node.right->accept(*this);
-    /* Visit stops here */
-
-    /* Code goes here */
-    if (node.left->node_type->type == Types::INT && node.right->node_type->type == Types::INT ||
-        node.left->node_type->type == Types::FLOAT && node.right->node_type->type == Types::FLOAT) {
-        node.node_type = node.left->node_type;
-    } else {
-        throw "Bad programmer exception";
-    }
-
-    /* Code stops here */
-}
-
-void TypeChecker::visit(Mod &node) {
-    /* Code goes here */
-
-
-    /* Code stops here */
-
-    /* Visit children */
-    node.left->accept(*this);
-    node.right->accept(*this);
-    /* Visit stops here */
-
-    /* Code goes here */
-    if (node.left->node_type->type == Types::INT && node.right->node_type->type == Types::INT ||
-        node.left->node_type->type == Types::FLOAT && node.right->node_type->type == Types::FLOAT) {
-        node.node_type = node.left->node_type;
-    } else {
-        throw "Bad programmer exception";
-    }
-
-    /* Code stops here */
-}
-
-void TypeChecker::visit(ListAdd &node) {
-    /* Code goes here */
-
-
-    /* Code stops here */
-
-    /* Visit children */
-    node.left->accept(*this);
-    node.right->accept(*this);
-    /* Visit stops here */
-
-    /* Code goes here */
-    if (node.right->node_type->type == Types::LIST) {
-        if (equal(node.left->node_type, node.right->node_type->types.front())) {
-            node.node_type = node.right->node_type;
-        } else {
-            throw "Not same type m8";
+    void TypeChecker::visit(Function &node) {
+        current_func = &node;
+
+        // Visit children
+        for (auto type : node.types) {
+            type->accept(*this);
+            Safe;
         }
-    } else if (node.right->node_type->type == Types::EMPTYLIST) {
-        node.node_type = new Type(Types::LIST);
-        node.node_type->types.push_back(node.left->node_type);
-        node.right->node_type = node.node_type;
-        garbage.push_back(node.node_type);
-    } else {
-        throw "Not a list m8";
-    }
 
-    /* Code stops here */
-}
+        if (node.types.size() > 0)
+            node.node_type = node.types.back();
 
-void TypeChecker::visit(Par &node) {
-    /* Code goes here */
-
-
-    /* Code stops here */
-
-    /* Visit children */
-    node.child->accept(*this);
-    /* Visit stops here */
-
-    /* Code goes here */
-    node.node_type = node.child->node_type;
-    /* Code stops here */
-}
-
-void TypeChecker::visit(Not &node) {
-    /* Code goes here */
-
-
-    /* Code stops here */
-
-    /* Visit children */
-    node.child->accept(*this);
-    /* Visit stops here */
-
-    /* Code goes here */
-    if (node.child->node_type->type == Types::BOOL) {
-        node.node_type = node.child->node_type;
-    } else {
-        throw " YA DUN FUKD IT UP";
-    }
-    /* Code stops here */
-}
-
-void TypeChecker::visit(Int &node) {
-    /* Code goes here */
-    node.node_type = new Type(Types::INT);
-    garbage.push_back(node.node_type);
-
-    /* Code stops here */
-}
-
-void TypeChecker::visit(Float &node) {
-    /* Code goes here */
-    node.node_type = new Type(Types::FLOAT);
-    garbage.push_back(node.node_type);
-
-    /* Code stops here */
-}
-
-void TypeChecker::visit(Bool &node) {
-    /* Code goes here */
-    node.node_type = new Type(Types::BOOL);
-    garbage.push_back(node.node_type);
-
-    /* Code stops here */
-}
-
-void TypeChecker::visit(Char &node) {
-    /* Code goes here */
-    // TODO check char length
-    node.value = node.tmp.front();
-    node.node_type = new Type(Types::CHAR);
-    garbage.push_back(node.node_type);
-
-    /* Code stops here */
-}
-
-void TypeChecker::visit(String &node) {
-    /* Code goes here */
-
-    node.node_type = new Type(Types::STRING);
-    garbage.push_back(node.node_type);
-
-    /* Code stops here */
-}
-
-void TypeChecker::visit(ListPattern &node) {
-    /* Code goes here */
-
-
-    /* Code stops here */
-
-    /* Visit children */
-    for (auto pattern : node.patterns) {
-        pattern->accept(*this);
-    }
-    /* Visit stops here */
-
-    /* Code goes here */
-    if (node.patterns.size() == 0) {
-        node.node_type = new Type(Types::EMPTYLIST);
-        garbage.push_back(node.node_type);
-    } else {
-        for (int i = 0; i < node.patterns.size() - 1; ++i) {
-            if (!equal(node.patterns[i]->node_type, node.patterns[i + 1]->node_type)) {
-                throw "bad programmer exception";
-            }
+        for (auto cse : node.cases) {
+            cse->accept(*this);
+            Safe;
         }
-        node.node_type = node.patterns[0]->node_type;
+        // Visit stops here
     }
-    /* Code stops here */
-}
 
-void TypeChecker::visit(TuplePattern &node) {
-    /* Code goes here */
-
-
-    /* Code stops here */
-
-    /* Visit children */
-    for (auto pattern : node.patterns) {
-        pattern->accept(*this);
-    }
-    /* Visit stops here */
-
-    /* Code goes here */
-    node.node_type = new Type(Types::TUPLE);
-    garbage.push_back(node.node_type);
-
-    for (auto pattern : node.patterns) {
-        node.node_type->types.push_back(pattern->node_type);
-    }
-    /* Code stops here */
-}
-
-void TypeChecker::visit(ListSplit &node) {
-    /* Code goes here */
-
-
-    /* Code stops here */
-
-    /* Visit children */
-    node.left->accept(*this);
-    node.right->accept(*this);
-    /* Visit stops here */
-
-    /* Code goes here */
-    if (node.right->node_type->type == Types::LIST) {
-        if (equal(node.left->node_type, node.right->node_type->types.front())) {
-            node.node_type = node.right->node_type;
-        } else {
-            throw "Not same type m8";
+    void TypeChecker::visit(Case &node) {
+        // Visit children
+        for (auto pattern : node.patterns) {
+            pattern->accept(*this);
         }
-    } else if (node.right->node_type->type == Types::EMPTYLIST) {
-        node.node_type = new Type(Types::LIST);
-        node.node_type->types.push_back(node.left->node_type);
-        garbage.push_back(node.node_type);
-    } else {
-        throw "Not a list m8";
-    }
-    /* Code stops here */
-}
+        node.expr->accept(*this);
+        CheckPanic;
 
-void TypeChecker::visit(List &node) {
-    /* Code goes here */
-
-
-    /* Code stops here */
-
-    /* Visit children */
-    for (auto expr : node.exprs) {
-        expr->accept(*this);
-    }
-    /* Visit stops here */
-
-    /* Code goes here */
-    if (node.exprs.size() == 0) {
-        node.node_type = new Type(Types::EMPTYLIST);
-        garbage.push_back(node.node_type);
-    } else {
-        for (int i = 0; i < node.exprs.size() - 1; ++i) {
-            if (!equal(node.exprs[i]->node_type, node.exprs[i + 1]->node_type)) {
-                throw "bad programmer exception";
-            }
+        if (current_func->is_anon) {
+            current_func->node_type = node.expr->node_type;
+            current_func->types.push_back(node.expr->node_type);
         }
-        node.node_type = new Type(Types::LIST);
-        node.node_type->types.push_back(node.exprs[0]->node_type);
-        garbage.push_back(node.node_type);
-    }
 
-    /* Code stops here */
-}
-
-void TypeChecker::visit(Tuple &node) {
-    /* Code goes here */
-
-
-    /* Code stops here */
-
-    /* Visit children */
-    for (auto expr : node.exprs) {
-        expr->accept(*this);
-    }
-    /* Visit stops here */
-
-    /* Code goes here */
-    node.node_type = new Type(Types::TUPLE);
-    garbage.push_back(node.node_type);
-
-    for (int i = 0; i < node.exprs.size(); ++i) {
-        node.node_type->types.push_back(node.exprs[i]->node_type);
-    }
-    /* Code stops here */
-}
-
-
-void TypeChecker::visit(Id &node) {
-    /* Code goes here */
-    node.node_type = node.scope->get_type(node.id);
-    /* Code stops here */
-}
-
-void TypeChecker::visit(Call &node) {
-    /* Code goes here */
-
-
-    /* Code stops here */
-
-    /* Visit children */
-    node.callee->accept(*this);
-    for (auto expr : node.exprs) {
-        expr->accept(*this);
-    }
-    /* Visit stops here */
-
-    /* Code goes here */
-    if (node.callee->node_type->type == Types::SIGNATURE) {
-        if (node.exprs.size() + 1 == node.callee->node_type->types.size()) {
-            for (int i = 0; i < node.exprs.size(); ++i) {
-                if (!equal(node.exprs[i]->node_type, node.callee->node_type->types[i])) {
-                    throw "bad programmer exception";
+        if (node.patterns.size() + 1 == current_func->types.size()) {
+            for (size_t i = 0; i < node.patterns.size(); ++i) {
+                if (node.patterns[i]->node_type->type == Types::EMPTYLIST &&
+                    current_func->types[i]->type == Types::LIST) {
+                    node.patterns[i]->node_type = current_func->types[i];
+                } else if (!equal(node.patterns[i]->node_type, current_func->types[i])) {
+                    AddError(Error::Expected("Wrong pattern type",
+                                current_func->types[i]->str(),
+                                node.patterns[i]->node_type->str(),
+                                node.patterns[i]->node_type->loc));
+                    return;
                 }
             }
         } else {
-            throw "bad programmer exception";
+            AddError(Error::Expected("Wrong pattern count",
+                        to_string(current_func->types.size() - 1),
+                        to_string(node.patterns.size()),
+                        node.loc));
+            return;
         }
-        node.node_type = node.callee->node_type->types.back();
-    } else {
-        throw "bad programmer exception";
+
+        if (node.expr->node_type->type == Types::EMPTYLIST &&
+            current_func->types.back()->type == Types::LIST) {
+            node.expr->node_type = current_func->types.back();
+        } else if (!equal(current_func->types.back(), node.expr->node_type)) {
+            AddError(Error::Expected("Wrong return type",
+                                     current_func->types.back()->str(),
+                                     node.expr->node_type->str(),
+                                     node.loc));
+            return;
+        }
     }
 
-    /* Code stops here */
-}
+    void TypeChecker::visit(Or &node) {
 
-void TypeChecker::visit(Type &node) {
-    /* Code goes here */
+        // Visit children
+        node.left->accept(*this);
+        node.right->accept(*this);
+        CheckPanic;
+        // Visit stops here
 
-
-    /* Code stops here */
-
-    /* Visit children */
-    for (auto type : node.types) {
-        type->accept(*this);
+        if (node.left->node_type->type == Types::BOOL && node.right->node_type->type == Types::BOOL) {
+            node.node_type = node.left->node_type;
+        } else {
+            AddError(Error::Binary("Operator only operates on Bool typed children",
+                                   node));
+            return;
+        }
     }
-    /* Visit stops here */
 
-    /* Code goes here */
-    node.node_type = &node;
+    void TypeChecker::visit(And &node) {
 
-    /* Code stops here */
-}
+        // Visit children
+        node.left->accept(*this);
+        node.right->accept(*this);
+        CheckPanic;
+        // Visit stops here
 
-bool TypeChecker::equal(Type *type1, Type *type2) {
-    return *type1 == *type2;
-}
+        if (node.left->node_type->type == Types::BOOL && node.right->node_type->type == Types::BOOL) {
+            node.node_type = node.left->node_type;
+        } else {
+            AddError(Error::Binary("Operator only operates on Bool typed children",
+                                   node));
+            return;
+        }
+    }
 
+    void TypeChecker::visit(Equal &node) {
+
+        // Visit children
+        node.left->accept(*this);
+        node.right->accept(*this);
+        CheckPanic;
+        // Visit stops here
+
+        if (equal(node.left->node_type, node.right->node_type)) {
+            node.node_type = make_shared<Type>(Types::BOOL);
+        } else {
+            AddError(Error::Binary("Operator only operates on children of the same type",
+                                   node));
+            return;
+        }
+    }
+
+    void TypeChecker::visit(NotEqual &node) {
+
+        // Visit children
+        node.left->accept(*this);
+        node.right->accept(*this);
+        CheckPanic;
+        // Visit stops here
+
+        if (equal(node.left->node_type, node.right->node_type)) {
+            node.node_type = make_shared<Type>(Types::BOOL, vector<Type *>());
+        } else {
+            AddError(Error::Binary("Operator only operates on children of the same type",
+                                   node));
+            return;
+        }
+    }
+
+    void TypeChecker::visit(Lesser &node) {
+
+        // Visit children
+        node.left->accept(*this);
+        node.right->accept(*this);
+        CheckPanic;
+        // Visit stops here
+
+        if ((node.left->node_type->type == Types::INT && node.right->node_type->type == Types::INT) ||
+            (node.left->node_type->type == Types::FLOAT && node.right->node_type->type == Types::FLOAT)) {
+            node.node_type = make_shared<Type>(Types::BOOL);
+        } else {
+            AddError(Error::Binary("Operator only operates on children of the same type",
+                                   node));
+            return;
+        }
+    }
+
+    void TypeChecker::visit(Greater &node) {
+
+        // Visit children
+        node.left->accept(*this);
+        node.right->accept(*this);
+        CheckPanic;
+        // Visit stops here
+
+        if ((node.left->node_type->type == Types::INT && node.right->node_type->type == Types::INT) ||
+            (node.left->node_type->type == Types::FLOAT && node.right->node_type->type == Types::FLOAT)) {
+            node.node_type = make_shared<Type>(Types::BOOL);
+        } else {
+            AddError(Error::Binary("Operator only operates on Int or Float children",
+                                   node));
+            return;
+        }
+    }
+
+    void TypeChecker::visit(LesserEq &node) {
+        // Visit children
+        node.left->accept(*this);
+        node.right->accept(*this);
+        CheckPanic;
+        // Visit stops here
+
+        if ((node.left->node_type->type == Types::INT && node.right->node_type->type == Types::INT) ||
+            (node.left->node_type->type == Types::FLOAT && node.right->node_type->type == Types::FLOAT)) {
+            node.node_type = make_shared<Type>(Types::BOOL);
+        } else {
+            AddError(Error::Binary("Operator only operates on Int or Float children",
+                                   node));
+            return;
+        }
+    }
+
+    void TypeChecker::visit(GreaterEq &node) {
+        // Visit children
+        node.left->accept(*this);
+        node.right->accept(*this);
+        CheckPanic;
+        // Visit stops here
+
+        if ((node.left->node_type->type == Types::INT && node.right->node_type->type == Types::INT) ||
+            (node.left->node_type->type == Types::FLOAT && node.right->node_type->type == Types::FLOAT)) {
+            node.node_type = make_shared<Type>(Types::BOOL);
+        } else {
+            AddError(Error::Binary("Operator only operates on Int or Float children",
+                                   node));
+            return;
+        }
+    }
+
+    void TypeChecker::visit(Add &node) {
+        // Visit children
+        node.left->accept(*this);
+        node.right->accept(*this);
+        CheckPanic;
+        // Visit stops here
+
+        if ((node.left->node_type->type == Types::INT && node.right->node_type->type == Types::INT) ||
+            (node.left->node_type->type == Types::FLOAT && node.right->node_type->type == Types::FLOAT)) {
+            node.node_type = node.left->node_type;
+        } else {
+            AddError(Error::Binary("Operator only operates on Int or Float children",
+                                   node));
+            return;
+        }
+    }
+
+    void TypeChecker::visit(Sub &node) {
+        // Visit children
+        node.left->accept(*this);
+        node.right->accept(*this);
+        CheckPanic;
+        // Visit stops here
+
+        if ((node.left->node_type->type == Types::INT && node.right->node_type->type == Types::INT) ||
+            (node.left->node_type->type == Types::FLOAT && node.right->node_type->type == Types::FLOAT)) {
+            node.node_type = node.left->node_type;
+        } else {
+            AddError(Error::Binary("Operator only operates on Int or Float children",
+                                   node));
+            return;
+        }
+    }
+
+    void TypeChecker::visit(Mul &node) {
+        // Visit children
+        node.left->accept(*this);
+        node.right->accept(*this);
+        CheckPanic;
+        // Visit stops here
+
+        if ((node.left->node_type->type == Types::INT && node.right->node_type->type == Types::INT) ||
+            (node.left->node_type->type == Types::FLOAT && node.right->node_type->type == Types::FLOAT)) {
+            node.node_type = node.left->node_type;
+        } else {
+            AddError(Error::Binary("Operator only operates on Int or Float children",
+                                   node));
+            return;
+        }
+    }
+
+    void TypeChecker::visit(Div &node) {
+        // Visit children
+        node.left->accept(*this);
+        node.right->accept(*this);
+        CheckPanic;
+        // Visit stops here
+
+        if ((node.left->node_type->type == Types::INT && node.right->node_type->type == Types::INT) ||
+            (node.left->node_type->type == Types::FLOAT && node.right->node_type->type == Types::FLOAT)) {
+            node.node_type = node.left->node_type;
+        } else {
+            AddError(Error::Binary("Operator only operates on Int or Float children",
+                                   node));
+            return;
+        }
+    }
+
+    void TypeChecker::visit(Mod &node) {
+        // Visit children
+        node.left->accept(*this);
+        node.right->accept(*this);
+        CheckPanic;
+        // Visit stops here
+
+        if ((node.left->node_type->type == Types::INT && node.right->node_type->type == Types::INT) ||
+            (node.left->node_type->type == Types::FLOAT && node.right->node_type->type == Types::FLOAT)) {
+            node.node_type = node.left->node_type;
+        } else {
+            AddError(Error::Binary("Operator only operates on Int or Float children",
+                                   node));
+            return;
+        }
+    }
+
+    void TypeChecker::visit(ListAdd &node) {
+        // Visit children
+        node.left->accept(*this);
+        node.right->accept(*this);
+        CheckPanic;
+        // Visit stops here
+
+        if (node.right->node_type->type == Types::LIST) {
+            if (equal(node.left->node_type, node.right->node_type->types.front())) {
+                node.node_type = node.right->node_type;
+            } else {
+                AddError(Error::Binary("Left type must be same type of right List",
+                                       node));
+                return;
+            }
+        } else if (node.right->node_type->type == Types::STRING) {
+            if (node.left->node_type->type == Types::CHAR) {
+                node.node_type = node.right->node_type;
+            } else {
+                AddError(Error::Binary("Left type must be Char when right is String",
+                                       node));
+                return;
+            }
+        }  else if (node.right->node_type->type == Types::EMPTYLIST) {
+            node.node_type = make_shared<Type>(Types::LIST);
+            node.node_type->types.push_back(node.left->node_type);
+            node.right->node_type = node.node_type;
+        } else {
+            AddError(Error::Binary("Right must be a List",
+                                   node));
+            return;
+        }
+    }
+
+    void TypeChecker::visit(Par &node) {
+        // Visit children
+        node.child->accept(*this);
+        CheckPanic;
+        // Visit stops here
+
+        // Code starts here
+        node.node_type = node.child->node_type;
+        // Code stops here
+    }
+
+    void TypeChecker::visit(Not &node) {
+        // Visit children
+        node.child->accept(*this);
+        CheckPanic;
+        // Visit stops here
+
+        if (node.child->node_type->type == Types::BOOL) {
+            node.node_type = node.child->node_type;
+        } else {
+            AddError(Error::Unary("Operator only operates on Bool typed children",
+                                   node));
+            return;
+        }
+    }
+
+    void TypeChecker::visit(Int &node) {
+        node.node_type = make_shared<Type>(Types::INT);
+    }
+
+    void TypeChecker::visit(Float &node) {
+        node.node_type = make_shared<Type>(Types::FLOAT);
+    }
+
+    void TypeChecker::visit(Bool &node) {
+        node.node_type = make_shared<Type>(Types::BOOL);
+    }
+
+    void TypeChecker::visit(Char &node) {
+        node.node_type = make_shared<Type>(Types::CHAR);
+    }
+
+    void TypeChecker::visit(String &node) {
+        node.node_type = make_shared<Type>(Types::STRING);
+    }
+
+    void TypeChecker::visit(ListPattern &node) {
+        // Visit children
+        for (auto pattern : node.patterns) {
+            pattern->accept(*this);
+        }
+        CheckPanic;
+        // Visit stops here
+
+        if (node.patterns.size() == 0) {
+            node.node_type = make_shared<Type>(Types::EMPTYLIST);
+        } else {
+            for (size_t i = 0; i < node.patterns.size() - 1; ++i) {
+                if (!equal(node.patterns[i]->node_type, node.patterns[i + 1]->node_type)) {
+                    AddError(Error::Expected("All items in a List must be of the same type",
+                                             node.patterns[i]->str(),
+                                             node.patterns[i + 1]->str(),
+                                             node.loc));
+                    return;
+                }
+            }
+
+            node.node_type = make_shared<Type>(Types::LIST);
+            node.node_type->types.push_back(node.patterns[0]->node_type);
+        }
+    }
+
+    void TypeChecker::visit(TuplePattern &node) {
+        // Visit children
+        for (auto pattern : node.patterns) {
+            pattern->accept(*this);
+        }
+        CheckPanic;
+        // Visit stops here
+
+        node.node_type = make_shared<Type>(Types::TUPLE);
+
+        for (auto pattern : node.patterns) {
+            node.node_type->types.push_back(pattern->node_type);
+        }
+    }
+
+    void TypeChecker::visit(ListSplit &node) {
+        // Visit children
+        node.left->accept(*this);
+        node.right->accept(*this);
+        CheckPanic;
+        // Visit stops here
+
+        if (node.right->node_type->type == Types::LIST) {
+            if (equal(node.left->node_type, node.right->node_type->types.front())) {
+                node.node_type = node.right->node_type;
+            } else {
+                AddError(Error::Expected("Left must be the same type as the right List",
+                                         node.right->node_type->types[0]->str(),
+                                         node.right->str(),
+                                         node.loc));
+                return;
+            }
+        } else if (node.right->node_type->type == Types::STRING) {
+            if (node.left->node_type->type == Types::CHAR) {
+                node.node_type = node.right->node_type;
+            } else {
+                AddError(Error::Expected("Left must be type Char, when right is String",
+                                         "Char",
+                                         node.left->node_type->str(),
+                                         node.loc));
+                return;
+            }
+        } else if (node.right->node_type->type == Types::EMPTYLIST) {
+            node.node_type = make_shared<Type>(Types::LIST);
+            node.node_type->types.push_back(node.left->node_type);
+        } else {
+            AddError(Error::Expected("Right must be a List",
+                                     "List",
+                                     node.right->node_type->str(),
+                                     node.loc));
+            return;
+        }
+    }
+
+    void TypeChecker::visit(List &node) {
+        // Visit children
+        for (auto expr : node.exprs) {
+            expr->accept(*this);
+        }
+        CheckPanic;
+        // Visit stops here
+
+        if (node.exprs.size() == 0) {
+            node.node_type = make_shared<Type>(Types::EMPTYLIST);
+        } else {
+            for (size_t i = 0; i < node.exprs.size() - 1; ++i) {
+                if (!equal(node.exprs[i]->node_type, node.exprs[i + 1]->node_type)) {
+                    AddError(Error::Expected("All items in a List must be same type",
+                                             node.exprs[i]->str(),
+                                             node.exprs[i + 1]->str(),
+                                             node.exprs[i + 1]->loc));
+                    return;
+                }
+            }
+            node.node_type = make_shared<Type>(Types::LIST);
+            node.node_type->types.push_back(node.exprs[0]->node_type);
+        }
+    }
+
+    void TypeChecker::visit(Tuple &node) {
+          // Visit children
+        for (auto expr : node.exprs) {
+            expr->accept(*this);
+        }
+        CheckPanic;
+        // Visit stops here
+
+        node.node_type = make_shared<Type>(Types::TUPLE);
+
+        for (size_t i = 0; i < node.exprs.size(); ++i) {
+            node.node_type->types.push_back(node.exprs[i]->node_type);
+        }
+    }
+
+
+    void TypeChecker::visit(Id &node) {
+        if (node.scope->exists(node.id)) {
+            node.node_type = node.scope->get_type(node.id);
+        } else {
+            AddError(Error(node.id + ": Id does not exist in the current scope",
+                           node.loc));
+            return;
+        }
+    }
+
+    void TypeChecker::visit(Call &node) {
+
+        // Visit children
+        node.callee->accept(*this);
+        for (auto expr : node.exprs) {
+            expr->accept(*this);
+        }
+        CheckPanic;
+        // Visit stops here
+
+        if (node.callee->node_type->type == Types::SIGNATURE) {
+            if (node.exprs.size() + 1 == node.callee->node_type->types.size()) {
+                for (size_t i = 0; i < node.exprs.size(); ++i) {
+                    if (node.exprs[i]->node_type->type == Types::EMPTYLIST &&
+                        node.callee->node_type->types[i]->type == Types::LIST) {
+                        node.exprs[i]->node_type = node.callee->node_type->types[i];
+                    } else if (!equal(node.exprs[i]->node_type, node.callee->node_type->types[i])) {
+                        AddError(Error::Expected("Function was called with an invalid argument",
+                                                 node.callee->node_type->types[i]->str(),
+                                                 node.exprs[i]->node_type->str(),
+                                                 node.exprs[i]->loc));
+                        return;
+                    }
+                }
+            } else {
+                AddError(Error::Expected("Wrong number of arguments",
+                                         to_string(node.callee->node_type->types.size() - 1),
+                                         to_string(node.exprs.size()),
+                                         node.loc));
+                return;
+            }
+            node.node_type = node.callee->node_type->types.back();
+        } else {
+            AddError(Error::Expected("Can't call a type that is not a Signature",
+                                     "Signature",
+                                     node.callee->node_type->str(),
+                                     node.callee->loc));
+            return;
+        }
+    }
+
+    void TypeChecker::visit(Type &node) {
+        for (auto type : node.types) {
+            type->accept(*this);
+        }
+    }
+
+    bool TypeChecker::equal(shared_ptr<Type> type1, shared_ptr<Type> type2) {
+        return *type1 == *type2;
+    }
 }

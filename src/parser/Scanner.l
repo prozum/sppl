@@ -18,7 +18,7 @@ typedef parser::Parser::token token;
 typedef parser::Parser::token_type token_type;
 
 #define yyterminate() return token::END
-#define YY_USER_ACTION  yylloc->columns(yyleng);
+#define YY_USER_ACTION  yylloc->columns = yyleng;
 
 using namespace std;
 %}
@@ -27,17 +27,18 @@ using namespace std;
 %%
 
 %{
-    yylloc->step();
+    yylloc->columns++;
 %}
 
 [ \t] {  }
 
 [\n] {
-    yylloc->lines(yyleng);
-    yylloc->step();
+    yylloc->lines = yyleng;
+    yylloc->columns = 1;
 }
 
-"#".*\n	{ }
+"#"[^\n]* {
+}
 
 "def" {
     return token::DEF;
@@ -60,7 +61,7 @@ using namespace std;
 }
 
 "Char"	{
-return token::CHARTYPE;
+    return token::CHARTYPE;
 }
 
 [0-9]+ {
@@ -74,9 +75,8 @@ return token::CHARTYPE;
 }
 
 "'"[^']"'" {
-    yylval->str_val = new string(yytext);
-    yylval->str_val->pop_back();
-    yylval->str_val->erase (0,1);
+
+    yylval->char_val =yytext[1];
     return token::CHARLITERAL;
 }
 
@@ -92,7 +92,7 @@ return token::CHARTYPE;
     return token::BOOLLITERAL;
 }
 
-[a-zA-Z][a-zA-Z0-9]* {
+[a-zA-Z_][a-zA-Z0-9_]* {
     yylval->str_val = new string(yytext);
     return token::ID;
 }

@@ -1,26 +1,36 @@
 #include "Compiler.h"
 #include "SpplJit.h"
 
-#include <iostream>
-#include <memory>
-#include <istream>
-#include <sstream>
-#include <string>
+#include <regex>
+
+using namespace jit;
 
 int main(int argc, char *argv[]) {
 
-    SpplJit::init_llvm();
+    SpplJit::Init_llvm();
 
-    std::stringstream input;
+    shared_ptr<ostream> ptr(&cout);
+    SpplJit jit(ptr);
 
-    SpplJit jit(&input, &cout);
-
-    string tmp("");
-    while (tmp.compare("q") != 0)
+    string input("");
+    string input_case("");
+    //jit.Eval("def test: Int\n| = 2*2");
+    while (input.compare("q") != 0)
     {
-        cout << "Input code:";
-        cin >> tmp;
-        jit.eval("def main: Float -> Float\n| x = " + tmp);
+        cout << ">>> ";
+        getline(cin, input);
+
+        if (!input.compare(0, 3, "def")) {
+            do
+            {
+                input += input_case;
+                cout << "... ";
+                getline(cin, input_case);
+            }
+            while(!(input_case.compare(0, 1, "|") && input_case.compare(0, 2, "\t|")));
+        }
+
+        jit.Eval(input);
         cout << endl << endl;
     }
 }

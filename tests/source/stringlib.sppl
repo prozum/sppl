@@ -1,0 +1,63 @@
+def main : [String] -> Int
+| (path : [])                                             = 0
+| (path : ( option : []))                                 = 0
+| (path : ( "--parse" : (in1 : xs)))                      = ParseString(in1)
+| (path : ( "--length" : (in1 : xs)))                     = StringLength(in1)
+| (path : ( option : ( in1 : [] )))                       = 0
+| (path : ( "--contains" : ( in1 : ( in2 : xs ))))        = BoolToInt(StringContains(in1, in2))
+| (path : ( option : ( in1 : ( in2 : [] ))))              = 0
+| (path : ( "--concat" : ( in1 : ( in2 : ( in3 : xs ))))) = BoolToInt(StringConcat(in1, in2) == in3)
+| args                                                    = 0
+
+def BoolToInt : Bool -> Int
+| True  = 1
+| False = 0
+
+def ParseString : String -> Int
+| x = ParseStringAcc(x, 0)
+
+def ParseStringAcc : String -> Int -> Int
+| "" acc       = acc
+| (x : xs) acc = ParseStringAcc(xs, (acc * 10) + ParseChar(x))
+
+def ParseChar : Char -> Int
+| '0' = 0
+| '1' = 1
+| '2' = 2
+| '3' = 3
+| '4' = 4
+| '5' = 5
+| '6' = 6
+| '7' = 7
+| '8' = 8
+| '9' = 9
+
+def StringLength : String -> Int
+| input = StringLengthAcc(input, 0)
+
+def StringLengthAcc : String -> Int -> Int
+| "" acc       = acc
+| (x : xs) acc = StringLengthAcc(xs, acc + 1)
+
+def StringConcat : String -> String -> String
+| "" ""            = ""
+| "" (x : back)    = x : StringConcat("", back)
+| (x : front) back = x : StringConcat(front, back)
+
+def StringContains : String -> String -> Bool
+| input find = StringContainsHelper(input, find, False)
+
+def StringContainsHelper : String -> String -> Bool -> Bool
+| "" "" bool         = bool
+| "" find bool       = False
+| input find True    = True
+| (x : xs) find bool = StringContainsHelper(xs, find, StringStartsWith(xs, find))
+
+def StringStartsWith : String -> String -> Bool
+| input find = StringStartsWithHelper(input, find, True)
+
+def StringStartsWithHelper : String -> String -> Bool -> Bool
+| input "" bool            = bool
+| "" find bool             = False
+| input find False         = False
+| (x : in) (y : find) bool = StringStartsWithHelper(in, find, x == y)

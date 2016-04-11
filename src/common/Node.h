@@ -1,5 +1,6 @@
 #pragma once
-#include "Visitor.h"
+
+#include "Location.h"
 
 #include <vector>
 #include <string>
@@ -7,7 +8,10 @@
 
 using namespace std;
 
+#define ANON_FUNC_NAME "__anon_func"
+
 namespace common {
+
     enum class Types {
         INT,
         FLOAT,
@@ -21,72 +25,169 @@ namespace common {
 		UNKNOWN
 	};
 
+	// Forward declarations
+	class Node;
+	class Expr;
+	class BinaryOp;
+	class UnaryOp;
+	class Type;
+	class Pattern;
+	class Program;
+	class Function;
+	class Case;
+	class Or;
+	class And;
+	class Equal;
+	class NotEqual;
+	class Lesser;
+	class Greater;
+	class LesserEq;
+	class GreaterEq;
+	class Add;
+	class Sub;
+	class Mul;
+	class Div;
+	class Mod;
+	class ListAdd;
+	class Par;
+	class Not;
+	class Int;
+	class Float;
+	class Bool;
+	class Char;
+	class String;
+	class ListPattern;
+	class TuplePattern;
+	class ListSplit;
+	class List;
+	class Tuple;
+	class Id;
+	class Call;
+	class Visitor;
 	class Scope;
 
-	/* Abstract Nodes */
 
+	string collection_str(Type &node, const std::string split);
+
+	// Abstract Nodes
 	class Node {
 	public:
-		Type* node_type;
-
+		shared_ptr<Type> node_type;
         // for the interpreter to save the children values of a Node
         // this should probably be moved into the visitor itself later
-        Expr *val;
+		shared_ptr<Expr> val;
 
-		virtual void accept(Visitor &v) = 0;
+		Location loc;
+
+		Node();
+		Node(Location);
+
+		virtual string str() = 0;
+		virtual void accept(Visitor &) = 0;
+	};
+
+	class Type : public Node {
+	public:
+		Types type;
+		vector<shared_ptr<Type>> types;
+
+		Type();
+		Type(Types);
+		Type(Types, Location);
+		Type(Types, vector<Type *>);
+		Type(Types, vector<Type *>, Location);
+		virtual ~Type();
+
+		virtual void accept(Visitor &v);
+		bool operator==(const Type &other) const;
+		bool operator!=(const Type &other) const;
+
+		string str();
 	};
 
 	class Expr : public Node {
 	public:
-		virtual void accept(Visitor &v) = 0;
+
+		Expr();
+		Expr(Location);
+
+		virtual void accept(Visitor &) = 0;
 	};
 
 	class BinaryOp : public Expr {
 	public:
-		Expr *left;
-		Expr *right;
+		shared_ptr<Expr> left;
+		shared_ptr<Expr> right;
 
-		virtual void accept(Visitor &v) = 0;
+		BinaryOp();
+		BinaryOp(Expr *, Expr *);
+		BinaryOp(Expr *, Expr *, Location);
+
+		virtual void accept(Visitor &) = 0;
 	};
 
 	class UnaryOp : public Expr {
 	public:
-		Expr *child;
+		shared_ptr<Expr> child;
 
-		virtual void accept(Visitor &v) = 0;
+		UnaryOp();
+		UnaryOp(Expr *);
+		UnaryOp(Expr *, Location);
+
+		virtual void accept(Visitor &) = 0;
 	};
 
 	class Pattern : public Expr {
 	public:
-		virtual void accept(Visitor &v) = 0;
+
+		Pattern();
+		Pattern(Location);
+
+		virtual void accept(Visitor &) = 0;
 	};
 
 	/* Declaration */
 
 	class Program : public Node {
 	public:
-		std::vector<Function*> funcs;
 
-		virtual void accept(Visitor &v);
+		vector<shared_ptr<Function>> funcs;
+
+		Program();
+		Program(vector<Function*>);
+		Program(vector<Function*>, Location);
+		Program(Expr *expr, Location);
+
+		virtual void accept(Visitor &);
+
+		string str();
 	};
 
 	class Function : public Node {
 	public:
-		std::string id;
-		std::vector<Type*> types;
-        std::vector<Case*> cases;
-		Scope *scope;
+		string id;
+        bool is_anon = false;
+		vector<shared_ptr<Type>> types;
+        vector<shared_ptr<Case>> cases;
+		Scope* scope;
 
-		Function() { }
-		Function(std::string s) { id = s; }
+		Function();
+		Function(std::string, bool is_anon = false);
+		Function(string, vector<Type*>);
+		Function(string, vector<Type*>, Location);
+		Function(string, Type*, Location);
+		Function(string, vector<Type*>, vector<Case*>);
+		Function(string, vector<Type*>, vector<Case*>, Location);
 
-		virtual void accept(Visitor &v);
+		virtual void accept(Visitor &);
+
+		string str();
 	};
 
 	class Case : public Node {
 	public:
-		std::vector<Pattern *> patterns;
-		Expr *expr;
+		shared_ptr<Expr> expr;
+		vector<shared_ptr<Pattern>> patterns;
 
         // used by the profiler to determine growth for case
 		// the first element in the vector is for the first test
@@ -102,10 +203,14 @@ namespace common {
 		// used by the optimizer to indicate if a case is tail recursive
         bool tail_rec = false;
 
-		Case() { }
-		Case(Expr *e) { expr = e; }
+		Case();
+		Case(Expr *);
+		Case(Expr *, vector<Pattern *>);
+		Case(Expr *, vector<Pattern *>, Location);
 
-		virtual void accept(Visitor &v);
+		virtual void accept(Visitor &);
+
+		string str();
 	};
 
 	/* Binary Operators */
@@ -113,127 +218,169 @@ namespace common {
 	class Or : public BinaryOp {
 	public:
 
-		Or() { }
-		Or(Expr *l, Expr *r) { left = l; right = r; }
+		Or();
+		Or(Expr *, Expr *);
+		Or(Expr *, Expr *, Location);
 
-		virtual void accept(Visitor &v);
+		virtual void accept(Visitor &);
+
+		string str();
 	};
 
 	class And : public BinaryOp {
 	public:
 
-		And() { }
-		And(Expr *l, Expr *r) { left = l; right = r; }
+		And();
+		And(Expr *, Expr *);
+		And(Expr *, Expr *, Location);
 
-		virtual void accept(Visitor &v);
+		virtual void accept(Visitor &);
+
+		string str();
 	};
 
 	class Equal : public BinaryOp {
 	public:
 
-		Equal() { }
-		Equal(Expr *l, Expr *r) { left = l; right = r; }
+		Equal();
+		Equal(Expr *, Expr *);
+		Equal(Expr *, Expr *, Location);
 
-		virtual void accept(Visitor &v);
+		virtual void accept(Visitor &);
+
+		string str();
 	};
 
 	class NotEqual : public BinaryOp {
 	public:
 
-		NotEqual() { }
-		NotEqual(Expr *l, Expr *r) { left = l; right = r; }
+		NotEqual();
+		NotEqual(Expr *, Expr *);
+		NotEqual(Expr *, Expr *, Location);
 
-		virtual void accept(Visitor &v);
+		virtual void accept(Visitor &);
+
+		string str();
 	};
 
 	class Lesser : public BinaryOp {
 	public:
 
-		Lesser() { }
-		Lesser(Expr *l, Expr *r) { left = l; right = r; }
+		Lesser();
+		Lesser(Expr *, Expr *);
+		Lesser(Expr *, Expr *, Location);
 
-		virtual void accept(Visitor &v);
+		virtual void accept(Visitor &);
+
+		string str();
 	};
 
 	class Greater : public BinaryOp {
 	public:
 
-		Greater() { }
-		Greater(Expr *l, Expr *r) { left = l; right = r; }
+		Greater();
+		Greater(Expr *, Expr *);
+		Greater(Expr *, Expr *, Location);
 
-		virtual void accept(Visitor &v);
+		virtual void accept(Visitor &);
+
+		string str();
 	};
 
 	class LesserEq : public BinaryOp {
 	public:
 
-		LesserEq() { }
-		LesserEq(Expr *l, Expr *r) { left = l; right = r; }
+		LesserEq();
+		LesserEq(Expr *, Expr *);
+		LesserEq(Expr *, Expr *, Location);
 
-		virtual void accept(Visitor &v);
+		virtual void accept(Visitor &);
+
+		string str();
 	};
 
 	class GreaterEq : public BinaryOp {
 	public:
 
-		GreaterEq() { }
-		GreaterEq(Expr *l, Expr *r) { left = l; right = r; }
+		GreaterEq();
+		GreaterEq(Expr *, Expr *);
+		GreaterEq(Expr *, Expr *, Location);
 
-		virtual void accept(Visitor &v);
+		virtual void accept(Visitor &);
+
+		string str();
 	};
 
 	class Add : public BinaryOp {
 	public:
 
-		Add() { }
-		Add(Expr *l, Expr *r) { left = l; right = r; }
+		Add();
+		Add(Expr *, Expr *);
+		Add(Expr *, Expr *, Location);
 
-		virtual void accept(Visitor &v);
+		virtual void accept(Visitor &);
+
+		string str();
 	};
 
 	class Sub : public BinaryOp {
 	public:
 
-		Sub() { }
-		Sub(Expr *l, Expr *r) { left = l; right = r; }
+		Sub();
+		Sub(Expr *, Expr *);
+		Sub(Expr *, Expr *, Location);
 
-		virtual void accept(Visitor &v);
+		virtual void accept(Visitor &);
+
+		string str();
 	};
 
 	class Mul : public BinaryOp {
 	public:
 
-		Mul() { }
-		Mul(Expr *l, Expr *r) { left = l; right = r; }
+		Mul();
+		Mul(Expr *, Expr *);
+		Mul(Expr *, Expr *, Location);
 
-		virtual void accept(Visitor &v);
+		virtual void accept(Visitor &);
+
+		string str();
 	};
 
 	class Div : public BinaryOp {
 	public:
 
-		Div() { }
-		Div(Expr *l, Expr *r) { left = l; right = r; }
+		Div();
+		Div(Expr *, Expr *);
+		Div(Expr *, Expr *, Location);
 
-		virtual void accept(Visitor &v);
+		virtual void accept(Visitor &);
+
+		string str();
 	};
 
 	class Mod : public BinaryOp {
 	public:
 
-		Mod() { }
-		Mod(Expr *l, Expr *r) { left = l; right = r; }
+		Mod();
+		Mod(Expr *, Expr *);
+		Mod(Expr *, Expr *, Location);
 
-		virtual void accept(Visitor &v);
+		virtual void accept(Visitor &);
+
+		string str();
 	};
 
 	class ListAdd : public BinaryOp {
 	public:
 
-		ListAdd() { }
-		ListAdd(Expr *l, Expr *r) { left = l; right = r; }
+		ListAdd();
+		ListAdd(Expr *, Expr *);
+		ListAdd(Expr *, Expr *, Location);
 
-		virtual void accept(Visitor &v);
+		virtual void accept(Visitor &);
+
+		string str();
 	};
 
 	/* Unary Operators */
@@ -241,153 +388,204 @@ namespace common {
 	class Par : public UnaryOp {
 	public:
 
-		Par() { }
-		Par(Expr *c) { child = c; }
+		Par();
+		Par(Expr *);
+		Par(Expr *, Location);
 
-		virtual void accept(Visitor &v);
+		virtual void accept(Visitor &);
+
+		string str();
 	};
 
 	class Not : public UnaryOp {
 	public:
 
-		Not() { }
-		Not(Expr *c) { child = c; }
+		Not();
+		Not(Expr *);
+		Not(Expr *, Location);
 
-		virtual void accept(Visitor &v);
+		virtual void accept(Visitor &);
+
+		string str();
 	};
 
 	/* Literals */
 
 	class Int : public Pattern {
 	public:
-		int value;
+		long value;
 
-		Int() { }
-		Int(int v) { value = v; }
+		Int(long);
+		Int(long, Location);
 
-		virtual void accept(Visitor &v);
+		virtual void accept(Visitor &);
+
+		string str();
 	};
 
 	class Float : public Pattern {
 	public:
-		float value;
+		double value;
 
-		Float() { }
-		Float(float v) { value = v; }
+		Float(double);
+		Float(double, Location);
 
-		virtual void accept(Visitor &v);
+		virtual void accept(Visitor &);
+
+		string str();
 	};
 
 	class Bool : public Pattern {
 	public:
 		bool value;
 
-		Bool() { }
-		Bool(bool v) { value = v; }
+		Bool(bool);
+		Bool(bool, Location);
 
-		virtual void accept(Visitor &v);
+		virtual void accept(Visitor &);
+
+		string str();
 	};
 
 	class Char : public Pattern {
 	public:
 		char value;
-		std::string tmp;
 
-		Char() { }
-		Char(char v) { value = v; }
-		Char(std::string v) { tmp = v; }
+		Char(char);
+		Char(char, Location);
 
-		virtual void accept(Visitor &v);
+		virtual void accept(Visitor &);
+
+		string str();
 	};
 
 	class String : public Pattern {
 	public:
-		std::string value;
+		string value;
 
-		String() { }
-		String(std::string v) { value = v; }
+		String(std::string);
+		String(string, Location);
 
-		virtual void accept(Visitor &v);
+		virtual void accept(Visitor &);
+
+		string str();
 	};
 
 	class ListPattern : public Pattern {
 	public:
-		std::vector<Pattern *> patterns;
+		vector<shared_ptr<Pattern>> patterns;
 
-		virtual void accept(Visitor &v);
+		ListPattern();
+		ListPattern(vector<Pattern *>);
+		ListPattern(vector<Pattern *>, Location);
+
+		virtual void accept(Visitor &);
+
+		string str();
 	};
 
 	class TuplePattern : public Pattern {
 	public:
-		std::vector<Pattern *> patterns;
+		vector<shared_ptr<Pattern>> patterns;
 
-		virtual void accept(Visitor &v);
+		TuplePattern();
+		TuplePattern(vector<Pattern *>);
+		TuplePattern(vector<Pattern *>, Location);
+
+		virtual void accept(Visitor &);
+
+		string str();
 	};
 
 	class ListSplit : public Pattern {
 	public:
-		Pattern *left;
-		Pattern *right;
+		shared_ptr<Pattern> left;
+		shared_ptr<Pattern> right;
 
-		ListSplit() { }
-		ListSplit(Pattern *l, Pattern *r) { left = l; right = r; }
+		ListSplit();
+		ListSplit(Pattern *, Pattern *);
+		ListSplit(Pattern *, Pattern *, Location);
 
-		virtual void accept(Visitor &v);
+		virtual void accept(Visitor &);
+
+		string str();
 	};
 
 	/* Other Expressions */
 
 	class List : public Expr {
 	public:
-		std::vector<Expr*> exprs;
+		vector<shared_ptr<Expr>> exprs;
 
-		virtual void accept(Visitor &v);
+		List();
+		List(vector<Expr*>);
+		List(vector<Expr*>, Location);
+
+		virtual void accept(Visitor &);
+
+		string str();
 	};
 
 	class Tuple : public Expr {
 	public:
-		std::vector<Expr*> exprs;
+		vector<shared_ptr<Expr>> exprs;
 
-		virtual void accept(Visitor &v);
+		Tuple();
+		Tuple(vector<Expr*>);
+		Tuple(vector<Expr*>, Location);
+
+		virtual void accept(Visitor &);
+
+		string str();
 	};
 
 	class Id : public Pattern {
 	public:
-		std::string id;
-		Scope *scope;
+		string id;
+		Scope* scope;
 
-		Id() { }
-		Id(std::string i) { id = i; }
+		Id();
+		Id(std::string);
+		Id(string, Location);
 
-		virtual void accept(Visitor &v);
+		virtual void accept(Visitor &);
+
+		string str();
 	};
 
 	class Call : public Expr {
 	public:
-		Expr *callee;
-		std::vector<Expr*> exprs;
+		shared_ptr<Expr> callee;
+		vector<shared_ptr<Expr>> exprs;
 
         //indicates if the call should be parallelized
         bool par = false;
 
-		Call() { }
-		Call(Expr *c) { callee = c; }
+		Call();
+		Call(Expr *);
+		Call(Expr *, vector<Expr*>);
+		Call(Expr *, vector<Expr*>, Location);
 
-		virtual void accept(Visitor &v);
+		virtual void accept(Visitor &);
+
+		string str();
 	};
+}
 
-	class Type : public Node {
-	public:
-		Types type = Types::UNKNOWN;
-		std::vector<Type *> types;
+namespace std
+{
+	template <>
+    struct hash<common::Type>
+    {
+        std::size_t operator()(const common::Type& k) const
+        {
+            size_t res = std::hash<int>()(static_cast<int>(k.type));
 
-        Type() { }
-		Type(Types t) { type = t; }
-		Type(Types t, std::vector<Type *> *ts) { type = t; types = *ts; }
+            for (auto type : k.types) {
+                res ^= (hash<common::Type>()(*type) << 1);
+            }
 
-		virtual void accept(Visitor &v);
-		bool operator==(const Type &other) const;
-
-		virtual ~Type();
-	};
+            return res;
+        }
+    };
 }

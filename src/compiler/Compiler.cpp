@@ -1,12 +1,13 @@
 #include "Compiler.h"
-#include "Printer.h"
+
 namespace compiler {
-
-    Compiler::Compiler(istream* in, ostream* out) : input(in), output(out)
-    {
-    }
-
-    Compiler::Compiler(istream *in, ostream *out, ostream *hout) : input(in), output(out), header_output(hout) {
+    Compiler::Compiler(shared_ptr<istream> in,
+                       shared_ptr<ostream> out,
+                       shared_ptr<ostream> hout)
+            : input(in),
+              output(out),
+              header_output(hout),
+              scope_generator(semantics::ScopeGenerator(driver.global.get())) {
 
     }
 
@@ -16,7 +17,7 @@ namespace compiler {
         {
 #ifdef CCPP
             case Backend::CPP:
-                generator = make_unique<codegen::CCodeGenerator>(*output, *header_output);
+                generator = make_unique<codegen::CCodeGenerator>(output, header_output);
                 break;
 #endif
 #ifdef CGNUASM
@@ -31,27 +32,32 @@ namespace compiler {
 #endif
 #ifdef CLLVM
             case Backend::LLVM:
-                generator = make_unique<codegen::LLVMCodeGenerator>(*output);
+                generator = make_unique<codegen::LLVMCodeGenerator>(output);
                 break;
 #endif
             case Backend::PPRINTER:
-                generator = make_unique<codegen::Printer>(*output);
+                generator = make_unique<codegen::Printer>(output);
             default:
                 throw "Not a valid backend";
         }
     }
 
-    void Compiler::compile() {
+    int Compiler::compile() {
 
         driver.parse_stream(*input);
-        if (driver.main == nullptr)
-            return;
+        if (driver.program == nullptr)
+            return 1;
 
-        scope_generator.visit(*driver.main);
-        type_checker.visit(*driver.main);
+        //case_checker.visit(*driver.program);
+        scope_generator.visit(*driver.program);
+        if (scope_generator.HasError())
+            return 2;
 
-        generator->visit(*driver.main);
+        type_checker.visit(*driver.program);
+        if (type_checker.HasError())
+            return 3;
+
+        generator->visit(*driver.program);
+        return 0;
     }
-
-
 }
