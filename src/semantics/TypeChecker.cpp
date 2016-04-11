@@ -28,7 +28,7 @@ namespace semantics
         }
 
         if (node.types.size() > 0)
-            node.node_type = node.types[0];
+            node.node_type = node.types.back();
 
         for (auto cse : node.cases) {
             cse->accept(*this);
@@ -71,7 +71,10 @@ namespace semantics
             return;
         }
 
-        if (!equal(current_func->types.back(), node.expr->node_type)) {
+        if (node.expr->node_type->type == Types::EMPTYLIST &&
+            current_func->types.back()->type == Types::LIST) {
+            node.expr->node_type = current_func->types.back();
+        } else if (!equal(current_func->types.back(), node.expr->node_type)) {
             AddError(Error::Expected("Wrong return type",
                                      current_func->types.back()->str(),
                                      node.expr->node_type->str(),
