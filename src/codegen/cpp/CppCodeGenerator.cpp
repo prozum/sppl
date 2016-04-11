@@ -893,17 +893,11 @@ namespace codegen
         // generation of concat
         result << name << "* " << g_generated << g_concat << name << "(" << name << "* list1, " << name << "* list2) { \n"
                    "    int i; \n"
-                   "    " << name << "* res = " << g_generated << g_create << name << "(0); \n"
-                   " \n"
-                   "    for (i = list2->" << g_size << " - 1; i >= 0; --i) { \n"
-                   "        res = " << g_generated << g_add << name << "(res, " << g_generated << g_valueat << name << "(list2, i)); \n"
-                   "    } \n"
-                   " \n"
                    "    for (i = list1->" << g_size << " - 1; i >= 0; --i) { \n"
-                   "        res = " << g_generated << g_add << name << "(res, " << g_generated << g_valueat << name << "(list1, i)); \n"
+                   "        list2 = " << g_generated << g_add << name << "(list2, " << g_generated << g_valueat << name << "(list1, i)); \n"
                    "    } \n"
                    " \n"
-                   "    return res; \n"
+                   "    return list2; \n"
                    "} \n"
                    "\n";
 
