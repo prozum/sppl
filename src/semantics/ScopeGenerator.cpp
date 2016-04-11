@@ -3,12 +3,10 @@
 #include "ScopeGenerator.h"
 
 namespace semantics {
-    ScopeGenerator::ScopeGenerator() { }
+    ScopeGenerator::ScopeGenerator(Scope* global)
+            : current_scope(global) { }
 
     void ScopeGenerator::visit(Program &node) {
-        res = new Scope();
-        current_scope = res;
-
         // Visit children
         for (auto func : node.funcs) {
             func->accept(*this);
@@ -18,7 +16,7 @@ namespace semantics {
 
     void ScopeGenerator::visit(Function &node) {
         current_func = &node;
-        node.scope = shared_ptr<Scope>(current_scope);
+        node.scope = current_scope;
 
         if (!current_scope->exists(node.id)) {
             auto type = make_shared<Type>(Types::SIGNATURE);
@@ -45,7 +43,7 @@ namespace semantics {
 
     void ScopeGenerator::visit(Case &node) {
         auto case_scope = new Scope(current_scope);
-        current_scope->children.push_back(shared_ptr<Scope>(case_scope));
+        current_scope->children.push_back(unique_ptr<Scope>(case_scope));
         current_scope = case_scope;
 
         // Visit children
@@ -238,7 +236,7 @@ namespace semantics {
     }
 
     void ScopeGenerator::visit(Id &node) {
-        node.scope = shared_ptr<Scope>(current_scope);
+        node.scope = current_scope;
 
         if (context == ScopeContext::PATTERN) {
             if (!current_scope->exists(node.id)) {

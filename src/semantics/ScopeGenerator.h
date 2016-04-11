@@ -17,9 +17,7 @@ namespace semantics {
 
     class ScopeGenerator : public Visitor {
     public:
-        Scope *res;
-
-        ScopeGenerator();
+        ScopeGenerator(Scope*);
 
         void visit(Program &node);
         void visit(Function &node);

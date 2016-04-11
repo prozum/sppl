@@ -7,7 +7,7 @@ endif()
 if(CGNUASM)
     add_subdirectory(gnuasm)
 endif()
-if(CLLVM)
+if(CLLVM OR JIT)
     add_subdirectory(llvm)
 endif()
 

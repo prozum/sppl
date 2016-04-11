@@ -156,7 +156,7 @@ namespace common {
 		Program();
 		Program(vector<Function*>);
 		Program(vector<Function*>, Location);
-		Program(string id, Expr *expr, Location);
+		Program(Expr *expr, Location);
 
 		virtual void accept(Visitor &);
 
@@ -166,12 +166,13 @@ namespace common {
 	class Function : public Node {
 	public:
 		string id;
+        bool is_anon = false;
 		vector<shared_ptr<Type>> types;
         vector<shared_ptr<Case>> cases;
-		shared_ptr<Scope> scope;
+		Scope* scope;
 
 		Function();
-		Function(std::string);
+		Function(std::string, bool is_anon = false);
 		Function(string, vector<Type*>);
 		Function(string, vector<Type*>, Location);
 		Function(string, Type*, Location);
@@ -541,7 +542,7 @@ namespace common {
 	class Id : public Pattern {
 	public:
 		string id;
-		shared_ptr<Scope> scope;
+		Scope* scope;
 
 		Id();
 		Id(std::string);

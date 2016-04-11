@@ -1,17 +1,17 @@
+#include "Driver.h"
+
 #include <fstream>
 #include <sstream>
 #include <ostream>
-
-#include "Driver.h"
-#include "Scanner.h"
-#include "Error.h"
 
 namespace parser {
 
 Driver::Driver()
         : trace_scanning(false),
-          trace_parsing(false)
+          trace_parsing(false),
+          global(new common::Scope())
     {
+
     }
 
     bool Driver::parse_stream(std::istream &in, const std::string &sname)
@@ -40,9 +40,11 @@ Driver::Driver()
         return parse_stream(iss, sname);
     }
 
-    void Driver::accept(common::Visitor &visitor)
+    bool Driver::accept(common::Visitor &visitor)
     {
         program->accept(visitor);
+
+        return visitor.HasError();
     }
 
     void Driver::error(const common::Location& loc,

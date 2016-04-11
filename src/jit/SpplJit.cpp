@@ -5,7 +5,8 @@ namespace jit {
     SpplJit::SpplJit(shared_ptr<ostream> out) : Machine(EngineBuilder().selectTarget()),
                                                 Layout(Machine->createDataLayout()),
                                                 CompileLayer(ObjectLayer, SimpleCompiler(*Machine)),
-                                                Generator(out) {
+                                                Generator(out),
+                                                ScopeGenerator(Driver.global.get()) {
         llvm::sys::DynamicLibrary::LoadLibraryPermanently(nullptr);
         init_module_passmanager();
     }
@@ -27,8 +28,7 @@ namespace jit {
     }
 
     void SpplJit::remove_module(ModuleHandleT handler) {
-        ModuleHandles.erase(
-                std::find(ModuleHandles.begin(), ModuleHandles.end(), handler));
+        ModuleHandles.erase(std::find(ModuleHandles.begin(), ModuleHandles.end(), handler));
         CompileLayer.removeModuleSet(handler);
     }
 
@@ -96,20 +96,20 @@ namespace jit {
         }
     }
 
-    string SpplJit::get_tuple_output(intptr_t addr, vector<common::Type *> node_types) {
+    string SpplJit::get_tuple_output(intptr_t addr, vector<shared_ptr<common::Type>> node_types) {
         string out("(");
         for (auto &node_type: node_types) {
             switch (node_type->type) {
                 case common::Types::INT:
-                    out += get_output(*(int64_t *) addr, node_type);
+                    out += get_output(*(int64_t *) addr, node_type.get());
                     addr += sizeof(int64_t);
                     break;
                 case common::Types::FLOAT:
-                    out += get_output(addr, node_type);
+                    out += get_output(addr, node_type.get());
                     addr += sizeof(double);
                     break;
                 case common::Types::STRING:
-                    out += get_output(*(intptr_t *) addr, node_type);
+                    out += get_output(*(intptr_t *) addr, node_type.get());
                     addr += sizeof(intptr_t *);
                     break;
                 case common::Types::TUPLE:
@@ -131,13 +131,11 @@ namespace jit {
         if (!Driver.parse_string(str))
             return;
 
-        Driver.accept(ScopeGenerator);
-        if (ScopeGenerator.HasError()) {
+        if (!Driver.accept(ScopeGenerator)) {
             return;
         }
 
-        Driver.accept(TypeChecker);
-        if (TypeChecker.HasError()) {
+        if (!Driver.accept(TypeChecker)) {
             return;
         }
 
@@ -150,18 +148,18 @@ namespace jit {
         // Print LLVM Module
         cout << Generator.ModuleString();
 
-        auto handler = add_module(std::move(Generator.Module));
-        init_module_passmanager();
+        //auto handler = add_module(std::move(Generator.Module));
+        //init_module_passmanager();
 
         // Only run anonymous functions
-        if (func_node->id.compare(ANON_FUNC_NAME) == 0) {
+        if (func_node->is_anon) {
             auto func = find_symbol(func_node->id);
             auto func_jit = (size_t (*)()) func.getAddress();
 
-            string output = get_output(func_jit(), func_node->node_type);
+            string output = get_output(func_jit(), func_node->node_type.get());
             cout << "output: " << output << endl;
         }
 
-        remove_module(handler);
+        //remove_module(handler);
     }
 }

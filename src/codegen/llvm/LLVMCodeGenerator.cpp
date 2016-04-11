@@ -57,7 +57,7 @@ namespace codegen {
         
         std::vector<Type *> tmp_vec;
         for (auto &sub_type: node_type->types)
-            tmp_vec.push_back(get_type(sub_type));
+            tmp_vec.push_back(get_type(sub_type.get()));
         llvm::ArrayRef<Type *> types(tmp_vec);
 
         auto new_type = StructType::create(getGlobalContext(), types);
@@ -73,7 +73,7 @@ namespace codegen {
         if (type != list_types.end())
             return type->second;
 
-        vector<llvm::Type *> tmp_vec = { get_type(node_type->types[0], true), Type::getInt64Ty(getGlobalContext()) };
+        vector<llvm::Type *> tmp_vec = { get_type(node_type->types[0].get(), true), Type::getInt64Ty(getGlobalContext()) };
         llvm::ArrayRef<Type *> types(tmp_vec);
 
         auto new_type = StructType::create(getGlobalContext(), types);
@@ -85,12 +85,12 @@ namespace codegen {
     void LLVMCodeGenerator::visit(common::Function &node) {
 
         // Get output type
-        Type *output_type = get_type(node.types[0]);
+        auto output_type = get_type(node.types[0].get());
 
         // Get input types
         std::vector<Type *> input_types;
         for (size_t i = 0; i < node.types.size() - 1; i++) {
-            input_types.push_back(get_type(node.types[i]));
+            input_types.push_back(get_type(node.types[i].get()));
         }
 
         // Setup function input/output types
@@ -352,19 +352,19 @@ namespace codegen {
     }
 
     void LLVMCodeGenerator::visit(common::Float &node) {
-        cur_val = ConstantFP::get(get_type(node.node_type), node.value);
+        cur_val = ConstantFP::get(get_type(node.node_type.get()), node.value);
     }
 
     void LLVMCodeGenerator::visit(common::Int &node) {
-        cur_val = ConstantInt::get(get_type(node.node_type), node.value);
+        cur_val = ConstantInt::get(get_type(node.node_type.get()), node.value);
     }
 
     void LLVMCodeGenerator::visit(common::Bool &node) {
-        cur_val = ConstantInt::get(get_type(node.node_type), node.value);
+        cur_val = ConstantInt::get(get_type(node.node_type.get()), node.value);
     }
 
     void LLVMCodeGenerator::visit(common::Char &node) {
-        cur_val = ConstantInt::get(get_type(node.node_type), node.value);
+        cur_val = ConstantInt::get(get_type(node.node_type.get()), node.value);
     }
 
     void LLVMCodeGenerator::visit(common::String &node) {
@@ -415,7 +415,7 @@ namespace codegen {
 
         ArrayRef<Constant *> tuple_val(tmp);
 
-        auto const_val = ConstantStruct::get(get_tuple_type(node.node_type), tuple_val);
+        auto const_val = ConstantStruct::get(get_tuple_type(node.node_type.get()), tuple_val);
         cur_val = new GlobalVariable(*Module.get(), const_val->getType(), true, GlobalVariable::ExternalLinkage, const_val);
 
     }
@@ -430,7 +430,7 @@ namespace codegen {
 
         ArrayRef<Constant *> list_data(tmp);
 
-        auto list_type = ArrayType::get(get_type(node.node_type->types[0]), node.exprs.size());
+        auto list_type = ArrayType::get(get_type(node.node_type->types[0].get()), node.exprs.size());
         auto const_val = ConstantArray::get(list_type, list_data);
 
         cur_val = new GlobalVariable(*Module.get(), const_val->getType(), true, GlobalVariable::ExternalLinkage, const_val);

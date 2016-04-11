@@ -1,2 +1,2 @@
-add_executable(jit Main.cpp SpplJit.cpp SpplJit.h)
-target_link_libraries(jit common parser compiler semantics)
+add_executable(jit-repl Main.cpp)
+target_link_libraries(jit-repl jit)

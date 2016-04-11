@@ -10,7 +10,7 @@ namespace common {
         std::unordered_map<std::string, shared_ptr<Type>> decls;
 
         Scope* parent;
-        std::vector<shared_ptr<Scope>> children;
+        std::vector<unique_ptr<Scope>> children;
 
         Scope() : Scope(nullptr) { }
         Scope(Scope* p);

@@ -48,11 +48,9 @@ namespace jit {
         void init_module_passmanager();
 
         ModuleHandleT add_module(std::unique_ptr<llvm::Module> m);
-
         void remove_module(ModuleHandleT handler);
 
         JITSymbol find_symbol(const std::string name);
-
         JITSymbol find_mangled_symbol(const std::string &name);
 
         std::string mangle(const std::string &name);
@@ -63,15 +61,13 @@ namespace jit {
         CompileLayerT CompileLayer;
         std::vector<ModuleHandleT> ModuleHandles;
         std::unique_ptr<legacy::FunctionPassManager> PassManager;
-
+        parser::Driver Driver;
+        codegen::LLVMCodeGenerator Generator;
         semantics::ScopeGenerator ScopeGenerator;
         semantics::TypeChecker TypeChecker;
-        codegen::LLVMCodeGenerator Generator;
-        parser::Driver Driver;
 
         string get_output(intptr_t data, common::Type *node_type);
-
-        string get_tuple_output(intptr_t addr, vector<common::Type *> node_type);
+        string get_tuple_output(intptr_t addr, vector<shared_ptr<common::Type>> node_type);
 
         template<typename T>
         static std::vector<T> singletonSet(T t) {
