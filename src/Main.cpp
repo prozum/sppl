@@ -94,5 +94,16 @@ int main(int argc, char *argv[])
     compiler::Compiler compiler(in, out, hout);
     compiler.set_backend(backend);
 
-    return compiler.compile();
+    int res = compiler.compile();
+
+    switch (res) {
+        case 2:
+            compiler.scope_generator.OutError(cerr);
+            break;
+        case 3:
+            compiler.type_checker.OutError(cerr);
+            break;
+    }
+
+    return res;
 }

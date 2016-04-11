@@ -52,11 +52,10 @@ namespace semantics
 
         if (node.patterns.size() + 1 == current_func->types.size()) {
             for (size_t i = 0; i < node.patterns.size(); ++i) {
-                if (node.patterns[i]->node_type->type == Types::EMPTYLIST) {
+                if (node.patterns[i]->node_type->type == Types::EMPTYLIST &&
+                    current_func->types[i]->type == Types::LIST) {
                     node.patterns[i]->node_type = current_func->types[i];
-                }
-
-                if (!equal(node.patterns[i]->node_type, current_func->types[i])) {
+                } else if (!equal(node.patterns[i]->node_type, current_func->types[i])) {
                     AddError(Error::Expected("Wrong pattern type",
                                 current_func->types[i]->str(),
                                 node.patterns[i]->node_type->str(),
@@ -528,7 +527,10 @@ namespace semantics
         if (node.callee->node_type->type == Types::SIGNATURE) {
             if (node.exprs.size() + 1 == node.callee->node_type->types.size()) {
                 for (size_t i = 0; i < node.exprs.size(); ++i) {
-                    if (!equal(node.exprs[i]->node_type, node.callee->node_type->types[i])) {
+                    if (node.exprs[i]->node_type->type == Types::EMPTYLIST &&
+                        node.callee->node_type->types[i]->type == Types::LIST) {
+                        node.exprs[i]->node_type = node.callee->node_type->types[i];
+                    } else if (!equal(node.exprs[i]->node_type, node.callee->node_type->types[i])) {
                         AddError(Error::Expected("Function was called with an invalid argument",
                                                  node.callee->node_type->types[i]->str(),
                                                  node.exprs[i]->node_type->str(),

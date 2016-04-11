@@ -599,12 +599,11 @@ namespace codegen
         }
 
         // create list
-        *output << g_generated << g_create << name << "(" << node.exprs.size() << ", ";
+        *output << g_generated << g_create << name << "(" << node.exprs.size();
         for (int i = node.exprs.size() - 1; i >= 0; i--) {
-            node.exprs[i]->accept(*this);
+            *output << ", ";
 
-            if (i != 0)
-                *output << ", ";
+            node.exprs[i]->accept(*this);
         }
 
         *output << ")";
@@ -828,7 +827,6 @@ namespace codegen
         /* generation of list constructer ends here */
 
         /* generation of at function starts here */
-        /* generation of at function starts here */
         result << last_type << " " << g_generated << g_at << name << "(" << name << "* this, int index) { \n"
                   "    if (index >= this->" << g_head << ") { \n"
                   "        printf(\"Out of bound!\"); \n"
@@ -885,8 +883,6 @@ namespace codegen
                   "} \n"
                   " \n";
         /* generation of compare function ends here */
-
-        /* TODO */
 
         // writing list to headerfile
         *header << result.str();
