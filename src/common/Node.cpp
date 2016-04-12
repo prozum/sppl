@@ -771,6 +771,8 @@ namespace common {
                 return "(" + collection_str(*this, ", ") + ")";
             case Types::SIGNATURE:
                 return  "(" + collection_str(*this, " -> ") + ")";
+            case Types::EMPTYLIST:
+                return "[]";
             default:
                 throw Error::NotImplemented("");
         }
