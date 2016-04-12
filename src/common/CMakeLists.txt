@@ -1,1 +1,1 @@
-add_library(common Visitor.cpp Visitor.h  Node.cpp Node.h Scope.cpp Scope.h CodeGenerator.cpp CodeGenerator.h Error.cpp Error.h Location.cpp Location.h)
+add_library(common Visitor.cpp Visitor.h  Node.cpp Node.h Scope.cpp Scope.h CodeGenerator.cpp CodeGenerator.h Error.cpp Error.h Location.cpp Location.h Type.cpp Type.h BinaryOp.cpp BinaryOp.h UnaryOp.cpp UnaryOp.h Pattern.cpp Pattern.h Common.h)

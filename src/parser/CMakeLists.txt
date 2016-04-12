@@ -10,6 +10,7 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 add_library(parser
         ${BISON_SpplParser_OUTPUTS}
         ${FLEX_SpplScanner_OUTPUTS}
-        Scanner.h Driver.h Driver.cpp)
+        Scanner.h Driver.h Driver.cpp
+        Variant.h Variant.cpp)
 target_link_libraries(parser common)
 

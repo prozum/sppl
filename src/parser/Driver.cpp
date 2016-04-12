@@ -44,7 +44,7 @@ Driver::Driver()
     {
         program->accept(visitor);
 
-        return visitor.HasError();
+        return !visitor.HasError();
     }
 
     void Driver::error(const common::Location& loc,

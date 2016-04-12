@@ -1,4 +1,10 @@
 #pragma once
+
+#include "Compiler.h"
+#include "Driver.h"
+#include "TypeChecker.h"
+#include "ScopeGenerator.h"
+
 #include <llvm/ExecutionEngine/ExecutionEngine.h>
 #include <llvm/ExecutionEngine/Orc/CompileUtils.h>
 #include <llvm/ExecutionEngine/Orc/IRCompileLayer.h>
@@ -18,11 +24,6 @@
 #include <llvm/IR/Verifier.h>
 #include <llvm/Support/TargetSelect.h>
 #include <llvm/Transforms/Scalar.h>
-
-#include "Compiler.h"
-#include "Driver.h"
-#include "TypeChecker.h"
-#include "ScopeGenerator.h"
 
 using namespace llvm;
 using namespace llvm::orc;
@@ -61,13 +62,14 @@ namespace jit {
         CompileLayerT CompileLayer;
         std::vector<ModuleHandleT> ModuleHandles;
         std::unique_ptr<legacy::FunctionPassManager> PassManager;
+
         parser::Driver Driver;
         codegen::LLVMCodeGenerator Generator;
         semantics::ScopeGenerator ScopeGenerator;
         semantics::TypeChecker TypeChecker;
 
-        string get_output(intptr_t data, common::Type *node_type);
-        string get_tuple_output(intptr_t addr, vector<shared_ptr<common::Type>> node_type);
+        string get_output(intptr_t data, common::Type type);
+        string get_tuple_output(intptr_t addr, common::Type tuple_type);
 
         template<typename T>
         static std::vector<T> singletonSet(T t) {

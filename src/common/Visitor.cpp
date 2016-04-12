@@ -15,8 +15,10 @@ namespace common {
     void Visitor::OutError(ostream &out) {
 
         for (auto &err: Errors) {
-            out << err;
+            out << err << endl;
         }
+
+        Errors.clear();
     }
 }
 

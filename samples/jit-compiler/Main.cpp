@@ -33,4 +33,5 @@ int main(int argc, char *argv[]) {
         jit.Eval(input);
         cout << endl << endl;
     }
+    //ptr.re;
 }

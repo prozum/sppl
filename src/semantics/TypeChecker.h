@@ -76,11 +76,7 @@ namespace semantics {
 
         virtual void visit(Call &node);
 
-        virtual void visit(Type &node);
-
     private:
         Function *current_func;
-
-        bool equal(shared_ptr<Type> type1, shared_ptr<Type> type2);
     };
 }

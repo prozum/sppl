@@ -14,6 +14,7 @@
 #include <iostream>
 
 #include "CodeGenerator.h"
+#include "Driver.h"
 
 using namespace std;
 
@@ -40,6 +41,10 @@ private:
 
 	std::unordered_map<common::Type, llvm::StructType *> tuple_types;
 	std::unordered_map<common::Type, llvm::StructType *> list_types;
+    std::unordered_map<common::Type, llvm::FunctionType *> func_types;
+	std::map<std::string, llvm::Function *> Functions;
+
+	parser::Driver Driver;
     llvm::Function *cur_func;
     llvm::Value *cur_val;
     llvm::BasicBlock *cur_pattern_block;
@@ -80,9 +85,10 @@ private:
     void visit(common::Call &node);
 	void visit(common::Par &node);
 
-    llvm::Type *get_type(common::Type *node_type, bool ptr = false);
-	llvm::StructType *get_tuple_type(common::Type *node_type);
-	llvm::StructType *get_list_type(common::Type *node_type);
+    llvm::Type *get_type(common::Type node_type, bool ptr = false);
+	llvm::StructType *get_tuple_type(common::Type type);
+	llvm::StructType *get_list_type(common::Type type);
+    llvm::FunctionType *get_func_type(common::Type type);
 
     llvm::Value *compare(llvm::Value *val1, llvm::Value *val2);
 

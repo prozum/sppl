@@ -4,13 +4,22 @@ namespace common {
 
     Location::Location() { }
 
-    Location::Location(int l, int c, string src) {
+    /*
+    Location::Location(const common::Location& other) {
+        lines = other.lines;
+        columns = other.columns;
+        source = other.source;
+    }
+    */
+
+    Location::Location(int l, int c) {
         lines = l;
         columns = c;
-        source = src;
     }
 
     ostream &operator<<(ostream &o, const Location &loc) {
-        return o << loc.source << ":" << loc.lines << ":" << loc.columns;
+        //if (loc.source.empty())
+            return o << loc.lines << ":" << loc.columns;
+        //return o << loc.source << ":" << loc.lines << ":" << loc.columns;
     }
 }

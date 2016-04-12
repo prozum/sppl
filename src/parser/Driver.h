@@ -31,8 +31,6 @@ class Driver
         void error(const std::string &msg);
 
         class Scanner* lexer;
-        common::Program *program = nullptr;
-        common::Program *global_scope;
-
+        unique_ptr<common::Program> program;
 };
 }

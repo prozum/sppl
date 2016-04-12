@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Node.h"
+#include "Common.h"
 #include "Error.h"
 
 #include <vector>
@@ -50,6 +50,6 @@ namespace common {
 		virtual void visit(Tuple &node) { throw "Not implemented"; }
 		virtual void visit(Id &node) { throw "Not implemented"; }
 		virtual void visit(Call &node) { throw "Not implemented"; }
-		virtual void visit(Type &node) { throw "Not implemented"; }
+		//virtual void visit(TypeNode &node) { throw "Not implemented"; }
 	};
 }

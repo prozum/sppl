@@ -8,7 +8,7 @@ namespace semantics {
 
     void ScopeGenerator::visit(Program &node) {
         // Visit children
-        for (auto func : node.funcs) {
+        for (auto &func: node.funcs) {
             func->accept(*this);
         }
         // Visit stops here
@@ -18,19 +18,16 @@ namespace semantics {
         current_func = &node;
         node.scope = current_scope;
 
-        if (!current_scope->exists(node.id)) {
-            auto type = make_shared<Type>(Types::SIGNATURE);
+        if (!current_scope->exists(node.id) || node.is_anon) {
+            auto type = Type(TypeId::SIGNATURE);
 
-            for (auto i : node.types)
-                type->types.push_back(i);
+            for (auto &type: node.signature.subtypes)
+                type.subtypes.push_back(type);
 
             current_scope->decls.insert({node.id, type});
 
             // Visit children
-            for (auto type : node.types) {
-                type->accept(*this);
-            }
-            for (auto cse : node.cases) {
+            for (auto &cse: node.cases) {
                 cse->accept(*this);
             }
             // Visit stops here
@@ -50,7 +47,7 @@ namespace semantics {
         context = ScopeContext::PATTERN;
 
         for (size_t i = 0; i < node.patterns.size(); i++) {
-            type_stack.push(current_func->types[i]);
+            type_stack.push(current_func->signature[i]);
             node.patterns[i]->accept(*this);
             type_stack.pop();
         }
@@ -172,11 +169,11 @@ namespace semantics {
     }
 
     void ScopeGenerator::visit(ListPattern &node) {
-        if (type_stack.top()->type == Types::LIST) {
-            type_stack.push(type_stack.top()->types[0]);
+        if (type_stack.top().id == TypeId::LIST) {
+            type_stack.push(type_stack.top().id);
 
             // Visit children
-            for (auto pattern : node.patterns) {
+            for (auto &pattern: node.patterns) {
                 pattern->accept(*this);
             }
             // Visit stops here
@@ -186,11 +183,11 @@ namespace semantics {
     }
 
     void ScopeGenerator::visit(TuplePattern &node) {
-        if (type_stack.top()->type == Types::TUPLE) {
-            if (node.patterns.size() == type_stack.top()->types.size()) {
+        if (type_stack.top().id == TypeId::TUPLE) {
+            if (node.patterns.size() == type_stack.top().subtypes.size()) {
                 // Visit children
                 for (size_t i = 0; i < node.patterns.size(); i++) {
-                    type_stack.push(type_stack.top()->types[i]);
+                    type_stack.push(type_stack.top().subtypes[i]);
                     node.patterns[i]->accept(*this);
                     type_stack.pop();
                 }
@@ -199,17 +196,16 @@ namespace semantics {
     }
 
     void ScopeGenerator::visit(ListSplit &node) {
-        if (type_stack.top()->type == Types::LIST) {
-            type_stack.push(type_stack.top()->types[0]);
+        if (type_stack.top().id == TypeId::LIST) {
+            type_stack.push(type_stack.top().id);
 
             // Visit children
             node.left->accept(*this);
             type_stack.pop();
             node.right->accept(*this);
             // Visit stops here
-        } else if (type_stack.top()->type == Types::STRING){
-            auto _char = make_shared<Type>(Types::CHAR);
-            type_stack.push(_char);
+        } else if (type_stack.top().id == TypeId::STRING){
+            type_stack.push(Type(TypeId::CHAR));
 
             // Visit children
             node.left->accept(*this);
@@ -221,7 +217,7 @@ namespace semantics {
 
     void ScopeGenerator::visit(List &node) {
         // Visit children
-        for (auto expr : node.exprs) {
+        for (auto &expr: node.exprs) {
             expr->accept(*this);
         }
         // Visit stops here
@@ -229,7 +225,7 @@ namespace semantics {
 
     void ScopeGenerator::visit(Tuple &node) {
         // Visit children
-        for (auto expr : node.exprs) {
+        for (auto &expr: node.exprs) {
             expr->accept(*this);
         }
         // Visit stops here
@@ -248,7 +244,7 @@ namespace semantics {
     void ScopeGenerator::visit(Call &node) {
         // Visit children
         node.callee->accept(*this);
-        for (auto expr : node.exprs) {
+        for (auto &expr: node.exprs) {
             expr->accept(*this);
         }
         // Visit stops here
