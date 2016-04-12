@@ -513,7 +513,7 @@ namespace codegen
 
         // else, just output value
         } else {
-            *output << node.value;
+            *output << "(" << node.value << ")";
         }
     }
 
@@ -531,7 +531,7 @@ namespace codegen
 
         // else, just output value
         } else {
-            *output << node.value;
+            *output << "(" << node.value << ")";
         }
 
     }
