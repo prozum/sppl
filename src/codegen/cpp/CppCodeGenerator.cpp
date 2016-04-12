@@ -93,7 +93,9 @@ namespace codegen
         *header << endl;
 
         // generate function in *output
-        *output << function.str() << " { \n";
+        *output << function.str() << " { \n"
+                   "Start: \n"
+                   "\n";
 
         // generate cases
         for (auto c : node.cases) {
@@ -165,12 +167,26 @@ namespace codegen
         // generate return expression
         id_context = IdContext::EXPR;
         current_func->types.back()->accept(*this);
-        *output << "        " << last_type << " res = ";
-        node.expr->accept(*this);
-        *output << "; \n";
 
-        *output << "        return res; \n"
-                   "    } \n"
+        if (node.tail_rec) {
+            auto call = (Call*)node.expr.get();
+            for (size_t i = 0; i < current_func->types.size() - 1; i++) {
+                *output << "        " << g_generated << g_arg << i << " = ";
+                call->exprs[i]->accept(*this);
+                *output << "; \n";
+            }
+
+            *output << "\n"
+                       "        goto Start; \n";
+        } else {
+            *output << "        " << last_type << " res = ";
+            node.expr->accept(*this);
+            *output << "; \n";
+
+            *output << "        return res; \n";
+        }
+
+        *output << "    } \n"
                    " \n";
     }
 
@@ -959,7 +975,7 @@ namespace codegen
         *output << "int " << g_generated << g_compare << name << "(" << name << " tuple1, " << name << " tuple2) { \n";
 
         for (size_t i = 0; i < type.types.size(); ++i) {
-            result << "    if (";
+            *output << "    if (";
 
             switch (type.types[i]->type) {
                 case Types::STRING:
@@ -1137,7 +1153,7 @@ namespace codegen
         auto got = lists.find(type);
 
         if (got == lists.end()) {
-            return  generate_tuple(type);
+            return  generate_list(type);
         } else {
             return got->second;
         }
@@ -1157,7 +1173,7 @@ namespace codegen
         auto got = signatures.find(type);
 
         if (got == signatures.end()) {
-            return  generate_tuple(type);
+            return  generate_signature(type);
         } else {
             return got->second;
         }

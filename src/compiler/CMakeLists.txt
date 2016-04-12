@@ -14,5 +14,5 @@ if (CLLVM)
     set (BACKEND_LIBS ${BACKEND_LIBS} cllvm)
 endif()
 
-target_link_libraries(compiler common parser semantics ${BACKEND_LIBS})
+target_link_libraries(compiler common parser semantics optimizer ${BACKEND_LIBS})
 

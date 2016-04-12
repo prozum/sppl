@@ -1,0 +1,25 @@
+def main : [String] -> [Int]
+| (x : xs) = map(fizzbuzz, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+
+def map : (Int -> Int) -> [Int] -> [Int]
+| f [] = []
+| f (x : xs) = f(x) : map(f, xs)
+
+def fizzbuzz : Int -> Int
+| n = ifelse(n % 3 == 0 && n % 5 == 0,
+            -3
+            ,
+            ifelse(n % 5 == 0,
+                -2
+                ,
+                ifelse(n % 3 == 0,
+                    -1
+                    ,
+                    n
+                )
+            )
+        )
+
+def ifelse : Bool -> Int -> Int -> Int
+| True a b = a
+| False a b = b

@@ -4,6 +4,7 @@
 #include "CodeGenerator.h"
 #include "TypeChecker.h"
 #include "ScopeGenerator.h"
+#include "GeneralOptimizer.h"
 
 #include <iostream>
 #include <memory>
@@ -11,6 +12,7 @@
 
 #ifdef CCPP
 #include "CppCodeGenerator.h"
+
 #endif
 
 #ifdef CGNUASM
@@ -52,6 +54,7 @@ namespace compiler {
         semantics::ScopeGenerator scope_generator;
         semantics::TypeChecker type_checker;
         semantics::PatternChecker pattern_checker;
+        optimizer::GeneralOptimizer optimizer;
 
         int compile();
 
