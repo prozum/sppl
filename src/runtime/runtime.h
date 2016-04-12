@@ -14,6 +14,7 @@ typedef struct worker_s {
 } worker_t;
 
 typedef struct scheduler_s {
+    context_t context;
     worker_t *worker;
     pthread_t *io_worker;
 } scheduler_t;
