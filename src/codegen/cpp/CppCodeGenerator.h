@@ -140,9 +140,12 @@ namespace codegen {
 
             Function* current_func;
 
-            string generate_list(Type &, bool isstring = false);
+            string generate_list(Type &);
             string generate_tuple(Type &);
             string generate_signature(Type &);
+            string get_list(Type &);
+            string get_tuple(Type &);
+            string get_signature(Type &);
             void generate_std();
     };
 }
