@@ -35,9 +35,9 @@ class Test : public CppUnit::TestFixture{
         CPPUNIT_TEST(addBoolFalseFalse);
         // Addition - Character
         CPPUNIT_TEST(addCharStrStr);
-        CPPUNIT_TEST(addCharStrChar);
-        CPPUNIT_TEST(addCharCharStr);
-        CPPUNIT_TEST(addCharCharChar);
+        CPPUNIT_TEST(addCharStrCha);
+        CPPUNIT_TEST(addCharChaStr);
+        CPPUNIT_TEST(addCharChaCha);
         // Addition - Mix
         CPPUNIT_TEST(addMixFloatInt);
         CPPUNIT_TEST(addMixIntFloat);
@@ -60,9 +60,9 @@ class Test : public CppUnit::TestFixture{
         CPPUNIT_TEST(subBoolFalseFalse);
         // Subtraction - Character
         CPPUNIT_TEST(subCharStrStr);
-        CPPUNIT_TEST(subCharStrChar);
-        CPPUNIT_TEST(subCharCharStr);
-        CPPUNIT_TEST(subCharCharChar);
+        CPPUNIT_TEST(subCharStrCha);
+        CPPUNIT_TEST(subCharChaStr);
+        CPPUNIT_TEST(subCharChaCha);
         // Subtraction - Mix
         CPPUNIT_TEST(subMixFloatInt);
         CPPUNIT_TEST(subMixIntFloat);
@@ -85,9 +85,9 @@ class Test : public CppUnit::TestFixture{
         CPPUNIT_TEST(mulBoolFalseFalse);
         // Multiplication - Character
         CPPUNIT_TEST(mulCharStrStr);
-        CPPUNIT_TEST(mulCharStrChar);
-        CPPUNIT_TEST(mulCharCharStr);
-        CPPUNIT_TEST(mulCharCharChar);
+        CPPUNIT_TEST(mulCharStrCha);
+        CPPUNIT_TEST(mulCharChaStr);
+        CPPUNIT_TEST(mulCharChaCha);
         // Multiplication - Mix
         CPPUNIT_TEST(mulMixFloatInt);
         CPPUNIT_TEST(mulMixIntFloat);
@@ -110,9 +110,9 @@ class Test : public CppUnit::TestFixture{
         CPPUNIT_TEST(divBoolFalseFalse);
         // Division - Character
         CPPUNIT_TEST(divCharStrStr);
-        CPPUNIT_TEST(divCharStrChar);
-        CPPUNIT_TEST(divCharCharStr);
-        CPPUNIT_TEST(divCharCharChar);
+        CPPUNIT_TEST(divCharStrCha);
+        CPPUNIT_TEST(divCharChaStr);
+        CPPUNIT_TEST(divCharChaCha);
         // Division - Mix
         CPPUNIT_TEST(divMixFloatInt);
         CPPUNIT_TEST(divMixIntFloat);
@@ -135,9 +135,9 @@ class Test : public CppUnit::TestFixture{
         CPPUNIT_TEST(modBoolFalseFalse);
         // Modulo - Character
         CPPUNIT_TEST(modCharStrStr);
-        CPPUNIT_TEST(modCharStrChar);
-        CPPUNIT_TEST(modCharCharStr);
-        CPPUNIT_TEST(modCharCharChar);
+        CPPUNIT_TEST(modCharStrCha);
+        CPPUNIT_TEST(modCharChaStr);
+        CPPUNIT_TEST(modCharChaCha);
         // Modulo - Mix
         CPPUNIT_TEST(modMixFloatInt);
         CPPUNIT_TEST(modMixIntFloat);
@@ -182,23 +182,23 @@ class Test : public CppUnit::TestFixture{
         CPPUNIT_TEST(binLessFalseTrue);
         CPPUNIT_TEST(binLessFalseFalse);
         // Binary/Int
-        CPPUNIT_TEST(binEqualInt);
-        CPPUNIT_TEST(binNotEqualInt);
-        CPPUNIT_TEST(binAndInt);
-        CPPUNIT_TEST(binOrInt);
-        CPPUNIT_TEST(binGrEqInt);
-        CPPUNIT_TEST(binLeEqInt);
-        CPPUNIT_TEST(binLessInt);
-        CPPUNIT_TEST(binGreatInt);
+        CPPUNIT_TEST(binEqualIntInt);
+        CPPUNIT_TEST(binNotEqualIntInt);
+        CPPUNIT_TEST(binAndIntInt);
+        CPPUNIT_TEST(binOrIntInt);
+        CPPUNIT_TEST(binGrEqIntInt);
+        CPPUNIT_TEST(binLeEqIntInt);
+        CPPUNIT_TEST(binLessIntInt);
+        CPPUNIT_TEST(binGreatIntInt);
         // Binary/Float
-        CPPUNIT_TEST(binEqualFloat);
-        CPPUNIT_TEST(binNotEqualFloat);
-        CPPUNIT_TEST(binAndFloat);
-        CPPUNIT_TEST(binOrFloat);
-        CPPUNIT_TEST(binGrEqFloat);
-        CPPUNIT_TEST(binLeEqFloat);
-        CPPUNIT_TEST(binLessFloat);
-        CPPUNIT_TEST(binGreatFloat);
+        CPPUNIT_TEST(binEqualFloatFloat);
+        CPPUNIT_TEST(binNotEqualFloatFloat);
+        CPPUNIT_TEST(binAndFloatFloat);
+        CPPUNIT_TEST(binOrFloatFloat);
+        CPPUNIT_TEST(binGrEqFloatFloat);
+        CPPUNIT_TEST(binLeEqFloatFloat);
+        CPPUNIT_TEST(binLessFloatFloat);
+        CPPUNIT_TEST(binGreatFloatFloat);
         // Signature - Length
         CPPUNIT_TEST(sigLengthZeroInt);
         CPPUNIT_TEST(sigLengthOneInt);
@@ -216,16 +216,16 @@ class Test : public CppUnit::TestFixture{
         CPPUNIT_TEST(patLengthMoreInt);
         CPPUNIT_TEST(patLengthLessInt);
         // Case - Count
-        CPPUNIT_TEST(casOneCaseInt);
-        CPPUNIT_TEST(casTwoCaseInt);
-        CPPUNIT_TEST(casThreeCaseInt);
-        CPPUNIT_TEST(casFourCaseInt);
-        CPPUNIT_TEST(casFiveCaseInt);
-        CPPUNIT_TEST(casSixCaseInt);
-        CPPUNIT_TEST(casSevenCaseInt);
-        CPPUNIT_TEST(casEightCaseInt);
-        CPPUNIT_TEST(casNineCaseInt);
-        CPPUNIT_TEST(casTenCaseInt);
+        CPPUNIT_TEST(casCountOneInt);
+        CPPUNIT_TEST(casCountTwoInt);
+        CPPUNIT_TEST(casCountThreeInt);
+        CPPUNIT_TEST(casCountFourInt);
+        CPPUNIT_TEST(casCountFiveInt);
+        CPPUNIT_TEST(casCountSixInt);
+        CPPUNIT_TEST(casCountSevenInt);
+        CPPUNIT_TEST(casCountEightInt);
+        CPPUNIT_TEST(casCountNineInt);
+        CPPUNIT_TEST(casCountTenInt);
         // List
         CPPUNIT_TEST(listCasEmpty);
         CPPUNIT_TEST(listAppendEmpty);
@@ -328,11 +328,9 @@ class Test : public CppUnit::TestFixture{
         CPPUNIT_TEST(keywordChar);
         CPPUNIT_TEST(keywordString);
         CPPUNIT_TEST(keywordBool);
-        CPPUNIT_TEST(keywordTrue);
-        CPPUNIT_TEST(keywordFalse);
         CPPUNIT_TEST(keywordMain);
         CPPUNIT_TEST(keywordDef);
-        // Functions - Ret Empty
+        // Functions - Ret Empty*/
         CPPUNIT_TEST(funcRetInt);
         CPPUNIT_TEST(funcRetFloat);
         CPPUNIT_TEST(funcRetBool);
@@ -402,9 +400,9 @@ protected:
 
     // Addition - Character
     void addCharStrStr();
-    void addCharStrChar();
-    void addCharCharStr();
-    void addCharCharChar();
+    void addCharStrCha();
+    void addCharChaStr();
+    void addCharChaCha();
 
     // Addition - Mix
     void addMixIntFloat();
@@ -433,9 +431,9 @@ protected:
 
     // Subtraction - Character
     void subCharStrStr();
-    void subCharStrChar();
-    void subCharCharStr();
-    void subCharCharChar();
+    void subCharStrCha();
+    void subCharChaStr();
+    void subCharChaCha();
 
     // Subtraction - Mix
     void subMixIntFloat();
@@ -464,9 +462,9 @@ protected:
 
     // Multiplication - Character
     void mulCharStrStr();
-    void mulCharStrChar();
-    void mulCharCharStr();
-    void mulCharCharChar();
+    void mulCharStrCha();
+    void mulCharChaStr();
+    void mulCharChaCha();
 
     // Multiplication - Mix
     void mulMixIntFloat();
@@ -495,9 +493,9 @@ protected:
 
     // Division - Character
     void divCharStrStr();
-    void divCharStrChar();
-    void divCharCharStr();
-    void divCharCharChar();
+    void divCharStrCha();
+    void divCharChaStr();
+    void divCharChaCha();
 
     // Division - Mix
     void divMixIntFloat();
@@ -526,9 +524,9 @@ protected:
 
     // Modulo - Character
     void modCharStrStr();
-    void modCharStrChar();
-    void modCharCharStr();
-    void modCharCharChar();
+    void modCharStrCha();
+    void modCharChaStr();
+    void modCharChaCha();
 
     // Modulo - Mix
     void modMixIntFloat();
@@ -585,25 +583,25 @@ protected:
 
     // Binary/Int
     // Binary/Int
-    void binEqualInt();
-    void binNotEqualInt();
-    void binAndInt();
-    void binOrInt();
-    void binLeEqInt();
-    void binGrEqInt();
-    void binLessInt();
-    void binGreatInt();
+    void binEqualIntInt();
+    void binNotEqualIntInt();
+    void binAndIntInt();
+    void binOrIntInt();
+    void binLeEqIntInt();
+    void binGrEqIntInt();
+    void binLessIntInt();
+    void binGreatIntInt();
 
     // Binary/Float
     // Binary/Float
-    void binEqualFloat();
-    void binNotEqualFloat();
-    void binAndFloat();
-    void binOrFloat();
-    void binLeEqFloat();
-    void binGrEqFloat();
-    void binLessFloat();
-    void binGreatFloat();
+    void binEqualFloatFloat();
+    void binNotEqualFloatFloat();
+    void binAndFloatFloat();
+    void binOrFloatFloat();
+    void binLeEqFloatFloat();
+    void binGrEqFloatFloat();
+    void binLessFloatFloat();
+    void binGreatFloatFloat();
 
     // Signature Length
     void sigLengthZeroInt();
@@ -624,16 +622,16 @@ protected:
     void patLengthLessInt();
 
     // Case Count
-    void casOneCaseInt();
-    void casTwoCaseInt();
-    void casThreeCaseInt();
-    void casFourCaseInt();
-    void casFiveCaseInt();
-    void casSixCaseInt();
-    void casSevenCaseInt();
-    void casEightCaseInt();
-    void casNineCaseInt();
-    void casTenCaseInt();
+    void casCountOneInt();
+    void casCountTwoInt();
+    void casCountThreeInt();
+    void casCountFourInt();
+    void casCountFiveInt();
+    void casCountSixInt();
+    void casCountSevenInt();
+    void casCountEightInt();
+    void casCountNineInt();
+    void casCountTenInt();
 
     //List
     void listCasEmpty();
@@ -741,8 +739,6 @@ protected:
     void tupleMixed();
 
     // Keywords
-    void keywordTrue();
-    void keywordFalse();
     void keywordInt();
     void keywordFloat();
     void keywordBool();
@@ -798,34 +794,26 @@ protected:
     void comment();
 
     bool compileChecker(shared_ptr<std::stringstream> source);
-    bool executeChecker(bool compStatus, std::string args, std::string expectedOutput);
-    shared_ptr<std::stringstream> buildSimple(std::string signature,
-                                  std::string body);
+    bool executeChecker(std::string args, std::string expectedOutput);
     shared_ptr<std::stringstream> buildSimple(std::string signature,
                                   std::string pattern,
                                   std::string body);
-    shared_ptr<std::stringstream> buildSimple(std::string pattern,
-                                  std::string left,
-                                  std::string op,
-                                  std::string right);
     std::string buildCase(std::string pattern,
                                 std::string body);
-    shared_ptr<std::stringstream> buildMultiCase(std::vector<string>
-                                     signature,
-                                     std::string ret,
-                                     std::string pattern,
-                                     std::string cas);
-    shared_ptr<std::stringstream> buildMultiCase(std::string signature,
-                                     std::string ret,
-                                     std::vector<std::string> pattern,
-                                     std::string cas);
-    shared_ptr<std::stringstream> buildMultiFunc(std::string mainSig,  std::string mainPat,  std::string mainBody,
-                                     std::string funcSig,  std::string funcPat,  std::string funcBody);
-    shared_ptr<std::stringstream> buildMultiFunc(std::string mainSig,  std::string mainPat,  std::string mainBody,
-                                     std::string func1Sig, std::string func1Pat, std::string func1Body,
-                                     std::string func2Sig, std::string func2Pat, std::string func2Body);
-    shared_ptr<std::stringstream> buildMultiFunc(std::string mainSig,  std::string mainPat,  std::string mainBody,
-                                     std::string func1Sig, std::string func1Pat, std::string func1Body,
-                                     std::string func2Sig, std::string func2Pat, std::string func2Body, 
-                                     std::string func3Sig, std::string func3Pat, std::string func3Body);
+    shared_ptr<std::stringstream> buildFunc(std::string mainSig, std::string mainPat, std::string mainBody,
+                                            std::string funcSig, std::string funcPat, std::string funcBody);
+    shared_ptr<std::stringstream> buildFunc(std::string mainSig, std::string mainPat, std::string mainBody,
+                                            std::string func1Sig, std::string func1Pat, std::string func1Body,
+                                            std::string func2Sig, std::string func2Pat, std::string func2Body);
+    shared_ptr<std::stringstream> buildFunc(std::string mainSig, std::string mainPat, std::string mainBody,
+                                            std::string func1Sig, std::string func1Pat, std::string func1Body,
+                                            std::string func2Sig, std::string func2Pat, std::string func2Body,
+                                            std::string func3Sig, std::string func3Pat, std::string func3Body);
+
+    shared_ptr<std::stringstream> buildMultiCase(string signature,
+                                                       std::string ret,
+                                                       std::vector<string> pattern,
+                                                       std::string cas);
+
+    bool checkIfFileExists(string file);
 };
