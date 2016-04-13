@@ -2,7 +2,7 @@
 
 
 void Test::keywordInt() {
-    std::shared_ptr<std::stringstream> source = buildSimple("Int->Int", "Int", "2");
+    std::shared_ptr<std::stringstream> source = buildSimple("Int->Int", "Int", "2", "2");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
     if(compStatus) {
@@ -12,7 +12,7 @@ void Test::keywordInt() {
 }
 
 void Test::keywordFloat() {
-    std::shared_ptr<std::stringstream> source = buildSimple("Float->Float", "Float", "2.0");
+    std::shared_ptr<std::stringstream> source = buildSimple("Float->Float", "Float", "2.0", "2.0");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
     if(compStatus) {
@@ -22,7 +22,7 @@ void Test::keywordFloat() {
 }
 
 void Test::keywordBool() {
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool->Bool", "Bool", "True");
+    std::shared_ptr<std::stringstream> source = buildSimple("Bool->Bool", "Bool", "True", "True");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
     if(compStatus) {
@@ -32,7 +32,7 @@ void Test::keywordBool() {
 }
 
 void Test::keywordChar() {
-    std::shared_ptr<std::stringstream> source = buildSimple("Char->Char", "Char", "'c'");
+    std::shared_ptr<std::stringstream> source = buildSimple("Char->Char", "Char", "'c'", "'c'");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
     if(compStatus) {
@@ -42,7 +42,7 @@ void Test::keywordChar() {
 }
 
 void Test::keywordString() {
-    std::shared_ptr<std::stringstream> source = buildSimple("String->String", "String", "\"string\"");
+    std::shared_ptr<std::stringstream> source = buildSimple("String->String", "String", "\"string\"", "\"string\"");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
     if(compStatus) {
@@ -52,7 +52,7 @@ void Test::keywordString() {
 }
 
 void Test::keywordDef() {
-    std::shared_ptr<std::stringstream> source = buildSimple("Int->Int", "def", "2");
+    std::shared_ptr<std::stringstream> source = buildSimple("Int->Int", "def", "2", "2");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
     if(compStatus) {
@@ -62,7 +62,7 @@ void Test::keywordDef() {
 }
 
 void Test::keywordMain() {
-    std::shared_ptr<std::stringstream> source = buildSimple("Int->Int", "main", "2");
+    std::shared_ptr<std::stringstream> source = buildSimple("Int->Int", "main", "2", "2");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
     if(compStatus) {
@@ -72,7 +72,7 @@ void Test::keywordMain() {
 }
 
 void Test::comment() {
-    std::shared_ptr<std::stringstream> source = buildSimple("Int", "", "2 # This is a comment");
+    std::shared_ptr<std::stringstream> source = buildSimple("Int", "", "2 # This is a comment", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if(compStatus) {

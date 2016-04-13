@@ -2,7 +2,7 @@
 
 
 void Test::divIntPosPos() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Int", "","2/2");
+    std::shared_ptr<std::stringstream> source = buildSimple("Int", "","2/2", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if (compStatus == true) {
@@ -12,7 +12,7 @@ void Test::divIntPosPos() {
 }
 
 void Test::divIntZeroZero() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Int", "","0/0");
+    std::shared_ptr<std::stringstream> source = buildSimple("Int", "","0/0", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if (compStatus == true) {
@@ -22,7 +22,7 @@ void Test::divIntZeroZero() {
 }
 
 void Test::divIntPosNeg() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Int", "","2/-2");
+    std::shared_ptr<std::stringstream> source = buildSimple("Int", "","2/-2", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if (compStatus == true) {
@@ -32,7 +32,7 @@ void Test::divIntPosNeg() {
 }
 
 void Test::divIntNegPos() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Int", "","-2/2");
+    std::shared_ptr<std::stringstream> source = buildSimple("Int", "","-2/2", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if (compStatus == true) {
@@ -42,7 +42,7 @@ void Test::divIntNegPos() {
 }
 
 void Test::divIntNegNeg() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Int", "","-2/-2");
+    std::shared_ptr<std::stringstream> source = buildSimple("Int", "","-2/-2", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if (compStatus == true) {
@@ -52,7 +52,7 @@ void Test::divIntNegNeg() {
 }
 
 void Test::divFloatPosPos() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Float", "","2.0/2.0");
+    std::shared_ptr<std::stringstream> source = buildSimple("Float", "","2.0/2.0", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if (compStatus == true) {
@@ -62,7 +62,7 @@ void Test::divFloatPosPos() {
 }
 
 void Test::divFloatZeroZero() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Float", "","0.0/0.0");
+    std::shared_ptr<std::stringstream> source = buildSimple("Float", "","0.0/0.0", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if (compStatus == true) {
@@ -72,7 +72,7 @@ void Test::divFloatZeroZero() {
 }
 
 void Test::divFloatPosNeg() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Float", "","2.0/-2.0");
+    std::shared_ptr<std::stringstream> source = buildSimple("Float", "","2.0/-2.0", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if (compStatus == true) {
@@ -82,7 +82,7 @@ void Test::divFloatPosNeg() {
 }
 
 void Test::divFloatNegPos() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Float", "","-2.0/2.0");
+    std::shared_ptr<std::stringstream> source = buildSimple("Float", "","-2.0/2.0", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if (compStatus == true) {
@@ -92,7 +92,7 @@ void Test::divFloatNegPos() {
 }
 
 void Test::divFloatNegNeg() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Float", "","-2.0/-2.0");
+    std::shared_ptr<std::stringstream> source = buildSimple("Float", "","-2.0/-2.0", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if (compStatus == true) {
@@ -102,7 +102,7 @@ void Test::divFloatNegNeg() {
 }
 
 void Test::divBoolTrueTrue() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","True/True");
+    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","True/True", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
     if (compStatus == true) {
@@ -112,7 +112,7 @@ void Test::divBoolTrueTrue() {
 }
 
 void Test::divBoolTrueFalse() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","True/False");
+    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","True/False", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
     if (compStatus == true) {
@@ -122,7 +122,7 @@ void Test::divBoolTrueFalse() {
 }
 
 void Test::divBoolFalseTrue() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","False/True");
+    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","False/True", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
     if (compStatus == true) {
@@ -132,7 +132,7 @@ void Test::divBoolFalseTrue() {
 }
 
 void Test::divBoolFalseFalse() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","False/False");
+    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","False/False", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
     if (compStatus == true) {
@@ -142,7 +142,7 @@ void Test::divBoolFalseFalse() {
 }
 
 void Test::divCharStrStr() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("String", "","\"string\"/\"string\"");
+    std::shared_ptr<std::stringstream> source = buildSimple("String", "","\"string\"/\"string\"", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
     if (compStatus == true) {
@@ -152,7 +152,7 @@ void Test::divCharStrStr() {
 }
 
 void Test::divCharStrCha() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("String", "","\"string\"/'c'");
+    std::shared_ptr<std::stringstream> source = buildSimple("String", "","\"string\"/'c'", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
     if (compStatus == true) {
@@ -162,7 +162,7 @@ void Test::divCharStrCha() {
 }
 
 void Test::divCharChaStr() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Char", "","'c'/\"string\"");
+    std::shared_ptr<std::stringstream> source = buildSimple("Char", "","'c'/\"string\"", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
     if (compStatus == true) {
@@ -172,7 +172,7 @@ void Test::divCharChaStr() {
 }
 
 void Test::divCharChaCha() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Char", "","'c'/'c'");
+    std::shared_ptr<std::stringstream> source = buildSimple("Char", "","'c'/'c'", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
     if (compStatus == true) {
@@ -182,7 +182,7 @@ void Test::divCharChaCha() {
 }
 
 void Test::divMixFloatInt() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Float", "","2-0/2");
+    std::shared_ptr<std::stringstream> source = buildSimple("Float", "","2-0/2", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
     if (compStatus == true) {
@@ -192,7 +192,7 @@ void Test::divMixFloatInt() {
 }
 
 void Test::divMixIntFloat() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Int", "","2/2.0");
+    std::shared_ptr<std::stringstream> source = buildSimple("Int", "","2/2.0", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
     if (compStatus == true) {

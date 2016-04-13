@@ -2,7 +2,7 @@
 
 
 void Test::mulIntPosPos() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Int", "","2*2");
+    std::shared_ptr<std::stringstream> source = buildSimple("Int", "","2*2", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if (compStatus == true) {
@@ -12,7 +12,7 @@ void Test::mulIntPosPos() {
 }
 
 void Test::mulIntZeroZero() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Int", "","0*0");
+    std::shared_ptr<std::stringstream> source = buildSimple("Int", "","0*0", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if (compStatus == true) {
@@ -22,7 +22,7 @@ void Test::mulIntZeroZero() {
 }
 
 void Test::mulIntPosNeg() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Int", "","2*-2");
+    std::shared_ptr<std::stringstream> source = buildSimple("Int", "","2*-2", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if (compStatus == true) {
@@ -32,7 +32,7 @@ void Test::mulIntPosNeg() {
 }
 
 void Test::mulIntNegPos() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Int", "","-2*2");
+    std::shared_ptr<std::stringstream> source = buildSimple("Int", "","-2*2", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if (compStatus == true) {
@@ -42,7 +42,7 @@ void Test::mulIntNegPos() {
 }
 
 void Test::mulIntNegNeg() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Int", "","-2*-2");
+    std::shared_ptr<std::stringstream> source = buildSimple("Int", "","-2*-2", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if (compStatus == true) {
@@ -52,7 +52,7 @@ void Test::mulIntNegNeg() {
 }
 
 void Test::mulFloatPosPos() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Float", "","2.0*2.0");
+    std::shared_ptr<std::stringstream> source = buildSimple("Float", "","2.0*2.0", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if (compStatus == true) {
@@ -62,7 +62,7 @@ void Test::mulFloatPosPos() {
 }
 
 void Test::mulFloatZeroZero() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Float", "","0.0*0.0");
+    std::shared_ptr<std::stringstream> source = buildSimple("Float", "","0.0*0.0", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if (compStatus == true) {
@@ -72,7 +72,7 @@ void Test::mulFloatZeroZero() {
 }
 
 void Test::mulFloatPosNeg() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Float", "","2.0*-2.0");
+    std::shared_ptr<std::stringstream> source = buildSimple("Float", "","2.0*-2.0", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if (compStatus == true) {
@@ -82,7 +82,7 @@ void Test::mulFloatPosNeg() {
 }
 
 void Test::mulFloatNegPos() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Float", "","-2.0*2.0");
+    std::shared_ptr<std::stringstream> source = buildSimple("Float", "","-2.0*2.0", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if (compStatus == true) {
@@ -92,7 +92,7 @@ void Test::mulFloatNegPos() {
 }
 
 void Test::mulFloatNegNeg() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Float", "","-2.0*-2.0");
+    std::shared_ptr<std::stringstream> source = buildSimple("Float", "","-2.0*-2.0", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if (compStatus == true) {
@@ -102,7 +102,7 @@ void Test::mulFloatNegNeg() {
 }
 
 void Test::mulBoolTrueTrue() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","True*True");
+    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","True*True", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
     if (compStatus == true) {
@@ -112,7 +112,7 @@ void Test::mulBoolTrueTrue() {
 }
 
 void Test::mulBoolTrueFalse() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","True*False");
+    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","True*False", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
     if (compStatus == true) {
@@ -122,7 +122,7 @@ void Test::mulBoolTrueFalse() {
 }
 
 void Test::mulBoolFalseTrue() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","False*True");
+    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","False*True", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
     if (compStatus == true) {
@@ -132,7 +132,7 @@ void Test::mulBoolFalseTrue() {
 }
 
 void Test::mulBoolFalseFalse() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","False*False");
+    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","False*False", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
     if (compStatus == true) {
@@ -142,7 +142,7 @@ void Test::mulBoolFalseFalse() {
 }
 
 void Test::mulCharStrStr() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("String", "","\"string\"*\"string\"");
+    std::shared_ptr<std::stringstream> source = buildSimple("String", "","\"string\"*\"string\"", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
     if (compStatus == true) {
@@ -152,7 +152,7 @@ void Test::mulCharStrStr() {
 }
 
 void Test::mulCharStrCha() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("String", "","\"string\"*'c'");
+    std::shared_ptr<std::stringstream> source = buildSimple("String", "","\"string\"*'c'", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
     if (compStatus == true) {
@@ -162,7 +162,7 @@ void Test::mulCharStrCha() {
 }
 
 void Test::mulCharChaStr() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Char", "","'c'*\"string\"");
+    std::shared_ptr<std::stringstream> source = buildSimple("Char", "","'c'*\"string\"", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
     if (compStatus == true) {
@@ -172,7 +172,7 @@ void Test::mulCharChaStr() {
 }
 
 void Test::mulCharChaCha() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Char", "","'c'*'c'");
+    std::shared_ptr<std::stringstream> source = buildSimple("Char", "","'c'*'c'", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
     if (compStatus == true) {
@@ -182,7 +182,7 @@ void Test::mulCharChaCha() {
 }
 
 void Test::mulMixFloatInt() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Float", "","2-0*2");
+    std::shared_ptr<std::stringstream> source = buildSimple("Float", "","2-0*2", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
     if (compStatus == true) {
@@ -192,7 +192,7 @@ void Test::mulMixFloatInt() {
 }
 
 void Test::mulMixIntFloat() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Int", "","2*2.0");
+    std::shared_ptr<std::stringstream> source = buildSimple("Int", "","2*2.0", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
     if (compStatus == true) {

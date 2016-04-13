@@ -2,7 +2,7 @@
 
 
 void Test::subIntPosPos() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Int", "","2-2");
+    std::shared_ptr<std::stringstream> source = buildSimple("Int", "","2-2", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if (compStatus == true) {
@@ -12,7 +12,7 @@ void Test::subIntPosPos() {
 }
 
 void Test::subIntZeroZero() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Int", "","0-0");
+    std::shared_ptr<std::stringstream> source = buildSimple("Int", "","0-0", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if (compStatus == true) {
@@ -22,7 +22,7 @@ void Test::subIntZeroZero() {
 }
 
 void Test::subIntPosNeg() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Int", "","2--2");
+    std::shared_ptr<std::stringstream> source = buildSimple("Int", "","2--2", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if (compStatus == true) {
@@ -32,7 +32,7 @@ void Test::subIntPosNeg() {
 }
 
 void Test::subIntNegPos() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Int", "","-2-2");
+    std::shared_ptr<std::stringstream> source = buildSimple("Int", "","-2-2", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if (compStatus == true) {
@@ -42,7 +42,7 @@ void Test::subIntNegPos() {
 }
 
 void Test::subIntNegNeg() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Int", "","-2--2");
+    std::shared_ptr<std::stringstream> source = buildSimple("Int", "","-2--2", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if (compStatus == true) {
@@ -52,7 +52,7 @@ void Test::subIntNegNeg() {
 }
 
 void Test::subFloatPosPos() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Float", "","2.0-2.0");
+    std::shared_ptr<std::stringstream> source = buildSimple("Float", "","2.0-2.0", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if (compStatus == true) {
@@ -62,7 +62,7 @@ void Test::subFloatPosPos() {
 }
 
 void Test::subFloatZeroZero() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Float", "","0.0-0.0");
+    std::shared_ptr<std::stringstream> source = buildSimple("Float", "","0.0-0.0", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if (compStatus == true) {
@@ -72,7 +72,7 @@ void Test::subFloatZeroZero() {
 }
 
 void Test::subFloatPosNeg() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Float", "","2.0--2.0");
+    std::shared_ptr<std::stringstream> source = buildSimple("Float", "","2.0--2.0", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if (compStatus == true) {
@@ -82,17 +82,17 @@ void Test::subFloatPosNeg() {
 }
 
 void Test::subFloatNegPos() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Float", "","-2.0-2.0");
+    std::shared_ptr<std::stringstream> source = buildSimple("Float", "","-2.0-2.0", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if (compStatus == true) {
-        bool execStatus = executeChecker("", "0.000000");
+        bool execStatus = executeChecker("", "-4.000000");
         CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
     }
 }
 
 void Test::subFloatNegNeg() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Float", "","-2.0--2.0");
+    std::shared_ptr<std::stringstream> source = buildSimple("Float", "","-2.0--2.0", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if (compStatus == true) {
@@ -102,7 +102,7 @@ void Test::subFloatNegNeg() {
 }
 
 void Test::subBoolTrueTrue() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","True-True");
+    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","True-True", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
     if (compStatus == true) {
@@ -112,7 +112,7 @@ void Test::subBoolTrueTrue() {
 }
 
 void Test::subBoolTrueFalse() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","True-False");
+    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","True-False", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
     if (compStatus == true) {
@@ -122,7 +122,7 @@ void Test::subBoolTrueFalse() {
 }
 
 void Test::subBoolFalseTrue() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","False-True");
+    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","False-True", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
     if (compStatus == true) {
@@ -132,7 +132,7 @@ void Test::subBoolFalseTrue() {
 }
 
 void Test::subBoolFalseFalse() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","False-False");
+    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","False-False", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
     if (compStatus == true) {
@@ -142,7 +142,7 @@ void Test::subBoolFalseFalse() {
 }
 
 void Test::subCharStrStr() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("String", "","\"string\"-\"string\"");
+    std::shared_ptr<std::stringstream> source = buildSimple("String", "","\"string\"-\"string\"", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
     if (compStatus == true) {
@@ -152,7 +152,7 @@ void Test::subCharStrStr() {
 }
 
 void Test::subCharStrCha() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("String", "","\"string\"-'c'");
+    std::shared_ptr<std::stringstream> source = buildSimple("String", "","\"string\"-'c'", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
     if (compStatus == true) {
@@ -162,7 +162,7 @@ void Test::subCharStrCha() {
 }
 
 void Test::subCharChaStr() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Char", "","'c'-\"string\"");
+    std::shared_ptr<std::stringstream> source = buildSimple("Char", "","'c'-\"string\"", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
     if (compStatus == true) {
@@ -172,7 +172,7 @@ void Test::subCharChaStr() {
 }
 
 void Test::subCharChaCha() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Char", "","'c'-'c'");
+    std::shared_ptr<std::stringstream> source = buildSimple("Char", "","'c'-'c'", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
     if (compStatus == true) {
@@ -182,7 +182,7 @@ void Test::subCharChaCha() {
 }
 
 void Test::subMixFloatInt() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Float", "","2-0-2");
+    std::shared_ptr<std::stringstream> source = buildSimple("Float", "","2-0-2", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
     if (compStatus == true) {
@@ -192,7 +192,7 @@ void Test::subMixFloatInt() {
 }
 
 void Test::subMixIntFloat() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Int", "","2-2.0");
+    std::shared_ptr<std::stringstream> source = buildSimple("Int", "","2-2.0", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
     if (compStatus == true) {

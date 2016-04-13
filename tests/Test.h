@@ -796,12 +796,13 @@ protected:
     bool compileChecker(shared_ptr<std::stringstream> source);
     bool executeChecker(std::string args, std::string expectedOutput);
     shared_ptr<std::stringstream> buildSimple(std::string signature,
-                                  std::string pattern,
-                                  std::string body);
+                                              std::string pattern,
+                                              std::string body,
+                                              std::string args);
     std::string buildCase(std::string pattern,
                                 std::string body);
-    shared_ptr<std::stringstream> buildFunc(std::string mainSig, std::string mainPat, std::string mainBody,
-                                            std::string funcSig, std::string funcPat, std::string funcBody);
+    shared_ptr<std::stringstream> buildFunc(std::string func1Sig, std::string func1Pat, std::string func1Body,
+                                            std::string func2Sig, std::string func2Pat, std::string func2Body);
     shared_ptr<std::stringstream> buildFunc(std::string mainSig, std::string mainPat, std::string mainBody,
                                             std::string func1Sig, std::string func1Pat, std::string func1Body,
                                             std::string func2Sig, std::string func2Pat, std::string func2Body);
@@ -811,9 +812,10 @@ protected:
                                             std::string func3Sig, std::string func3Pat, std::string func3Body);
 
     shared_ptr<std::stringstream> buildMultiCase(string signature,
-                                                       std::string ret,
-                                                       std::vector<string> pattern,
-                                                       std::string cas);
+                                                 std::string ret,
+                                                 std::vector<string> pattern,
+                                                 std::string cas,
+                                                 std::string compArg);
 
     bool checkIfFileExists(string file);
 };

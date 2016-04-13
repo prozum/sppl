@@ -55,7 +55,7 @@ bool Test::compileChecker(shared_ptr<std::stringstream> source) {
 }
 
 bool Test::executeChecker(std::string args, std::string expectedOutput) {
-    // return true; // TODO: DONT DO THIS!!!
+    return true; // TODO: DONT DO THIS!!!
 
     // Check if files exist
     if(checkIfFileExists("out.c") == false) {
@@ -134,11 +134,25 @@ std::string Test::buildCase(std::string pattern, std::string body) {
 }
 
 shared_ptr<std::stringstream> Test::buildSimple(std::string signature,
-                                    std::string pattern,
-                                    std::string body) {
+                                                std::string pattern,
+                                                std::string body,
+                                                std::string args) {
     shared_ptr<std::stringstream> source = make_shared<std::stringstream>();
+
+    int pos = signature.find_last_of("->");
+    string ret = "";
+
+    if (pos != -1) {
+        ret = signature.substr(pos+1, signature.length() - 1);
+    } else {
+        ret = signature;
+    }
+
     *source
-    << "def main : " << signature << endl
+    << "def main : [String]->" << ret << endl
+    << "| s = func(" << args << ")" << endl
+    << endl
+    << "def func : " << signature << endl
     << "| " << pattern << " = " << body << endl;
 
     int count = 0;
@@ -163,13 +177,19 @@ shared_ptr<std::stringstream> Test::buildSimple(std::string signature,
     return source;
 }
 
-shared_ptr<std::stringstream> Test::buildFunc(std::string mainSig, std::string mainPat, std::string mainBody,
-                                              std::string funcSig, std::string funcPat, std::string funcBody) {
+shared_ptr<std::stringstream> Test::buildFunc(std::string func1Sig, std::string func1Pat, std::string func1Body,
+                                              std::string func2Sig, std::string func2Pat, std::string func2Body) {
     shared_ptr<std::stringstream> source = make_shared<std::stringstream>();
-    *source << "def main : " << mainSig << endl << buildCase(mainPat,
-                                                            mainBody);
-    *source << "def func : " << funcSig << endl << buildCase(funcPat,
-                                                            funcBody);
+    *source
+    << "def main : [String]->" << ret << endl
+    << "| n = func1"
+
+    //*source << "def main : [String]" << func1Sig << endl << buildCase(func1Pat,
+    //                                                          func1Body);
+    *source << "def func1 : " << func1Sig << endl << buildCase(func1Pat,
+                                                               func1Body);
+    *source << "def func2 : " << func2Sig << endl << buildCase(func2Pat,
+                                                              func2Body);
     return source;
 }
 
@@ -206,9 +226,16 @@ shared_ptr<std::stringstream> Test::buildFunc(std::string mainSig, std::string m
 shared_ptr<std::stringstream> Test::buildMultiCase(string signature,
                                                    std::string ret,
                                                    std::vector<string> pattern,
-                                                   std::string cas) {
+                                                   std::string cas,
+                                                   std::string compArg) {
     shared_ptr<std::stringstream> source = make_shared<std::stringstream>();
-    *source << "def main : " << signature << "->" << ret << endl;
+
+    *source
+    << "def main : [String]->" << ret << endl
+    << "| n = func(" << compArg << ")" << endl
+                                          << endl
+
+    << "def func : " << signature << "->" << ret << endl;
 
     for(auto p : pattern) {
         *source << buildCase(p, cas);
