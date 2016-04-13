@@ -745,7 +745,7 @@ namespace codegen
         // generate add function for list
         *header << name << "* " << g_generated << g_add << name << "(" << name << "* current, " << last_type << " item); \n";
         *output << name << "* " << g_generated << g_add << name << "(" << name << "* current, " << last_type << " item) { \n"
-                   "    " << name << "* res = malloc(sizeof(" << last_type << "));\n"
+                   "    " << name << "* res = malloc(sizeof(" << name << "));\n"
                    "    res->" << g_value << " = item; \n"
                    "    res->" << g_next << " = current; \n"
                    "    res->" << g_empty << " = 0; \n"
@@ -760,7 +760,7 @@ namespace codegen
         *output << name << "* " << g_generated << g_create << name << "(int count, ...) { \n"
                   "    int i; \n"
                   "    va_list args; \n"
-                  "    " << name << "* res = malloc(sizeof(" << last_type << ")); \n"
+                  "    " << name << "* res = malloc(sizeof(" << name << ")); \n"
                   "    res->" << g_empty << " = 1; \n"
                   "    res->" << g_size << " = 0; \n"
                   "\n"
