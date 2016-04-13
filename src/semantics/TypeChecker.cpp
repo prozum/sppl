@@ -10,9 +10,28 @@ namespace semantics
     TypeChecker::TypeChecker() { }
 
     void TypeChecker::visit(Program &node) {
+        auto str = make_shared<Type>(Types::STRING);
+        Type strlist = Type(Types::LIST);
+        strlist.types.push_back(str);
+
         // Visit children
         for (auto func : node.funcs) {
             func->accept(*this);
+
+            if (func->id == "main") {
+                if (*func->types.front() != strlist) {
+                    AddError(Error::Expected("Declaration of \"main\" had wrong input type",
+                                             strlist.str(),
+                                             func->types.front()->str(),
+                                             func->loc));
+                } else if (func->types.size() != 2) {
+                    AddError(Error::Expected("Function \"main\" had wrong number of input",
+                                             "2",
+                                             to_string(func->types.size()),
+                                             func->loc));
+                }
+            }
+
             Safe;
         }
         // Visit stops here
@@ -438,7 +457,7 @@ namespace semantics
             if (equal(node.left->node_type, node.right->node_type->types.front())) {
                 node.node_type = node.right->node_type;
             } else {
-                AddError(Error::Expected("Left must be the same type as the right List",
+                AddError(Error::Expected("Left must be the same type as the right Lists child",
                                          node.right->node_type->types[0]->str(),
                                          node.right->str(),
                                          node.loc));
