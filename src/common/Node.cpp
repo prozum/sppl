@@ -711,7 +711,11 @@ namespace common {
     }
 
     string Char::str() {
-        return "\'" + to_string(value) + "\'";
+        string res = "\'";
+        res += value;
+        res += "\'";
+
+        return res;
     }
 
     string String::str() {
