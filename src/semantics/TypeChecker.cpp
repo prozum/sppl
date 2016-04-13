@@ -38,6 +38,8 @@ namespace semantics
 
         if (current_func->is_anon) {
             current_func->type = node.expr->type;
+            current_func->signature = Type(TypeId::SIGNATURE, vector<Type>());
+            current_func->signature.subtypes.push_back(node.expr->type);
         }
 
         if (node.patterns.size() == current_func->signature.subtypes.size() - 1) {

@@ -28,6 +28,8 @@ namespace common {
 		vector<Type> subtypes;
 		Location loc;
 
+		Type();
+		~Type();
 		Type(TypeId);
 		Type(TypeId, Location);
 		Type(TypeId, std::vector<Type>);

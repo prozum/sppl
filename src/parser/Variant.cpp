@@ -2,7 +2,8 @@
 
 namespace parser {
     Variant &Variant::operator=(const Variant &other) {
-        memcpy(&val, &other.val, sizeof(value));
+        memcpy(&ptr, &other.ptr, sizeof(Pointer));
+        memcpy(&num, &other.num, sizeof(Numeric));
     }
 
     Variant::Variant() {

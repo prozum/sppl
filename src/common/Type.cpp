@@ -1,6 +1,12 @@
 #include "Type.h"
 
 namespace common {
+
+    Type::Type() { }
+
+    Type::~Type() {
+    }
+
     Type::Type(TypeId id) :
             id(id) { }
 
@@ -81,4 +87,6 @@ namespace common {
 
         return str + ")";
     }
+
+
 }
