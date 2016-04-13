@@ -3,6 +3,7 @@
 
 void Test::listCasEmpty() {
     std::shared_ptr<std::stringstream> source = buildSimple("[Int]->Int", "[]", "2");
+    string s = source->str();
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if(compStatus) {
@@ -116,7 +117,7 @@ void Test::listListString() {
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if(compStatus) {
-        bool execStatus = executeChecker("", "[[\"string\"]");
+        bool execStatus = executeChecker("", "[[\"string\"]]");
         CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
     }
 }
@@ -406,7 +407,7 @@ void Test::listNestedDifLengthInt() {
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if(compStatus) {
-        bool execStatus = executeChecker("", "");
+        bool execStatus = executeChecker("", "[[1, 2, 3], [1, 2, 3, 4, 5, 6, 7, 8, 9, 0]]");
         CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
     }
 }

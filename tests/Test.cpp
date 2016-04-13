@@ -1,7 +1,20 @@
+#include <algorithm>
 #include "Test.h"
 
 void Test::setUp() {
     // First test setup
+
+#ifdef CCPP
+    backend = compiler::Backend::CPP;
+#elif CGNUASM
+    backend = compiler::Backend::GNUASM;
+#elif CHASKELL
+    backend = compiler::Backend::HASKELL;
+#elif CLLVM
+    backend = compiler::Backend::LLVM;
+#else
+    backend = compiler::Backend::PPRINTER;
+#endif
 }
 
 void Test::tearDown() {
@@ -42,7 +55,7 @@ bool Test::compileChecker(shared_ptr<std::stringstream> source) {
 }
 
 bool Test::executeChecker(std::string args, std::string expectedOutput) {
-    //return true; // TODO: DONT DO THIS!!!
+    // return true; // TODO: DONT DO THIS!!!
 
     // Check if files exist
     if(checkIfFileExists("out.c") == false) {
@@ -54,7 +67,11 @@ bool Test::executeChecker(std::string args, std::string expectedOutput) {
     }
 
     // Compile program
-    system("gcc out.c -o prog");
+    int status = system("gcc out.c -o prog");
+
+    if (status != 0) {
+        CPPUNIT_ASSERT_MESSAGE("C Compiler Error", false);
+    }
 
     // SOURCE: http://stackoverflow.com/questions/478898/how-to-execute-a-command-and-get-output-of-command-within-c
     // Used to read from outputstream for the program
@@ -120,7 +137,29 @@ shared_ptr<std::stringstream> Test::buildSimple(std::string signature,
                                     std::string pattern,
                                     std::string body) {
     shared_ptr<std::stringstream> source = make_shared<std::stringstream>();
-    *source << "def main : " << signature << endl << "| " << pattern << " = " << body << endl;
+    *source
+    << "def main : " << signature << endl
+    << "| " << pattern << " = " << body << endl;
+
+    int count = 0;
+    for (int pos = 0; pos < signature.length(); ++pos) {
+        if (signature[pos] == '-') {
+            pos++;
+            if (signature[pos] == '>') {
+                count++;
+            }
+        }
+    }
+
+    if (count > 0) {
+        *source << "| ";
+        for (int i = 0; i < count; ++i) {
+            *source << "arg" << i << " ";
+        }
+
+        *source << " = " << body << endl;
+    }
+
     return source;
 }
 
