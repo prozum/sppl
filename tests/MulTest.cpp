@@ -56,7 +56,7 @@ void Test::mulFloatPosPos() {
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if (compStatus == true) {
-        bool execStatus = executeChecker("", "4.0");
+        bool execStatus = executeChecker("", "4.000000");
         CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
     }
 }
@@ -66,7 +66,7 @@ void Test::mulFloatZeroZero() {
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if (compStatus == true) {
-        bool execStatus = executeChecker("", "0.0");
+        bool execStatus = executeChecker("", "0.000000");
         CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
     }
 }
@@ -76,7 +76,7 @@ void Test::mulFloatPosNeg() {
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if (compStatus == true) {
-        bool execStatus = executeChecker("", "-4.0");
+        bool execStatus = executeChecker("", "-4.000000");
         CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
     }
 }
@@ -86,7 +86,7 @@ void Test::mulFloatNegPos() {
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if (compStatus == true) {
-        bool execStatus = executeChecker("", "-4.0");
+        bool execStatus = executeChecker("", "-4.000000");
         CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
     }
 }
@@ -96,7 +96,7 @@ void Test::mulFloatNegNeg() {
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if (compStatus == true) {
-        bool execStatus = executeChecker("", "4.0");
+        bool execStatus = executeChecker("", "4.000000");
         CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
     }
 }

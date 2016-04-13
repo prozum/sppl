@@ -26,7 +26,7 @@ void Test::subIntPosNeg() {
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if (compStatus == true) {
-        bool execStatus = executeChecker("", "0");
+        bool execStatus = executeChecker("", "4");
         CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
     }
 }
@@ -56,7 +56,7 @@ void Test::subFloatPosPos() {
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if (compStatus == true) {
-        bool execStatus = executeChecker("", "4.0");
+        bool execStatus = executeChecker("", "0.000000");
         CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
     }
 }
@@ -66,7 +66,7 @@ void Test::subFloatZeroZero() {
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if (compStatus == true) {
-        bool execStatus = executeChecker("", "0.0");
+        bool execStatus = executeChecker("", "0.000000");
         CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
     }
 }
@@ -76,7 +76,7 @@ void Test::subFloatPosNeg() {
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if (compStatus == true) {
-        bool execStatus = executeChecker("", "0.0");
+        bool execStatus = executeChecker("", "4.000000");
         CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
     }
 }
@@ -86,7 +86,7 @@ void Test::subFloatNegPos() {
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if (compStatus == true) {
-        bool execStatus = executeChecker("", "0.0");
+        bool execStatus = executeChecker("", "0.000000");
         CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
     }
 }
@@ -96,7 +96,7 @@ void Test::subFloatNegNeg() {
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if (compStatus == true) {
-        bool execStatus = executeChecker("", "0.0");
+        bool execStatus = executeChecker("", "0.000000");
         CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
     }
 }

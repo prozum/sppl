@@ -21,7 +21,7 @@ void Test::funcRetFloat () {
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if(compStatus) {
-        bool execStatus = executeChecker("", "2.0");
+        bool execStatus = executeChecker("", "2.000000");
         CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
     }
 }
@@ -86,7 +86,7 @@ void Test::funcFloatRetFloat () {
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if(compStatus) {
-        bool execStatus = executeChecker("", "2.0");
+        bool execStatus = executeChecker("", "2.000000");
         CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
     }
 }
@@ -151,7 +151,7 @@ void Test::funcFloatFloatRetFloat () {
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if(compStatus) {
-        bool execStatus = executeChecker("", "4.0");
+        bool execStatus = executeChecker("", "4.000000");
         CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
     }
 }
@@ -216,7 +216,7 @@ void Test::funcListFloatRetListFloat () {
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if(compStatus) {
-        bool execStatus = executeChecker("", "[1.0]");
+        bool execStatus = executeChecker("", "[1.000000]");
         CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
     }
 }
@@ -268,7 +268,7 @@ void Test::funcTupleIntIntRetTupleIntInt () {
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if(compStatus) {
-        bool execStatus = executeChecker("", "(2,2)");
+        bool execStatus = executeChecker("", "(2, 2)");
         CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
     }
 }
@@ -281,7 +281,7 @@ void Test::funcTupleFloatFloatRetTupleFloatFloat () {
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if(compStatus) {
-        bool execStatus = executeChecker("", "(2.0,2.0)");
+        bool execStatus = executeChecker("", "(2.000000, 2.000000)");
         CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
     }
 }
@@ -294,7 +294,7 @@ void Test::funcTupleBoolBoolRetTupleBoolBool () {
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if(compStatus) {
-        bool execStatus = executeChecker("", "(True,False)");
+        bool execStatus = executeChecker("", "(True, False)");
         CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
     }
 }
@@ -307,7 +307,7 @@ void Test::funcTupleCharCharRetTupleCharChar () {
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if(compStatus) {
-        bool execStatus = executeChecker("", "('c','h')");
+        bool execStatus = executeChecker("", "('c', 'h')");
         CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
     }
 }
@@ -320,7 +320,7 @@ void Test::funcTupleStringStringRetTupleStringString () {
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if(compStatus) {
-        bool execStatus = executeChecker("", "func((\"string\",\"string\"))");
+        bool execStatus = executeChecker("", "(\"string\", \"string\")");
         CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
     }
 }
@@ -348,7 +348,7 @@ void Test::funcFloatToFloatRetFloat () {
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if(compStatus) {
-        bool execStatus = executeChecker("", "2.0");
+        bool execStatus = executeChecker("", "2.000000");
         CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
     }
 }
@@ -418,7 +418,7 @@ void Test::funcTupleIntIntToTupleIntIntRetInt () {
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if(compStatus) {
-        bool execStatus = executeChecker("", "(1,2)");
+        bool execStatus = executeChecker("", "(1, 2)");
         CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
     }
 }

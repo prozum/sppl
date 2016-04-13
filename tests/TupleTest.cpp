@@ -116,7 +116,7 @@ void Test::tupleTwoInt() {
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if(compStatus) {
-        bool execStatus = executeChecker("", "(2,2)");
+        bool execStatus = executeChecker("", "(2, 2)");
         CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
     }
 }
@@ -126,7 +126,7 @@ void Test::tupleTwoFloat() {
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if(compStatus) {
-        bool execStatus = executeChecker("", "(2.0,2.0)");
+        bool execStatus = executeChecker("", "(2.000000, 2.000000)");
         CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
     }
 }
@@ -136,7 +136,7 @@ void Test::tupleTwoBool() {
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if(compStatus) {
-        bool execStatus = executeChecker("", "(True,False)");
+        bool execStatus = executeChecker("", "(True, False)");
         CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
     }
 }
@@ -146,7 +146,7 @@ void Test::tupleTwoChar() {
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if(compStatus) {
-        bool execStatus = executeChecker("", "('c','h')");
+        bool execStatus = executeChecker("", "('c', 'h')");
         CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
     }
 }
@@ -156,7 +156,7 @@ void Test::tupleTwoString() {
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if(compStatus) {
-        bool execStatus = executeChecker("", "(\"string\",\"string\")");
+        bool execStatus = executeChecker("", "(\"string\", \"string\")");
         CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
     }
 }
@@ -166,7 +166,7 @@ void Test::tupleThreeInt() {
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if(compStatus) {
-        bool execStatus = executeChecker("", "(2,2,2)");
+        bool execStatus = executeChecker("", "(2, 2, 2)");
         CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
     }
 }
@@ -176,7 +176,7 @@ void Test::tupleThreeFloat() {
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if(compStatus) {
-        bool execStatus = executeChecker("", "(2.0,2.0,2.0)");
+        bool execStatus = executeChecker("", "(2.000000, 2.000000, 2.000000)");
         CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
     }
 }
@@ -196,7 +196,7 @@ void Test::tupleThreeChar() {
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if(compStatus) {
-        bool execStatus = executeChecker("", "('c','h','a')");
+        bool execStatus = executeChecker("", "('c', 'h', 'a')");
         CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
     }
 }
@@ -206,7 +206,7 @@ void Test::tupleThreeString() {
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if(compStatus) {
-        bool execStatus = executeChecker("", "(\"string\",\"string\",\"string\")");
+        bool execStatus = executeChecker("", "(\"string\", \"string\", \"string\")");
         CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
     }
 }
@@ -216,7 +216,7 @@ void Test::tupleMixed() {
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if(compStatus) {
-        bool execStatus = executeChecker("", "(2,2.0,True,'c','h','a','r',\"string\")");
+        bool execStatus = executeChecker("", "(2, 2.000000, True, 'c', 'h', 'a', 'r', \"string\")");
         CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
     }
 }
@@ -226,7 +226,7 @@ void Test::tupleListInt() {
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if(compStatus) {
-        bool execStatus = executeChecker("", "([2],[2])");
+        bool execStatus = executeChecker("", "([2], [2])");
         CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
     }
 }
@@ -236,7 +236,7 @@ void Test::tupleListFloat() {
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if(compStatus) {
-        bool execStatus = executeChecker("", "([2.0],[2.0])");
+        bool execStatus = executeChecker("", "([2.000000], [2.000000])");
         CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
     }
 }
@@ -246,7 +246,7 @@ void Test::tupleListBool() {
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if(compStatus) {
-        bool execStatus = executeChecker("", "([True],[False])");
+        bool execStatus = executeChecker("", "([True], [False])");
         CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
     }
 }
@@ -256,7 +256,7 @@ void Test::tupleListChar() {
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if(compStatus) {
-        bool execStatus = executeChecker("", "(['c'],['h'])");
+        bool execStatus = executeChecker("", "(['c'], ['h'])");
         CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
     }
 }
@@ -266,7 +266,7 @@ void Test::tupleListString() {
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if(compStatus) {
-        bool execStatus = executeChecker("", "([\"string\"],[\"string\"])");
+        bool execStatus = executeChecker("", "([\"string\"], [\"string\"])");
         CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
     }
 }
@@ -276,7 +276,7 @@ void Test::tupleNested() {
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if(compStatus) {
-        bool execStatus = executeChecker("", "((1,2),(3,4))");
+        bool execStatus = executeChecker("", "((1, 2), (3, 4))");
         CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
     }
 }
@@ -286,7 +286,7 @@ void Test::tupleTwoNested() {
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if(compStatus) {
-        bool execStatus = executeChecker("", "((1,2.0),(True,('c',\"har\")))");
+        bool execStatus = executeChecker("", "((1, 2.000000), (True, ('c', \"har\")))");
         CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
     }
 }
@@ -296,7 +296,7 @@ void Test::tupleSuperNested() {
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if(compStatus) {
-        bool execStatus = executeChecker("", "('h',('e',('l',('l',('o',(' ',('w',('o',('r',('l',('d','!')))))))))))");
+        bool execStatus = executeChecker("", "('h', ('e', ('l', ('l', ('o', (' ', ('w', ('o', ('r', ('l', ('d', '!')))))))))))");
         CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
     }
 }

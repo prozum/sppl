@@ -56,7 +56,7 @@ void Test::divFloatPosPos() {
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if (compStatus == true) {
-        bool execStatus = executeChecker("", "1.0");
+        bool execStatus = executeChecker("", "1.000000");
         CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
     }
 }
@@ -66,7 +66,7 @@ void Test::divFloatZeroZero() {
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if (compStatus == true) {
-        bool execStatus = executeChecker("", "0.0");
+        bool execStatus = executeChecker("", "0.000000");
         CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
     }
 }
@@ -76,7 +76,7 @@ void Test::divFloatPosNeg() {
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if (compStatus == true) {
-        bool execStatus = executeChecker("", "-1.0");
+        bool execStatus = executeChecker("", "-1.000000");
         CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
     }
 }
@@ -86,7 +86,7 @@ void Test::divFloatNegPos() {
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if (compStatus == true) {
-        bool execStatus = executeChecker("", "-1.0");
+        bool execStatus = executeChecker("", "-1.000000");
         CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
     }
 }
@@ -96,7 +96,7 @@ void Test::divFloatNegNeg() {
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if (compStatus == true) {
-        bool execStatus = executeChecker("", "1.0");
+        bool execStatus = executeChecker("", "1.000000");
         CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
     }
 }

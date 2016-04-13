@@ -42,7 +42,7 @@ bool Test::compileChecker(shared_ptr<std::stringstream> source) {
 }
 
 bool Test::executeChecker(std::string args, std::string expectedOutput) {
-    return true; // TODO: DONT DO THIS!!!
+    //return true; // TODO: DONT DO THIS!!!
 
     // Check if files exist
     if(checkIfFileExists("out.c") == false) {
@@ -81,7 +81,7 @@ bool Test::executeChecker(std::string args, std::string expectedOutput) {
         // If fail, first clear last test output, then return
         string resTemp = "result differ from expected\nResult   => ";
         resTemp += res;
-        resTemp += "\nExpected =>";
+        resTemp += "\nExpected => ";
         resTemp += expectedOutput;
 
         CPPUNIT_ASSERT_MESSAGE(resTemp, false);

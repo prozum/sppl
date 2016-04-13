@@ -36,7 +36,7 @@ void Test::listFloat() {
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if(compStatus) {
-        bool execStatus = executeChecker("", "[2.0]");
+        bool execStatus = executeChecker("", "[2.000000]");
         CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
     }
 }
@@ -86,7 +86,7 @@ void Test::listListFloat() {
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if(compStatus) {
-        bool execStatus = executeChecker("", "[[2.0]]");
+        bool execStatus = executeChecker("", "[[2.000000]]");
         CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
     }
 }
@@ -136,7 +136,7 @@ void Test::listAppendInt() {
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if(compStatus) {
-        bool execStatus = executeChecker("", "[1,2,3]");
+        bool execStatus = executeChecker("", "[1, 2, 3]");
         CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
     }
 }
@@ -146,7 +146,7 @@ void Test::listAppendFloat() {
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if(compStatus) {
-        bool execStatus = executeChecker("", "[1.0,2.0,3.0]");
+        bool execStatus = executeChecker("", "[1.000000, 2.000000, 3.000000]");
         CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
     }
 }
@@ -156,7 +156,7 @@ void Test::listAppendBool() {
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if(compStatus) {
-        bool execStatus = executeChecker("", "[True,False,True]");
+        bool execStatus = executeChecker("", "[True, False, True]");
         CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
     }
 }
@@ -166,7 +166,7 @@ void Test::listAppendChar() {
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if(compStatus) {
-        bool execStatus = executeChecker("", "['c','h','a','r']");
+        bool execStatus = executeChecker("", "['c', 'h', 'a', 'r']");
         CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
     }
 }
@@ -176,7 +176,7 @@ void Test::listAppendString() {
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if(compStatus) {
-        bool execStatus = executeChecker("", "[\"string\",\"string\",\"string\"]");
+        bool execStatus = executeChecker("", "[\"string\", \"string\", \"string\"]");
         CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
     }
 }
@@ -186,7 +186,7 @@ void Test::listLongInt() {
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if(compStatus) {
-        bool execStatus = executeChecker("", "[0,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0]");
+        bool execStatus = executeChecker("", "[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0]");
         CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
     }
 }
@@ -416,7 +416,7 @@ void Test::listTupleInt() {
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if(compStatus) {
-        bool execStatus = executeChecker("", "[(1,2),(3,4),(5,6)]");
+        bool execStatus = executeChecker("", "[(1, 2), (3, 4), (5, 6)]");
         CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
     }
 }
@@ -426,7 +426,7 @@ void Test::listTupleFloat() {
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if(compStatus) {
-        bool execStatus = executeChecker("", "[(1.0,2.0),(3.0,4.0),(5.0,6.0)]");
+        bool execStatus = executeChecker("", "[(1.000000, 2.000000), (3.000000, 4.000000), (5.000000, 6.000000)]");
         CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
     }
 }
@@ -436,7 +436,7 @@ void Test::listTupleBool() {
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if(compStatus) {
-        bool execStatus = executeChecker("", "[(True,False),(False,True),(False,False)]");
+        bool execStatus = executeChecker("", "[(True, False), (False, True), (False, False)]");
         CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
     }
 }
@@ -446,7 +446,7 @@ void Test::listTupleChar() {
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if(compStatus) {
-        bool execStatus = executeChecker("", "[('c','h'),('a','r'),('c','h')]");
+        bool execStatus = executeChecker("", "[('c', 'h'), ('a', 'r'), ('c', 'h')]");
         CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
     }
 }
@@ -456,7 +456,7 @@ void Test::listTupleString() {
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if(compStatus) {
-        bool execStatus = executeChecker("", "[(\"string\",\"string\"),(\"string\",\"string\"),(\"string\",\"string\")]");
+        bool execStatus = executeChecker("", "[(\"string\", \"string\"), (\"string\", \"string\"), (\"string\", \"string\")]");
         CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
     }
 }
