@@ -698,7 +698,12 @@ namespace common {
     }
 
     string Float::str() {
-        return value == (long)value ? to_string(value) + ".0" : to_string(value);
+        string res = to_string(value);
+
+        if (res.find('.') == res.npos)
+            res += ".0";
+
+        return res;
     }
 
     string Bool::str() {
