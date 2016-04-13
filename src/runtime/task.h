@@ -20,7 +20,7 @@ typedef enum state_e {
 
 typedef struct task_s {
     int64_t id;
-    reg_table_t regs;
+    context_t context;
     state_t state;
     void *args;
     func f;
