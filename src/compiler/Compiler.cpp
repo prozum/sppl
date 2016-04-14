@@ -57,6 +57,8 @@ namespace compiler {
         if (type_checker.HasError())
             return 3;
 
+        optimizer.visit(*driver.program);
+
         generator->visit(*driver.program);
         return 0;
     }

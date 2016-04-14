@@ -1,13 +1,13 @@
-def main : [String] -> Int
-| (path : [])                                             = 0
-| (path : ( option : []))                                 = 0
-| (path : ( "--parse" : (in1 : xs)))                      = ParseString(in1)
-| (path : ( "--length" : (in1 : xs)))                     = StringLength(in1)
-| (path : ( option : ( in1 : [] )))                       = 0
-| (path : ( "--contains" : ( in1 : ( in2 : xs ))))        = BoolToInt(StringContains(in1, in2))
-| (path : ( option : ( in1 : ( in2 : [] ))))              = 0
-| (path : ( "--concat" : ( in1 : ( in2 : ( in3 : xs ))))) = BoolToInt(StringConcat(in1, in2) == in3)
-| args                                                    = 0
+def main : [String] -> String
+| (path : [])                                             = "Invalid"
+| (path : ( option : []))                                 = "Invalid"
+| (path : ( "--parse" : (in1 : xs)))                      = IntToString(ParseString(in1))
+| (path : ( "--length" : (in1 : xs)))                     = IntToString(StringLength(in1))
+| (path : ( "--toupper" : (in1 : xs)))                    = StrMap(ToUpper, in1)
+| (path : ( option : ( in1 : [] )))                       = "Invalid"
+| (path : ( "--contains" : ( in1 : ( in2 : xs ))))        = BoolToString(StringContains(in1, in2))
+| (path : ( "--concat" : ( in1 : ( in2 : xs ))))          = StringConcat(in1, in2)
+| args                                                    = "Invalid"
 
 def BoolToInt : Bool -> Int
 | True  = 1
@@ -61,3 +61,64 @@ def StringStartsWithHelper : String -> String -> Bool -> Bool
 | "" find bool             = False
 | input find False         = False
 | (x : in) (y : find) bool = StringStartsWithHelper(in, find, x == y)
+
+def IntToString : Int -> String
+| 0 = "0"
+| n = IfElse(n < 0, '-' : IntToStringAcc(n, ""), IntToStringAcc(n, ""))
+
+def IntToStringAcc : Int -> String -> String
+| 0 res = res
+| n res = IntToStringAcc((n - (n % 10)) / 10, IntToChar(n % 10) : res)
+
+def BoolToString : Bool -> String
+| True = "True"
+| False = "False"
+
+def IfElse : Bool -> String -> String -> String
+| True a b = a
+| False a b = b
+
+def IntToChar : Int -> Char
+| 0 = '0'
+| 1 = '1'
+| 2 = '2'
+| 3 = '3'
+| 4 = '4'
+| 5 = '5'
+| 6 = '6'
+| 7 = '7'
+| 8 = '8'
+| 9 = '9'
+
+def StrMap : (Char -> Char) -> String -> String
+| f "" = ""
+| f (x : xs) = f(x) : StrMap(f, xs)
+
+def ToUpper : Char -> Char
+| 'q' = 'Q'
+| 'w' = 'W'
+| 'e' = 'E'
+| 'r' = 'R'
+| 't' = 'T'
+| 'y' = 'Y'
+| 'u' = 'U'
+| 'i' = 'I'
+| 'o' = 'O'
+| 'p' = 'P'
+| 'a' = 'A'
+| 's' = 'S'
+| 'd' = 'D'
+| 'f' = 'F'
+| 'g' = 'G'
+| 'h' = 'H'
+| 'j' = 'J'
+| 'k' = 'K'
+| 'l' = 'L'
+| 'z' = 'Z'
+| 'x' = 'X'
+| 'c' = 'C'
+| 'v' = 'V'
+| 'b' = 'B'
+| 'n' = 'N'
+| 'm' = 'M'
+| n = n

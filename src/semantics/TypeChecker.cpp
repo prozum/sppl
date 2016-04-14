@@ -9,9 +9,26 @@ namespace semantics
     TypeChecker::TypeChecker() { }
 
     void TypeChecker::visit(Program &node) {
+        auto strlist = Type(TypeId::LIST, vector<Type>({ Type(TypeId::STRING) }));
+
         // Visit children
         for (auto &func: node.funcs) {
             func->accept(*this);
+
+            if (func->id == "main") {
+                if (func->signature.subtypes.front() != strlist) {
+                    AddError(Error::Expected("Declaration of \"main\" had wrong input type",
+                                             strlist.str(),
+                                             func->signature.subtypes.front().str(),
+                                             func->loc));
+                } else if (func->signature.subtypes.size() != 2) {
+                    AddError(Error::Expected("Function \"main\" had wrong number of input",
+                                             "2",
+                                             to_string(func->signature.subtypes.size()),
+                                             func->loc));
+                }
+            }
+
             Safe;
         }
         // Visit stops here
@@ -21,7 +38,7 @@ namespace semantics
         current_func = &node;
 
         // Visit children
-        for (auto &cse : node.cases) {
+        for (auto &cse: node.cases) {
             cse->accept(*this);
             Safe;
         }
@@ -30,7 +47,7 @@ namespace semantics
 
     void TypeChecker::visit(Case &node) {
         // Visit children
-        for (auto &pattern : node.patterns) {
+        for (auto &pattern: node.patterns) {
             pattern->accept(*this);
         }
         node.expr->accept(*this);
@@ -44,7 +61,8 @@ namespace semantics
 
         if (node.patterns.size() == current_func->signature.subtypes.size() - 1) {
             for (size_t i = 0; i < node.patterns.size(); ++i) {
-                if (node.patterns[i]->type.id == TypeId::EMPTYLIST) {
+                if (node.patterns[i]->type.id == TypeId::EMPTYLIST &&
+                        current_func->signature.subtypes[i].id == TypeId::LIST) {
                     node.patterns[i]->type = current_func->signature.subtypes[i];
                 }
 
@@ -64,7 +82,10 @@ namespace semantics
             return;
         }
 
-        if (current_func->type != node.expr->type) {
+        if (node.expr->type.id == TypeId::EMPTYLIST &&
+                current_func->signature.subtypes.back().id == TypeId::LIST)
+            node.expr->type = current_func->signature.subtypes.back();
+        else if (current_func->type != node.expr->type) {
             AddError(Error::Expected("Wrong return type",
                                      current_func->type.str(),
                                      node.expr->type.str(),
@@ -357,23 +378,19 @@ namespace semantics
     }
 
     void TypeChecker::visit(Int &node) {
-        node.type = Type(TypeId::INT);
+
     }
 
     void TypeChecker::visit(Float &node) {
-        node.type = Type(TypeId::FLOAT);
     }
 
     void TypeChecker::visit(Bool &node) {
-        node.type = Type(TypeId::BOOL);
     }
 
     void TypeChecker::visit(Char &node) {
-        node.type = Type(TypeId::CHAR);
     }
 
     void TypeChecker::visit(String &node) {
-        node.type = Type(TypeId::STRING);
     }
 
     void TypeChecker::visit(ListPattern &node) {
@@ -428,7 +445,7 @@ namespace semantics
             if (node.left->type == node.right->type.subtypes.front()) {
                 node.type = node.right->type;
             } else {
-                AddError(Error::Expected("Left must be the same type as the right List",
+                AddError(Error::Expected("Left must be the same type as the right Lists children",
                                          node.right->type.subtypes[0].str(),
                                          node.right->str(),
                                          node.loc));
@@ -520,7 +537,10 @@ namespace semantics
         if (node.callee->type.id == TypeId::SIGNATURE) {
             if (node.exprs.size() + 1 == node.callee->type.subtypes.size()) {
                 for (size_t i = 0; i < node.exprs.size(); ++i) {
-                    if (node.exprs[i]->type != node.callee->type.subtypes[i]) {
+                    if (node.exprs[i]->type.id == TypeId::EMPTYLIST &&
+                            node.callee->type.subtypes[i].id == TypeId::LIST)
+                        node.exprs[i]->type = node.callee->type.subtypes[i];
+                    else if (node.exprs[i]->type != node.callee->type.subtypes[i]) {
                         AddError(Error::Expected("Function was called with an invalid argument",
                                                  node.callee->type.subtypes[i].str(),
                                                  node.exprs[i]->type.str(),
