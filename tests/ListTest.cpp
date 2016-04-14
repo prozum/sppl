@@ -4,6 +4,7 @@
 void Test::listCasEmpty() {
     std::shared_ptr<std::stringstream> source = buildSimple("[Int]->Int", "[]", "2", "[]");
     bool compStatus = compileChecker(source);
+    string s = source->str();
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if(compStatus) {
         bool execStatus = executeChecker("", "2");
