@@ -20,22 +20,22 @@ namespace common {
 
     Int::Int(long value,
              Location loc) :
-            Pattern(loc),
+            Pattern(Type(TypeId::INT), loc),
             value(value) { }
 
     Float::Float(double value,
                  Location loc) :
-            Pattern(loc),
+            Pattern(Type(TypeId::FLOAT), loc),
             value(value) { }
 
     Bool::Bool(bool value,
                Location loc) :
-            Pattern(loc),
+            Pattern(Type(TypeId::BOOL), loc),
             value(value) { }
 
     Char::Char(char value,
                Location loc) :
-            Pattern(loc),
+            Pattern(Type(TypeId::CHAR), loc),
             value(value) { }
 
     String::String(string value,
@@ -46,16 +46,12 @@ namespace common {
     ListPattern::ListPattern(vector<unique_ptr<Pattern>> patterns,
                              Location loc) :
             Pattern(loc),
-            patterns(move(patterns))
-    {
-    }
+            patterns(move(patterns)) { }
 
     TuplePattern::TuplePattern(vector<unique_ptr<Pattern>> patterns,
                                Location loc) :
             Pattern(loc),
-            patterns(move(patterns))
-    {
-    }
+            patterns(move(patterns)) { }
 
     ListSplit::ListSplit(unique_ptr<Pattern> left,
                          unique_ptr<Pattern> right,
@@ -66,15 +62,13 @@ namespace common {
 
     List::List(vector<unique_ptr<Expr>> exprs,
                Location loc) :
-            Expr(loc),
+            Expr(Type(TypeId::LIST), loc),
             exprs(move(exprs)) { }
 
     Tuple::Tuple(vector<unique_ptr<Expr>> exprs,
                  Location loc) :
-            Expr(loc),
-            exprs(move(exprs))
-    {
-    }
+            Expr(Type(TypeId::TUPLE), loc),
+            exprs(move(exprs)) { }
 
     Id::Id(string id,
            Location loc) :
