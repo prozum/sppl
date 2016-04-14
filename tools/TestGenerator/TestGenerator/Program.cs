@@ -91,6 +91,70 @@ namespace TestGenerator
 		}
 
 		static void GenerateFuncTest(StreamWriter writer, string testCaseName, 
+			string retType, 
+			string func1Signature, string func1Pattern, string func1Body, string func1Arg,
+			string shouldCompile, string execArg, string expected) {
+
+			string source = 
+				"void Test::" + testCaseName + " () {\n" +
+				"    std::shared_ptr<std::stringstream> source = buildFunc(\"" + retType + "\",\n" +
+				"        \"" + func1Signature + "\", \"" + func1Pattern + "\", \"" + func1Body + "\", \"" + func1Arg + "\");\n" +
+				"    bool compStatus = compileChecker(source);\n" +
+				"    CPPUNIT_ASSERT_MESSAGE(\"" + compMsg + "\", compStatus == " + shouldCompile + ");\n" +
+				"    if(compStatus) {\n" +
+				"        bool execStatus = executeChecker(\"" + execArg + "\", \"" + expected + "\");\n" +
+				"        CPPUNIT_ASSERT_MESSAGE(\"" + execMsg + "\", execStatus);\n" +
+				"    }\n" +
+				"}\n\n";
+			writer.WriteLine (source);
+		}
+
+		static void GenerateFuncTest(StreamWriter writer, string testCaseName, 
+			string retType, 
+			string func1Signature, string func1Pattern, string func1Body, string func1Arg,
+			string func2Signature, string func2Pattern, string func2Body,
+			string shouldCompile, string execArg, string expected) {
+
+			string source = 
+				"void Test::" + testCaseName + " () {\n" +
+				"    std::shared_ptr<std::stringstream> source = buildFunc(\"" + retType + "\",\n" +
+				"        \"" + func1Signature + "\", \"" + func1Pattern + "\", \"" + func1Body + "\", \"" + func1Arg + "\",\n" +
+				"        \"" + func2Signature + "\", \"" + func2Pattern + "\", \"" + func2Body + "\");\n" +
+				"    bool compStatus = compileChecker(source);\n" +
+				"    CPPUNIT_ASSERT_MESSAGE(\"" + compMsg + "\", compStatus == " + shouldCompile + ");\n" +
+				"    if(compStatus) {\n" +
+				"        bool execStatus = executeChecker(\"" + execArg + "\", \"" + expected + "\");\n" +
+				"        CPPUNIT_ASSERT_MESSAGE(\"" + execMsg + "\", execStatus);\n" +
+				"    }\n" +
+				"}\n\n";
+			writer.WriteLine (source);
+		}
+
+		static void GenerateFuncTest(StreamWriter writer, string testCaseName, 
+			string retType, 
+			string func1Signature, string func1Pattern, string func1Body, string func1Arg,
+			string func2Signature, string func2Pattern, string func2Body,
+			string func3Signature, string func3Pattern, string func3Body,
+			string shouldCompile, string execArg, string expected) {
+
+			string source = 
+				"void Test::" + testCaseName + " () {\n" +
+				"    std::shared_ptr<std::stringstream> source = buildFunc(\"" + retType + "\",\n" +
+				"        \"" + func1Signature + "\", \"" + func1Pattern + "\", \"" + func1Body + "\", \"" + func1Arg + "\",\n" +
+				"        \"" + func2Signature + "\", \"" + func2Pattern + "\", \"" + func2Body + "\",\n" +
+				"        \"" + func3Signature + "\", \"" + func3Pattern + "\", \"" + func3Body + "\");\n" +
+				"    bool compStatus = compileChecker(source);\n" +
+				"    CPPUNIT_ASSERT_MESSAGE(\"" + compMsg + "\", compStatus == " + shouldCompile + ");\n" +
+				"    if(compStatus) {\n" +
+				"        bool execStatus = executeChecker(\"" + execArg + "\", \"" + expected + "\");\n" +
+				"        CPPUNIT_ASSERT_MESSAGE(\"" + execMsg + "\", execStatus);\n" +
+				"    }\n" +
+				"}\n\n";
+			writer.WriteLine (source);
+		}
+
+		/*
+		static void GenerateFuncTest(StreamWriter writer, string testCaseName, 
 			string mainSignature, string mainPattern, string mainBody, 
 			string func1Signature, string func1Pattern, string func1Body, 
 			string shouldCompile, string execArg, string expected) {
@@ -155,7 +219,7 @@ namespace TestGenerator
 				"}\n\n";
 			writer.WriteLine (source);
 		}
-
+*/
 
 		static void buildAddTest() {
 			StreamWriter writer = new StreamWriter ("AddTest.cpp");
@@ -545,45 +609,45 @@ namespace TestGenerator
 			StreamWriter writer = new StreamWriter ("FuncTest.cpp");
 			writer.WriteLine ("#include \"Test.h\"\n\n");
 
-			GenerateFuncTest (writer, "funcRetInt", "Int", "", "func()", "Int", "", "2", "true", "", "2");
-			GenerateFuncTest (writer, "funcRetFloat", "Float", "", "func()", "Float", "", "2.0", "true", "", "2.000000");
-			GenerateFuncTest (writer, "funcRetBool", "Bool", "", "func()", "Bool", "", "True", "true", "", "True");
-			GenerateFuncTest (writer, "funcRetChar", "Char", "", "func()", "Char", "", "'c'", "true", "", "'c'");
-			GenerateFuncTest (writer, "funcRetString", "String", "", "func()", "String", "", "\\\"string\\\"", "true", "", "\\\"string\\\"");
+			GenerateFuncTest (writer, "funcRetInt", "Int", "Int", "", "2", "", "true", "", "2");
+			GenerateFuncTest (writer, "funcRetFloat", "Float", "Float", "", "2.0", "", "true", "", "2.000000");
+			GenerateFuncTest (writer, "funcRetBool", "Bool", "Bool", "", "True", "", "true", "", "True");
+			GenerateFuncTest (writer, "funcRetChar", "Char", "Char", "", "'c'", "", "true", "", "'c'");
+			GenerateFuncTest (writer, "funcRetString", "String", "String", "", "\\\"string\\\"", "", "true", "", "\\\"string\\\"");
 
-			GenerateFuncTest (writer, "funcIntRetInt", "Int", "", "func(2)", "Int->Int", "n", "n", "true", "", "2");
-			GenerateFuncTest (writer, "funcFloatRetFloat", "Float", "", "func(2.0)", "Float->Float", "n", "n", "true", "", "2.000000");
-			GenerateFuncTest (writer, "funcBoolRetBool", "Bool", "", "func(True)", "Bool->Bool", "n", "n", "true", "", "True");
-			GenerateFuncTest (writer, "funcCharRetChar", "Char", "", "func('c')", "Char->Char", "n", "n", "true", "", "'c'");
-			GenerateFuncTest (writer, "funcStringRetString", "String", "", "func(\\\"string\\\")", "String->String", "n", "n", "true", "", "\\\"string\\\"");
+			GenerateFuncTest (writer, "funcIntRetInt", "Int", "Int->Int", "n", "n", "2", "true", "", "2");
+			GenerateFuncTest (writer, "funcFloatRetFloat", "Float", "Float->Float", "n", "n", "2.0", "true", "", "2.000000");
+			GenerateFuncTest (writer, "funcBoolRetBool", "Bool", "Bool->Bool", "n", "n", "True", "true", "", "True");
+			GenerateFuncTest (writer, "funcCharRetChar", "Char", "Char->Char", "n", "n", "'c'", "true", "", "'c'");
+			GenerateFuncTest (writer, "funcStringRetString", "String", "String->String", "n", "n", "\\\"string\\\"","true", "", "\\\"string\\\"");
 
-			GenerateFuncTest (writer, "funcIntIntRetInt", "Int", "", "func(2,2)", "Int->Int->Int", "m n", "m+n", "true", "", "4");
-			GenerateFuncTest (writer, "funcFloatFloatRetFloat", "Float", "", "func(2.0,2.0)", "Float->Float->Float", "m n", "m+n", "true", "", "4.000000");
-			GenerateFuncTest (writer, "funcBoolBoolRetBool", "Bool", "", "func(True, False)", "Bool->Bool->Bool", "m n", "m||n", "true", "", "True");
-			GenerateFuncTest (writer, "funcCharCharRetChar", "Char", "", "func('c','h')", "Char->Char->Char", "m n", "'c'", "true", "", "'c'");
-			GenerateFuncTest (writer, "funcStringStringRetString", "String", "", "func(\\\"string\\\", \\\"string\\\")", "String->String->String", "m n", "\\\"string\\\"", "true", "", "\\\"string\\\"");
+			GenerateFuncTest (writer, "funcIntIntRetInt", "Int", "Int->Int->Int", "m n", "m+n", "2,2", "true", "", "4");
+			GenerateFuncTest (writer, "funcFloatFloatRetFloat", "Float", "Float->Float->Float", "m n", "m+n", "2.0,2.0", "true", "", "4.000000");
+			GenerateFuncTest (writer, "funcBoolBoolRetBool", "Bool", "Bool->Bool->Bool", "m n", "m||n", "True,False", "true", "", "True");
+			GenerateFuncTest (writer, "funcCharCharRetChar", "Char", "Char->Char->Char", "m n", "'c'", "'c','h'", "true", "", "'c'");
+			GenerateFuncTest (writer, "funcStringStringRetString", "String", "String->String->String", "m n", "\\\"string\\\"", "\\\"string\\\", \\\"string\\\"","true", "", "\\\"string\\\"");
 
-			GenerateFuncTest (writer, "funcListIntRetListInt", "[Int]", "", "func([1])", "[Int]->[Int]", "n", "n", "true", "", "[1]");
-			GenerateFuncTest (writer, "funcListFloatRetListFloat", "[Float]", "", "func([1.0])", "[Float]->[Float]", "n", "n", "true", "", "[1.000000]");
-			GenerateFuncTest (writer, "funcListBoolRetListBool", "[Bool]", "", "func([True])", "[Bool]->[Bool]", "n", "n", "true", "", "[True]");
-			GenerateFuncTest (writer, "funcListCharRetListChar", "[Char]", "", "func(['c'])", "[Char]->[Char]", "n", "n", "true", "", "['c']");
-			GenerateFuncTest (writer, "funcListStringRetListString", "[String]", "", "func([\\\"string\\\"])", "[String]->[String]", "n", "n", "true", "", "[\\\"string\\\"]");
+			GenerateFuncTest (writer, "funcListIntRetListInt", "[Int]", "[Int]->[Int]", "n", "n", "[1]", "true", "", "[1]");
+			GenerateFuncTest (writer, "funcListFloatRetListFloat", "[Float]", "[Float]->[Float]", "n", "n", "[1.0]", "true", "", "[1.000000]");
+			GenerateFuncTest (writer, "funcListBoolRetListBool", "[Bool]", "[Bool]->[Bool]", "n", "n", "[True]", "true", "", "[True]");
+			GenerateFuncTest (writer, "funcListCharRetListChar", "[Char]", "[Char]->[Char]", "n", "n", "['c']", "true", "", "['c']");
+			GenerateFuncTest (writer, "funcListStringRetListString", "[String]", "[String]->[String]", "n", "n", "[\\\"string\\\"]", "true", "", "[\\\"string\\\"]");
 
-			GenerateFuncTest (writer, "funcTupleIntIntRetTupleIntInt", "(Int,Int)", "", "func((2,2))", "(Int,Int)->(Int,Int)", "n", "n", "true", "", "(2, 2)");
-			GenerateFuncTest (writer, "funcTupleFloatFloatRetTupleFloatFloat", "(Float,Float)", "", "func((2.0,2.0))", "(Float,Float)->(Float,Float)", "n", "n", "true", "", "(2.000000, 2.000000)");
-			GenerateFuncTest (writer, "funcTupleBoolBoolRetTupleBoolBool", "(Bool,Bool)", "", "func((True,False))", "(Bool,Bool)->(Bool,Bool)", "n", "n", "true", "", "(True, False)");
-			GenerateFuncTest (writer, "funcTupleCharCharRetTupleCharChar", "(Char,Char)", "", "func(('c','h'))", "(Char,Char)->(Char,Char)", "n", "n", "true", "", "('c', 'h')");
-			GenerateFuncTest (writer, "funcTupleStringStringRetTupleStringString", "(String,String)", "", "func((\\\"string\\\",\\\"string\\\"))", "(String,String)->(String,String)", "n", "n", "true", "", "(\\\"string\\\", \\\"string\\\")");
+			GenerateFuncTest (writer, "funcTupleIntIntRetTupleIntInt", "(Int,Int)", "(Int,Int)->(Int,Int)", "n", "n", "(2,2)", "true", "", "(2, 2)");
+			GenerateFuncTest (writer, "funcTupleFloatFloatRetTupleFloatFloat", "(Float,Float)", "(Float,Float)->(Float,Float)", "n", "n", "(2.0,2.0)", "true", "", "(2.000000, 2.000000)");
+			GenerateFuncTest (writer, "funcTupleBoolBoolRetTupleBoolBool", "(Bool,Bool)", "(Bool,Bool)->(Bool,Bool)", "n", "n", "(True,False)", "true", "", "(True, False)");
+			GenerateFuncTest (writer, "funcTupleCharCharRetTupleCharChar", "(Char,Char)", "(Char,Char)->(Char,Char)", "n", "n", "('c','h')", "true", "", "('c', 'h')");
+			GenerateFuncTest (writer, "funcTupleStringStringRetTupleStringString", "(String,String)", "(String,String)->(String,String)", "n", "n", "(\\\"string\\\",\\\"string\\\")", "true", "", "(\\\"string\\\", \\\"string\\\")");
 
-			GenerateFuncTest (writer, "funcIntToIntRetInt", "Int", "", "func1(func2)", "(Int->Int)->Int", "f", "f(2)", "Int->Int", "n", "n", "true", "", "2");
-			GenerateFuncTest (writer, "funcFloatToFloatRetFloat", "Float", "", "func1(func2)", "(Float->Float)->Float", "f", "f(2.0)", "Float->Float", "n", "n", "true", "", "2.000000");
-			GenerateFuncTest (writer, "funcBoolToBoolRetBool", "Bool", "", "func1(func2)", "(Bool->Bool)->Bool", "f", "f(True)", "Bool->Bool", "n", "n", "true", "", "True");
-			GenerateFuncTest (writer, "funcCharToCharRetChar", "Char", "", "func1(func2)", "(Char->Char)->Char", "f", "f('c')", "Char->Char", "n", "n", "true", "", "'c'");
-			GenerateFuncTest (writer, "funcStringToStringRetString", "String", "", "func1(func2)", "(String->String)->String", "f", "f(\\\"string\\\")", "String->String", "n", "n", "true", "", "\\\"string\\\"");
+			GenerateFuncTest (writer, "funcIntToIntRetInt", "Int", "(Int->Int)->Int", "f", "f(2)", "func2", "Int->Int", "n", "n", "true", "", "2");
+			GenerateFuncTest (writer, "funcFloatToFloatRetFloat", "Float", "(Float->Float)->Float", "f", "f(2.0)", "func2", "Float->Float", "n", "n", "true", "", "2.000000");
+			GenerateFuncTest (writer, "funcBoolToBoolRetBool", "Bool", "(Bool->Bool)->Bool", "f", "f(True)", "func2", "Bool->Bool", "n", "n", "true", "", "True");
+			GenerateFuncTest (writer, "funcCharToCharRetChar", "Char", "(Char->Char)->Char", "f", "f('c')", "func2", "Char->Char", "n", "n", "true", "", "'c'");
+			GenerateFuncTest (writer, "funcStringToStringRetString", "String", "(String->String)->String", "f", "f(\\\"string\\\")", "func2", "String->String", "n", "n", "true", "", "\\\"string\\\"");
 
-			GenerateFuncTest (writer, "funcListIntToListIntRetListInt", "[Int]", "", "func1(func2)", "([Int]->[Int])->[Int]", "f", "f([1])", "[Int]->[Int]", "n", "n", "true", "", "[1]");
-			GenerateFuncTest (writer, "funcTupleIntIntToTupleIntIntRetInt", "(Int,Int)", "", "func1(func2)", "((Int,Int)->(Int,Int))->(Int,Int)", "f", "f((1,2))", "(Int,Int)->(Int,Int)", "n", "n", "true", "", "(1, 2)");
-			GenerateFuncTest (writer, "funcIntToIntRetToIntRetToInt", "Int", "", "func1(func2)", "((Int->Int)->Int)->Int", "f", "f(func3)", "(Int->Int)->Int", "f", "f(2)", "Int->Int", "n", "n", "true", "", "2");
+			GenerateFuncTest (writer, "funcListIntToListIntRetListInt", "[Int]", "([Int]->[Int])->[Int]", "f", "f([1])", "func2", "[Int]->[Int]", "n", "n", "true", "", "[1]");
+			GenerateFuncTest (writer, "funcTupleIntIntToTupleIntIntRetInt", "(Int,Int)", "((Int,Int)->(Int,Int))->(Int,Int)", "f", "f((1,2))", "func2", "(Int,Int)->(Int,Int)", "n", "n", "true", "", "(1, 2)");
+			GenerateFuncTest (writer, "funcIntToIntRetToIntRetToInt", "Int", "((Int->Int)->Int)->Int", "f", "f(func3)", "func2", "(Int->Int)->Int", "f", "f(2)", "Int->Int", "n", "n", "true", "", "2");
 
 			writer.Close ();
 		}
