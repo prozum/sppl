@@ -58,6 +58,7 @@ namespace codegen
         for (auto f : node.funcs) {
             f->accept(*this);
             *output << endl;
+            output_buffer();
         }
     }
 
@@ -723,6 +724,8 @@ namespace codegen
     }
 
     string CCodeGenerator::generate_list(Type &type) {
+        // save the generated list in a result stream
+        stringstream result;
         string name = g_generated + g_list + to_string(list_count);
 
         // increase list count, so next list doesn't have the same name
@@ -744,7 +747,7 @@ namespace codegen
 
         // generate add function for list
         *header << name << "* " << g_generated << g_add << name << "(" << name << "* current, " << last_type << " item); \n";
-        *output << name << "* " << g_generated << g_add << name << "(" << name << "* current, " << last_type << " item) { \n"
+        buffer << name << "* " << g_generated << g_add << name << "(" << name << "* current, " << last_type << " item) { \n"
                    "    " << name << "* res = malloc(sizeof(" << name << "));\n"
                    "    res->" << g_value << " = item; \n"
                    "    res->" << g_next << " = current; \n"
@@ -757,7 +760,7 @@ namespace codegen
 
         // generate create function for list
         *header << name << "* " << g_generated << g_create << name << "(int count, ...); \n";
-        *output << name << "* " << g_generated << g_create << name << "(int count, ...) { \n"
+        buffer << name << "* " << g_generated << g_create << name << "(int count, ...) { \n"
                   "    int i; \n"
                   "    va_list args; \n"
                   "    " << name << "* res = malloc(sizeof(" << name << ")); \n"
@@ -778,7 +781,7 @@ namespace codegen
 
         // generate at function for list
         *header << name << "* " << g_generated << g_at << name << "(" << name << "* current, int index); \n";
-        *output << name << "* " << g_generated << g_at << name << "(" << name << "* current, int index) { \n"
+        buffer << name << "* " << g_generated << g_at << name << "(" << name << "* current, int index) { \n"
                    "    while (index-- > 0) { \n"
                    "        if (current->" << g_empty << ") { \n"
                    "            return current; \n"
@@ -793,7 +796,7 @@ namespace codegen
 
         // generate valueat function for list
         *header << last_type << " " << g_generated << g_valueat << name << "(" << name << "* current, int index); \n";
-        *output << last_type << " " << g_generated << g_valueat << name << "(" << name << "* current, int index) { \n"
+        buffer << last_type << " " << g_generated << g_valueat << name << "(" << name << "* current, int index) { \n"
                    "    " << name << "* res = " << g_generated << g_at << name << "(current, index); \n"
                    "\n"
                    "    if (res->" << g_empty << ") { \n"
@@ -807,7 +810,7 @@ namespace codegen
 
         // generate compare function for list
         *header << "int " << g_generated << g_compare << name << "(" << name << "* list1, " << name << "* list2); \n";
-        *output << "int " << g_generated << g_compare << name << "(" << name << "* list1, " << name << "* list2) { \n"
+        buffer << "int " << g_generated << g_compare << name << "(" << name << "* list1, " << name << "* list2) { \n"
                    "    int i; \n"
                    "    if (list1->" << g_size << " != list2->" << g_size << ") { \n"
                    "         return 0; \n"
@@ -818,19 +821,19 @@ namespace codegen
 
         switch (type.types.front()->type) {
             case Types::LIST:
-                *output << "!" << g_generated << g_compare << lists[*type.types.front()] <<
+                buffer << "!" << g_generated << g_compare << lists[*type.types.front()] <<
                         "(" << g_generated << g_valueat << name << "(list1, i), " << g_generated << g_valueat << name << "(list2, i))";
                 break;
             case Types::TUPLE:
-                *output << "!" << g_generated << g_compare << tuples[*type.types.front()] <<
+                buffer << "!" << g_generated << g_compare << tuples[*type.types.front()] <<
                         "(" << g_generated << g_valueat << name << "(list1, i), " << g_generated << g_valueat << name << "(list2, i))";
                 break;
             default:
-                *output << g_generated << g_valueat << name << "(list1, i) != " << g_generated << g_valueat << name << "(list2, i)";
+                buffer << g_generated << g_valueat << name << "(list1, i) != " << g_generated << g_valueat << name << "(list2, i)";
                 break;
         }
 
-        *output << ") \n"
+        buffer << ") \n"
                   "            return 0; \n"
                   "    } \n"
                   " \n"
@@ -840,7 +843,7 @@ namespace codegen
 
         // generation of concat 43 sec old
         *header << name << "* " << g_generated << g_concat << name << "(" << name << "* list1, " << name << "* list2); \n";
-        *output << name << "* " << g_generated << g_concat << name << "(" << name << "* list1, " << name << "* list2) { \n"
+        buffer << name << "* " << g_generated << g_concat << name << "(" << name << "* list1, " << name << "* list2) { \n"
                    "    int i; \n"
                    "    " << name << "** elements = malloc(sizeof(" << name << "*) * list1->" << g_size <<"); \n"
                    " \n"
@@ -862,7 +865,7 @@ namespace codegen
         to_strings[type] = g_generated + g_tostring + name;
 
         *header << string_type_name << "* " << to_strings[type] << "(" << name << "* value); \n";
-        *output << string_type_name << "* " << to_strings[type] << "(" << name << "* value) { \n"
+        buffer << string_type_name << "* " << to_strings[type] << "(" << name << "* value) { \n"
                 "    " << string_type_name << "* comma = " << g_generated << g_create << g_string << "(\", \"); \n"
                 "    " << string_type_name << "* res = " << g_generated << g_create << g_string << "(\"]\"); \n"
                 "    int i; \n"
@@ -913,7 +916,7 @@ namespace codegen
         to_strings[type] = g_generated + g_tostring + name;
 
         *header << string_type_name << "* " << to_strings[type] << "(" << name << " value); \n";
-        *output << string_type_name << "* " << to_strings[type] << "(" << name << " value) { \n"
+        buffer << string_type_name << "* " << to_strings[type] << "(" << name << " value) { \n"
                    "    return " << g_generated << g_create << g_string << "(\"" << type.str() << "\"); \n"
                    "} \n"
                    " \n";
@@ -964,47 +967,47 @@ namespace codegen
         result << ")";
 
         *header << result.str() << "; \n";
-        *output << result.str() << " { \n";
+        buffer << result.str() << " { \n";
 
         // generate a result variable
-        *output << "    " << name << " " << "res; \n";
+        buffer << "    " << name << " " << "res; \n";
 
         // for each item in res, assign values
         for (size_t i = 0; i < type.types.size(); ++i) {
-            *output << "    res." << g_generated << g_item << i << " = " << g_generated << g_item << i << "; \n";
+            buffer << "    res." << g_generated << g_item << i << " = " << g_generated << g_item << i << "; \n";
         }
-        *output << " \n"
+        buffer << " \n"
                    "    return res; \n"
                    "} \n"
                    " \n";
 
         // generate a compare function for this tuple
         *header << "int " << g_generated << g_compare << name << "(" << name << " tuple1, " << name << " tuple2); \n";
-        *output << "int " << g_generated << g_compare << name << "(" << name << " tuple1, " << name << " tuple2) { \n";
+        buffer << "int " << g_generated << g_compare << name << "(" << name << " tuple1, " << name << " tuple2) { \n";
 
         for (size_t i = 0; i < type.types.size(); ++i) {
-            *output << "    if (";
+            buffer << "    if (";
 
             switch (type.types[i]->type) {
                 case Types::STRING:
                 case Types::LIST:
-                    *output << "!" << g_generated << g_compare << lists[*type.types[i]] <<
+                    buffer << "!" << g_generated << g_compare << lists[*type.types[i]] <<
                                "(tuple1." << g_generated << g_item << i << ", tuple2." << g_generated << g_item << i << ")";
                     break;
                 case Types::TUPLE:
-                    *output << "!" << g_generated << g_compare << tuples[*type.types[i]] <<
+                    buffer << "!" << g_generated << g_compare << tuples[*type.types[i]] <<
                                "(tuple1." << g_generated << g_item << i << ", tuple2." << g_generated << g_item << i << ")";
                     break;
                 default:
-                    *output << "(tuple1." << g_generated << g_item << i << " != tuple2." << g_generated << g_item << i << ")";
+                    buffer << "(tuple1." << g_generated << g_item << i << " != tuple2." << g_generated << g_item << i << ")";
                     break;
             }
 
-            *output << ") \n"
+            buffer << ") \n"
                       "        return 0; \n";
         }
 
-        *output << " \n"
+        buffer << " \n"
                   "    return 1; \n"
                   "} \n"
                   "\n";
@@ -1014,18 +1017,18 @@ namespace codegen
         to_strings[type] = g_generated + g_tostring + name;
 
         *header << string_type_name << "* " << to_strings[type] << "(" << name << " value); \n";
-        *output << string_type_name << "* " << to_strings[type] << "(" << name << " value) { \n"
+        buffer << string_type_name << "* " << to_strings[type] << "(" << name << " value) { \n"
                    "    " << string_type_name << "* comma = " << g_generated << g_create << g_string << "(\", \"); \n"
                    "    " << string_type_name << "* res = " << g_generated << g_create << g_string << "(\")\"); \n"
                    "\n";
 
         for (size_t i = type.types.size() - 1; i != 0; --i) {
-            *output << "    res = " << g_generated << g_concat << string_type_name << "(" << to_strings[*type.types[i]] << "(value." << g_generated << g_item << i << ")" << ", res); \n";
-            *output << "    res = " << g_generated << g_concat << string_type_name << "(comma, res); \n";
+            buffer << "    res = " << g_generated << g_concat << string_type_name << "(" << to_strings[*type.types[i]] << "(value." << g_generated << g_item << i << ")" << ", res); \n";
+            buffer << "    res = " << g_generated << g_concat << string_type_name << "(comma, res); \n";
         }
 
 
-        *output << "    res = " << g_generated << g_concat << string_type_name << "(" << to_strings[*type.types.front()] << "(value." << g_generated << g_item << "0)" << ", res); \n"
+        buffer << "    res = " << g_generated << g_concat << string_type_name << "(" << to_strings[*type.types.front()] << "(value." << g_generated << g_item << "0)" << ", res); \n"
                    "    res = " << g_generated << g_add << string_type_name << "(res, '('); \n"
                    " \n"
                    "    return res; \n"
@@ -1060,6 +1063,8 @@ namespace codegen
 
         generate_list(*real_string);
         generate_list(*string_list);
+
+        output_buffer();
 
         // generation of string constructer starts here
         *header << string_type_name << "* " << g_generated << g_create << g_string << "(char* values);\n";
@@ -1185,5 +1190,10 @@ namespace codegen
         } else {
             return got->second;
         }
+    }
+
+    void CCodeGenerator::output_buffer() {
+        *output << buffer.str(),
+        buffer.str(string());
     }
 }

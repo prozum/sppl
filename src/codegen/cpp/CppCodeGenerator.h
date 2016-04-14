@@ -115,6 +115,7 @@ namespace codegen {
             const string g_main = "main";
 
             shared_ptr<std::ostream> &header;
+            stringstream buffer;
 
             int tuple_count = 0;
             int list_count = 0;
@@ -147,5 +148,7 @@ namespace codegen {
             string get_tuple(Type &);
             string get_signature(Type &);
             void generate_std();
+            void output_buffer();
+
     };
 }
