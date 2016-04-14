@@ -838,14 +838,22 @@ namespace codegen
                   "} \n"
                   " \n";
 
-        // generation of concat
+        // generation of concat 43 sec old
         *header << name << "* " << g_generated << g_concat << name << "(" << name << "* list1, " << name << "* list2); \n";
         *output << name << "* " << g_generated << g_concat << name << "(" << name << "* list1, " << name << "* list2) { \n"
                    "    int i; \n"
-                   "    for (i = list1->" << g_size << " - 1; i >= 0; --i) { \n"
-                   "        list2 = " << g_generated << g_add << name << "(list2, " << g_generated << g_valueat << name << "(list1, i)); \n"
+                   "    " << name << "** elements = malloc(sizeof(" << name << "*) * list1->" << g_size <<"); \n"
+                   " \n"
+                   "    for (i = 0; !list1->" << g_empty << "; ++i) { \n"
+                   "        elements[i] = list1; \n"
+                   "        list1 = list1->" << g_next << "; \n"
                    "    } \n"
                    " \n"
+                   "    for (--i; i >= 0; --i) { \n"
+                   "        list2 = " << g_generated << g_add << name << "(list2, elements[i]->" << g_value << "); \n"
+                   "    } \n"
+                   " \n"
+                   "    free(elements); \n"
                    "    return list2; \n"
                    "} \n"
                    "\n";
