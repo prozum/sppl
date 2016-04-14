@@ -81,7 +81,7 @@ using namespace std;
 }
 
 "\""[^"]*"\"" {
-    yylval->str = make_unique<string>(yytext);
+    yylval->str = new string(yytext);
     yylval->str->pop_back();
     yylval->str->erase (0,1);
     return token::STRINGLITERAL;
@@ -93,7 +93,7 @@ using namespace std;
 }
 
 [a-zA-Z_][a-zA-Z0-9_]* {
-    yylval->str = make_unique<string>(yytext);
+    yylval->str = new string(yytext);
     return token::ID;
 }
 
