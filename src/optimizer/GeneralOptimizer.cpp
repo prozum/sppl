@@ -136,17 +136,22 @@ namespace optimizer {
 
     void GeneralOptimizer::visit(ListPattern &node)
     {
-
+        for (auto pattern : node.patterns) {
+            pattern->accept(*this);
+        }
     }
 
     void GeneralOptimizer::visit(TuplePattern &node)
     {
-
+        for (auto pattern : node.patterns) {
+            pattern->accept(*this);
+        }
     }
 
     void GeneralOptimizer::visit(ListSplit &node)
     {
-
+        node.left->accept(*this);
+        node.right->accept(*this);
     }
 
     void GeneralOptimizer::visit(Int &node)
@@ -171,7 +176,9 @@ namespace optimizer {
 
     void GeneralOptimizer::visit(List &node)
     {
-
+        for (auto expr : node.exprs) {
+            expr->accept(*this);
+        }
     }
 
     void GeneralOptimizer::visit(Id &node)
@@ -180,14 +187,21 @@ namespace optimizer {
 
     void GeneralOptimizer::visit(Call &node)
     {
+        node.callee->accept(*this);
 
+        for (auto expr : node.exprs) {
+            expr->accept(*this);
+        }
     }
 
     void GeneralOptimizer::visit(Type &node)
     {
     }
 
-    void GeneralOptimizer::visit(Tuple &node) {
-
+    void GeneralOptimizer::visit(Tuple &node)
+    {
+        for (auto expr : node.exprs) {
+            expr->accept(*this);
+        }
     }
 }
