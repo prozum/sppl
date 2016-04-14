@@ -11,7 +11,7 @@ using namespace common;
 namespace optimizer {
 
     class GeneralOptimizer : public Visitor {
-
+    public:
         void visit(Program &node);
 
         void visit(Function &node);
@@ -75,5 +75,7 @@ namespace optimizer {
         void visit(Call &node);
 
         void visit(Type &node);
+
+    private:
     };
 }

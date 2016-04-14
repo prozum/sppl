@@ -113,6 +113,7 @@ namespace common {
 	public:
 		unique_ptr<Expr> expr;
 		vector<unique_ptr<Pattern>> patterns;
+		bool tail_rec = false;
 
 		Case(unique_ptr<Expr>, vector<unique_ptr<Pattern>>, Location);
 

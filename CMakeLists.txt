@@ -42,6 +42,7 @@ include_directories(
         src/codegen/llvm
         src/codegen/pprinter
         src/compiler
+        src/optimizer
         src/jit
 )
 
