@@ -65,35 +65,35 @@ using namespace std;
 }
 
 [0-9]+ {
-    yylval->num.long_int = atol(yytext);
+    yylval->long_int = atol(yytext);
     return token::INTLITERAL;
 }
 
 [0-9]+"."[0-9]+ {
-    yylval->num.long_double = atof(yytext);
+    yylval->long_double = atof(yytext);
     return token::FLOATLITERAL;
 }
 
 "'"[^']"'" {
 
-    yylval->num.chr = yytext[1];
+    yylval->chr = yytext[1];
     return token::CHARLITERAL;
 }
 
 "\""[^"]*"\"" {
-    yylval->ptr.str = make_unique<string>(yytext);
-    yylval->ptr.str->pop_back();
-    yylval->ptr.str->erase (0,1);
+    yylval->str = make_unique<string>(yytext);
+    yylval->str->pop_back();
+    yylval->str->erase (0,1);
     return token::STRINGLITERAL;
 }
 
 "True"|"False" {
-    yylval->num.boolean = (string(yytext) == "True") ? true : false;
+    yylval->boolean = (string(yytext) == "True") ? true : false;
     return token::BOOLLITERAL;
 }
 
 [a-zA-Z_][a-zA-Z0-9_]* {
-    yylval->ptr.str = make_unique<string>(yytext);
+    yylval->str = make_unique<string>(yytext);
     return token::ID;
 }
 

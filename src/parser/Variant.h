@@ -8,14 +8,21 @@
 using namespace common;
 namespace parser {
 
+    /*
     union Numeric {
         char chr;
         long long_int;
         long double long_double;
         bool boolean;
     };
+     */
 
-    union Pointer {
+    union Variant {
+        char chr;
+        long long_int;
+        long double long_double;
+        bool boolean;
+
         unique_ptr<Type> type;
 
         unique_ptr<Function> func;
@@ -29,19 +36,21 @@ namespace parser {
         unique_ptr<vector<unique_ptr<Pattern>>> pattern_vec;
         unique_ptr<vector<unique_ptr<Expr>>> expr_vec;
 
-
-        Pointer() : type(nullptr) {
+        Variant() : type(nullptr) {
             //type.release();
             //type = unique_ptr<Type>(nullptr);
             //memset( this, unique_ptr<Pointer>(nullptr), sizeof(Pointer) );
         }
 
-        ~Pointer() {
+        ~Variant() {
             //memset( &this->expr, 0, sizeof(decltype(this->expr)) );
-            new (&type) unique_ptr<Type>(nullptr);
+            //new (&type) unique_ptr<Type>(nullptr);
         }
+
+        Variant &operator=(const Variant &other);
     };
 
+    /*
     class Variant {
     public:
         Variant();
@@ -51,4 +60,5 @@ namespace parser {
 
         Variant &operator=(const Variant &other);
     };
+     */
 }
