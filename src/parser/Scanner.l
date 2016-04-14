@@ -76,7 +76,7 @@ using namespace std;
 
 "'"[^']"'" {
 
-    yylval->num.chr =yytext[1];
+    yylval->num.chr = yytext[1];
     return token::CHARLITERAL;
 }
 

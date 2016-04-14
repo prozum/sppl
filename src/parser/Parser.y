@@ -70,7 +70,9 @@ using namespace std;
 
 #define move_uniq_vec(SRC, DIST) for (auto& i: SRC) DIST.push_back(move(i))
 
-#define release(item) move(* item.release())
+#define release(ITEM) move(* ITEM.release())
+
+#define force_copy(DIST, SRC) memcpy(&DIST, &SRC, sizeof(decltype(SRC)))
 
 %}
 
@@ -134,7 +136,7 @@ expr:	expr OR expr                                        { $$ = make_unique<Or>
 	|	expr MOD expr                                       { $$ = make_unique<Mod>(move($1), move($3), @2); }
 	|	expr COLON expr                                     { $$ = make_unique<ListAdd>(move($1), move($3), @2); }
 	|	ID                                                  { $$ = make_unique<Id>(* $1, @1); }
-	|	literal                                             { $$ = move($1); }
+	|	literal                                             { force_copy($$, $1); }
 	|	struct_inst                                         { $$ = move($1); }
 	|	PARSTART expr PAREND                                { $$ = make_unique<Par>(move($2), @1); }
 	|	expr PARSTART exprs_comma PAREND                    { $$ = make_unique<Call>(move($1), release($3), @2); }
