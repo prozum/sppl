@@ -11,28 +11,31 @@
 
 namespace parser {
 
-class Driver
-{
-    public:
-        Driver();
+    class Driver
+    {
+        public:
+            Driver(ostream &msgout = cout, ostream &codeout = cout);
 
-        unique_ptr<Scanner> scanner;
-        unique_ptr<Parser> parser;
+            ostream &msgout;
+            ostream &codeout;
 
-        bool trace_scanning;
-        bool trace_parsing;
-        unique_ptr<common::Scope> global;
-        std::string source;
+            unique_ptr<Scanner> scanner;
+            unique_ptr<Parser> parser;
 
-        bool parse_stream(std::istream& in, const std::string& src = "stream input");
-        bool parse_string(const std::string& input, const std::string& src = "string stream");
-        bool parse_file(const std::string& filename);
+            bool trace_scanning;
+            bool trace_parsing;
+            unique_ptr<common::Scope> global;
+            std::string source;
 
-        bool accept(common::Visitor &visitor);
+            bool parse_stream(std::istream& in, const std::string& src = "stream input");
+            bool parse_string(const std::string& input, const std::string& src = "string stream");
+            bool parse_file(const std::string& filename);
 
-        void error(const common::Location &loc, const std::string &msg);
-        void error(const std::string &msg);
+            bool accept(common::Visitor &visitor);
 
-        unique_ptr<common::Program> program;
+            void error(const common::Location &loc, const std::string &msg);
+            void error(const std::string &msg);
+
+            unique_ptr<common::Program> program;
 };
 }

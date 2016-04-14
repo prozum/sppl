@@ -31,7 +31,7 @@ using namespace llvm::orc;
 namespace jit {
     class SpplJit {
     public:
-        SpplJit(shared_ptr<ostream> out);
+        SpplJit();
 
         void Eval(string str);
 
@@ -41,7 +41,6 @@ namespace jit {
             InitializeNativeTargetAsmParser();
         }
 
-    private:
         typedef ObjectLinkingLayer<> ObjLayerT;
         typedef IRCompileLayer<ObjLayerT> CompileLayerT;
         typedef CompileLayerT::ModuleSetHandleT ModuleHandleT;

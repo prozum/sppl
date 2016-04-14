@@ -6,13 +6,12 @@
 
 namespace parser {
 
-Driver::Driver()
-        : trace_scanning(false),
-          trace_parsing(false),
-          global(new common::Scope())
-    {
-
-    }
+    Driver::Driver(ostream &msgout, ostream &codeout) :
+            msgout(msgout),
+            codeout(codeout),
+            trace_scanning(false),
+            trace_parsing(false),
+            global(new common::Scope()) { }
 
     bool Driver::parse_stream(std::istream &in, const std::string &sname)
     {

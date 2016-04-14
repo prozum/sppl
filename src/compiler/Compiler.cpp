@@ -17,12 +17,12 @@ namespace compiler {
         {
 #ifdef CCPP
             case Backend::CPP:
-                generator = make_unique<codegen::CCodeGenerator>(output, header_output);
+                generator = make_unique<codegen::CCodeGenerator>(driver);
                 break;
 #endif
 #ifdef CGNUASM
             case Backend::GNUASM:
-                generator = make_unique<codegen::GasCodeGenerator>(*output);
+                generator = make_unique<codegen::GasCodeGenerator>(driver);
                 break;
 #endif
 #ifdef CHASKELL
@@ -32,11 +32,11 @@ namespace compiler {
 #endif
 #ifdef CLLVM
             case Backend::LLVM:
-                generator = make_unique<codegen::LLVMCodeGenerator>(output);
+                generator = make_unique<codegen::LLVMCodeGenerator>(driver);
                 break;
 #endif
             case Backend::PPRINTER:
-                generator = make_unique<codegen::Printer>(output);
+                generator = make_unique<codegen::Printer>(driver);
             default:
                 throw "Not a valid backend";
         }

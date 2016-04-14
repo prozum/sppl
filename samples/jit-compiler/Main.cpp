@@ -9,8 +9,7 @@ int main(int argc, char *argv[]) {
 
     SpplJit::Init_llvm();
 
-    shared_ptr<ostream> ptr(&cout);
-    SpplJit jit(ptr);
+    SpplJit jit;
 
     string input("");
     string input_case("");

@@ -5,8 +5,8 @@ using namespace std;
 
 namespace codegen {
 
-    Printer::Printer(shared_ptr<ostream> out)
-        : CodeGenerator(out) { }
+    Printer::Printer(Driver &driver)
+        : CodeGenerator(driver) { }
 
     void Printer::visit(Program &node) {
         *output << node.str();

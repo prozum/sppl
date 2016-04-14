@@ -1,5 +1,4 @@
 #pragma once
-#include <llvm/ADT/STLExtras.h>
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/Module.h>
 #include <llvm/IR/Verifier.h>
@@ -17,6 +16,7 @@
 #include "Driver.h"
 
 using namespace std;
+using namespace parser;
 
 namespace codegen {
 
@@ -25,9 +25,9 @@ namespace codegen {
         EXPR,
     };
 
-class LLVMCodeGenerator : public common::CodeGenerator {
+class LLVMCodeGenerator : public CodeGenerator {
   public:
-    LLVMCodeGenerator(shared_ptr<ostream>);
+    LLVMCodeGenerator(parser::Driver &driver);
 
     void visit(common::Program &node);
 
@@ -37,14 +37,11 @@ class LLVMCodeGenerator : public common::CodeGenerator {
 
 	string ModuleString();
 
-private:
-
 	std::unordered_map<common::Type, llvm::StructType *> tuple_types;
 	std::unordered_map<common::Type, llvm::StructType *> list_types;
     std::unordered_map<common::Type, llvm::FunctionType *> func_types;
 	std::map<std::string, llvm::Function *> Functions;
 
-	parser::Driver Driver;
     llvm::Function *cur_func;
     llvm::Value *cur_val;
     llvm::BasicBlock *cur_pattern_block;

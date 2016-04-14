@@ -3,13 +3,15 @@
 #include <string>
 #include "CodeGenerator.h"
 #include "Node.h"
-using namespace common;
+
 using namespace std;
+using namespace common;
+using namespace parser;
 
 namespace codegen {
     class Printer : public CodeGenerator {
     public:
-        Printer(shared_ptr<ostream> out);
+        Printer(Driver &driver);
 
         virtual void visit(Program &node);
     };

@@ -2,11 +2,13 @@
 
 namespace jit {
 
-    SpplJit::SpplJit(shared_ptr<ostream> out) : Machine(EngineBuilder().selectTarget()),
-                                                Layout(Machine->createDataLayout()),
-                                                CompileLayer(ObjectLayer, SimpleCompiler(*Machine)),
-                                                Generator(out),
-                                                ScopeGenerator(Driver.global.get()) {
+    SpplJit::SpplJit() :
+            Machine(EngineBuilder().selectTarget()),
+            Layout(Machine->createDataLayout()),
+            CompileLayer(ObjectLayer, SimpleCompiler(*Machine)),
+            Generator(Driver),
+            ScopeGenerator(Driver.global.get())
+    {
         llvm::sys::DynamicLibrary::LoadLibraryPermanently(nullptr);
         init_module_passmanager();
     }
@@ -146,9 +148,6 @@ namespace jit {
         Driver.accept(Generator);
         auto func_ir = Generator.Module->getFunction(func_node->id);
         PassManager->run(*func_ir);
-
-        // Print LLVM Module
-        cout << Generator.ModuleString();
 
         auto handler = add_module(std::move(Generator.Module));
         init_module_passmanager();

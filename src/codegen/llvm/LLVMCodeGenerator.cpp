@@ -3,8 +3,8 @@
 using namespace llvm;
 
 namespace codegen {
-    LLVMCodeGenerator::LLVMCodeGenerator(shared_ptr<std::ostream> out)
-            : common::CodeGenerator::CodeGenerator(out),
+    LLVMCodeGenerator::LLVMCodeGenerator(parser::Driver &driver)
+            : CodeGenerator(driver),
               Builder(getGlobalContext()),
               Module(std::make_unique<llvm::Module>("SpplModule", getGlobalContext())) {}
 
@@ -12,6 +12,8 @@ namespace codegen {
         for (auto &func : node.funcs) {
             func->accept(*this);
         }
+
+        driver.codeout << ModuleString();
     }
 
     llvm::Type *LLVMCodeGenerator::get_type(common::Type type, bool ptr)
@@ -148,7 +150,7 @@ namespace codegen {
         Builder.CreateBr(cur_pattern_block);
 
         verifyFunction(*cur_func);
-        Functions[node.id] = cur_func;
+        Functions[node.id] = move(cur_func);
     }
 
     Value *LLVMCodeGenerator::compare(Value *val1, Value *val2)
@@ -406,7 +408,12 @@ namespace codegen {
                 cur_val = ContextValues[node.id];
                 if (cur_val)
                     return;
-                cur_val = Functions[node.id];
+                cur_val = Module->getFunction(node.id);
+
+                if (cur_val)
+                    return;
+
+
                 break;
         }
     }
