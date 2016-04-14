@@ -83,12 +83,12 @@ using namespace std;
 
 program:	funcs_ne                                        { driver.program = make_unique<Program>(release($1), @1); }
     |       expr                                            { driver.program = make_unique<Program>(move($1), @1); };
-funcs_ne:	funcs_ne func                                   { $$ = move($1); $$->push_back(move($2)); }
+funcs_ne:	funcs_ne func                                   { force_copy($$, $1); $$->push_back(move($2)); }
 	|       func                                            { make($$, vector<unique_ptr<Function>>, ()); $$->push_back(move($1)); } ;
-//func:		decl cases_ne                                   { $$ = move($1); move_uniq_vec($2, $$->cases); }
-func:		decl cases_ne                                   { $$ = move($1); $$->cases = release($2); }
+//func:		decl cases_ne                                   { force_copy($$, $1); move_uniq_vec($2, $$->cases); }
+func:		decl cases_ne                                   { force_copy($$, $1); $$->cases = release($2); }
 decl:		DEF ID COLON signature                          { make($$, Function, (* $2, release($4), @1)); }
-signature:	signature ARROR type                            { $$ = move($1); $$->subtypes.push_back(* $3); }
+signature:	signature ARROR type                            { force_copy($$, $1); $$->subtypes.push_back(* $3); }
 	|       type                                            { make($$, Type, (TypeId::SIGNATURE, @1)); $$->subtypes.push_back(* $1); } ;
 type:	BOOLTYPE                                            { make($$, Type, (TypeId::BOOL, @1)); }
 	|	INTTYPE                                             { make($$, Type, (TypeId::INT, @1)); }
@@ -96,23 +96,23 @@ type:	BOOLTYPE                                            { make($$, Type, (Type
 	|	CHARTYPE                                            { make($$, Type, (TypeId::CHAR, @1)); }
 	|	STRINGTYPE                                          { make($$, Type, (TypeId::STRING, @1)); }
 	|	SQSTART type SQEND                                  { make($$, Type, (TypeId::LIST, @2)); $$->subtypes.push_back(* $2); }
-	|	PARSTART signature PAREND                           { $$ = move($2); }
+	|	PARSTART signature PAREND                           { force_copy($$, $2); }
 	|	PARSTART types_comma_ne COMMA type PAREND           { make($$, Type, (TypeId::TUPLE, $2->subtypes, @2)); $$->subtypes.push_back(* $4); }
-types_comma_ne: types_comma_ne COMMA type                   { $$ = move($1); $$->subtypes.push_back(* $3); }
+types_comma_ne: types_comma_ne COMMA type                   { force_copy($$, $1); $$->subtypes.push_back(* $3); }
 	|	type                                                { make($$, Type, ()); $$->subtypes.push_back(* $1); };
-cases_ne:	cases_ne case                                   { $$ = move($1); $$->push_back(move($2)); }
+cases_ne:	cases_ne case                                   { force_copy($$, $1); $$->push_back(move($2)); }
 	|   case                                                { make($$, vector<unique_ptr<Case>>, ()); $$->push_back(move($1)); };
 case: 		PIPE patterns ASSIGN expr                       { make($$, Case, (move($4), release($2), @2)); }
-patterns:	patterns pattern                                { $$ = move($1); $$->push_back(move($2)); }
+patterns:	patterns pattern                                { force_copy($$, $1); $$->push_back(move($2)); }
 	|                                                       { make($$, vector<unique_ptr<Pattern>>, ()); } ;
-pattern:    literal                                         { $$ = move($1); }
+pattern:    literal                                         { force_copy($$, $1); }
 	| 	ID                                                  { make($$, Id, (* $1, @1)); }
 	| 	PARSTART pattern COLON pattern PAREND               { make($$, ListSplit, (move($2), move($4), @2));  }
 	| 	PARSTART patterns_comma_ne COMMA pattern PAREND     { $2->push_back(move($4)); make($$, TuplePattern, (release($2), @2));  }
     |   SQSTART patterns_comma SQEND                        { make($$, ListPattern, (release($2), @2)); }
-patterns_comma:    patterns_comma_ne                        { $$ = move($1); }
+patterns_comma:    patterns_comma_ne                        { force_copy($$, $1); }
 	|	                                                    { make($$, vector<unique_ptr<Pattern>>, ()); } ;
-patterns_comma_ne:  patterns_comma_ne COMMA pattern         { $$ = move($1); $$->push_back(move($3)); }
+patterns_comma_ne:  patterns_comma_ne COMMA pattern         { force_copy($$, $1); $$->push_back(move($3)); }
 	|   pattern                                             { make($$, vector<unique_ptr<Pattern>>, ()); $$->push_back(move($1)); } ;
 literal:	INTLITERAL                                      { make($$, Int,($1, @1)); }
 	|	SUB INTLITERAL                                      { make($$, Int, (- $2, @2)); }
@@ -137,15 +137,15 @@ expr:	expr OR expr                                        { make($$, Or, (move($
 	|	expr COLON expr                                     { make($$, ListAdd, (move($1), move($3), @2)); }
 	|	ID                                                  { make($$, Id, (* $1, @1)); }
 	|	literal                                             { force_copy($$, $1); }
-	|	struct_inst                                         { $$ = move($1); }
+	|	struct_inst                                         { force_copy($$, $1); }
 	|	PARSTART expr PAREND                                { make($$, Par, (move($2), @1)); }
 	|	expr PARSTART exprs_comma PAREND                    { make($$, Call, (move($1), release($3), @2)); }
 	|	EXMARK expr                                         { make($$, Not, (move($2), @1)); } ;
 struct_inst:	SQSTART exprs_comma SQEND                   { make($$, List, (release($2), @1)); }
 	|	PARSTART exprs_comma_ne COMMA expr PAREND           { $2->push_back(move($4)); make($$, Tuple, (release($2), @1)); }  ;
-exprs_comma:    exprs_comma_ne                              { $$ = move($1); }
+exprs_comma:    exprs_comma_ne                              { force_copy($$, $1); }
 	|	                                                    { make($$, vector<unique_ptr<Expr>>, ()); } ;
-exprs_comma_ne: exprs_comma_ne COMMA expr                   { $$ = move($1); $$->push_back(move($3));  }
+exprs_comma_ne: exprs_comma_ne COMMA expr                   { force_copy($$, $1); $$->push_back(move($3));  }
 	|	expr                                                { make($$, vector<unique_ptr<Expr>>, ()); $$->push_back(move($1)); } ;
 
 %%
