@@ -98,10 +98,10 @@ int main(int argc, char *argv[])
 
     switch (res) {
         case 2:
-            compiler.scope_generator.OutError(cerr);
+            compiler.scope_generator.outError(cerr);
             break;
         case 3:
-            compiler.type_checker.OutError(cerr);
+            compiler.type_checker.outError(cerr);
             break;
     }
 

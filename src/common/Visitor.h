@@ -14,10 +14,10 @@ namespace common {
 		friend class Node;
 	public:
 		bool notsafe = false;
-		void AddError(Error error);
+		void addError(Error error);
 		std::vector<Error> Errors;
-		bool HasError();
-		void OutError(ostream &out);
+		bool hasError();
+		void outError(ostream &out);
 
 		virtual void visit(Program &node) { throw "Not implemented"; }
 		virtual void visit(Function &node) { throw "Not implemented"; }

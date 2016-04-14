@@ -43,7 +43,7 @@ namespace parser {
     {
         program->accept(visitor);
 
-        return !visitor.HasError();
+        return !visitor.hasError();
     }
 
     void Driver::error(const common::Location& loc,

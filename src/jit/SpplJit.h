@@ -46,6 +46,7 @@ namespace jit {
         typedef CompileLayerT::ModuleSetHandleT ModuleHandleT;
 
         void init_module_passmanager();
+        SpplJit::ModuleHandleT module_handler;
 
         ModuleHandleT add_module(std::unique_ptr<llvm::Module> m);
         void remove_module(ModuleHandleT handler);

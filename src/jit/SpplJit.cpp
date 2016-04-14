@@ -134,22 +134,25 @@ namespace jit {
             return;
 
         if (!Driver.accept(ScopeGenerator)) {
-            ScopeGenerator.OutError(cout);
+            ScopeGenerator.outError(cout);
             return;
         }
 
         if (!Driver.accept(TypeChecker)) {
-            TypeChecker.OutError(cout);
+            TypeChecker.outError(cout);
             return;
         }
 
         // Generate ir_func
         auto func_node = Driver.program->funcs[0].get();
-        Driver.accept(Generator);
+        if (!Driver.accept(Generator)) {
+            return;
+        }
         auto func_ir = Generator.Module->getFunction(func_node->id);
         PassManager->run(*func_ir);
 
-        auto handler = add_module(std::move(Generator.Module));
+        // Store function in seperate module
+        module_handler = add_module(std::move(Generator.Module));
         init_module_passmanager();
 
         // Only run anonymous functions
@@ -160,8 +163,10 @@ namespace jit {
             assert(func_jit != NULL);
             string output = get_output(func_jit(), func_node->type);
             cout << "output: " << output << endl;
+
+            // Remove module
+            remove_module(module_handler);
         }
 
-        remove_module(handler);
     }
 }

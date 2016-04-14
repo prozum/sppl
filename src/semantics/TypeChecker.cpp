@@ -17,12 +17,12 @@ namespace semantics
 
             if (func->id == "main") {
                 if (func->signature.subtypes.front() != strlist) {
-                    AddError(Error::Expected("Declaration of \"main\" had wrong input type",
+                    addError(Error::Expected("Declaration of \"main\" had wrong input type",
                                              strlist.str(),
                                              func->signature.subtypes.front().str(),
                                              func->loc));
                 } else if (func->signature.subtypes.size() != 2) {
-                    AddError(Error::Expected("Function \"main\" had wrong number of input",
+                    addError(Error::Expected("Function \"main\" had wrong number of input",
                                              "2",
                                              to_string(func->signature.subtypes.size()),
                                              func->loc));
@@ -67,18 +67,18 @@ namespace semantics
                 }
 
                 if (node.patterns[i]->type != current_func->signature.subtypes[i]) {
-                    AddError(Error::Expected("Wrong pattern type",
-                                current_func->signature.subtypes[i].str(),
-                                node.patterns[i]->type.str(),
-                                node.patterns[i]->loc));
+                    addError(Error::Expected("Wrong pattern type",
+                                             current_func->signature.subtypes[i].str(),
+                                             node.patterns[i]->type.str(),
+                                             node.patterns[i]->loc));
                     return;
                 }
             }
         } else {
-            AddError(Error::Expected("Wrong pattern count",
-                        to_string(current_func->signature.subtypes.size() - 1),
-                        to_string(node.patterns.size()),
-                        node.loc));
+            addError(Error::Expected("Wrong pattern count",
+                                     to_string(current_func->signature.subtypes.size() - 1),
+                                     to_string(node.patterns.size()),
+                                     node.loc));
             return;
         }
 
@@ -86,7 +86,7 @@ namespace semantics
                 current_func->signature.subtypes.back().id == TypeId::LIST)
             node.expr->type = current_func->signature.subtypes.back();
         else if (current_func->type != node.expr->type) {
-            AddError(Error::Expected("Wrong return type",
+            addError(Error::Expected("Wrong return type",
                                      current_func->type.str(),
                                      node.expr->type.str(),
                                      node.loc));
@@ -105,7 +105,7 @@ namespace semantics
         if (node.left->type.id == TypeId::BOOL && node.right->type.id == TypeId::BOOL) {
             node.type = node.left->type;
         } else {
-            AddError(Error::Binary("Operator only operates on Bool typed children",
+            addError(Error::Binary("Operator only operates on Bool typed children",
                                    node));
             return;
         }
@@ -122,7 +122,7 @@ namespace semantics
         if (node.left->type == TypeId::BOOL && node.right->type == TypeId::BOOL) {
             node.type = node.left->type;
         } else {
-            AddError(Error::Binary("Operator only operates on Bool typed children",
+            addError(Error::Binary("Operator only operates on Bool typed children",
                                    node));
             return;
         }
@@ -139,7 +139,7 @@ namespace semantics
         if (node.left->type == node.right->type) {
             node.type = Type(TypeId::BOOL);
         } else {
-            AddError(Error::Binary("Operator only operates on children of the same type",
+            addError(Error::Binary("Operator only operates on children of the same type",
                                    node));
             return;
         }
@@ -156,7 +156,7 @@ namespace semantics
         if (node.left->type == node.right->type) {
             node.type = Type(TypeId::BOOL);
         } else {
-            AddError(Error::Binary("Operator only operates on children of the same type",
+            addError(Error::Binary("Operator only operates on children of the same type",
                                    node));
             return;
         }
@@ -174,7 +174,7 @@ namespace semantics
             (node.left->type.id == TypeId::FLOAT && node.right->type.id == TypeId::FLOAT)) {
             node.type = Type(TypeId::BOOL);
         } else {
-            AddError(Error::Binary("Operator only operates on children of the same type",
+            addError(Error::Binary("Operator only operates on children of the same type",
                                    node));
             return;
         }
@@ -192,7 +192,7 @@ namespace semantics
             (node.left->type.id == TypeId::FLOAT && node.right->type.id == TypeId::FLOAT)) {
             node.type = Type(TypeId::BOOL);
         } else {
-            AddError(Error::Binary("Operator only operates on Int or Float children",
+            addError(Error::Binary("Operator only operates on Int or Float children",
                                    node));
             return;
         }
@@ -209,7 +209,7 @@ namespace semantics
             (node.left->type.id == TypeId::FLOAT && node.right->type.id == TypeId::FLOAT)) {
             node.type = Type(TypeId::BOOL);
         } else {
-            AddError(Error::Binary("Operator only operates on Int or Float children",
+            addError(Error::Binary("Operator only operates on Int or Float children",
                                    node));
             return;
         }
@@ -226,7 +226,7 @@ namespace semantics
             (node.left->type.id == TypeId::FLOAT && node.right->type.id == TypeId::FLOAT)) {
             node.type = Type(TypeId::BOOL);
         } else {
-            AddError(Error::Binary("Operator only operates on Int or Float children",
+            addError(Error::Binary("Operator only operates on Int or Float children",
                                    node));
             return;
         }
@@ -243,7 +243,7 @@ namespace semantics
             (node.left->type.id == TypeId::FLOAT && node.right->type.id == TypeId::FLOAT)) {
             node.type = node.left->type;
         } else {
-            AddError(Error::Binary("Operator only operates on Int or Float children",
+            addError(Error::Binary("Operator only operates on Int or Float children",
                                    node));
             return;
         }
@@ -260,7 +260,7 @@ namespace semantics
             (node.left->type.id == TypeId::FLOAT && node.right->type.id == TypeId::FLOAT)) {
             node.type = node.left->type;
         } else {
-            AddError(Error::Binary("Operator only operates on Int or Float children",
+            addError(Error::Binary("Operator only operates on Int or Float children",
                                    node));
             return;
         }
@@ -277,7 +277,7 @@ namespace semantics
             (node.left->type.id == TypeId::FLOAT && node.right->type.id == TypeId::FLOAT)) {
             node.type = node.left->type;
         } else {
-            AddError(Error::Binary("Operator only operates on Int or Float children",
+            addError(Error::Binary("Operator only operates on Int or Float children",
                                    node));
             return;
         }
@@ -294,7 +294,7 @@ namespace semantics
             (node.left->type.id == TypeId::FLOAT && node.right->type.id == TypeId::FLOAT)) {
             node.type = node.left->type;
         } else {
-            AddError(Error::Binary("Operator only operates on Int or Float children",
+            addError(Error::Binary("Operator only operates on Int or Float children",
                                    node));
             return;
         }
@@ -311,7 +311,7 @@ namespace semantics
             (node.left->type.id == TypeId::FLOAT && node.right->type.id == TypeId::FLOAT)) {
             node.type = node.left->type;
         } else {
-            AddError(Error::Binary("Operator only operates on Int or Float children",
+            addError(Error::Binary("Operator only operates on Int or Float children",
                                    node));
             return;
         }
@@ -328,7 +328,7 @@ namespace semantics
             if (node.left->type == node.right->type.subtypes.front()) {
                 node.type = node.right->type;
             } else {
-                AddError(Error::Binary("Left type must be same type of right List",
+                addError(Error::Binary("Left type must be same type of right List",
                                        node));
                 return;
             }
@@ -336,7 +336,7 @@ namespace semantics
             if (node.left->type.id == TypeId::CHAR) {
                 node.type = node.right->type;
             } else {
-                AddError(Error::Binary("Left type must be Char when right is String",
+                addError(Error::Binary("Left type must be Char when right is String",
                                        node));
                 return;
             }
@@ -345,7 +345,7 @@ namespace semantics
             node.type.subtypes.push_back(node.left->type);
             node.right->type = node.type;
         } else {
-            AddError(Error::Binary("Right must be a List",
+            addError(Error::Binary("Right must be a List",
                                    node));
             return;
         }
@@ -371,8 +371,8 @@ namespace semantics
         if (node.child->type.id == TypeId::BOOL) {
             node.type = node.child->type;
         } else {
-            AddError(Error::Unary("Operator only operates on Bool typed children",
-                                   node));
+            addError(Error::Unary("Operator only operates on Bool typed children",
+                                  node));
             return;
         }
     }
@@ -406,7 +406,7 @@ namespace semantics
         } else {
             for (size_t i = 0; i < node.patterns.size() - 1; ++i) {
                 if (node.patterns[i]->type != node.patterns[i + 1]->type) {
-                    AddError(Error::Expected("All items in a List must be of the same type",
+                    addError(Error::Expected("All items in a List must be of the same type",
                                              node.patterns[i]->str(),
                                              node.patterns[i + 1]->str(),
                                              node.loc));
@@ -445,7 +445,7 @@ namespace semantics
             if (node.left->type == node.right->type.subtypes.front()) {
                 node.type = node.right->type;
             } else {
-                AddError(Error::Expected("Left must be the same type as the right Lists children",
+                addError(Error::Expected("Left must be the same type as the right Lists children",
                                          node.right->type.subtypes[0].str(),
                                          node.right->str(),
                                          node.loc));
@@ -455,7 +455,7 @@ namespace semantics
             if (node.left->type.id == TypeId::CHAR) {
                 node.type = node.right->type;
             } else {
-                AddError(Error::Expected("Left must be type Char, when right is String",
+                addError(Error::Expected("Left must be type Char, when right is String",
                                          "Char",
                                          node.left->type.str(),
                                          node.loc));
@@ -465,7 +465,7 @@ namespace semantics
             node.type = Type(TypeId::LIST);
             node.type.subtypes.push_back(node.left->type);
         } else {
-            AddError(Error::Expected("Right must be a List",
+            addError(Error::Expected("Right must be a List",
                                      "List",
                                      node.right->type.str(),
                                      node.loc));
@@ -486,7 +486,7 @@ namespace semantics
         } else {
             for (size_t i = 0; i < node.exprs.size() - 1; ++i) {
                 if (node.exprs[i]->type != node.exprs[i + 1]->type) {
-                    AddError(Error::Expected("All items in a List must be same type",
+                    addError(Error::Expected("All items in a List must be same type",
                                              node.exprs[i]->str(),
                                              node.exprs[i + 1]->str(),
                                              node.exprs[i + 1]->loc));
@@ -518,7 +518,7 @@ namespace semantics
         if (node.scope->exists(node.id)) {
             node.type = node.scope->get_type(node.id);
         } else {
-            AddError(Error(node.id + ": Id does not exist in the current scope",
+            addError(Error(node.id + ": Id does not exist in the current scope",
                            node.loc));
             return;
         }
@@ -541,7 +541,7 @@ namespace semantics
                             node.callee->type.subtypes[i].id == TypeId::LIST)
                         node.exprs[i]->type = node.callee->type.subtypes[i];
                     else if (node.exprs[i]->type != node.callee->type.subtypes[i]) {
-                        AddError(Error::Expected("Function was called with an invalid argument",
+                        addError(Error::Expected("Function was called with an invalid argument",
                                                  node.callee->type.subtypes[i].str(),
                                                  node.exprs[i]->type.str(),
                                                  node.exprs[i]->loc));
@@ -549,7 +549,7 @@ namespace semantics
                     }
                 }
             } else {
-                AddError(Error::Expected("Wrong number of arguments",
+                addError(Error::Expected("Wrong number of arguments",
                                          to_string(node.callee->type.subtypes.size() - 1),
                                          to_string(node.exprs.size()),
                                          node.loc));
@@ -557,7 +557,7 @@ namespace semantics
             }
             node.type = node.callee->type.subtypes.back();
         } else {
-            AddError(Error::Expected("Can't call a type that is not a Signature",
+            addError(Error::Expected("Can't call a type that is not a Signature",
                                      "Signature",
                                      node.callee->type.str(),
                                      node.callee->loc));

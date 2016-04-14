@@ -50,11 +50,11 @@ namespace compiler {
 
         //case_checker.visit(*driver.program);
         scope_generator.visit(*driver.program);
-        if (scope_generator.HasError())
+        if (scope_generator.hasError())
             return 2;
 
         type_checker.visit(*driver.program);
-        if (type_checker.HasError())
+        if (type_checker.hasError())
             return 3;
 
         optimizer.visit(*driver.program);

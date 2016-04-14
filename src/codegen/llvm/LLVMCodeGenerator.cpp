@@ -405,15 +405,21 @@ namespace codegen {
                 ContextValues[node.id] = cur_val;
                 break;
             case EXPR:
+                // Pattern value
                 cur_val = ContextValues[node.id];
                 if (cur_val)
                     return;
-                cur_val = Module->getFunction(node.id);
 
+                // Current module
+                cur_val = Module->getFunction(node.id);
                 if (cur_val)
                     return;
 
+                // External module
+                if (driver.global->decls.count(node.id))
+                    cur_val = llvm::Function::Create(get_func_type(driver.global->decls[node.id]), llvm::Function::ExternalLinkage, node.id, Module.get());
 
+                // TODO ERROR NOT FOUND
                 break;
         }
     }

@@ -29,7 +29,7 @@ namespace semantics {
             }
             // Visit stops here
         } else {
-            AddError(Error(node.id + " has already been declared", node.loc));
+            addError(Error(node.id + " has already been declared", node.loc));
             return;
         }
     }
