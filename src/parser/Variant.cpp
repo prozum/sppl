@@ -1,11 +1,14 @@
 #include "Variant.h"
 
 namespace parser {
+
     Variant &Variant::operator=(const Variant &other) {
-        memcpy(&ptr, &other.ptr, sizeof(Pointer));
-        memcpy(&num, &other.num, sizeof(Numeric));
+        memcpy(this, &other, sizeof(Variant));
+        //memcpy(this, &other, sizeof(Numeric));
     }
 
+    /*
     Variant::Variant() {
     }
+     */
 }

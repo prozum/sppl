@@ -16,6 +16,9 @@ class Driver
     public:
         Driver();
 
+        unique_ptr<Scanner> scanner;
+        unique_ptr<Parser> parser;
+
         bool trace_scanning;
         bool trace_parsing;
         unique_ptr<common::Scope> global;
@@ -30,7 +33,6 @@ class Driver
         void error(const common::Location &loc, const std::string &msg);
         void error(const std::string &msg);
 
-        class Scanner* lexer;
         unique_ptr<common::Program> program;
 };
 }

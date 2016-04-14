@@ -18,13 +18,13 @@ Driver::Driver()
     {
         source = sname;
 
-        Scanner scanner(&in);
-        scanner.set_debug(trace_scanning);
-        this->lexer = &scanner;
+        scanner = make_unique<Scanner>(&in);
+        scanner->set_debug(trace_scanning);
 
-        Parser parser(*this);
-        parser.set_debug_level(trace_parsing);
-        return (parser.parse() == 0);
+        parser = make_unique<Parser>(*this);
+        parser->set_debug_level(trace_parsing);
+
+        return (parser->parse() == 0);
     }
 
     bool Driver::parse_file(const std::string &filename)

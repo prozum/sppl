@@ -21,10 +21,7 @@ namespace semantics {
         if (!current_scope->exists(node.id) || node.is_anon) {
             auto type = Type(TypeId::SIGNATURE);
 
-            for (auto &type: node.signature.subtypes)
-                type.subtypes.push_back(type);
-
-            current_scope->decls.insert({node.id, type});
+            current_scope->decls.insert({node.id, node.signature});
 
             // Visit children
             for (auto &cse: node.cases) {
