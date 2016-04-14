@@ -66,7 +66,7 @@ using namespace std;
 
 // Connect bison parser to flex scanner
 #undef yylex
-#define yylex driver.lexer->lex
+#define yylex driver.scanner->lex
 
 #define release(ITEM) move(* ITEM.release())
 
