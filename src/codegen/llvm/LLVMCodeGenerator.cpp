@@ -394,7 +394,6 @@ namespace codegen {
             args.push_back(cur_val);
         }
 
-        auto type = callee->getType();
         cur_val = Builder.CreateCall(callee, args, "calltmp");
     }
 

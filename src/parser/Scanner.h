@@ -5,7 +5,7 @@
 
 #ifndef YY_DECL
 
-#define YY_DECL                                         \
+#define YY_DECL                                        \
     parser::Parser::token_type                         \
     parser::Scanner::lex(                              \
         parser::Parser::semantic_type* yylval,         \

@@ -17,8 +17,6 @@
 using namespace common;
 using namespace std;
 
-#include "Variant.h"
-
 }
 
 %{
@@ -27,7 +25,6 @@ using namespace std;
 
 %}
 
-//%define api.value.type {Variant}
 %union {
     char chr;
     long long_int;
