@@ -87,11 +87,9 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    auto in = make_shared<ifstream>(input[0]);
-    auto out = make_shared<ofstream>(output);
-    auto hout = make_shared<ofstream>(header_output);
-
-    compiler::Compiler compiler(in, out, hout);
+    compiler::Compiler compiler();
+    compiler.set_output(output);
+    compiler.set_header_output(header_output);
     compiler.set_backend(backend);
 
     int res = compiler.compile();

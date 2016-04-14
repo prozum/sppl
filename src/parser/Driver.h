@@ -8,24 +8,35 @@
 
 #include <string>
 #include <vector>
+#include <fstream>
+#include <sstream>
 
 namespace parser {
 
     class Driver
     {
         public:
-            Driver(ostream &msgout = cout, ostream &codeout = cout);
+            Driver(ostream *out = &cout, ostream *hout = &cout, ostream *mout = &cout);
 
-            ostream &msgout;
-            ostream &codeout;
+            // Code, header and message streams
+            ostream *out;
+            ostream *hout;
+            ostream *mout;
 
-            unique_ptr<Scanner> scanner;
-            unique_ptr<Parser> parser;
+            // File streams
+            ofstream fout;
+            ofstream fhout;
+
+            Scanner scanner;
+            Parser parser;
 
             bool trace_scanning;
             bool trace_parsing;
-            unique_ptr<common::Scope> global;
+            common::Scope global;
             std::string source;
+
+            void set_output(string filename);
+            void set_header_output(string filename);
 
             bool parse_stream(std::istream& in, const std::string& src = "stream input");
             bool parse_string(const std::string& input, const std::string& src = "string stream");
@@ -37,5 +48,5 @@ namespace parser {
             void error(const std::string &msg);
 
             unique_ptr<common::Program> program;
-};
+    };
 }

@@ -1,14 +1,13 @@
 #include "Driver.h"
 
-#include <fstream>
-#include <sstream>
-#include <ostream>
 
 namespace parser {
 
-    Driver::Driver(ostream &msgout, ostream &codeout) :
-            msgout(msgout),
-            codeout(codeout),
+    Driver::Driver(ostream *out, ostream *hout, ostream *mout) :
+            out(out),
+            hout(hout),
+            mout(mout),
+            parser(* this),
             trace_scanning(false),
             trace_parsing(false),
             global(new common::Scope()) { }
@@ -17,13 +16,12 @@ namespace parser {
     {
         source = sname;
 
-        scanner = make_unique<Scanner>(&in);
-        scanner->set_debug(trace_scanning);
+        scanner.switch_streams(in, * mout);
 
-        parser = make_unique<Parser>(*this);
-        parser->set_debug_level(trace_parsing);
+        scanner.set_debug(trace_scanning);
+        parser.set_debug_level(trace_parsing);
 
-        return (parser->parse() == 0);
+        return (parser.parse() == 0);
     }
 
     bool Driver::parse_file(const std::string &filename)
@@ -43,17 +41,27 @@ namespace parser {
     {
         program->accept(visitor);
 
+        for (auto &error: visitor.Errors) {
+            *mout << error;
+        }
+
         return !visitor.hasError();
     }
 
     void Driver::error(const common::Location& loc,
                        const std::string &msg)
     {
-        std::cerr << loc << msg << std::endl;
+        *mout << Error(msg, loc);
     }
 
     void Driver::error(const std::string &msg)
     {
-        std::cerr << msg << std::endl;
+        *mout << Error(msg);
+    }
+
+    void Driver::set_output(string filename) {
+        //hout = std::ofstream(filename, std::ofstream::out);
+        fout = std::ofstream(filename);
+        out = &fout;
     }
 }

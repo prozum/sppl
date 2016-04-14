@@ -7,7 +7,7 @@ namespace jit {
             Layout(Machine->createDataLayout()),
             CompileLayer(ObjectLayer, SimpleCompiler(*Machine)),
             Generator(Driver),
-            ScopeGenerator(Driver.global.get())
+            ScopeGenerator(&Driver.global)
     {
         llvm::sys::DynamicLibrary::LoadLibraryPermanently(nullptr);
         init_module_passmanager();

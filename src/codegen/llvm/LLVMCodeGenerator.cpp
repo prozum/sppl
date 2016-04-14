@@ -13,7 +13,7 @@ namespace codegen {
             func->accept(*this);
         }
 
-        driver.codeout << ModuleString();
+        *driver.out << ModuleString();
     }
 
     llvm::Type *LLVMCodeGenerator::get_type(common::Type type, bool ptr)
@@ -415,8 +415,8 @@ namespace codegen {
                     return;
 
                 // External module
-                if (driver.global->decls.count(node.id))
-                    cur_val = llvm::Function::Create(get_func_type(driver.global->decls[node.id]), llvm::Function::ExternalLinkage, node.id, Module.get());
+                if (driver.global.decls.count(node.id))
+                    cur_val = llvm::Function::Create(get_func_type(driver.global.decls[node.id]), llvm::Function::ExternalLinkage, node.id, Module.get());
 
                 // TODO ERROR NOT FOUND
                 break;

@@ -1,13 +1,8 @@
 #include "Compiler.h"
 
 namespace compiler {
-    Compiler::Compiler(shared_ptr<istream> in,
-                       shared_ptr<ostream> out,
-                       shared_ptr<ostream> hout)
-            : input(in),
-              output(out),
-              header_output(hout),
-              scope_generator(semantics::ScopeGenerator(driver.global.get())) {
+    Compiler::Compiler() :
+            scope_generator(semantics::ScopeGenerator(driver.global.get())) {
 
     }
 
@@ -61,5 +56,15 @@ namespace compiler {
 
         generator->visit(*driver.program);
         return 0;
+    }
+
+    void Compiler::set_output(string out) {
+        //output =  ofstream(out);
+        driver.codeout = output;
+        driver.codeout = output;
+    }
+
+    void Compiler::set_header_output(string hout) {
+        header_output =  ofstream(hout);
     }
 }
