@@ -204,7 +204,6 @@ namespace parser {
 
     int Scanner::yywrap() {
         if (driver.next_input()) {
-            switch_streams(* driver.in, * driver.mout);
             return 0;
         }
 

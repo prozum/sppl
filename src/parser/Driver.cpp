@@ -23,6 +23,7 @@ namespace parser {
             in = &fin;
             if (!fin.good())
                 return false;
+            scanner.switch_streams(in, mout);
             return true;
         }
         return false;
@@ -68,7 +69,6 @@ namespace parser {
 
         if (!next_input())
             return false;
-        scanner.switch_streams(* in, * mout);
         if (parser.parse() != 0)
             return false;
 
