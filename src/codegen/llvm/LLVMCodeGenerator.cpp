@@ -93,9 +93,9 @@ namespace codegen {
         if (old_type != func_types.end())
             return old_type->second;
 
-        auto output_type = get_type(type.subtypes[0]);
+        auto output_type = get_type(type.subtypes.back());
         std::vector<llvm::Type *> input_types;
-        for (size_t i = 1; i < type.subtypes.size(); i++) {
+        for (size_t i = 0; i < type.subtypes.size() - 1; i++) {
             input_types.push_back(get_type(type.subtypes[i]));
         }
 
@@ -160,7 +160,7 @@ namespace codegen {
         else if (val1->getType()->isIntegerTy())
             return Builder.CreateICmpEQ(val1, val2, "cmptmp");
         else
-            throw "Not supported!";
+            throw runtime_error("This should not happen!");
     }
 
     void LLVMCodeGenerator::visit(common::Case &node) {

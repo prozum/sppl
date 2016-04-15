@@ -37,14 +37,15 @@ namespace semantics
     void TypeChecker::visit(Function &node) {
         current_func = &node;
 
-        node.type = node.signature.subtypes.back();
-
         // Visit children
         for (auto &cse: node.cases) {
             cse->accept(*this);
             Safe;
         }
         // Visit stops here
+
+        // Set return type
+        node.type = node.signature.subtypes.back();
     }
 
     void TypeChecker::visit(Case &node) {
@@ -55,10 +56,9 @@ namespace semantics
         node.expr->accept(*this);
         CheckPanic;
 
+        // Set signature for anonymous function
         if (current_func->is_anon) {
-            current_func->type = node.expr->type;
-            current_func->signature = Type(TypeId::SIGNATURE, vector<Type>());
-            current_func->signature.subtypes.push_back(node.expr->type);
+            current_func->signature = Type(TypeId::SIGNATURE, vector<Type>({node.expr->type}));
         }
 
         if (node.patterns.size() == current_func->signature.subtypes.size() - 1) {
@@ -87,7 +87,7 @@ namespace semantics
         if (node.expr->type.id == TypeId::EMPTYLIST &&
                 current_func->signature.subtypes.back().id == TypeId::LIST)
             node.expr->type = current_func->signature.subtypes.back();
-        else if (current_func->type != node.expr->type) {
+        else if (current_func->signature.subtypes.back() != node.expr->type) {
             addError(Error::Expected("Wrong return type",
                                      current_func->type.str(),
                                      node.expr->type.str(),

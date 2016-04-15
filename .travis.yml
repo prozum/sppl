@@ -18,20 +18,26 @@ before_install:
   - wget -O - http://llvm.org/apt/llvm-snapshot.gpg.key | sudo apt-key add -
   - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
   - sudo apt-get -qq update
-  - sudo apt-get -qq install clang-3.8 gcc-5 g++-5 libstdc++-5-dev
+  - sudo apt-get -qq install clang-3.8 gcc-5 g++-5 libstdc++-5-dev libcppunit-1.13-0 libcppunit-dev
   - if [ "$CXX" = "g++" ]; then export CXX="g++-5" CC="gcc-5"; fi
   - if [ "$CXX" = "clang++" ]; then export CXX="clang++-3.8" CC="clang-3.8"; fi
     # Debug Data:
   - make --version
-  - clang-3.8 --version
+  - clang --version
   - gcc-5 --version
   - cmake --version
 
 install:
   - mkdir build && cd build
-  - cmake .. -DDEBUG=1 -DCLLVM=1
+  - cmake .. -DDEBUG=1 -DCLLVM=1 
 
 script:
+  - make -j 8
+  - sudo make install
+  - # C TEST
+  - cd ..
+  - mkdir test-c && cd test-c
+  - cmake .. -DDEBUG=1 -DCCPP=1 -DTESTS=1 --build-target tests
   - make -j 8
   - sudo make install
 
