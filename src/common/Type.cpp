@@ -73,11 +73,11 @@ namespace common {
             case TypeId::TUPLE:
                 return subtype_str(", ");
             case TypeId::SIGNATURE:
-                return  subtype_str(" -> ");
+                return subtype_str(" -> ");
             case TypeId::EMPTYLIST:
                 return "[]";
             default:
-                throw runtime_error("Cannot convert unknown type to string!");
+                return "Unknown";
         }
     }
 

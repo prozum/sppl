@@ -19,8 +19,6 @@ namespace semantics {
         node.scope = current_scope;
 
         if (!current_scope->exists(node.id) || node.is_anon) {
-            auto type = Type(TypeId::SIGNATURE);
-
             current_scope->decls.insert({node.id, node.signature});
 
             // Visit children
@@ -44,9 +42,8 @@ namespace semantics {
         context = ScopeContext::PATTERN;
 
         for (size_t i = 0; i < node.patterns.size(); i++) {
-            type_stack.push(current_func->signature[i]);
+            node.patterns[i]->type = current_func->signature[i];
             node.patterns[i]->accept(*this);
-            type_stack.pop();
         }
 
         context = ScopeContext::EXPR;
@@ -166,50 +163,36 @@ namespace semantics {
     }
 
     void ScopeGenerator::visit(ListPattern &node) {
-        if (type_stack.top().id == TypeId::LIST) {
-            type_stack.push(type_stack.top().id);
-
-            // Visit children
-            for (auto &pattern: node.patterns) {
-                pattern->accept(*this);
+        if (node.type.id == TypeId::LIST) {
+            for (int i = 0; i < node.patterns.size(); ++i) {
+                node.patterns[i]->type = node.type.subtypes[i];
+                node.patterns[i]->accept(*this);
             }
-            // Visit stops here
-
-            type_stack.pop();
         }
     }
 
     void ScopeGenerator::visit(TuplePattern &node) {
-        if (type_stack.top().id == TypeId::TUPLE) {
-            if (node.patterns.size() == type_stack.top().subtypes.size()) {
-                // Visit children
+        if (node.type.id == TypeId::TUPLE) {
+            if (node.patterns.size() == node.type.subtypes.size()) {
                 for (size_t i = 0; i < node.patterns.size(); i++) {
-                    type_stack.push(type_stack.top().subtypes[i]);
+                    node.patterns[i]->type = node.type.subtypes[i];
                     node.patterns[i]->accept(*this);
-                    type_stack.pop();
                 }
             }
         }
     }
 
     void ScopeGenerator::visit(ListSplit &node) {
-        if (type_stack.top().id == TypeId::LIST) {
-            type_stack.push(type_stack.top().id);
-
-            // Visit children
-            node.left->accept(*this);
-            type_stack.pop();
-            node.right->accept(*this);
-            // Visit stops here
-        } else if (type_stack.top().id == TypeId::STRING){
-            type_stack.push(Type(TypeId::CHAR));
-
-            // Visit children
-            node.left->accept(*this);
-            type_stack.pop();
-            node.right->accept(*this);
-            // Visit stops here
+        if (node.type.id == TypeId::LIST) {
+            node.left->type = node.type.subtypes.front();
+            node.right->type = node.type;
+        } else if (node.type.id == TypeId::STRING){
+            node.left->type = Type(TypeId::CHAR);
+            node.right->type = node.type;
         }
+
+        node.left->accept(*this);
+        node.right->accept(*this);
     }
 
     void ScopeGenerator::visit(List &node) {
@@ -233,7 +216,7 @@ namespace semantics {
 
         if (context == ScopeContext::PATTERN) {
             if (!current_scope->exists(node.id)) {
-                current_scope->decls.insert({node.id, type_stack.top()});
+                current_scope->decls.insert({node.id, node.type});
             }
         }
     }

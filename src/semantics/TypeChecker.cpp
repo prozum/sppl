@@ -449,7 +449,7 @@ namespace semantics
             } else {
                 addError(Error::Expected("Left must be the same type as the right Lists children",
                                          node.right->type.subtypes[0].str(),
-                                         node.right->str(),
+                                         node.left->type.str(),
                                          node.loc));
                 return;
             }

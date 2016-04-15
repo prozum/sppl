@@ -63,7 +63,7 @@ namespace codegen
     {
         stringstream function;
         stringstream arg_name;
-        string return_type = get_type(node.type.subtypes.back());
+        string return_type = get_type(node.type);
         string argument_type;
 
         current_func = &node;
@@ -625,19 +625,17 @@ namespace codegen
         string name = "";
 
         if (id_context == IdContext::PATTERN) {
-            string id_type = get_type(node.type);
-
             // created name from get_value_builder
             for (auto str : get_value_builder) {
                 name += str;
             }
 
             // generate an assignment for the id, which should occur after the if-statement
-            assign << id_type << " " << g_user << node.id << " = ";
+            assign << get_type(node.type) << " " << g_user << node.id << " = ";
 
             if ((node.type.id == TypeId::LIST || node.type.id == TypeId::STRING) &&
                  list_offsets.back() > 0) {
-                assign << g_generated << g_at << id_type << "(" << name << ", " << list_offsets.back() << ");";
+                assign << g_generated << g_at << get_list(node.type) << "(" << name << ", " << list_offsets.back() << ");";
             } else {
                 assign << name << ";";
             }
