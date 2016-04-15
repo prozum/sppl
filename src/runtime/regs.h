@@ -10,4 +10,12 @@ typedef struct context_s {
     uint64_t rbp; // base pointer
 } context_t;
 
+void swtch_context(context_t **old, context_t *new);
+
+void push_context();
+
+void pop_context();
+
+void save_scheduler_context(context_t *context);
+
 #endif //SPPL_REGS_H

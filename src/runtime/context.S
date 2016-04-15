@@ -37,10 +37,21 @@ swtch_context:
     pushq   %rdi
 
     movq    %rsp, (%rax)
-    movq    %rdx, rsp
+    movq    %rdx, %rsp
 
     popq    %rdi
     popq    %rsi
     popq    %rbx
     popq    %rbp
+    ret
+
+.globl save_scheduler_context
+save_scheduler_context:
+    movq 8(%rsp), %rax
+
+    pushq   %rbp
+    pushq   %rbx
+    pushq   %rsi
+    pushq   %rdi
+
     ret
