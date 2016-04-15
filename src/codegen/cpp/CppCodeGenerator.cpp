@@ -11,15 +11,16 @@ namespace codegen
 {
     CCodeGenerator::CCodeGenerator(Driver &driver) :
             CodeGenerator(driver),
-            real_string(Type(TypeId::LIST, vector<Type>({ Type(TypeId::CHAR) }))),
-            string_list(Type(TypeId::LIST, vector<Type>({ Type(TypeId::STRING) }))),
-            list_offsets(vector<int>({ 0 })),
+            output(driver.out),
             header(driver.hout),
-            output(driver.out)
+            list_offsets(vector<int>({ 0 })),
+            string_list(Type(TypeId::LIST, vector<Type>({ Type(TypeId::STRING) }))),
+            real_string(Type(TypeId::LIST, vector<Type>({ Type(TypeId::CHAR) })))
     { }
 
     void CCodeGenerator::visit(Program &node)
     {
+        program = &node;
         Function* main = nullptr;
 
         // generate the standard functionality for every program
@@ -47,7 +48,7 @@ namespace codegen
                    "        args = " << g_generated << g_add << strlistname << "(args, " << g_generated << g_create << g_string << "(argv[i])); \n"
                    "    } \n"
                    " \n"
-                   "    " << g_generated << g_print << g_string << "("  << to_strings[main->type] << "(" <<  g_user << g_main << "(args))); \n"
+                   "    " << g_generated << g_print << g_string << "("  << to_strings[main->type] << "(" << g_global << g_user << g_main << ".call(&" << g_global << g_user << g_main << ", args))); \n"
                    "    return 0; \n"
                    "} \n"
                    " \n";
@@ -65,21 +66,21 @@ namespace codegen
         stringstream arg_name;
         string return_type = get_type(node.type);
         string argument_type;
+        string signature = get_environment(node.signature);
 
         current_func = &node;
 
         // generate function name and return type
-        function << return_type << " " << g_user << node.id << "(";
+        function << return_type << " " << g_user << node.id << "(" << signature << " *" << g_generated << g_signature;
 
         // generate function arguments
         for (size_t i = 0; i < node.signature.subtypes.size() - 1; i++) {
+            function << ", ";
+
             argument_type = get_type(node.signature.subtypes[i]);
             arg_name << g_generated << g_arg << i;
             arg_names.push_back(arg_name.str());
             function << argument_type << " " << arg_name.str();
-
-            if (i < node.signature.subtypes.size() - 2) // don't generate ", " after last argument
-                function << ", ";
 
             arg_name.str("");
         }
@@ -87,13 +88,15 @@ namespace codegen
         function << ")";
 
         // generate function decleration in header
-        *header << function.str() << ";" << endl;
-        *header << endl;
+        *header << function.str() << "; \n \n";
+
+        *header << signature << " " << g_global << g_user << node.id << " = { " << g_user << node.id << " }; \n\n";
 
         // generate function in *output
         *output << function.str() << " { \n"
                    "Start: \n"
                    "\n";
+
 
         // generate cases
         for (auto &c: node.cases) {
@@ -164,25 +167,27 @@ namespace codegen
 
         // generate return expression
         id_context = IdContext::EXPR;
+        expr_stack.push(stringstream());
 
         if (node.tail_rec) {
             auto call = (Call*)node.expr.get();
             for (size_t i = 0; i < current_func->signature.subtypes.size() - 1; i++) {
-                *output << "        " << g_generated << g_arg << i << " = ";
+                expr_stack.push(stringstream());
                 call->exprs[i]->accept(*this);
-                *output << "; \n";
+                *output << "        " << g_generated << g_arg << i << " = " << expr_stack.top().str() << "; \n";
+                expr_stack.pop();
             }
 
             *output << "\n"
                        "        goto Start; \n";
         } else {
             string result_type = get_type(current_func->signature.subtypes.back());
+            expr_stack.push(stringstream());
 
-            *output << "        " << result_type << " res = ";
             node.expr->accept(*this);
-            *output << "; \n";
-
+            *output << "        " << result_type << " res = " << expr_stack.top().str() << "; \n";
             *output << "        return res; \n";
+            expr_stack.pop();
         }
 
         *output << "    } \n"
@@ -191,20 +196,20 @@ namespace codegen
 
     void CCodeGenerator::visit(Or &node)
     {
-        *output << "(";
+        expr_stack.top() << "(";
         node.left->accept(*this);
-        *output << "||";
+        expr_stack.top() << "||";
         node.right->accept(*this);
-        *output << ")";
+        expr_stack.top() << ")";
     }
 
     void CCodeGenerator::visit(And &node)
     {
-        *output << "(";
+        expr_stack.top() << "(";
         node.left->accept(*this);
-        *output << "&&";
+        expr_stack.top() << "&&";
         node.right->accept(*this);
-        *output << ")";
+        expr_stack.top() << ")";
     }
 
     void CCodeGenerator::visit(Equal &node)
@@ -214,9 +219,9 @@ namespace codegen
 
     void CCodeGenerator::visit(NotEqual &node)
     {
-        *output << "(!";
+        expr_stack.top() << "(!";
         output_equal(node.type, *node.left.get(), *node.right.get());
-        *output << ")";
+        expr_stack.top() << ")";
     }
 
     void CCodeGenerator::output_equal(Type &type, Expr &left, Expr &right) {
@@ -226,111 +231,111 @@ namespace codegen
             case TypeId::TUPLE:
                 name = get_tuple(left.type);
 
-                *output << g_generated << g_compare << name << "(";
+                expr_stack.top() << g_generated << g_compare << name << "(";
                 left.accept(*this);
-                *output << ", ";
+                expr_stack.top() << ", ";
                 right.accept(*this);
-                *output << ")";
+                expr_stack.top() << ")";
                 break;
             case TypeId::LIST:
             case TypeId::STRING:
                 name = get_list(left.type);
 
-                *output << g_generated << g_compare << name << "(";
+                expr_stack.top() << g_generated << g_compare << name << "(";
                 left.accept(*this);
-                *output << ", ";
+                expr_stack.top() << ", ";
                 right.accept(*this);
-                *output << ")";
+                expr_stack.top() << ")";
                 break;
             default:
-                *output << "(";
+                expr_stack.top() << "(";
                 left.accept(*this);
-                *output << "==";
+                expr_stack.top() << "==";
                 right.accept(*this);
-                *output << ")";
+                expr_stack.top() << ")";
                 break;
         }
     }
 
     void CCodeGenerator::visit(Lesser &node)
     {
-        *output << "(";
+        expr_stack.top() << "(";
         node.left->accept(*this);
-        *output << "<";
+        expr_stack.top() << "<";
         node.right->accept(*this);
-        *output << ")";
+        expr_stack.top() << ")";
     }
 
     void CCodeGenerator::visit(LesserEq &node)
     {
-        *output << "(";
+        expr_stack.top() << "(";
         node.left->accept(*this);
-        *output << "<=";
+        expr_stack.top() << "<=";
         node.right->accept(*this);
-        *output << ")";
+        expr_stack.top() << ")";
     }
 
     void CCodeGenerator::visit(Greater &node)
     {
-        *output << "(";
+        expr_stack.top() << "(";
         node.left->accept(*this);
-        *output << ">";
+        expr_stack.top() << ">";
         node.right->accept(*this);
-        *output << ")";
+        expr_stack.top() << ")";
     }
 
     void CCodeGenerator::visit(GreaterEq &node)
     {
-        *output << "(";
+        expr_stack.top() << "(";
         node.left->accept(*this);
-        *output << ">=";
+        expr_stack.top() << ">=";
         node.right->accept(*this);
-        *output << ")";
+        expr_stack.top() << ")";
     }
 
     void CCodeGenerator::visit(Add &node)
     {
-        *output << "(";
+        expr_stack.top() << "(";
         node.left->accept(*this);
-        *output << "+";
+        expr_stack.top() << "+";
         node.right->accept(*this);
-        *output << ")";
+        expr_stack.top() << ")";
     }
 
     void CCodeGenerator::visit(Sub &node)
     {
-        *output << "(";
+        expr_stack.top() << "(";
         node.left->accept(*this);
-        *output << "-";
+        expr_stack.top() << "-";
         node.right->accept(*this);
-        *output << ")";
+        expr_stack.top() << ")";
     }
 
     void CCodeGenerator::visit(Mul &node)
     {
-        *output << "(";
+        expr_stack.top() << "(";
         node.left->accept(*this);
-        *output << "*";
+        expr_stack.top() << "*";
         node.right->accept(*this);
-        *output << ")";
+        expr_stack.top() << ")";
     }
 
     void CCodeGenerator::visit(Div &node)
     {
-        *output << "(";
+        expr_stack.top() << "(";
         node.left->accept(*this);
-        *output << "/";
+        expr_stack.top() << "/";
         node.right->accept(*this);
-        *output << ")";
+        expr_stack.top() << ")";
     }
 
     void CCodeGenerator::visit(Mod &node)
     {
-        *output << "(";
+        expr_stack.top() << "(";
         node.left->accept(*this);
-        *output << "%";
+        expr_stack.top() << "%";
         node.right->accept(*this);
-        *output << ")";
+        expr_stack.top() << ")";
     }
 
     void CCodeGenerator::visit(ListAdd &node)
@@ -339,26 +344,26 @@ namespace codegen
 
         // use pregenerated push function to push thing onto list
         // look at generate_list(Type &type) for the generation of this function
-        *output << g_generated << g_add << name << "(";
+        expr_stack.top() << g_generated << g_add << name << "(";
         node.right->accept(*this);
-        *output << ", ";
+        expr_stack.top() << ", ";
         node.left->accept(*this);
-        *output << ")";
+        expr_stack.top() << ")";
     }
 
     void CCodeGenerator::visit(Par &node)
     {
-        *output << "(";
+        expr_stack.top() << "(";
         node.child->accept(*this);
-        *output << ")";
+        expr_stack.top() << ")";
     }
 
     void CCodeGenerator::visit(Not &node)
     {
-        *output << "(";
-        *output << "!";
+        expr_stack.top() << "(";
+        expr_stack.top() << "!";
         node.child->accept(*this);
-        *output << ")";
+        expr_stack.top() << ")";
     }
 
     void CCodeGenerator::visit(ListPattern &node)
@@ -509,7 +514,7 @@ namespace codegen
 
         // else, just output value
         } else {
-            *output << "(" << node.value << ")";
+            expr_stack.top() << "(" << node.value << ")";
         }
     }
 
@@ -527,7 +532,7 @@ namespace codegen
 
         // else, just output value
         } else {
-            *output << "(" << node.str() << ")";
+            expr_stack.top() << "(" << node.str() << ")";
         }
 
     }
@@ -546,7 +551,7 @@ namespace codegen
 
         // else, just output value
         } else {
-            *output << node.value;
+            expr_stack.top() << node.value;
         }
     }
 
@@ -564,7 +569,7 @@ namespace codegen
 
         // else, just output value
         } else {
-            *output << node.str();
+            expr_stack.top() << node.str();
         }
     }
 
@@ -585,7 +590,7 @@ namespace codegen
         // else, just output value
         } else {
             // gcreate_string is generate by generate_std. It creates string base on a char*
-            *output << g_generated << g_create << g_string << "(" << node.str() << ")";
+            expr_stack.top() << g_generated << g_create << g_string << "(" << node.str() << ")";
         }
     }
 
@@ -594,14 +599,14 @@ namespace codegen
         string name = get_list(node.type);
 
         // create list
-        *output << g_generated << g_create << name << "(" << node.exprs.size();
+        expr_stack.top() << g_generated << g_create << name << "(" << node.exprs.size();
         for (int i = node.exprs.size() - 1; i >= 0; i--) {
-            *output << ", ";
+            expr_stack.top() << ", ";
 
             node.exprs[i]->accept(*this);
         }
 
-        *output << ")";
+        expr_stack.top() << ")";
     }
 
     void CCodeGenerator::visit(Tuple &node)
@@ -609,14 +614,14 @@ namespace codegen
         string name = get_tuple(node.type);
 
         // create tuple
-        *output << g_generated << g_create << name << "(";
+        expr_stack.top() << g_generated << g_create << name << "(";
         for (auto &expr: node.exprs){
             expr->accept(*this);
 
             if (expr != node.exprs.back())
-                *output << ", ";
+                expr_stack.top() << ", ";
         }
-        *output << ")";
+        expr_stack.top() << ")";
     }
 
     void CCodeGenerator::visit(Id &node)
@@ -646,27 +651,42 @@ namespace codegen
             // since and id, in a pattern is allways true, then last_pattern is just set to "1"
             last_pattern = "1";
         } else {
-            *output << g_user << node.id;
+            bool is_declared = false;
+
+            for (auto &func: program->funcs) {
+                if (func->id == node.id) {
+                    is_declared = true;
+                    break;
+                }
+            }
+
+            if (is_declared) {
+                expr_stack.top() << "&" << g_global;
+            }
+
+            expr_stack.top() << g_user << node.id;
         }
     }
 
     void CCodeGenerator::visit(Call &node)
     {
-        *output << "(";
+        string name = g_generated + g_closure + to_string(env_count++);
+        string assignment = get_environment(node.callee->type) + "* " + name + " = ";
+
+        expr_stack.push(stringstream());
         // generate the callee (aka, the function being called)
         node.callee->accept(*this);
+        *output << "        " << assignment << expr_stack.top().str() << "; \n";
+        expr_stack.pop();
 
         // generate the arguments the function is being called with
-        *output << "(";
+        expr_stack.top() << name << "->call(" << name;
         for (auto &expr: node.exprs){
+            expr_stack.top() << ", ";
+
             expr->accept(*this);
-
-            if (expr != node.exprs.back())
-                *output << ", ";
         }
-        *output << ")";
-
-        *output << ")";
+        expr_stack.top() << ")";
     }
 
     string CCodeGenerator::get_type(Type &type) {
@@ -682,18 +702,18 @@ namespace codegen
                 return g_int;
             case TypeId::BOOL:
                 return g_bool;
-                // for tuples, lists, signatures and strings, custom types will be generated
+                // for tuples, lists, closures and strings, custom types will be generated
             case TypeId::TUPLE:
                 return get_tuple(type);
             case TypeId::SIGNATURE:
-                return get_signature(type);
+                return get_environment(type) + "*";
             case TypeId::STRING:
                 return string_type_name + "*";
             case TypeId::LIST:
                 return get_list(type) + "*";
             default:
                 // This should never happen. If it does, the type checker made a mistake.
-                break;
+                return "This really shouldn't happen.";
         }
     }
 
@@ -810,7 +830,7 @@ namespace codegen
                   "} \n"
                   " \n";
 
-        // generation of concat 43 sec old
+        // generation of concat
         *header << name << "* " << g_generated << g_concat << name << "(" << name << "* list1, " << name << "* list2); \n";
         buffer << name << "* " << g_generated << g_concat << name << "(" << name << "* list1, " << name << "* list2) { \n"
                    "    int i; \n"
@@ -851,14 +871,14 @@ namespace codegen
                 "} \n"
                 " \n";
 
-        // save list in signature hash map
+
         lists[type] = name;
 
         // return name of list generated
         return name;
     }
 
-    string CCodeGenerator::generate_signature(Type &type) {
+    string CCodeGenerator::generate_environment(Type &type) {
         // result is needed, so we don't generate something inside the signature, while generating other types
         stringstream result;
         string name = g_generated + g_signature + to_string(sig_count);
@@ -866,19 +886,20 @@ namespace codegen
         // increase signature count, so next signature doesn't have the same name
         sig_count++;
 
-        result << "typedef " << get_type(type.subtypes.back()) << " (* " << name << ")(";
+        result << "typedef struct " << name << " {\n"
+               << "    " << get_type(type.subtypes.back()) << " (* call)(struct " << name << "*";
 
         for (size_t i = 0; i < type.subtypes.size() - 1; ++i) {
+            result << ", ";
+
             // get the actual type of the argument
             result << get_type(type.subtypes[i]);
-
-            if (i < type.subtypes.size() - 2) // don't print ", " after the last argument
-                result << ", ";
         }
 
-        result << "); \n";
+        result << "); \n"
+                  "} " << name << ";\n\n";
 
-        *header << result.str();
+        *header << "\n" << result.str();
 
         // generation of signature to string
         to_strings[type] = g_generated + g_tostring + name;
@@ -890,7 +911,7 @@ namespace codegen
                    " \n";
 
         // save signature in signature hash map
-        signatures[type] = name;
+        closures[type] = name;
 
         // return name of signature generated
         return name;
@@ -1149,11 +1170,11 @@ namespace codegen
         }
     }
 
-    string CCodeGenerator::get_signature(Type &type) {
-        auto got = signatures.find(type);
+    string CCodeGenerator::get_environment(Type &type) {
+        auto got = closures.find(type);
 
-        if (got == signatures.end()) {
-            return  generate_signature(type);
+        if (got == closures.end()) {
+            return  generate_environment(type);
         } else {
             return got->second;
         }

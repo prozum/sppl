@@ -110,6 +110,8 @@ namespace codegen {
             const string g_size = "size";
             const string g_item = "item";
             const string g_arg = "arg";
+            const string g_closure = "closure";
+            const string g_global = "global";
             const string g_main = "main";
 
             stringstream buffer;
@@ -120,9 +122,10 @@ namespace codegen {
             int list_count = 0;
             int sig_count = 0;
             int oob_count = 0;
+            int env_count = 0;
             unordered_map<Type, string> tuples;
             unordered_map<Type, string> lists;
-            unordered_map<Type, string> signatures;
+            unordered_map<Type, string> closures;
             unordered_map<Type, string> to_strings;
             vector<string> arg_names;
             vector<string> get_value_builder;
@@ -132,18 +135,21 @@ namespace codegen {
             string last_pattern;
             string string_type_name;
 
-            Type real_string;
-            Type string_list;
+            std::stack<stringstream> expr_stack;
 
+            Type string_list;
+            Type real_string;
+
+            Program* program;
             Function* current_func;
 
             string get_type(Type &);
             string generate_list(Type &);
             string generate_tuple(Type &);
-            string generate_signature(Type &);
+            string generate_environment(Type &);
             string get_list(Type &);
             string get_tuple(Type &);
-            string get_signature(Type &);
+            string get_environment(Type &);
             void generate_std();
             void output_buffer();
             void output_equal(Type &, Expr &, Expr &);
