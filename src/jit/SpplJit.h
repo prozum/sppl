@@ -1,4 +1,10 @@
 #pragma once
+
+#include "Compiler.h"
+#include "Driver.h"
+#include "TypeChecker.h"
+#include "ScopeGenerator.h"
+
 #include <llvm/ExecutionEngine/ExecutionEngine.h>
 #include <llvm/ExecutionEngine/Orc/CompileUtils.h>
 #include <llvm/ExecutionEngine/Orc/IRCompileLayer.h>
@@ -19,18 +25,13 @@
 #include <llvm/Support/TargetSelect.h>
 #include <llvm/Transforms/Scalar.h>
 
-#include "Compiler.h"
-#include "Driver.h"
-#include "TypeChecker.h"
-#include "ScopeGenerator.h"
-
 using namespace llvm;
 using namespace llvm::orc;
 
 namespace jit {
     class SpplJit {
     public:
-        SpplJit(shared_ptr<ostream> out);
+        SpplJit();
 
         void Eval(string str);
 
@@ -40,12 +41,12 @@ namespace jit {
             InitializeNativeTargetAsmParser();
         }
 
-    private:
         typedef ObjectLinkingLayer<> ObjLayerT;
         typedef IRCompileLayer<ObjLayerT> CompileLayerT;
         typedef CompileLayerT::ModuleSetHandleT ModuleHandleT;
 
         void init_module_passmanager();
+        SpplJit::ModuleHandleT module_handler;
 
         ModuleHandleT add_module(std::unique_ptr<llvm::Module> m);
         void remove_module(ModuleHandleT handler);
@@ -61,13 +62,14 @@ namespace jit {
         CompileLayerT CompileLayer;
         std::vector<ModuleHandleT> ModuleHandles;
         std::unique_ptr<legacy::FunctionPassManager> PassManager;
+
         parser::Driver Driver;
         codegen::LLVMCodeGenerator Generator;
         semantics::ScopeGenerator ScopeGenerator;
         semantics::TypeChecker TypeChecker;
 
-        string get_output(intptr_t data, common::Type *node_type);
-        string get_tuple_output(intptr_t addr, vector<shared_ptr<common::Type>> node_type);
+        string get_output(intptr_t data, common::Type type);
+        string get_tuple_output(intptr_t addr, common::Type tuple_type);
 
         template<typename T>
         static std::vector<T> singletonSet(T t) {

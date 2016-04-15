@@ -1,5 +1,4 @@
 %option c++
-%option noyywrap
 %option prefix="Sppl"
 
 %{
@@ -27,13 +26,13 @@ using namespace std;
 %%
 
 %{
-    yylloc->columns++;
+    yylloc->columns += yyleng;
 %}
 
 [ \t] {  }
 
 [\n] {
-    yylloc->lines = yyleng;
+    yylloc->lines = 1;
     yylloc->columns = 1;
 }
 
@@ -65,35 +64,35 @@ using namespace std;
 }
 
 [0-9]+ {
-    yylval->long_val = atol(yytext);
+    yylval->long_int = atol(yytext);
     return token::INTLITERAL;
 }
 
 [0-9]+"."[0-9]+ {
-    yylval->longdouble_val = atof(yytext);
+    yylval->long_double = atof(yytext);
     return token::FLOATLITERAL;
 }
 
 "'"[^']"'" {
 
-    yylval->char_val =yytext[1];
+    yylval->chr = yytext[1];
     return token::CHARLITERAL;
 }
 
 "\""[^"]*"\"" {
-    yylval->str_val = new string(yytext);
-    yylval->str_val->pop_back();
-    yylval->str_val->erase (0,1);
+    yylval->str = new string(yytext);
+    yylval->str->pop_back();
+    yylval->str->erase (0,1);
     return token::STRINGLITERAL;
 }
 
 "True"|"False" {
-    yylval->bool_val = (string(yytext) == "True") ? true : false;
+    yylval->boolean = (string(yytext) == "True") ? true : false;
     return token::BOOLLITERAL;
 }
 
 [a-zA-Z_][a-zA-Z0-9_]* {
-    yylval->str_val = new string(yytext);
+    yylval->str = new string(yytext);
     return token::ID;
 }
 
@@ -189,32 +188,41 @@ using namespace std;
 
 %%
 
+#include "Driver.h"
+
 namespace parser {
 
-Scanner::Scanner(std::istream* in,
-                 std::ostream* out)
-    : SpplFlexLexer(in, out)
-{
-}
+    Scanner::Scanner(Driver &driver) :
+        SpplFlexLexer(),
+        driver(driver) { }
 
-Scanner::~Scanner()
-{
-}
+    Scanner::~Scanner() { }
 
-void Scanner::set_debug(bool b)
-{
-    yy_flex_debug = b;
-}
+    void Scanner::set_debug(bool b) {
+        yy_flex_debug = b;
+    }
 
+    int Scanner::yywrap() {
+        if (driver.next_input()) {
+            return 0;
+        }
+
+        return 1;
+    }
 }
 
 #ifdef yylex
 #undef yylex
 #endif
 
-int SpplFlexLexer::yylex()
-{
+int SpplFlexLexer::yylex() {
     std::cerr << "in SpplFlexLexer::yylex() !" << std::endl;
     return 0;
 }
+
+int SpplFlexLexer::yywrap() {
+    std::cerr << "in SpplFlexLexer::yywrap() !" << std::endl;
+    return 0;
+}
+
 

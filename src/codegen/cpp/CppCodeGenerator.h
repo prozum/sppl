@@ -21,7 +21,7 @@ namespace codegen {
     class CCodeGenerator: public CodeGenerator
     {
         public:
-            CCodeGenerator(shared_ptr<std::ostream>&, shared_ptr<std::ostream>&);
+            CCodeGenerator(Driver &driver);
 
             void visit(Program &node);
 
@@ -85,8 +85,6 @@ namespace codegen {
 
             void visit(Call &node);
 
-            void visit(Type &node);
-
         private:
             const string g_generated = "generated_";
             const string g_user = "user_";
@@ -114,7 +112,9 @@ namespace codegen {
             const string g_arg = "arg";
             const string g_main = "main";
 
-            shared_ptr<std::ostream> &header;
+            stringstream buffer;
+            ostream *output;
+            ostream *header;
 
             int tuple_count = 0;
             int list_count = 0;
@@ -130,16 +130,14 @@ namespace codegen {
             vector<int> list_offsets;
             IdContext id_context;
             string last_pattern;
-            string last_type;
             string string_type_name;
 
-            shared_ptr<Type> _char;
-            shared_ptr<Type> fake_string;
-            shared_ptr<Type> real_string;
-            shared_ptr<Type> string_list;
+            Type real_string;
+            Type string_list;
 
             Function* current_func;
 
+            string get_type(Type &);
             string generate_list(Type &);
             string generate_tuple(Type &);
             string generate_signature(Type &);
@@ -147,5 +145,8 @@ namespace codegen {
             string get_tuple(Type &);
             string get_signature(Type &);
             void generate_std();
+            void output_buffer();
+            void output_equal(Type &, Expr &, Expr &);
+
     };
 }

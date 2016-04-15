@@ -1,13 +1,8 @@
 #include "Compiler.h"
 
 namespace compiler {
-    Compiler::Compiler(shared_ptr<istream> in,
-                       shared_ptr<ostream> out,
-                       shared_ptr<ostream> hout)
-            : input(in),
-              output(out),
-              header_output(hout),
-              scope_generator(semantics::ScopeGenerator(driver.global.get())) {
+    Compiler::Compiler() :
+            scope_generator(semantics::ScopeGenerator(&global)) {
 
     }
 
@@ -17,12 +12,12 @@ namespace compiler {
         {
 #ifdef CCPP
             case Backend::CPP:
-                generator = make_unique<codegen::CCodeGenerator>(output, header_output);
+                generator = make_unique<codegen::CCodeGenerator>(*this);
                 break;
 #endif
 #ifdef CGNUASM
             case Backend::GNUASM:
-                generator = make_unique<codegen::GasCodeGenerator>(*output);
+                generator = make_unique<codegen::GasCodeGenerator>(driver);
                 break;
 #endif
 #ifdef CHASKELL
@@ -32,34 +27,36 @@ namespace compiler {
 #endif
 #ifdef CLLVM
             case Backend::LLVM:
-                generator = make_unique<codegen::LLVMCodeGenerator>(output);
+                generator = make_unique<codegen::LLVMCodeGenerator>(*this);
                 break;
 #endif
             case Backend::PPRINTER:
-                generator = make_unique<codegen::Printer>(output);
+                generator = make_unique<codegen::Printer>(*this);
+                break;
             default:
-                throw "Not a valid backend";
+                throw runtime_error("Not a valid backend");
         }
     }
 
     int Compiler::compile() {
 
-        driver.parse_stream(*input);
-        if (driver.program == nullptr)
+        if (!parse_files())
             return 1;
 
-        //case_checker.visit(*driver.program);
-        scope_generator.visit(*driver.program);
-        if (scope_generator.HasError())
+        if (!accept(scope_generator))
             return 2;
 
-        type_checker.visit(*driver.program);
-        if (type_checker.HasError())
+        if (!accept(type_checker))
             return 3;
 
-        optimizer.visit(*driver.program);
+        if (!accept(optimizer))
+            return 4;
 
-        generator->visit(*driver.program);
+        if (!accept(*generator))
+            return 5;
+
         return 0;
     }
+
+
 }

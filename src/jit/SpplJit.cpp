@@ -2,11 +2,13 @@
 
 namespace jit {
 
-    SpplJit::SpplJit(shared_ptr<ostream> out) : Machine(EngineBuilder().selectTarget()),
-                                                Layout(Machine->createDataLayout()),
-                                                CompileLayer(ObjectLayer, SimpleCompiler(*Machine)),
-                                                Generator(out),
-                                                ScopeGenerator(Driver.global.get()) {
+    SpplJit::SpplJit() :
+            Machine(EngineBuilder().selectTarget()),
+            Layout(Machine->createDataLayout()),
+            CompileLayer(ObjectLayer, SimpleCompiler(*Machine)),
+            Generator(Driver),
+            ScopeGenerator(&Driver.global)
+    {
         llvm::sys::DynamicLibrary::LoadLibraryPermanently(nullptr);
         init_module_passmanager();
     }
@@ -75,51 +77,51 @@ namespace jit {
     }
 
 
-    string SpplJit::get_output(intptr_t data, common::Type *node_type) {
+    string SpplJit::get_output(intptr_t data, common::Type type) {
         string out;
 
-        switch (node_type->type) {
-            case common::Types::INT:
+        switch (type.id) {
+            case common::TypeId::INT:
                 return to_string((int64_t) data);
-            case common::Types::FLOAT:
+            case common::TypeId::FLOAT:
                 // WTF is double type a pointer
                 return to_string(*(double *) data);
-            case common::Types::STRING:
+            case common::TypeId::STRING:
                 out += "\"";
                 out += (char *) data;
                 out += "\"";
                 return out;
-            case common::Types::TUPLE:
-                return get_tuple_output(data, node_type->types);
+            case common::TypeId::TUPLE:
+                return get_tuple_output(data, type);
             default:
-                throw Error::NotImplemented("Cannot convert to C data: " + node_type->str());
+                throw Error::NotImplemented("Cannot convert to C data: " + type.str());
         }
     }
 
-    string SpplJit::get_tuple_output(intptr_t addr, vector<shared_ptr<common::Type>> node_types) {
+    string SpplJit::get_tuple_output(intptr_t addr, common::Type tuple_type) {
         string out("(");
-        for (auto &node_type: node_types) {
-            switch (node_type->type) {
-                case common::Types::INT:
-                    out += get_output(*(int64_t *) addr, node_type.get());
+        for (auto &type: tuple_type.subtypes) {
+            switch (type.id) {
+                case common::TypeId::INT:
+                    out += get_output(*(int64_t *) addr, type);
                     addr += sizeof(int64_t);
                     break;
-                case common::Types::FLOAT:
-                    out += get_output(addr, node_type.get());
+                case common::TypeId::FLOAT:
+                    out += get_output(addr, type);
                     addr += sizeof(double);
                     break;
-                case common::Types::STRING:
-                    out += get_output(*(intptr_t *) addr, node_type.get());
+                case common::TypeId::STRING:
+                    out += get_output(*(intptr_t *) addr, type);
                     addr += sizeof(intptr_t *);
                     break;
-                case common::Types::TUPLE:
-                    out += get_tuple_output(*(intptr_t *) addr, node_type->types);
+                case common::TypeId::TUPLE:
+                    out += get_tuple_output(*(intptr_t *) addr, type);
                     addr += sizeof(intptr_t *);
                     break;
                 default:
-                    throw Error::NotImplemented("Cannot convert to C data: " + node_type->str());
+                    throw Error::NotImplemented("Cannot convert to C data: " + type.str());
             }
-            if (node_type != node_types.back())
+            if (type != tuple_type.subtypes.back())
                 out += ",";
         }
         out += ")";
@@ -132,34 +134,39 @@ namespace jit {
             return;
 
         if (!Driver.accept(ScopeGenerator)) {
+            ScopeGenerator.outError(cout);
             return;
         }
 
         if (!Driver.accept(TypeChecker)) {
+            TypeChecker.outError(cout);
             return;
         }
 
         // Generate ir_func
-        auto func_node = Driver.program->funcs[0];
-        Driver.accept(Generator);
+        auto func_node = Driver.program->funcs[0].get();
+        if (!Driver.accept(Generator)) {
+            return;
+        }
         auto func_ir = Generator.Module->getFunction(func_node->id);
         PassManager->run(*func_ir);
 
-        // Print LLVM Module
-        cout << Generator.ModuleString();
-
-        //auto handler = add_module(std::move(Generator.Module));
-        //init_module_passmanager();
+        // Store function in seperate module
+        module_handler = add_module(std::move(Generator.Module));
+        init_module_passmanager();
 
         // Only run anonymous functions
         if (func_node->is_anon) {
             auto func = find_symbol(func_node->id);
             auto func_jit = (size_t (*)()) func.getAddress();
 
-            string output = get_output(func_jit(), func_node->node_type.get());
+            assert(func_jit != NULL);
+            string output = get_output(func_jit(), func_node->type);
             cout << "output: " << output << endl;
+
+            // Remove module
+            remove_module(module_handler);
         }
 
-        //remove_module(handler);
     }
 }

@@ -2,7 +2,6 @@
 #include "Error.h"
 #include "Scope.h"
 
-#include <iostream>
 
 using namespace std;
 namespace semantics
@@ -10,9 +9,26 @@ namespace semantics
     TypeChecker::TypeChecker() { }
 
     void TypeChecker::visit(Program &node) {
+        auto strlist = Type(TypeId::LIST, vector<Type>({ Type(TypeId::STRING) }));
+
         // Visit children
-        for (auto func : node.funcs) {
+        for (auto &func: node.funcs) {
             func->accept(*this);
+
+            if (func->id == "main") {
+                if (func->signature.subtypes.front() != strlist) {
+                    addError(Error::Expected("Declaration of \"main\" had wrong input type",
+                                             strlist.str(),
+                                             func->signature.subtypes.front().str(),
+                                             func->loc));
+                } else if (func->signature.subtypes.size() != 2) {
+                    addError(Error::Expected("Function \"main\" had wrong number of input",
+                                             "2",
+                                             to_string(func->signature.subtypes.size()),
+                                             func->loc));
+                }
+            }
+
             Safe;
         }
         // Visit stops here
@@ -22,62 +38,59 @@ namespace semantics
         current_func = &node;
 
         // Visit children
-        for (auto type : node.types) {
-            type->accept(*this);
-            Safe;
-        }
-
-        if (node.types.size() > 0)
-            node.node_type = node.types.back();
-
-        for (auto cse : node.cases) {
+        for (auto &cse: node.cases) {
             cse->accept(*this);
             Safe;
         }
         // Visit stops here
+
+        // Set return type
+        node.type = node.signature.subtypes.back();
     }
 
     void TypeChecker::visit(Case &node) {
         // Visit children
-        for (auto pattern : node.patterns) {
+        for (auto &pattern: node.patterns) {
             pattern->accept(*this);
         }
         node.expr->accept(*this);
         CheckPanic;
 
+        // Set signature for anonymous function
         if (current_func->is_anon) {
-            current_func->node_type = node.expr->node_type;
-            current_func->types.push_back(node.expr->node_type);
+            current_func->signature = Type(TypeId::SIGNATURE, vector<Type>({node.expr->type}));
         }
 
-        if (node.patterns.size() + 1 == current_func->types.size()) {
+        if (node.patterns.size() == current_func->signature.subtypes.size() - 1) {
             for (size_t i = 0; i < node.patterns.size(); ++i) {
-                if (node.patterns[i]->node_type->type == Types::EMPTYLIST &&
-                    current_func->types[i]->type == Types::LIST) {
-                    node.patterns[i]->node_type = current_func->types[i];
-                } else if (!equal(node.patterns[i]->node_type, current_func->types[i])) {
-                    AddError(Error::Expected("Wrong pattern type",
-                                current_func->types[i]->str(),
-                                node.patterns[i]->node_type->str(),
-                                node.patterns[i]->node_type->loc));
+                if (node.patterns[i]->type.id == TypeId::EMPTYLIST &&
+                        current_func->signature.subtypes[i].id == TypeId::LIST) {
+                    node.patterns[i]->type = current_func->signature.subtypes[i];
+                }
+
+                if (node.patterns[i]->type != current_func->signature.subtypes[i]) {
+                    addError(Error::Expected("Wrong pattern type",
+                                             current_func->signature.subtypes[i].str(),
+                                             node.patterns[i]->type.str(),
+                                             node.patterns[i]->loc));
                     return;
                 }
             }
         } else {
-            AddError(Error::Expected("Wrong pattern count",
-                        to_string(current_func->types.size() - 1),
-                        to_string(node.patterns.size()),
-                        node.loc));
+            addError(Error::Expected("Wrong pattern count",
+                                     to_string(current_func->signature.subtypes.size() - 1),
+                                     to_string(node.patterns.size()),
+                                     node.loc));
             return;
         }
 
-        if (node.expr->node_type->type == Types::EMPTYLIST &&
-            current_func->types.back()->type == Types::LIST) {
-            node.expr->node_type = current_func->types.back();
-        } else if (!equal(current_func->types.back(), node.expr->node_type)) {
-            AddError(Error::Expected("Wrong return type",
-                                     current_func->types.back()->str(),
-                                     node.expr->node_type->str(),
+        if (node.expr->type.id == TypeId::EMPTYLIST &&
+                current_func->signature.subtypes.back().id == TypeId::LIST)
+            node.expr->type = current_func->signature.subtypes.back();
+        else if (current_func->signature.subtypes.back() != node.expr->type) {
+            addError(Error::Expected("Wrong return type",
+                                     current_func->type.str(),
+                                     node.expr->type.str(),
                                      node.loc));
             return;
         }
@@ -91,10 +104,10 @@ namespace semantics
         CheckPanic;
         // Visit stops here
 
-        if (node.left->node_type->type == Types::BOOL && node.right->node_type->type == Types::BOOL) {
-            node.node_type = node.left->node_type;
+        if (node.left->type.id == TypeId::BOOL && node.right->type.id == TypeId::BOOL) {
+            node.type = node.left->type;
         } else {
-            AddError(Error::Binary("Operator only operates on Bool typed children",
+            addError(Error::Binary("Operator only operates on Bool typed children",
                                    node));
             return;
         }
@@ -108,10 +121,10 @@ namespace semantics
         CheckPanic;
         // Visit stops here
 
-        if (node.left->node_type->type == Types::BOOL && node.right->node_type->type == Types::BOOL) {
-            node.node_type = node.left->node_type;
+        if (node.left->type == TypeId::BOOL && node.right->type == TypeId::BOOL) {
+            node.type = node.left->type;
         } else {
-            AddError(Error::Binary("Operator only operates on Bool typed children",
+            addError(Error::Binary("Operator only operates on Bool typed children",
                                    node));
             return;
         }
@@ -125,10 +138,10 @@ namespace semantics
         CheckPanic;
         // Visit stops here
 
-        if (equal(node.left->node_type, node.right->node_type)) {
-            node.node_type = make_shared<Type>(Types::BOOL);
+        if (node.left->type == node.right->type) {
+            node.type = Type(TypeId::BOOL);
         } else {
-            AddError(Error::Binary("Operator only operates on children of the same type",
+            addError(Error::Binary("Operator only operates on children of the same type",
                                    node));
             return;
         }
@@ -142,10 +155,10 @@ namespace semantics
         CheckPanic;
         // Visit stops here
 
-        if (equal(node.left->node_type, node.right->node_type)) {
-            node.node_type = make_shared<Type>(Types::BOOL, vector<Type *>());
+        if (node.left->type == node.right->type) {
+            node.type = Type(TypeId::BOOL);
         } else {
-            AddError(Error::Binary("Operator only operates on children of the same type",
+            addError(Error::Binary("Operator only operates on children of the same type",
                                    node));
             return;
         }
@@ -159,11 +172,11 @@ namespace semantics
         CheckPanic;
         // Visit stops here
 
-        if ((node.left->node_type->type == Types::INT && node.right->node_type->type == Types::INT) ||
-            (node.left->node_type->type == Types::FLOAT && node.right->node_type->type == Types::FLOAT)) {
-            node.node_type = make_shared<Type>(Types::BOOL);
+        if ((node.left->type.id == TypeId::INT && node.right->type.id == TypeId::INT) ||
+            (node.left->type.id == TypeId::FLOAT && node.right->type.id == TypeId::FLOAT)) {
+            node.type = Type(TypeId::BOOL);
         } else {
-            AddError(Error::Binary("Operator only operates on children of the same type",
+            addError(Error::Binary("Operator only operates on children of the same type",
                                    node));
             return;
         }
@@ -177,11 +190,11 @@ namespace semantics
         CheckPanic;
         // Visit stops here
 
-        if ((node.left->node_type->type == Types::INT && node.right->node_type->type == Types::INT) ||
-            (node.left->node_type->type == Types::FLOAT && node.right->node_type->type == Types::FLOAT)) {
-            node.node_type = make_shared<Type>(Types::BOOL);
+        if ((node.left->type.id == TypeId::INT && node.right->type.id == TypeId::INT) ||
+            (node.left->type.id == TypeId::FLOAT && node.right->type.id == TypeId::FLOAT)) {
+            node.type = Type(TypeId::BOOL);
         } else {
-            AddError(Error::Binary("Operator only operates on Int or Float children",
+            addError(Error::Binary("Operator only operates on Int or Float children",
                                    node));
             return;
         }
@@ -194,11 +207,11 @@ namespace semantics
         CheckPanic;
         // Visit stops here
 
-        if ((node.left->node_type->type == Types::INT && node.right->node_type->type == Types::INT) ||
-            (node.left->node_type->type == Types::FLOAT && node.right->node_type->type == Types::FLOAT)) {
-            node.node_type = make_shared<Type>(Types::BOOL);
+        if ((node.left->type.id == TypeId::INT && node.right->type.id == TypeId::INT) ||
+            (node.left->type.id == TypeId::FLOAT && node.right->type.id == TypeId::FLOAT)) {
+            node.type = Type(TypeId::BOOL);
         } else {
-            AddError(Error::Binary("Operator only operates on Int or Float children",
+            addError(Error::Binary("Operator only operates on Int or Float children",
                                    node));
             return;
         }
@@ -211,11 +224,11 @@ namespace semantics
         CheckPanic;
         // Visit stops here
 
-        if ((node.left->node_type->type == Types::INT && node.right->node_type->type == Types::INT) ||
-            (node.left->node_type->type == Types::FLOAT && node.right->node_type->type == Types::FLOAT)) {
-            node.node_type = make_shared<Type>(Types::BOOL);
+        if ((node.left->type.id == TypeId::INT && node.right->type.id == TypeId::INT) ||
+            (node.left->type.id == TypeId::FLOAT && node.right->type.id == TypeId::FLOAT)) {
+            node.type = Type(TypeId::BOOL);
         } else {
-            AddError(Error::Binary("Operator only operates on Int or Float children",
+            addError(Error::Binary("Operator only operates on Int or Float children",
                                    node));
             return;
         }
@@ -228,11 +241,11 @@ namespace semantics
         CheckPanic;
         // Visit stops here
 
-        if ((node.left->node_type->type == Types::INT && node.right->node_type->type == Types::INT) ||
-            (node.left->node_type->type == Types::FLOAT && node.right->node_type->type == Types::FLOAT)) {
-            node.node_type = node.left->node_type;
+        if ((node.left->type.id == TypeId::INT && node.right->type.id == TypeId::INT) ||
+            (node.left->type.id == TypeId::FLOAT && node.right->type.id == TypeId::FLOAT)) {
+            node.type = node.left->type;
         } else {
-            AddError(Error::Binary("Operator only operates on Int or Float children",
+            addError(Error::Binary("Operator only operates on Int or Float children",
                                    node));
             return;
         }
@@ -245,11 +258,11 @@ namespace semantics
         CheckPanic;
         // Visit stops here
 
-        if ((node.left->node_type->type == Types::INT && node.right->node_type->type == Types::INT) ||
-            (node.left->node_type->type == Types::FLOAT && node.right->node_type->type == Types::FLOAT)) {
-            node.node_type = node.left->node_type;
+        if ((node.left->type.id == TypeId::INT && node.right->type.id == TypeId::INT) ||
+            (node.left->type.id == TypeId::FLOAT && node.right->type.id == TypeId::FLOAT)) {
+            node.type = node.left->type;
         } else {
-            AddError(Error::Binary("Operator only operates on Int or Float children",
+            addError(Error::Binary("Operator only operates on Int or Float children",
                                    node));
             return;
         }
@@ -262,11 +275,11 @@ namespace semantics
         CheckPanic;
         // Visit stops here
 
-        if ((node.left->node_type->type == Types::INT && node.right->node_type->type == Types::INT) ||
-            (node.left->node_type->type == Types::FLOAT && node.right->node_type->type == Types::FLOAT)) {
-            node.node_type = node.left->node_type;
+        if ((node.left->type.id == TypeId::INT && node.right->type.id == TypeId::INT) ||
+            (node.left->type.id == TypeId::FLOAT && node.right->type.id == TypeId::FLOAT)) {
+            node.type = node.left->type;
         } else {
-            AddError(Error::Binary("Operator only operates on Int or Float children",
+            addError(Error::Binary("Operator only operates on Int or Float children",
                                    node));
             return;
         }
@@ -279,11 +292,11 @@ namespace semantics
         CheckPanic;
         // Visit stops here
 
-        if ((node.left->node_type->type == Types::INT && node.right->node_type->type == Types::INT) ||
-            (node.left->node_type->type == Types::FLOAT && node.right->node_type->type == Types::FLOAT)) {
-            node.node_type = node.left->node_type;
+        if ((node.left->type.id == TypeId::INT && node.right->type.id == TypeId::INT) ||
+            (node.left->type.id == TypeId::FLOAT && node.right->type.id == TypeId::FLOAT)) {
+            node.type = node.left->type;
         } else {
-            AddError(Error::Binary("Operator only operates on Int or Float children",
+            addError(Error::Binary("Operator only operates on Int or Float children",
                                    node));
             return;
         }
@@ -296,11 +309,11 @@ namespace semantics
         CheckPanic;
         // Visit stops here
 
-        if ((node.left->node_type->type == Types::INT && node.right->node_type->type == Types::INT) ||
-            (node.left->node_type->type == Types::FLOAT && node.right->node_type->type == Types::FLOAT)) {
-            node.node_type = node.left->node_type;
+        if ((node.left->type.id == TypeId::INT && node.right->type.id == TypeId::INT) ||
+            (node.left->type.id == TypeId::FLOAT && node.right->type.id == TypeId::FLOAT)) {
+            node.type = node.left->type;
         } else {
-            AddError(Error::Binary("Operator only operates on Int or Float children",
+            addError(Error::Binary("Operator only operates on Int or Float children",
                                    node));
             return;
         }
@@ -313,28 +326,28 @@ namespace semantics
         CheckPanic;
         // Visit stops here
 
-        if (node.right->node_type->type == Types::LIST) {
-            if (equal(node.left->node_type, node.right->node_type->types.front())) {
-                node.node_type = node.right->node_type;
+        if (node.right->type.id == TypeId::LIST) {
+            if (node.left->type == node.right->type.subtypes.front()) {
+                node.type = node.right->type;
             } else {
-                AddError(Error::Binary("Left type must be same type of right List",
+                addError(Error::Binary("Left type must be same type of right List",
                                        node));
                 return;
             }
-        } else if (node.right->node_type->type == Types::STRING) {
-            if (node.left->node_type->type == Types::CHAR) {
-                node.node_type = node.right->node_type;
+        } else if (node.right->type.id == TypeId::STRING) {
+            if (node.left->type.id == TypeId::CHAR) {
+                node.type = node.right->type;
             } else {
-                AddError(Error::Binary("Left type must be Char when right is String",
+                addError(Error::Binary("Left type must be Char when right is String",
                                        node));
                 return;
             }
-        }  else if (node.right->node_type->type == Types::EMPTYLIST) {
-            node.node_type = make_shared<Type>(Types::LIST);
-            node.node_type->types.push_back(node.left->node_type);
-            node.right->node_type = node.node_type;
+        }  else if (node.right->type.id == TypeId::EMPTYLIST) {
+            node.type = Type(TypeId::LIST);
+            node.type.subtypes.push_back(node.left->type);
+            node.right->type = node.type;
         } else {
-            AddError(Error::Binary("Right must be a List",
+            addError(Error::Binary("Right must be a List",
                                    node));
             return;
         }
@@ -347,7 +360,7 @@ namespace semantics
         // Visit stops here
 
         // Code starts here
-        node.node_type = node.child->node_type;
+        node.type = node.child->type;
         // Code stops here
     }
 
@@ -357,49 +370,45 @@ namespace semantics
         CheckPanic;
         // Visit stops here
 
-        if (node.child->node_type->type == Types::BOOL) {
-            node.node_type = node.child->node_type;
+        if (node.child->type.id == TypeId::BOOL) {
+            node.type = node.child->type;
         } else {
-            AddError(Error::Unary("Operator only operates on Bool typed children",
-                                   node));
+            addError(Error::Unary("Operator only operates on Bool typed children",
+                                  node));
             return;
         }
     }
 
     void TypeChecker::visit(Int &node) {
-        node.node_type = make_shared<Type>(Types::INT);
+
     }
 
     void TypeChecker::visit(Float &node) {
-        node.node_type = make_shared<Type>(Types::FLOAT);
     }
 
     void TypeChecker::visit(Bool &node) {
-        node.node_type = make_shared<Type>(Types::BOOL);
     }
 
     void TypeChecker::visit(Char &node) {
-        node.node_type = make_shared<Type>(Types::CHAR);
     }
 
     void TypeChecker::visit(String &node) {
-        node.node_type = make_shared<Type>(Types::STRING);
     }
 
     void TypeChecker::visit(ListPattern &node) {
         // Visit children
-        for (auto pattern : node.patterns) {
+        for (auto &pattern: node.patterns) {
             pattern->accept(*this);
         }
         CheckPanic;
         // Visit stops here
 
         if (node.patterns.size() == 0) {
-            node.node_type = make_shared<Type>(Types::EMPTYLIST);
+            node.type = Type(TypeId::EMPTYLIST);
         } else {
             for (size_t i = 0; i < node.patterns.size() - 1; ++i) {
-                if (!equal(node.patterns[i]->node_type, node.patterns[i + 1]->node_type)) {
-                    AddError(Error::Expected("All items in a List must be of the same type",
+                if (node.patterns[i]->type != node.patterns[i + 1]->type) {
+                    addError(Error::Expected("All items in a List must be of the same type",
                                              node.patterns[i]->str(),
                                              node.patterns[i + 1]->str(),
                                              node.loc));
@@ -407,23 +416,23 @@ namespace semantics
                 }
             }
 
-            node.node_type = make_shared<Type>(Types::LIST);
-            node.node_type->types.push_back(node.patterns[0]->node_type);
+            node.type = Type(TypeId::LIST);
+            node.type.subtypes.push_back(node.patterns[0]->type);
         }
     }
 
     void TypeChecker::visit(TuplePattern &node) {
         // Visit children
-        for (auto pattern : node.patterns) {
+        for (auto &pattern: node.patterns) {
             pattern->accept(*this);
         }
         CheckPanic;
         // Visit stops here
 
-        node.node_type = make_shared<Type>(Types::TUPLE);
+        node.type = Type(TypeId::TUPLE);
 
-        for (auto pattern : node.patterns) {
-            node.node_type->types.push_back(pattern->node_type);
+        for (auto &pattern: node.patterns) {
+            node.type.subtypes.push_back(pattern->type);
         }
     }
 
@@ -434,33 +443,33 @@ namespace semantics
         CheckPanic;
         // Visit stops here
 
-        if (node.right->node_type->type == Types::LIST) {
-            if (equal(node.left->node_type, node.right->node_type->types.front())) {
-                node.node_type = node.right->node_type;
+        if (node.right->type.id == TypeId::LIST) {
+            if (node.left->type == node.right->type.subtypes.front()) {
+                node.type = node.right->type;
             } else {
-                AddError(Error::Expected("Left must be the same type as the right List",
-                                         node.right->node_type->types[0]->str(),
-                                         node.right->str(),
+                addError(Error::Expected("Left must be the same type as the right Lists children",
+                                         node.right->type.subtypes[0].str(),
+                                         node.left->type.str(),
                                          node.loc));
                 return;
             }
-        } else if (node.right->node_type->type == Types::STRING) {
-            if (node.left->node_type->type == Types::CHAR) {
-                node.node_type = node.right->node_type;
+        } else if (node.right->type.id == TypeId::STRING) {
+            if (node.left->type.id == TypeId::CHAR) {
+                node.type = node.right->type;
             } else {
-                AddError(Error::Expected("Left must be type Char, when right is String",
+                addError(Error::Expected("Left must be type Char, when right is String",
                                          "Char",
-                                         node.left->node_type->str(),
+                                         node.left->type.str(),
                                          node.loc));
                 return;
             }
-        } else if (node.right->node_type->type == Types::EMPTYLIST) {
-            node.node_type = make_shared<Type>(Types::LIST);
-            node.node_type->types.push_back(node.left->node_type);
+        } else if (node.right->type.id == TypeId::EMPTYLIST) {
+            node.type = Type(TypeId::LIST);
+            node.type.subtypes.push_back(node.left->type);
         } else {
-            AddError(Error::Expected("Right must be a List",
+            addError(Error::Expected("Right must be a List",
                                      "List",
-                                     node.right->node_type->str(),
+                                     node.right->type.str(),
                                      node.loc));
             return;
         }
@@ -468,50 +477,50 @@ namespace semantics
 
     void TypeChecker::visit(List &node) {
         // Visit children
-        for (auto expr : node.exprs) {
+        for (auto &expr: node.exprs) {
             expr->accept(*this);
         }
         CheckPanic;
         // Visit stops here
 
         if (node.exprs.size() == 0) {
-            node.node_type = make_shared<Type>(Types::EMPTYLIST);
+            node.type = Type(TypeId::EMPTYLIST);
         } else {
             for (size_t i = 0; i < node.exprs.size() - 1; ++i) {
-                if (!equal(node.exprs[i]->node_type, node.exprs[i + 1]->node_type)) {
-                    AddError(Error::Expected("All items in a List must be same type",
+                if (node.exprs[i]->type != node.exprs[i + 1]->type) {
+                    addError(Error::Expected("All items in a List must be same type",
                                              node.exprs[i]->str(),
                                              node.exprs[i + 1]->str(),
                                              node.exprs[i + 1]->loc));
                     return;
                 }
             }
-            node.node_type = make_shared<Type>(Types::LIST);
-            node.node_type->types.push_back(node.exprs[0]->node_type);
+            node.type = Type(TypeId::LIST);
+            node.type.subtypes.push_back(node.exprs[0]->type);
         }
     }
 
     void TypeChecker::visit(Tuple &node) {
           // Visit children
-        for (auto expr : node.exprs) {
+        for (auto &expr: node.exprs) {
             expr->accept(*this);
         }
         CheckPanic;
         // Visit stops here
 
-        node.node_type = make_shared<Type>(Types::TUPLE);
+        node.type = Type(TypeId::TUPLE);
 
         for (size_t i = 0; i < node.exprs.size(); ++i) {
-            node.node_type->types.push_back(node.exprs[i]->node_type);
+            node.type.subtypes.push_back(node.exprs[i]->type);
         }
     }
 
 
     void TypeChecker::visit(Id &node) {
         if (node.scope->exists(node.id)) {
-            node.node_type = node.scope->get_type(node.id);
+            node.type = node.scope->get_type(node.id);
         } else {
-            AddError(Error(node.id + ": Id does not exist in the current scope",
+            addError(Error(node.id + ": Id does not exist in the current scope",
                            node.loc));
             return;
         }
@@ -521,50 +530,40 @@ namespace semantics
 
         // Visit children
         node.callee->accept(*this);
-        for (auto expr : node.exprs) {
+        for (auto &expr: node.exprs) {
             expr->accept(*this);
         }
         CheckPanic;
         // Visit stops here
 
-        if (node.callee->node_type->type == Types::SIGNATURE) {
-            if (node.exprs.size() + 1 == node.callee->node_type->types.size()) {
+        if (node.callee->type.id == TypeId::SIGNATURE) {
+            if (node.exprs.size() + 1 == node.callee->type.subtypes.size()) {
                 for (size_t i = 0; i < node.exprs.size(); ++i) {
-                    if (node.exprs[i]->node_type->type == Types::EMPTYLIST &&
-                        node.callee->node_type->types[i]->type == Types::LIST) {
-                        node.exprs[i]->node_type = node.callee->node_type->types[i];
-                    } else if (!equal(node.exprs[i]->node_type, node.callee->node_type->types[i])) {
-                        AddError(Error::Expected("Function was called with an invalid argument",
-                                                 node.callee->node_type->types[i]->str(),
-                                                 node.exprs[i]->node_type->str(),
+                    if (node.exprs[i]->type.id == TypeId::EMPTYLIST &&
+                            node.callee->type.subtypes[i].id == TypeId::LIST)
+                        node.exprs[i]->type = node.callee->type.subtypes[i];
+                    else if (node.exprs[i]->type != node.callee->type.subtypes[i]) {
+                        addError(Error::Expected("Function was called with an invalid argument",
+                                                 node.callee->type.subtypes[i].str(),
+                                                 node.exprs[i]->type.str(),
                                                  node.exprs[i]->loc));
                         return;
                     }
                 }
             } else {
-                AddError(Error::Expected("Wrong number of arguments",
-                                         to_string(node.callee->node_type->types.size() - 1),
+                addError(Error::Expected("Wrong number of arguments",
+                                         to_string(node.callee->type.subtypes.size() - 1),
                                          to_string(node.exprs.size()),
                                          node.loc));
                 return;
             }
-            node.node_type = node.callee->node_type->types.back();
+            node.type = node.callee->type.subtypes.back();
         } else {
-            AddError(Error::Expected("Can't call a type that is not a Signature",
+            addError(Error::Expected("Can't call a type that is not a Signature",
                                      "Signature",
-                                     node.callee->node_type->str(),
+                                     node.callee->type.str(),
                                      node.callee->loc));
             return;
         }
-    }
-
-    void TypeChecker::visit(Type &node) {
-        for (auto type : node.types) {
-            type->accept(*this);
-        }
-    }
-
-    bool TypeChecker::equal(shared_ptr<Type> type1, shared_ptr<Type> type2) {
-        return *type1 == *type2;
     }
 }

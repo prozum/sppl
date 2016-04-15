@@ -2,7 +2,7 @@
 
 
 void Test::binEqualTrueTrue() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","True==True");
+    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","True==True", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if (compStatus == true) {
@@ -12,7 +12,7 @@ void Test::binEqualTrueTrue() {
 }
 
 void Test::binEqualTrueFalse() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","True==False");
+    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","True==False", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if (compStatus == true) {
@@ -22,7 +22,7 @@ void Test::binEqualTrueFalse() {
 }
 
 void Test::binEqualFalseTrue() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","False==True");
+    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","False==True", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if (compStatus == true) {
@@ -32,7 +32,7 @@ void Test::binEqualFalseTrue() {
 }
 
 void Test::binEqualFalseFalse() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","False==False");
+    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","False==False", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if (compStatus == true) {
@@ -42,7 +42,7 @@ void Test::binEqualFalseFalse() {
 }
 
 void Test::binNotEqualTrueTrue() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","True!=True");
+    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","True!=True", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if (compStatus == true) {
@@ -52,7 +52,7 @@ void Test::binNotEqualTrueTrue() {
 }
 
 void Test::binNotEqualTrueFalse() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","True!=False");
+    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","True!=False", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if (compStatus == true) {
@@ -62,7 +62,7 @@ void Test::binNotEqualTrueFalse() {
 }
 
 void Test::binNotEqualFalseTrue() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","False!=True");
+    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","False!=True", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if (compStatus == true) {
@@ -72,7 +72,7 @@ void Test::binNotEqualFalseTrue() {
 }
 
 void Test::binNotEqualFalseFalse() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","False!=False");
+    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","False!=False", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if (compStatus == true) {
@@ -82,7 +82,7 @@ void Test::binNotEqualFalseFalse() {
 }
 
 void Test::binAndTrueTrue() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","True&&True");
+    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","True&&True", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if (compStatus == true) {
@@ -92,7 +92,7 @@ void Test::binAndTrueTrue() {
 }
 
 void Test::binAndTrueFalse() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","True&&False");
+    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","True&&False", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if (compStatus == true) {
@@ -102,7 +102,7 @@ void Test::binAndTrueFalse() {
 }
 
 void Test::binAndFalseTrue() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","False&&True");
+    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","False&&True", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if (compStatus == true) {
@@ -112,7 +112,7 @@ void Test::binAndFalseTrue() {
 }
 
 void Test::binAndFalseFalse() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","False&&False");
+    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","False&&False", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if (compStatus == true) {
@@ -122,7 +122,7 @@ void Test::binAndFalseFalse() {
 }
 
 void Test::binOrTrueTrue() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","True||True");
+    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","True||True", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if (compStatus == true) {
@@ -132,7 +132,7 @@ void Test::binOrTrueTrue() {
 }
 
 void Test::binOrTrueFalse() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","True||False");
+    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","True||False", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if (compStatus == true) {
@@ -142,7 +142,7 @@ void Test::binOrTrueFalse() {
 }
 
 void Test::binOrFalseTrue() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","False||True");
+    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","False||True", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if (compStatus == true) {
@@ -152,7 +152,7 @@ void Test::binOrFalseTrue() {
 }
 
 void Test::binOrFalseFalse() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","False||False");
+    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","False||False", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if (compStatus == true) {
@@ -162,7 +162,7 @@ void Test::binOrFalseFalse() {
 }
 
 void Test::binGrEqTrueTrue() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","True>=True");
+    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","True>=True", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
     if (compStatus == true) {
@@ -172,7 +172,7 @@ void Test::binGrEqTrueTrue() {
 }
 
 void Test::binGrEqTrueFalse() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","True>=False");
+    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","True>=False", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
     if (compStatus == true) {
@@ -182,7 +182,7 @@ void Test::binGrEqTrueFalse() {
 }
 
 void Test::binGrEqFalseTrue() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","False>=True");
+    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","False>=True", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
     if (compStatus == true) {
@@ -192,7 +192,7 @@ void Test::binGrEqFalseTrue() {
 }
 
 void Test::binGrEqFalseFalse() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","False>=False");
+    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","False>=False", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
     if (compStatus == true) {
@@ -202,7 +202,7 @@ void Test::binGrEqFalseFalse() {
 }
 
 void Test::binLeEqTrueTrue() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","True<=True");
+    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","True<=True", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
     if (compStatus == true) {
@@ -212,7 +212,7 @@ void Test::binLeEqTrueTrue() {
 }
 
 void Test::binLeEqTrueFalse() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","True<=False");
+    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","True<=False", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
     if (compStatus == true) {
@@ -222,7 +222,7 @@ void Test::binLeEqTrueFalse() {
 }
 
 void Test::binLeEqFalseTrue() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","False<=True");
+    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","False<=True", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
     if (compStatus == true) {
@@ -232,7 +232,7 @@ void Test::binLeEqFalseTrue() {
 }
 
 void Test::binLeEqFalseFalse() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","False<=False");
+    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","False<=False", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
     if (compStatus == true) {
@@ -242,7 +242,7 @@ void Test::binLeEqFalseFalse() {
 }
 
 void Test::binGreatTrueTrue() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","True>True");
+    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","True>True", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
     if (compStatus == true) {
@@ -252,7 +252,7 @@ void Test::binGreatTrueTrue() {
 }
 
 void Test::binGreatTrueFalse() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","True>False");
+    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","True>False", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
     if (compStatus == true) {
@@ -262,7 +262,7 @@ void Test::binGreatTrueFalse() {
 }
 
 void Test::binGreatFalseTrue() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","False>True");
+    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","False>True", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
     if (compStatus == true) {
@@ -272,7 +272,7 @@ void Test::binGreatFalseTrue() {
 }
 
 void Test::binGreatFalseFalse() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","False>False");
+    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","False>False", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
     if (compStatus == true) {
@@ -282,7 +282,7 @@ void Test::binGreatFalseFalse() {
 }
 
 void Test::binLessTrueTrue() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","True<True");
+    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","True<True", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
     if (compStatus == true) {
@@ -292,7 +292,7 @@ void Test::binLessTrueTrue() {
 }
 
 void Test::binLessTrueFalse() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","True<False");
+    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","True<False", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
     if (compStatus == true) {
@@ -302,7 +302,7 @@ void Test::binLessTrueFalse() {
 }
 
 void Test::binLessFalseTrue() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","False<True");
+    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","False<True", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
     if (compStatus == true) {
@@ -312,7 +312,7 @@ void Test::binLessFalseTrue() {
 }
 
 void Test::binLessFalseFalse() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","False<False");
+    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","False<False", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
     if (compStatus == true) {

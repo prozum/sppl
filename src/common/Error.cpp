@@ -8,4 +8,20 @@ namespace common {
     {
         return (stream << err.loc << "|" << err.msg);
     }
+
+    Error Error::NotImplemented(string msg) {
+        return Error ("NotImplemented: " + msg);
+    }
+
+    Error Error::Expected(string msg, string expected, string actual, Location loc) {
+        return Error(msg + ": Expected: '" + expected + "' Actual: '" + actual + "'", loc);
+    }
+
+    Error Error::Binary(string msg, common::BinaryOp &op) {
+        return Error("'" + op.str() + "' " + msg + ": Left: '" + op.left->str() + "' Right: '" + op.right->str() + "'", op.loc);
+    }
+
+    Error Error::Unary(string msg, common::UnaryOp &op) {
+        return Error("'" + op.str() + "' " + msg + ": Child: '" + op.child->str() + "'", op.loc);
+    }
 }

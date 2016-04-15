@@ -3,20 +3,22 @@
 using namespace std;
 
 namespace common {
-    void Visitor::AddError(Error err) {
+    void Visitor::addError(Error err) {
         Errors.push_back(err);
         notsafe = true;
     }
 
-    bool Visitor::HasError() {
+    bool Visitor::hasError() {
         return Errors.size() != 0;
     }
 
-    void Visitor::OutError(ostream &out) {
+    void Visitor::outError(ostream &out) {
 
         for (auto &err: Errors) {
-            out << err;
+            out << err << endl;
         }
+
+        Errors.clear();
     }
 }
 

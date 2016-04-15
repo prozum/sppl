@@ -1,4 +1,3 @@
-#add_library(parser NodeBuilder.cpp NodeBuilder.h Parser.cpp Parser.h Scanner.cpp Scanner.h)
 find_package(BISON)
 find_package(FLEX)
 
@@ -10,6 +9,7 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 add_library(parser
         ${BISON_SpplParser_OUTPUTS}
         ${FLEX_SpplScanner_OUTPUTS}
-        Scanner.h Driver.h Driver.cpp)
+        Scanner.h Driver.h Driver.cpp
+        CodeGenerator.h CodeGenerator.cpp)
 target_link_libraries(parser common)
 

@@ -2,7 +2,7 @@
 
 
 void Test::binEqualIntInt() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","2==2");
+    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","2==2", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if (compStatus == true) {
@@ -12,7 +12,7 @@ void Test::binEqualIntInt() {
 }
 
 void Test::binNotEqualIntInt() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","2!=2");
+    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","2!=2", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if (compStatus == true) {
@@ -22,7 +22,7 @@ void Test::binNotEqualIntInt() {
 }
 
 void Test::binAndIntInt() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","2&&2");
+    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","2&&2", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
     if (compStatus == true) {
@@ -32,7 +32,7 @@ void Test::binAndIntInt() {
 }
 
 void Test::binOrIntInt() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","2||2");
+    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","2||2", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
     if (compStatus == true) {
@@ -42,7 +42,7 @@ void Test::binOrIntInt() {
 }
 
 void Test::binGrEqIntInt() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","2>=2");
+    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","2>=2", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if (compStatus == true) {
@@ -52,7 +52,7 @@ void Test::binGrEqIntInt() {
 }
 
 void Test::binLeEqIntInt() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","2<=2");
+    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","2<=2", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if (compStatus == true) {
@@ -62,7 +62,7 @@ void Test::binLeEqIntInt() {
 }
 
 void Test::binGreatIntInt() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","2>2");
+    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","2>2", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if (compStatus == true) {
@@ -72,7 +72,7 @@ void Test::binGreatIntInt() {
 }
 
 void Test::binLessIntInt() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","2<2");
+    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","2<2", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if (compStatus == true) {
@@ -82,7 +82,7 @@ void Test::binLessIntInt() {
 }
 
 void Test::binEqualFloatFloat() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","2.0==2.0");
+    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","2.0==2.0", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if (compStatus == true) {
@@ -92,7 +92,7 @@ void Test::binEqualFloatFloat() {
 }
 
 void Test::binNotEqualFloatFloat() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","2.0!=2.0");
+    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","2.0!=2.0", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if (compStatus == true) {
@@ -102,7 +102,7 @@ void Test::binNotEqualFloatFloat() {
 }
 
 void Test::binAndFloatFloat() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","2.0&&2.0");
+    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","2.0&&2.0", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
     if (compStatus == true) {
@@ -112,7 +112,7 @@ void Test::binAndFloatFloat() {
 }
 
 void Test::binOrFloatFloat() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","2.0||2.0");
+    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","2.0||2.0", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
     if (compStatus == true) {
@@ -122,7 +122,7 @@ void Test::binOrFloatFloat() {
 }
 
 void Test::binGrEqFloatFloat() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","2.0>=2.0");
+    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","2.0>=2.0", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if (compStatus == true) {
@@ -132,7 +132,7 @@ void Test::binGrEqFloatFloat() {
 }
 
 void Test::binLeEqFloatFloat() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","2.0<=2.0");
+    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","2.0<=2.0", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if (compStatus == true) {
@@ -142,7 +142,7 @@ void Test::binLeEqFloatFloat() {
 }
 
 void Test::binGreatFloatFloat() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","2.0>2.0");
+    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","2.0>2.0", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if (compStatus == true) {
@@ -152,7 +152,7 @@ void Test::binGreatFloatFloat() {
 }
 
 void Test::binLessFloatFloat() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","2.0<2.0");
+    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","2.0<2.0", "");
     bool compStatus = compileChecker(source);
     CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
     if (compStatus == true) {
