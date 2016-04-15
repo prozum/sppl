@@ -1,5 +1,4 @@
 %option c++
-%option noyywrap
 %option prefix="Sppl"
 
 %{
@@ -27,13 +26,13 @@ using namespace std;
 %%
 
 %{
-    yylloc->columns++;
+    yylloc->columns += yyleng;
 %}
 
 [ \t] {  }
 
 [\n] {
-    yylloc->lines = yyleng;
+    yylloc->lines = 1;
     yylloc->columns = 1;
 }
 
@@ -189,32 +188,42 @@ using namespace std;
 
 %%
 
+#include "Driver.h"
+
 namespace parser {
 
-Scanner::Scanner(std::istream* in,
-                 std::ostream* out)
-    : SpplFlexLexer(in, out)
-{
-}
+    Scanner::Scanner(Driver &driver) :
+        SpplFlexLexer(),
+        driver(driver) { }
 
-Scanner::~Scanner()
-{
-}
+    Scanner::~Scanner() { }
 
-void Scanner::set_debug(bool b)
-{
-    yy_flex_debug = b;
-}
+    void Scanner::set_debug(bool b) {
+        yy_flex_debug = b;
+    }
 
+    int Scanner::yywrap() {
+        if (driver.next_input()) {
+            switch_streams(* driver.in, * driver.mout);
+            return 0;
+        }
+
+        return 1;
+    }
 }
 
 #ifdef yylex
 #undef yylex
 #endif
 
-int SpplFlexLexer::yylex()
-{
+int SpplFlexLexer::yylex() {
     std::cerr << "in SpplFlexLexer::yylex() !" << std::endl;
     return 0;
 }
+
+int SpplFlexLexer::yywrap() {
+    std::cerr << "in SpplFlexLexer::yywrap() !" << std::endl;
+    return 0;
+}
+
 

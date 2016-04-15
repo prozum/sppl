@@ -37,6 +37,8 @@ namespace semantics
     void TypeChecker::visit(Function &node) {
         current_func = &node;
 
+        node.type = node.signature.subtypes.back();
+
         // Visit children
         for (auto &cse: node.cases) {
             cse->accept(*this);

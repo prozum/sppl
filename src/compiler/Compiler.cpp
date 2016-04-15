@@ -2,7 +2,7 @@
 
 namespace compiler {
     Compiler::Compiler() :
-            scope_generator(semantics::ScopeGenerator(&driver.global)) {
+            scope_generator(semantics::ScopeGenerator(&global)) {
 
     }
 
@@ -12,7 +12,7 @@ namespace compiler {
         {
 #ifdef CCPP
             case Backend::CPP:
-                generator = make_unique<codegen::CCodeGenerator>(driver);
+                generator = make_unique<codegen::CCodeGenerator>(*this);
                 break;
 #endif
 #ifdef CGNUASM
@@ -27,50 +27,36 @@ namespace compiler {
 #endif
 #ifdef CLLVM
             case Backend::LLVM:
-                generator = make_unique<codegen::LLVMCodeGenerator>(driver);
+                generator = make_unique<codegen::LLVMCodeGenerator>(*this);
                 break;
 #endif
             case Backend::PPRINTER:
-                generator = make_unique<codegen::Printer>(driver);
+                generator = make_unique<codegen::Printer>(*this);
+                break;
             default:
-                throw "Not a valid backend";
+                throw runtime_error("Not a valid backend");
         }
     }
 
     int Compiler::compile() {
 
-        driver.parse_stream(*input);
-        if (driver.program == nullptr)
+        if (!parse_files())
             return 1;
 
-        //case_checker.visit(*driver.program);
-        scope_generator.visit(*driver.program);
-        if (scope_generator.hasError())
+        if (!accept(scope_generator))
             return 2;
 
-        type_checker.visit(*driver.program);
-        if (type_checker.hasError())
+        if (!accept(type_checker))
             return 3;
 
-        optimizer.visit(*driver.program);
+        if (!accept(optimizer))
+            return 4;
 
-        generator->visit(*driver.program);
+        if (!accept(*generator))
+            return 5;
+
         return 0;
     }
 
-    void Compiler::set_output(string out) {
-        //output =  ofstream(out);
-        driver.codeout = output;
-        driver.codeout = output;
-    }
 
-    void Compiler::set_header_output(string hout) {
-        header_output =  ofstream(hout);
-    }
-
-    void Compiler::set_inputs(vector<string> inputs) {
-        for (auto file: inputs) {
-
-        }
-    }
 }

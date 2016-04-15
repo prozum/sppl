@@ -42,22 +42,17 @@ namespace compiler {
         PPRINTER
     };
 
-    class Compiler {
+    class Compiler : public Driver {
     public:
         Compiler();
 
-        parser::Driver driver;
-        ofstream output;
-        ofstream header_output;
         unique_ptr<CodeGenerator> generator;
         semantics::ScopeGenerator scope_generator;
         semantics::TypeChecker type_checker;
         optimizer::GeneralOptimizer optimizer;
 
-        int compile(vector<string> inputs);
+        int compile();
 
-        void set_output(string out);
-        void set_header_output(string hout);
         void set_backend(Backend backend);
     };
 

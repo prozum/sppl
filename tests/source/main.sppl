@@ -1,2 +1,2 @@
-def main: Int -> Int
-	| 0 = 1
+def mai: [String] -> Int
+	| n = 100

@@ -23,19 +23,25 @@
 
 namespace parser {
 
+    class Driver;
+
+
+
     class Scanner : public SpplFlexLexer
     {
     public:
-        Scanner(std::istream* arg_yyin = 0,
-                std::ostream* arg_yyout = 0);
-
+        Scanner(Driver &driver);
         virtual ~Scanner();
 
         virtual Parser::token_type lex(
                 Parser::semantic_type* yylval,
-                Parser::location_type* yylloc
-        );
+                Parser::location_type* yylloc);
+
+        int yywrap();
 
         void set_debug(bool b);
+
+
+        Driver &driver;
     };
 }

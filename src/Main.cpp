@@ -30,7 +30,7 @@ void print_help(char *program_name)
 int main(int argc, char *argv[])
 {
     Backend backend = Backend::PPRINTER;
-    vector<string> input;
+    vector<string> inputs;
     string output("a.out");
     string header_output("a.h");
 
@@ -78,30 +78,20 @@ int main(int argc, char *argv[])
                 return 3;
             }
          else
-            input.push_back(argv[i]);
+            inputs.push_back(argv[i]);
     }
 
-    if (input.size() == 0)
+    if (inputs.size() == 0)
     {
         cerr << "No input files" << endl;
         return 1;
     }
 
-    compiler::Compiler compiler();
+    Compiler compiler;
     compiler.set_output(output);
     compiler.set_header_output(header_output);
+    compiler.set_inputs(inputs);
     compiler.set_backend(backend);
 
-    int res = compiler.compile();
-
-    switch (res) {
-        case 2:
-            compiler.scope_generator.outError(cerr);
-            break;
-        case 3:
-            compiler.type_checker.outError(cerr);
-            break;
-    }
-
-    return res;
+    return compiler.compile();
 }
