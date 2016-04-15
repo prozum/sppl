@@ -41,6 +41,7 @@ namespace parser {
             bool parse_stream(std::istream& in, const std::string& src = "stream input");
             bool parse_string(const std::string& input, const std::string& src = "string stream");
             bool parse_file(const std::string& filename);
+            bool parse_files(const vector<string> files);
 
             bool accept(common::Visitor &visitor);
 

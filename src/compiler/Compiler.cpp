@@ -2,7 +2,7 @@
 
 namespace compiler {
     Compiler::Compiler() :
-            scope_generator(semantics::ScopeGenerator(driver.global.get())) {
+            scope_generator(semantics::ScopeGenerator(&driver.global)) {
 
     }
 
@@ -66,5 +66,11 @@ namespace compiler {
 
     void Compiler::set_header_output(string hout) {
         header_output =  ofstream(hout);
+    }
+
+    void Compiler::set_inputs(vector<string> inputs) {
+        for (auto file: inputs) {
+
+        }
     }
 }

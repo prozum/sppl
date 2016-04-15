@@ -9,14 +9,14 @@ using namespace std;
 
 namespace codegen
 {
-    CCodeGenerator::CCodeGenerator(shared_ptr<std::ostream> &out, shared_ptr<std::ostream> &head)
-            : CodeGenerator::CodeGenerator(out),
-              header(head),
-              real_string(Type(TypeId::LIST, vector<Type>({ Type(TypeId::CHAR) }))),
-              string_list(Type(TypeId::LIST, vector<Type>({ Type(TypeId::STRING) }))),
-              list_offsets(vector<int>({ 0 }))
-    {
-    }
+    CCodeGenerator::CCodeGenerator(Driver &driver) :
+            CodeGenerator(driver),
+            real_string(Type(TypeId::LIST, vector<Type>({ Type(TypeId::CHAR) }))),
+            string_list(Type(TypeId::LIST, vector<Type>({ Type(TypeId::STRING) }))),
+            list_offsets(vector<int>({ 0 })),
+            header(driver.hout),
+            output(driver.out)
+    { }
 
     void CCodeGenerator::visit(Program &node)
     {

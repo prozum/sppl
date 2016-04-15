@@ -54,7 +54,7 @@ namespace compiler {
         semantics::TypeChecker type_checker;
         optimizer::GeneralOptimizer optimizer;
 
-        int compile();
+        int compile(vector<string> inputs);
 
         void set_output(string out);
         void set_header_output(string hout);

@@ -21,7 +21,7 @@ namespace codegen {
     class CCodeGenerator: public CodeGenerator
     {
         public:
-            CCodeGenerator(shared_ptr<std::ostream>&, shared_ptr<std::ostream>&);
+            CCodeGenerator(Driver &driver);
 
             void visit(Program &node);
 
@@ -112,8 +112,9 @@ namespace codegen {
             const string g_arg = "arg";
             const string g_main = "main";
 
-            shared_ptr<std::ostream> &header;
             stringstream buffer;
+            ostream *output;
+            ostream *header;
 
             int tuple_count = 0;
             int list_count = 0;

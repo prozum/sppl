@@ -14,7 +14,7 @@ namespace parser {
 
     bool Driver::parse_stream(std::istream &in, const std::string &sname)
     {
-        source = sname;
+        source = sname; 
 
         scanner.switch_streams(in, * mout);
 
