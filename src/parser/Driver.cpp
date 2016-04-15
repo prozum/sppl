@@ -86,7 +86,14 @@ namespace parser {
 
     bool Driver::accept(common::Visitor &visitor)
     {
-        program->accept(visitor);
+        visitor.Errors.clear();
+
+        try {
+            program->accept(visitor);
+        }
+        catch (Error err) {
+            visitor.Errors.push_back(err);
+        }
 
         for (auto &error: visitor.Errors) {
             *mout << error;

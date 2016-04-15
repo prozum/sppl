@@ -11,6 +11,10 @@ namespace jit {
     {
         llvm::sys::DynamicLibrary::LoadLibraryPermanently(nullptr);
         init_module_passmanager();
+
+        // Life is too short
+        Driver.set_output("/dev/null");
+        Driver.set_header_output("/dev/null");
     }
 
     SpplJit::ModuleHandleT SpplJit::add_module(std::unique_ptr<llvm::Module> module) {
@@ -134,12 +138,10 @@ namespace jit {
             return;
 
         if (!Driver.accept(ScopeGenerator)) {
-            ScopeGenerator.outError(cout);
             return;
         }
 
         if (!Driver.accept(TypeChecker)) {
-            TypeChecker.outError(cout);
             return;
         }
 
@@ -162,7 +164,7 @@ namespace jit {
 
             assert(func_jit != NULL);
             string output = get_output(func_jit(), func_node->type);
-            cout << "output: " << output << endl;
+            cout << output << "\t\ttype: " << func_node->type.str() << endl;
 
             // Remove module
             remove_module(module_handler);

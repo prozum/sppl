@@ -40,7 +40,7 @@ namespace common {
 
     String::String(string value,
                    Location loc) :
-            Pattern(loc),
+            Pattern(Type(TypeId::STRING), loc),
             value(value) { }
 
     ListPattern::ListPattern(vector<unique_ptr<Pattern>> patterns,

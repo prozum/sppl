@@ -16,7 +16,6 @@
 
 #include <llvm/Support/DynamicLibrary.h>
 
-//#include <llvm/ADT/STLExtras.h>
 #include <llvm/Analysis/Passes.h>
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/LLVMContext.h>

@@ -18,11 +18,10 @@ namespace semantics {
 
     void PatternChecker::visit(Case &node) {
         if (node.patterns.size() != cur_func->signature.subtypes.size() - 1) {
-            addError(Error::Expected("Case didn't have the correct number of patterns",
-                                     to_string(cur_func->signature.subtypes.size() - 1),
-                                     to_string(node.patterns.size()),
-                                     node.loc));
-            return;
+            throw Error::Expected("Case didn't have the correct number of patterns",
+                                  to_string(cur_func->signature.subtypes.size() - 1),
+                                  to_string(node.patterns.size()),
+                                  node.loc);
         }
     }
 }

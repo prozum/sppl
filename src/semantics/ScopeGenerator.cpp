@@ -27,8 +27,7 @@ namespace semantics {
             }
             // Visit stops here
         } else {
-            addError(Error(node.id + " has already been declared", node.loc));
-            return;
+            throw Error(node.id + " has already been declared", node.loc);
         }
     }
 
@@ -164,7 +163,7 @@ namespace semantics {
 
     void ScopeGenerator::visit(ListPattern &node) {
         if (node.type.id == TypeId::LIST) {
-            for (int i = 0; i < node.patterns.size(); ++i) {
+            for (size_t i = 0; i < node.patterns.size(); ++i) {
                 node.patterns[i]->type = node.type.subtypes[i];
                 node.patterns[i]->accept(*this);
             }

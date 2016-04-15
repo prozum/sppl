@@ -43,7 +43,7 @@ namespace codegen {
             case common::TypeId::SIGNATURE:
                 return PointerType::getUnqual(get_func_type(type));
             default:
-                throw "Not supported";
+                throw runtime_error("This should not happen!");
         }
 
         if (ptr)
@@ -215,6 +215,8 @@ namespace codegen {
         ctx = EXPR;
         node.expr->accept(*this);
 
+        auto type1 = cur_phi_node->getType();
+        auto type2 = cur_val->getType();
         // Add return value to phi node
         cur_phi_node->addIncoming(cur_val, cur_case_block);
         Builder.CreateBr(cur_ret_block);
