@@ -18,7 +18,7 @@ before_install:
   - wget -O - http://llvm.org/apt/llvm-snapshot.gpg.key | sudo apt-key add -
   - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
   - sudo apt-get -qq update
-  - sudo apt-get -qq install clang-3.8 gcc-5 g++-5 libstdc++-5-dev libcppunit libcppunit-dev
+  - sudo apt-get -qq install clang-3.8 gcc-5 g++-5 libstdc++-5-dev libcppunit-1.13-0v5 libcppunit-dev
   - if [ "$CXX" = "g++" ]; then export CXX="g++-5" CC="gcc-5"; fi
   - if [ "$CXX" = "clang++" ]; then export CXX="clang++-3.8" CC="clang-3.8"; fi
     # Debug Data:
