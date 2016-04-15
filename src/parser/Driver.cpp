@@ -75,8 +75,7 @@ namespace parser {
         return true;
     }
 
-    bool Driver::parse_string(const std::string &input, const std::string &sname)
-    {
+    bool Driver::parse_string(const std::string &input, const std::string &sname) {
         input_type = InputType::STRING;
 
         std::istringstream iss(input);
@@ -84,8 +83,7 @@ namespace parser {
         return parse_stream(iss, sname);
     }
 
-    bool Driver::accept(common::Visitor &visitor)
-    {
+    bool Driver::accept(common::Visitor &visitor) {
         visitor.Errors.clear();
 
         try {
@@ -96,20 +94,22 @@ namespace parser {
         }
 
         for (auto &error: visitor.Errors) {
-            *mout << error;
+            show_error(error);
         }
 
         return !visitor.hasError();
     }
 
     void Driver::error(const common::Location& loc,
-                       const std::string &msg)
-    {
-        *mout << Error(msg, loc);
+                       const std::string &msg) {
+        show_error(Error(msg, loc));
     }
 
-    void Driver::error(const std::string &msg)
-    {
-        *mout << Error(msg);
+    void Driver::error(const std::string &msg) {
+         show_error(Error(msg));
+    }
+
+    void Driver::show_error(Error err) {
+        *mout << err << endl;
     }
 }

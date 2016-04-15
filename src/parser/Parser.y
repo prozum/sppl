@@ -3,8 +3,10 @@
 %define "parser_class_name" {Parser}
 %locations
 %initial-action {
-    @$.begin = new Location();
-    @$.end = new Location();
+    //@$.lines = 1;
+    //@$.columns = 1;
+    //@$.begin = new Location();
+    //@$.end = new Location();
     //@$.begin->source = @$.end->source = driver.source;
 }
 %debug

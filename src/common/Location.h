@@ -8,19 +8,27 @@ using namespace std;
 
 namespace common {
 
+	struct Position {
+
+		Position() = default;
+		Position(unsigned l, unsigned c, string src = "") :
+			line(l), column(c), source(src) { }
+		unsigned line = 1;
+		unsigned column = 1;
+		string source;
+	};
+
 	class Location {
 	public:
 		Location();
-		//Location(const common::Location&);
-		//Location(int l, int c, string src);
-		Location(int l, int c);
+		Location(unsigned l, unsigned c, string src = "");
 
-		int lines = 0;
-		int columns = 0;
-		//string source;
+		void step();
+		void columns (unsigned count = 1);
+		void lines(unsigned count = 1);
 
-		Location *begin;
-		Location *end;
+		Position begin;
+		Position end;
 	};
 
 	ostream &operator<<(ostream &o, const Location &s);

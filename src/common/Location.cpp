@@ -4,22 +4,27 @@ namespace common {
 
     Location::Location() { }
 
-    /*
-    Location::Location(const common::Location& other) {
-        lines = other.lines;
-        columns = other.columns;
-        source = other.source;
-    }
-    */
+    Location::Location(unsigned l, unsigned c, string src) :
+            begin(l, c, src),
+            end(l, c, src) { }
 
-    Location::Location(int l, int c) {
-        lines = l;
-        columns = c;
+    void Location::step() {
+        begin = end;
     }
 
-    ostream &operator<<(ostream &o, const Location &loc) {
-        //if (loc.source.empty())
-            return o << loc.lines << ":" << loc.columns;
-        //return o << loc.source << ":" << loc.lines << ":" << loc.columns;
+    void Location::columns(unsigned count) {
+        end.column = max(1u, end.column + count);
+    }
+
+    void Location::lines(unsigned count) {
+        end.column = 1;
+        end.line += count;
+    }
+
+    ostream &operator<<(ostream &out, const Location &loc) {
+        if (loc.begin.source.empty())
+            return out << loc.begin.line << ":" << loc.begin.column;
+        return out << loc.begin.source << ":"
+               << loc.begin.line << ":" << loc.begin.column;
     }
 }

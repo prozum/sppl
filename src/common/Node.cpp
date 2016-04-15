@@ -40,7 +40,7 @@ namespace common {
     }
 
     Function::Function(unique_ptr<Expr> expr) :
-            Node(loc),
+            Node(expr->loc),
             id(ANON_FUNC_NAME),
             signature(Type(TypeId::UNKNOWN)),
             is_anon(true) {

@@ -17,7 +17,7 @@ typedef parser::Parser::token token;
 typedef parser::Parser::token_type token_type;
 
 #define yyterminate() return token::END
-#define YY_USER_ACTION  yylloc->columns = yyleng;
+#define YY_USER_ACTION  yylloc->columns(yyleng);
 
 using namespace std;
 %}
@@ -26,17 +26,21 @@ using namespace std;
 %%
 
 %{
-    yylloc->columns += yyleng;
+    yylloc->step();
 %}
 
-[ \t] {  }
+[ \t] {
+    yylloc->step();
+}
 
 [\n] {
-    yylloc->lines = 1;
-    yylloc->columns = 1;
+    yylloc->lines(yyleng);
+    yylloc->step();
 }
 
 "#"[^\n]* {
+    yylloc->lines(yyleng);
+    yylloc->step();
 }
 
 "def" {
