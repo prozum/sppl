@@ -29,11 +29,11 @@ using namespace std;
     yylloc->step();
 %}
 
-[ \t] {
+[ \t]+ {
     yylloc->step();
 }
 
-[\n] {
+[\n]+ {
     yylloc->lines(yyleng);
     yylloc->step();
 }

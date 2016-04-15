@@ -40,7 +40,7 @@ int main(int argc, char *argv[]) {
         } else {
             if (!input.compare(0, 3, "def")) {
                 do {
-                    input += input_case;
+                    input += input_case + "\n";
                     cout << "... ";
                     getline(cin, input_case);
                 }
