@@ -68,7 +68,7 @@ namespace jit {
         semantics::TypeChecker TypeChecker;
 
         string get_output(intptr_t data, common::Type type);
-        string get_tuple_output(intptr_t addr, common::Type tuple_type);
+        string get_tuple_output(intptr_t addr, vector<common::Type> types);
 
         template<typename T>
         static std::vector<T> singletonSet(T t) {

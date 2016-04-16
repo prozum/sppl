@@ -2,6 +2,10 @@
 #include "Visitor.h"
 
 namespace common {
+
+    void Par::accept(Visitor &v) { v.visit(*this); }
+    void Not::accept(Visitor &v) { v.visit(*this); }
+
     UnaryOp::UnaryOp(unique_ptr<Expr> child,
                  Location loc) :
         Expr(loc),
@@ -15,6 +19,12 @@ namespace common {
              Location loc) :
             UnaryOp(move(child), loc) { }
 
-    void Par::accept(Visitor &v) { v.visit(*this); }
-    void Not::accept(Visitor &v) { v.visit(*this); }
+    string Par::str() {
+        return "(" + child->str() + ")";
+    }
+
+    string Not::str() {
+        return "!" + child->str();
+    }
+
 }

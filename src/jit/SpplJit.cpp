@@ -96,40 +96,42 @@ namespace jit {
                 out += "\"";
                 return out;
             case common::TypeId::TUPLE:
-                return get_tuple_output(data, type);
+                return get_tuple_output(data, type.subtypes);
+            case common::TypeId::SIGNATURE:
+                return type.str();
             default:
                 throw Error::NotImplemented("Cannot convert to C data: " + type.str());
         }
     }
 
-    string SpplJit::get_tuple_output(intptr_t addr, common::Type tuple_type) {
+    string SpplJit::get_tuple_output(intptr_t addr, vector<common::Type> types) {
         string out("(");
-        for (auto &type: tuple_type.subtypes) {
-            switch (type.id) {
+        for (size_t i = 0; i < types.size(); i++) {
+            switch (types[i].id) {
                 case common::TypeId::INT:
-                    out += get_output(*(int64_t *) addr, type);
+                    out += get_output(*(int64_t *) addr, types[i]);
                     addr += sizeof(int64_t);
                     break;
                 case common::TypeId::FLOAT:
-                    out += get_output(addr, type);
+                    out += get_output(addr, types[i]);
                     addr += sizeof(double);
                     break;
                 case common::TypeId::STRING:
-                    out += get_output(*(intptr_t *) addr, type);
+                    out += get_output(*(intptr_t *) addr, types[i]);
                     addr += sizeof(intptr_t *);
                     break;
                 case common::TypeId::TUPLE:
-                    out += get_tuple_output(*(intptr_t *) addr, type);
+                    out += get_tuple_output(*(intptr_t *) addr, types[i].subtypes);
                     addr += sizeof(intptr_t *);
                     break;
                 default:
-                    throw Error::NotImplemented("Cannot convert to C data: " + type.str());
+                    throw Error::NotImplemented("Cannot convert to C data: " + types[i].str());
             }
-            if (type != tuple_type.subtypes.back())
-                out += ",";
+            if (types[i] != types[i].subtypes.back())
+                out += ", ";
         }
-        out += ")";
-        return out;
+
+        return  out + ")";
     }
 
 
@@ -146,10 +148,10 @@ namespace jit {
         }
 
         // Generate ir_func
-        auto func_node = Driver.program->funcs[0].get();
         if (!Driver.accept(Generator)) {
             return;
         }
+        auto func_node = Driver.program->funcs[0].get();
         auto func_ir = Generator.Module->getFunction(func_node->id);
         PassManager->run(*func_ir);
 

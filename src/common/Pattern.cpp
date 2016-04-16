@@ -74,4 +74,89 @@ namespace common {
            Location loc) :
             Pattern(loc),
             id(id) { }
+
+    string List::str() {
+        string str("[");
+
+        for (auto i = 0; i < exprs.size(); i++) {
+            str += exprs[i]->str();
+            if (i + 1 != exprs.size())
+                str += ", ";
+        }
+
+        return str + "]";
+    }
+
+    string Tuple::str() {
+        string str("(");
+
+        for (auto i = 0; i < exprs.size(); i++) {
+            str += exprs[i]->str();
+            if (i + 1 != exprs.size())
+                str += ", ";
+        }
+
+        return str + ")";
+    }
+
+    string Id::str() {
+        return id;
+    }
+
+    string Int::str() {
+        return to_string(value);
+    }
+
+    string Float::str() {
+        string res = to_string(value);
+
+        if (res.find('.') == res.npos)
+            res += ".0";
+
+        return res;
+    }
+
+    string Bool::str() {
+        return value ? "True" : "False";
+    }
+
+    string Char::str() {
+        string res = "\'";
+        res += value;
+        res += "\'";
+
+        return res;
+    }
+
+    string String::str() {
+        return "\"" + value + "\"";
+    }
+
+    string ListPattern::str() {
+        string str("[");
+
+        for (auto i = 0; i < patterns.size(); i++) {
+            str += patterns[i]->str();
+            if (i + 1 != patterns.size())
+                str += ", ";
+        }
+
+        return str + "]";
+    }
+
+    string TuplePattern::str() {
+        string str("(");
+
+        for (auto i = 0; i < patterns.size(); i++) {
+            str += patterns[i]->str();
+            if (i + 1 != patterns.size())
+                str += ", ";
+        }
+
+        return str + ")";
+    }
+
+    string ListSplit::str() {
+        return "(" + left->str() + " : " + right->str() + ")";
+    }
 }

@@ -94,4 +94,61 @@ namespace common {
                          unique_ptr<Expr> right,
                          Location loc) :
             BinaryOp(move(left), move(right), loc) { }
+
+    string Or::str() {
+        return left->str() + " || " + right->str();
+    }
+
+    string And::str() {
+        return left->str() + " && " + right->str();
+    }
+
+    string Equal::str() {
+        return left->str() + " == " + right->str();
+    }
+
+    string NotEqual::str() {
+        return left->str() + " != " + right->str();
+    }
+
+    string Lesser::str() {
+        return left->str() + " < " + right->str();
+    }
+
+    string Greater::str() {
+        return left->str() + " > " + right->str();
+    }
+
+    string LesserEq::str() {
+        return left->str() + " <= " + right->str();
+    }
+
+    string GreaterEq::str() {
+        return left->str() + " >= " + right->str();
+    }
+
+    string Add::str() {
+        return left->str() + " + " + right->str();
+    }
+
+    string Sub::str() {
+        return left->str() + " - " + right->str();
+    }
+
+    string Mul::str() {
+        return left->str() + " * " + right->str();
+    }
+
+    string Div::str() {
+        return left->str() + " / " + right->str();
+    }
+
+    string Mod::str() {
+        return left->str() + " % " + right->str();
+    }
+
+    string ListAdd::str() {
+        return left->str() + " : " + right->str();
+    }
+
 }
