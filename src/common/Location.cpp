@@ -21,6 +21,10 @@ namespace common {
         end.line += count;
     }
 
+    void Location::sources(string src) {
+        end.source = src;
+    }
+
     ostream &operator<<(ostream &out, const Location &loc) {
         if (loc.begin.source.empty())
             return out << loc.begin.line << ":" << loc.begin.column;

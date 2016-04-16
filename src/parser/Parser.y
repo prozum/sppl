@@ -2,12 +2,9 @@
 %name-prefix "parser"
 %define "parser_class_name" {Parser}
 %locations
+%define api.location.type {Location}
 %initial-action {
-    //@$.lines = 1;
-    //@$.columns = 1;
-    //@$.begin = new Location();
-    //@$.end = new Location();
-    //@$.begin->source = @$.end->source = driver.source;
+    @$.begin.source = @$.end.source = driver.source;
 }
 %debug
 %parse-param { class Driver& driver }
@@ -46,7 +43,6 @@ using namespace std;
     vector<unique_ptr<Expr>> *      expr_vec;
 }
 
-%define api.location.type {common::Location}
 
 
 %token END 0 "end of stream"
@@ -163,7 +159,6 @@ exprs_comma_ne: exprs_comma_ne COMMA expr                   { $$ = $1; $$->push_
 %%
 
 void parser::Parser::error(const Parser::location_type& loc,
-                           const std::string& msg)
-{
+                           const std::string& msg) {
     driver.error(loc, msg);
 }

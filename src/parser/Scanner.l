@@ -7,6 +7,7 @@
 
 #include "Node.h"
 #include "Scanner.h"
+#include "Driver.h"
 
 #define YY_NO_UNISTD_H
 
@@ -26,6 +27,10 @@ using namespace std;
 %%
 
 %{
+    if (new_source) {
+        yylloc->sources(driver.source);
+        new_source = false;
+    }
     yylloc->step();
 %}
 
@@ -208,6 +213,7 @@ namespace parser {
 
     int Scanner::yywrap() {
         if (driver.next_input()) {
+            new_source = true;
             return 0;
         }
 

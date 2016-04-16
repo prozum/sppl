@@ -19,11 +19,12 @@ namespace parser {
         if (input_type != InputType::FILES)
             return false;
         if (filenames.size() > cur_file) {
-            fin = ifstream(filenames[cur_file++]);
+            fin = ifstream(filenames[cur_file]);
             in = &fin;
             if (!fin.good())
                 return false;
             scanner.switch_streams(in, mout);
+            source = filenames[cur_file++];
             return true;
         }
         return false;
@@ -43,10 +44,10 @@ namespace parser {
         hout = &fhout;
     }
 
-    bool Driver::parse_stream(std::istream &in, const std::string &sname)
-    {
+    bool Driver::parse_stream(std::istream &in, const std::string &sname) {
         input_type = InputType::STREAM;
         source = sname;
+
         scanner.switch_streams(&in, mout);
         scanner.set_debug(trace_scanning);
         parser.set_debug_level(trace_parsing);
@@ -54,9 +55,9 @@ namespace parser {
         return (parser.parse() == 0);
     }
 
-    bool Driver::parse_file(const std::string &filename)
-    {
+    bool Driver::parse_file(const std::string &filename) {
         input_type = InputType::FILE;
+        source = filename;
 
         std::ifstream in(filename.c_str());
         if (!in.good()) return false;
@@ -77,6 +78,7 @@ namespace parser {
 
     bool Driver::parse_string(const std::string &input, const std::string &sname) {
         input_type = InputType::STRING;
+        source = sname;
 
         std::istringstream iss(input);
 

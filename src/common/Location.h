@@ -24,8 +24,9 @@ namespace common {
 		Location(unsigned l, unsigned c, string src = "");
 
 		void step();
-		void columns (unsigned count = 1);
+		void columns(unsigned count = 1);
 		void lines(unsigned count = 1);
+		void sources(string src = "");
 
 		Position begin;
 		Position end;

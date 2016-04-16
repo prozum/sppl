@@ -25,8 +25,6 @@ namespace parser {
 
     class Driver;
 
-
-
     class Scanner : public SpplFlexLexer
     {
     public:
@@ -41,7 +39,7 @@ namespace parser {
 
         void set_debug(bool b);
 
-
+        bool new_source;
         Driver &driver;
     };
 }
