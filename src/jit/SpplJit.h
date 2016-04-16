@@ -19,7 +19,7 @@
 #include <llvm/Analysis/Passes.h>
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/LLVMContext.h>
-#include <llvm/IR/LegacyPassManager.h>
+#include <llvm/IR/PassManager.h>
 #include <llvm/IR/Verifier.h>
 #include <llvm/Support/TargetSelect.h>
 #include <llvm/Transforms/Scalar.h>
@@ -32,9 +32,9 @@ namespace jit {
     public:
         SpplJit();
 
-        void Eval(string str);
+        void eval(string str);
 
-        static void Init_llvm() {
+        static void initLLVM() {
             InitializeNativeTarget();
             InitializeNativeTargetAsmPrinter();
             InitializeNativeTargetAsmParser();
@@ -44,31 +44,31 @@ namespace jit {
         typedef IRCompileLayer<ObjLayerT> CompileLayerT;
         typedef CompileLayerT::ModuleSetHandleT ModuleHandleT;
 
-        void init_module_passmanager();
-        SpplJit::ModuleHandleT module_handler;
+        void createModule();
+        ModuleHandleT addModule(std::unique_ptr<llvm::Module> m);
+        void removeModule(ModuleHandleT handler);
 
-        ModuleHandleT add_module(std::unique_ptr<llvm::Module> m);
-        void remove_module(ModuleHandleT handler);
-
-        JITSymbol find_symbol(const std::string name);
-        JITSymbol find_mangled_symbol(const std::string &name);
-
+        JITSymbol findSymbol(const std::string name);
+        JITSymbol findMangledSymbol(const std::string &name);
         std::string mangle(const std::string &name);
+
+        string getOutput(intptr_t data, common::Type type);
+        string getOutputTuple(intptr_t addr, vector<common::Type> types);
 
         std::unique_ptr<TargetMachine> Machine;
         const DataLayout Layout;
         ObjLayerT ObjectLayer;
         CompileLayerT CompileLayer;
+
+        std::unique_ptr<legacy::FunctionPassManager> PassMgr;
         std::vector<ModuleHandleT> ModuleHandles;
-        std::unique_ptr<legacy::FunctionPassManager> PassManager;
+        ModuleHandleT moduleHandler;
 
         parser::Driver Driver;
         codegen::LLVMCodeGenerator Generator;
         semantics::ScopeGenerator ScopeGenerator;
         semantics::TypeChecker TypeChecker;
 
-        string get_output(intptr_t data, common::Type type);
-        string get_tuple_output(intptr_t addr, vector<common::Type> types);
 
         template<typename T>
         static std::vector<T> singletonSet(T t) {
