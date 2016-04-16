@@ -11,7 +11,7 @@ option(INTERPRETER "Interpreter description" OFF)
 option(JIT "LLVM JIT Compiler" OFF)
 option(TESTS "Tests" OFF)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -static")
 if(DEBUG)
     set(CMAKE_BUILD_TYPE Debug)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall -pedantic -Wno-unused-parameter")
