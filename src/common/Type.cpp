@@ -83,7 +83,7 @@ namespace common {
 
     string Type::subtype_str(const std::string split) {
         string str("(");
-        for (auto i = 0; i < subtypes.size(); i++) {
+        for (size_t i = 0; i < subtypes.size(); i++) {
             str += subtypes[i].str();
             if (i + 1 != subtypes.size())
                 str += split;

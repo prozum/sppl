@@ -78,7 +78,7 @@ namespace common {
     string List::str() {
         string str("[");
 
-        for (auto i = 0; i < exprs.size(); i++) {
+        for (size_t i = 0; i < exprs.size(); i++) {
             str += exprs[i]->str();
             if (i + 1 != exprs.size())
                 str += ", ";
@@ -90,7 +90,7 @@ namespace common {
     string Tuple::str() {
         string str("(");
 
-        for (auto i = 0; i < exprs.size(); i++) {
+        for (size_t i = 0; i < exprs.size(); i++) {
             str += exprs[i]->str();
             if (i + 1 != exprs.size())
                 str += ", ";
@@ -135,7 +135,7 @@ namespace common {
     string ListPattern::str() {
         string str("[");
 
-        for (auto i = 0; i < patterns.size(); i++) {
+        for (size_t i = 0; i < patterns.size(); i++) {
             str += patterns[i]->str();
             if (i + 1 != patterns.size())
                 str += ", ";
@@ -147,7 +147,7 @@ namespace common {
     string TuplePattern::str() {
         string str("(");
 
-        for (auto i = 0; i < patterns.size(); i++) {
+        for (size_t i = 0; i < patterns.size(); i++) {
             str += patterns[i]->str();
             if (i + 1 != patterns.size())
                 str += ", ";
