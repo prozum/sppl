@@ -14,16 +14,16 @@ namespace codegen {
     void GasCodeGenerator::visit(Program &node) {
         // Visit all functions
 
-        for (auto &func : node.funcs) {
+        for (auto &func : node.Funcs) {
             func->accept(*this);
         }
 
         string source = buildSource();  // Build source.S file
-        *driver.out << source << endl;
+        *Drv.Out << source << endl;
     }
 
     void GasCodeGenerator::visit(Function &node) {
-        FuncName = node.id;                     // Function name used for anything function related including
+        FuncName = node.Id;                     // Function name used for anything function related including
                                                 // names and labels.
 
         string globl = ".globl ";               // Build the globl
@@ -38,9 +38,9 @@ namespace codegen {
         Func += "funcstart:\n";
 
         CaseCount = 0;
-        Cases = node.cases.size();             // Get number of cases
+        Cases = node.Cases.size();             // Get number of cases
 
-        for (auto &funcCase : node.cases) {     // Build cases
+        for (auto &funcCase : node.Cases) {     // Build cases
             funcCase->accept(*this);
         }
 
@@ -68,7 +68,7 @@ namespace codegen {
         CaseCount++;
 
         int argc = 0;
-        for (auto &c : node.patterns) {
+        for (auto &c : node.Patterns) {
             c->accept(*this);
             cout << "PATTERN IN THIS SCOPE => " << Helper.TypeName << "    " << Helper.TypeValue << endl;
 
@@ -88,7 +88,7 @@ namespace codegen {
             Func += ".";
             Func += FuncName;
             Func += "casedefault:\n";
-            node.expr->accept(*this);
+            node.Expr->accept(*this);
         } else {                    // Other cases
             Func += ".";
             Func += FuncName;
@@ -97,7 +97,7 @@ namespace codegen {
             Func += ":\n";
 
             int argNum = 0;                         // first argument have index 0
-            for (auto &c : node.patterns) {
+            for (auto &c : node.Patterns) {
                 c->accept(*this);                    // Gets the pattern, and puts it in "helper"
 
                 cout << "Working on pattern" << endl;
@@ -127,7 +127,7 @@ namespace codegen {
                 }
                 // repeat for all possebilities
             }
-            node.expr->accept(*this);
+            node.Expr->accept(*this);
 
             Helper = {};
         }
@@ -170,10 +170,10 @@ namespace codegen {
     void GasCodeGenerator::visit(Add &node) {
         cout << "ADD" << endl;
 
-        node.left->accept(*this);
+        node.Left->accept(*this);
 
         Func += "pushl %eax\n";
-        node.right->accept(*this);
+        node.Right->accept(*this);
 
         Func += "popl %ebx\n";
         Func += "addl %ebx, %eax\n";
@@ -210,14 +210,14 @@ namespace codegen {
 
     void GasCodeGenerator::visit(Int &node) {
         Func += "movl $";
-        Func += to_string(node.value);
+        Func += to_string(node.Val);
         Func += ", %eax\n";
 
         Helper.TypeName = "Int";
-        Helper.TypeValue = to_string(node.value);
+        Helper.TypeValue = to_string(node.Val);
 
 
-        cout << "Got integer => " << to_string(node.value) << endl;
+        cout << "Got integer => " << to_string(node.Val) << endl;
     }
 
     void GasCodeGenerator::visit(Float &node) {
@@ -258,15 +258,15 @@ namespace codegen {
 
     void GasCodeGenerator::visit(Id &node) {
         Helper.TypeName = "Id";
-        Helper.TypeValue = FuncName + node.id;
-        cout << "Got ID => " << node.id << endl;
+        Helper.TypeValue = FuncName + node.Val;
+        cout << "Got ID => " << node.Val << endl;
     }
 
     void GasCodeGenerator::visit(Call &node) {
 
         // TODO: Find way pu push arguments to stack.
         vector<string> params;
-        for (auto &arg : node.exprs) {
+        for (auto &arg : node.Args) {
             arg->accept(*this);
 
             if(Helper.TypeName.compare("Int") == 0) {
@@ -276,7 +276,7 @@ namespace codegen {
             }
         }
 
-        node.callee->accept(*this); // function to call;
+        node.Callee->accept(*this); // function to call;
         Func += "call ";
         Func += Helper.TypeValue;
         Func += "\n";

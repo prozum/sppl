@@ -3,5 +3,5 @@
 namespace parser {
 
     CodeGenerator::CodeGenerator(Driver &driver) :
-            driver(driver) { }
+            Drv(driver) { }
 }

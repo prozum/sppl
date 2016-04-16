@@ -13,22 +13,22 @@ namespace common {
     }
 
     void Location::columns(unsigned count) {
-        end.column = max(1u, end.column + count);
+        end.Column = max(1u, end.Column + count);
     }
 
     void Location::lines(unsigned count) {
-        end.column = 1;
-        end.line += count;
+        end.Column = 1;
+        end.Line += count;
     }
 
     void Location::sources(string src) {
-        end.source = src;
+        end.Src = src;
     }
 
     ostream &operator<<(ostream &out, const Location &loc) {
-        if (loc.begin.source.empty())
-            return out << loc.begin.line << ":" << loc.begin.column;
-        return out << loc.begin.source << ":"
-               << loc.begin.line << ":" << loc.begin.column;
+        if (loc.begin.Src.empty())
+            return out << loc.begin.Line << ":" << loc.begin.Column;
+        return out << loc.begin.Src << ":"
+               << loc.begin.Line << ":" << loc.begin.Column;
     }
 }

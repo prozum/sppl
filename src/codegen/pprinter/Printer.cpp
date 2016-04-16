@@ -9,6 +9,6 @@ namespace codegen {
         : CodeGenerator(driver) { }
 
     void Printer::visit(Program &node) {
-        *driver.out << node.str();
+        *Drv.Out << node.str();
     }
 }

@@ -14,7 +14,7 @@ namespace common {
 
 	// Forward declarations
 	class Node;
-	class Expr;
+	class Expression;
 	class BinaryOp;
 	class UnaryOp;
 	class Type;
@@ -56,8 +56,8 @@ namespace common {
 	// Abstract Nodes
 	class Node {
 	public:
-		Type type;
-		Location loc;
+		Type Ty;
+		Location Loc;
 
 		Node(Location);
 		Node(Type, Location);
@@ -65,28 +65,25 @@ namespace common {
         Node& operator=(const Node&) = delete;
         ~Node() = default;
 
-		virtual string str() = 0;
 		virtual void accept(Visitor &) = 0;
+		virtual string str() = 0;
 	};
 
 	class Program : public Node {
 	public:
-
-		vector<unique_ptr<Function>> funcs;
+		vector<unique_ptr<Function>> Funcs;
 
 		Program(vector<unique_ptr<Function>>, Location);
-		Program(unique_ptr<Expr> expr, Location);
+		Program(unique_ptr<Expression> expr, Location);
 
 		virtual void accept(Visitor &);
-
 		string str();
 	};
 
-	class Expr : public Node {
+	class Expression : public Node {
 	public:
-
-		Expr(Location);
-		Expr(Type, Location);
+		Expression(Location);
+		Expression(Type, Location);
 
 		virtual void accept(Visitor &) = 0;
 	};
@@ -95,66 +92,61 @@ namespace common {
 
 	class Function : public Node {
 	public:
-		string id;
-		Type signature;
-        vector<unique_ptr<Case>> cases;
-		Scope* scope;
-		bool is_anon = false;
+		string Id;
+		Type Signature;
+        vector<unique_ptr<Case>> Cases;
+		Scope* Scp;
+		bool Anon = false;
 
-		Function(unique_ptr<Expr>);
+		Function(unique_ptr<Expression>);
 		Function(string, Type, Location);
 
 		virtual void accept(Visitor &);
-
 		string str();
 	};
 
 	class Case : public Node {
 	public:
-		unique_ptr<Expr> expr;
-		vector<unique_ptr<Pattern>> patterns;
-		bool tail_rec = false;
+		unique_ptr<Expression> Expr;
+		vector<unique_ptr<Pattern>> Patterns;
+		bool TailRec = false;
 
-		Case(unique_ptr<Expr>, vector<unique_ptr<Pattern>>, Location);
+		Case(unique_ptr<Expression>, vector<unique_ptr<Pattern>>, Location);
 
 		virtual void accept(Visitor &);
-
 		string str();
 	};
 
-	class Call : public Expr {
+	class Call : public Expression {
 	public:
-		unique_ptr<Expr> callee;
-		vector<unique_ptr<Expr>> exprs;
+		unique_ptr<Expression> Callee;
+		vector<unique_ptr<Expression>> Args;
 
-		Call(unique_ptr<Expr>, vector<unique_ptr<Expr>>, Location);
+		Call(unique_ptr<Expression>, vector<unique_ptr<Expression>>, Location);
 
 		virtual void accept(Visitor &);
-
 		string str();
 	};
 
 	/* Other Expressions */
 
-	class List : public Expr {
+	class List : public Expression {
 	public:
-		vector<unique_ptr<Expr>> exprs;
+		vector<unique_ptr<Expression>> Elements;
 
-		List(vector<unique_ptr<Expr>>, Location);
+		List(vector<unique_ptr<Expression>>, Location);
 
 		virtual void accept(Visitor &);
-
 		string str();
 	};
 
-	class Tuple : public Expr {
+	class Tuple : public Expression {
 	public:
-		vector<unique_ptr<Expr>> exprs;
+		vector<unique_ptr<Expression>> Elements;
 
-		Tuple(vector<unique_ptr<Expr>>, Location);
+		Tuple(vector<unique_ptr<Expression>>, Location);
 
 		virtual void accept(Visitor &);
-
 		string str();
 	};
 }

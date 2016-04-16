@@ -24,9 +24,9 @@ namespace common {
 
 	class Type {
 	public:
-		TypeId id;
-		vector<Type> subtypes;
-		Location loc;
+		TypeId Id;
+		vector<Type> Subtypes;
+		Location Loc;
 
 		Type();
 		~Type();
@@ -40,7 +40,7 @@ namespace common {
 		Type operator[](const size_t i);
 
 		string str();
-		string subtype_str(const std::string split);
+		string subtypeStr(const std::string split);
 
 	};
 
@@ -53,9 +53,9 @@ namespace std
     {
         std::size_t operator()(const common::Type& type) const
         {
-            size_t res = std::hash<int>()(static_cast<int>(type.id));
+            size_t res = std::hash<int>()(static_cast<int>(type.Id));
 
-            for (auto &subtype : type.subtypes) {
+            for (auto &subtype : type.Subtypes) {
                 res ^= (hash<common::Type>()(subtype) << 1);
             }
 

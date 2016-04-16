@@ -18,137 +18,137 @@ namespace common {
     void LesserEq::accept(Visitor &v) { v.visit(*this); }
     void GreaterEq::accept(Visitor &v) { v.visit(*this); }
 
-    BinaryOp::BinaryOp(unique_ptr<Expr> left,
-                   unique_ptr<Expr> right,
+    BinaryOp::BinaryOp(unique_ptr<Expression> left,
+                   unique_ptr<Expression> right,
                    Location loc) :
-        Expr(loc),
-        left(move(left)),
-        right(move(right)) { }
+        Expression(loc),
+        Left(move(left)),
+        Right(move(right)) { }
 
-    Add::Add(unique_ptr<Expr> left,
-         unique_ptr<Expr> right,
+    Add::Add(unique_ptr<Expression> left,
+         unique_ptr<Expression> right,
          Location loc) :
         BinaryOp(move(left), move(right), loc) { }
 
-    Sub::Sub(unique_ptr<Expr> left,
-             unique_ptr<Expr> right,
+    Sub::Sub(unique_ptr<Expression> left,
+             unique_ptr<Expression> right,
              Location loc) :
             BinaryOp(move(left), move(right), loc) { }
 
-    Mul::Mul(unique_ptr<Expr> left,
-             unique_ptr<Expr> right,
+    Mul::Mul(unique_ptr<Expression> left,
+             unique_ptr<Expression> right,
              Location loc) :
             BinaryOp(move(left), move(right), loc) { }
 
-    Div::Div(unique_ptr<Expr> left,
-             unique_ptr<Expr> right,
+    Div::Div(unique_ptr<Expression> left,
+             unique_ptr<Expression> right,
              Location loc) :
             BinaryOp(move(left), move(right), loc) { }
 
-    Mod::Mod(unique_ptr<Expr> left,
-             unique_ptr<Expr> right,
+    Mod::Mod(unique_ptr<Expression> left,
+             unique_ptr<Expression> right,
              Location loc) :
             BinaryOp(move(left), move(right), loc) { }
 
-    ListAdd::ListAdd(unique_ptr<Expr> left,
-                     unique_ptr<Expr> right,
+    ListAdd::ListAdd(unique_ptr<Expression> left,
+                     unique_ptr<Expression> right,
                      Location loc) :
             BinaryOp(move(left), move(right), loc) { }
 
-    Or::Or(unique_ptr<Expr> left,
-           unique_ptr<Expr> right,
+    Or::Or(unique_ptr<Expression> left,
+           unique_ptr<Expression> right,
            Location loc) :
             BinaryOp(move(left), move(right), loc) { }
 
-    And::And(unique_ptr<Expr> left,
-             unique_ptr<Expr> right,
+    And::And(unique_ptr<Expression> left,
+             unique_ptr<Expression> right,
              Location loc) :
             BinaryOp(move(left), move(right), loc) { }
 
-    Equal::Equal(unique_ptr<Expr> left,
-                 unique_ptr<Expr> right,
+    Equal::Equal(unique_ptr<Expression> left,
+                 unique_ptr<Expression> right,
                  Location loc) :
             BinaryOp(move(left), move(right), loc) { }
 
-    NotEqual::NotEqual(unique_ptr<Expr> left,
-                       unique_ptr<Expr> right,
+    NotEqual::NotEqual(unique_ptr<Expression> left,
+                       unique_ptr<Expression> right,
                        Location loc) :
             BinaryOp(move(left), move(right), loc) { }
 
-    Lesser::Lesser(unique_ptr<Expr> left,
-                   unique_ptr<Expr> right,
+    Lesser::Lesser(unique_ptr<Expression> left,
+                   unique_ptr<Expression> right,
                    Location loc) :
             BinaryOp(move(left), move(right), loc) { }
 
-    Greater::Greater(unique_ptr<Expr> left,
-                     unique_ptr<Expr> right,
+    Greater::Greater(unique_ptr<Expression> left,
+                     unique_ptr<Expression> right,
                      Location loc) :
             BinaryOp(move(left), move(right), loc) { }
 
-    LesserEq::LesserEq(unique_ptr<Expr> left,
-                       unique_ptr<Expr> right,
+    LesserEq::LesserEq(unique_ptr<Expression> left,
+                       unique_ptr<Expression> right,
                        Location loc) :
             BinaryOp(move(left), move(right), loc) { }
 
-    GreaterEq::GreaterEq(unique_ptr<Expr> left,
-                         unique_ptr<Expr> right,
+    GreaterEq::GreaterEq(unique_ptr<Expression> left,
+                         unique_ptr<Expression> right,
                          Location loc) :
             BinaryOp(move(left), move(right), loc) { }
 
     string Or::str() {
-        return left->str() + " || " + right->str();
+        return Left->str() + " || " + Right->str();
     }
 
     string And::str() {
-        return left->str() + " && " + right->str();
+        return Left->str() + " && " + Right->str();
     }
 
     string Equal::str() {
-        return left->str() + " == " + right->str();
+        return Left->str() + " == " + Right->str();
     }
 
     string NotEqual::str() {
-        return left->str() + " != " + right->str();
+        return Left->str() + " != " + Right->str();
     }
 
     string Lesser::str() {
-        return left->str() + " < " + right->str();
+        return Left->str() + " < " + Right->str();
     }
 
     string Greater::str() {
-        return left->str() + " > " + right->str();
+        return Left->str() + " > " + Right->str();
     }
 
     string LesserEq::str() {
-        return left->str() + " <= " + right->str();
+        return Left->str() + " <= " + Right->str();
     }
 
     string GreaterEq::str() {
-        return left->str() + " >= " + right->str();
+        return Left->str() + " >= " + Right->str();
     }
 
     string Add::str() {
-        return left->str() + " + " + right->str();
+        return Left->str() + " + " + Right->str();
     }
 
     string Sub::str() {
-        return left->str() + " - " + right->str();
+        return Left->str() + " - " + Right->str();
     }
 
     string Mul::str() {
-        return left->str() + " * " + right->str();
+        return Left->str() + " * " + Right->str();
     }
 
     string Div::str() {
-        return left->str() + " / " + right->str();
+        return Left->str() + " / " + Right->str();
     }
 
     string Mod::str() {
-        return left->str() + " % " + right->str();
+        return Left->str() + " % " + Right->str();
     }
 
     string ListAdd::str() {
-        return left->str() + " : " + right->str();
+        return Left->str() + " : " + Right->str();
     }
 
 }

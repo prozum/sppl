@@ -152,7 +152,7 @@ namespace codegen {
             string get_environment(Type &);
             void generate_std();
             void output_buffer();
-            void output_equal(Type &, Expr &, Expr &);
+            void output_equal(Type &, Expression &, Expression &);
 
     };
 }

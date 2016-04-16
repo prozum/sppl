@@ -13,10 +13,9 @@ namespace parser {
 
     class CodeGenerator : public Visitor {
     public:
+        Driver &Drv;
 
         CodeGenerator(Driver &driver);
-
-        Driver &driver;
     };
 
 }

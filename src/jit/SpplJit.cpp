@@ -7,14 +7,14 @@ namespace jit {
             Layout(Machine->createDataLayout()),
             CompileLayer(ObjectLayer, SimpleCompiler(*Machine)),
             Generator(Driver),
-            ScopeGenerator(&Driver.global)
+            ScopeGenerator(&Driver.Global)
     {
         llvm::sys::DynamicLibrary::LoadLibraryPermanently(nullptr);
         createModule();
 
         // Time is short, mortal
-        Driver.set_output("/dev/null");
-        Driver.set_header_output("/dev/null");
+        Driver.setOutput("/dev/null");
+        Driver.setHeaderOutput("/dev/null");
     }
 
     SpplJit::ModuleHandleT SpplJit::addModule(std::unique_ptr<llvm::Module> module) {
@@ -83,7 +83,7 @@ namespace jit {
     string SpplJit::getOutput(intptr_t data, common::Type type) {
         string out;
 
-        switch (type.id) {
+        switch (type.Id) {
             case common::TypeId::INT:
                 return to_string((int64_t) data);
             case common::TypeId::FLOAT:
@@ -95,18 +95,18 @@ namespace jit {
                 out += "\"";
                 return out;
             case common::TypeId::TUPLE:
-                return getOutputTuple(data, type.subtypes);
+                return getOutputTuple(data, type.Subtypes);
             case common::TypeId::SIGNATURE:
                 return type.str();
             default:
-                throw Error::NotImplemented("Cannot convert to C data: " + type.str());
+                throw runtime_error("Cannot convert to C data: " + type.str());
         }
     }
 
     string SpplJit::getOutputTuple(intptr_t addr, vector<common::Type> types) {
         string out("(");
         for (size_t i = 0; i < types.size(); i++) {
-            switch (types[i].id) {
+            switch (types[i].Id) {
                 case common::TypeId::INT:
                     out += getOutput(*(int64_t *) addr, types[i]);
                     addr += sizeof(int64_t);
@@ -120,13 +120,13 @@ namespace jit {
                     addr += sizeof(intptr_t *);
                     break;
                 case common::TypeId::TUPLE:
-                    out += getOutputTuple(*(intptr_t *) addr, types[i].subtypes);
+                    out += getOutputTuple(*(intptr_t *) addr, types[i].Subtypes);
                     addr += sizeof(intptr_t *);
                     break;
                 default:
-                    throw Error::NotImplemented("Cannot convert to C data: " + types[i].str());
+                    throw runtime_error("Cannot convert to C data: " + types[i].str());
             }
-            if (types[i] != types[i].subtypes.back())
+            if (i + 1 != types.size())
                 out += ", ";
         }
 
@@ -135,7 +135,7 @@ namespace jit {
 
 
     void SpplJit::eval(std::string str) {
-        if (!Driver.parse_string(str))
+        if (!Driver.parseString(str))
             return;
 
         if (!Driver.accept(ScopeGenerator)) {
@@ -150,8 +150,8 @@ namespace jit {
         if (!Driver.accept(Generator)) {
             return;
         }
-        auto FuncNode = Driver.program->funcs[0].get();
-        auto FuncIR = Generator.Module->getFunction(FuncNode->id);
+        auto FuncNode = Driver.Prog->Funcs[0].get();
+        auto FuncIR = Generator.Module->getFunction(FuncNode->Id);
         PassMgr->run(* FuncIR);
 
         // Store function in seperate module
@@ -159,13 +159,13 @@ namespace jit {
         createModule();
 
         // Only run anonymous functions
-        if (FuncNode->is_anon) {
-            auto Func = findSymbol(FuncNode->id);
+        if (FuncNode->Anon) {
+            auto Func = findSymbol(FuncNode->Id);
             auto FuncJIT = (size_t (*)()) Func.getAddress();
 
             assert(FuncJIT != NULL);
-            string output = getOutput(FuncJIT(), FuncNode->type);
-            cout << output << "\t\ttype: " << FuncNode->type.str() << endl;
+            string output = getOutput(FuncJIT(), FuncNode->Ty);
+            cout << output << "\t\ttype: " << FuncNode->Ty.str() << endl;
 
             // Remove module
             removeModule(moduleHandler);

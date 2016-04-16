@@ -27,9 +27,9 @@ using namespace std;
 %%
 
 %{
-    if (new_source) {
-        yylloc->sources(driver.source);
-        new_source = false;
+    if (NewSource) {
+        yylloc->sources(Drv.Src);
+        NewSource = false;
     }
     yylloc->step();
 %}
@@ -212,8 +212,8 @@ namespace parser {
     }
 
     int Scanner::yywrap() {
-        if (driver.next_input()) {
-            new_source = true;
+        if (Drv.nextInput()) {
+            NewSource = true;
             return 0;
         }
 

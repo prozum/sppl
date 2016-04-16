@@ -8,38 +8,38 @@ namespace common {
     }
 
     Type::Type(TypeId id) :
-            id(id) { }
+            Id(id) { }
 
     Type::Type(TypeId id,
            Location loc) :
-            id(id),
-            loc(loc) { }
+            Id(id),
+            Loc(loc) { }
 
     Type::Type(TypeId id,
                vector<Type> subtypes) :
-                id(id),
-                subtypes(subtypes) { }
+                Id(id),
+                Subtypes(subtypes) { }
 
     Type::Type(TypeId id,
                vector<Type> subtypes,
                Location loc) :
-                id(id),
-                subtypes(subtypes),
-                loc(loc) { }
+                Id(id),
+                Subtypes(subtypes),
+                Loc(loc) { }
 
     bool Type::operator==(const Type &other) const {
-        if (id != other.id)
+        if (Id != other.Id)
             return false;
-        switch (id) {
+        switch (Id) {
             case TypeId::LIST:
-                return subtypes[0] == other.subtypes[0];
+                return Subtypes[0] == other.Subtypes[0];
             case TypeId::SIGNATURE:
             case TypeId::TUPLE:
-                if (subtypes.size() != other.subtypes.size())
+                if (Subtypes.size() != other.Subtypes.size())
                     return false;
 
-                for (unsigned i = 0; i < subtypes.size(); ++i) {
-                    if (subtypes[i] != other.subtypes[i]) {
+                for (unsigned i = 0; i < Subtypes.size(); ++i) {
+                    if (Subtypes[i] != other.Subtypes[i]) {
                         return false;
                     }
                 }
@@ -53,11 +53,11 @@ namespace common {
     }
 
     Type Type::operator[](const size_t i) {
-        return  subtypes[i];
+        return  Subtypes[i];
     }
 
     std::string Type::str() {
-        switch (id) {
+        switch (Id) {
             case TypeId::INT:
                 return "Int";
             case TypeId::FLOAT:
@@ -69,11 +69,11 @@ namespace common {
             case TypeId::STRING:
                 return "String";
             case TypeId::LIST:
-                return "[" + subtypes[0].str() + "]";
+                return "[" + Subtypes[0].str() + "]";
             case TypeId::TUPLE:
-                return subtype_str(", ");
+                return subtypeStr(", ");
             case TypeId::SIGNATURE:
-                return subtype_str(" -> ");
+                return subtypeStr(" -> ");
             case TypeId::EMPTYLIST:
                 return "[]";
             default:
@@ -81,11 +81,11 @@ namespace common {
         }
     }
 
-    string Type::subtype_str(const std::string split) {
+    string Type::subtypeStr(const std::string split) {
         string str("(");
-        for (size_t i = 0; i < subtypes.size(); i++) {
-            str += subtypes[i].str();
-            if (i + 1 != subtypes.size())
+        for (size_t i = 0; i < Subtypes.size(); i++) {
+            str += Subtypes[i].str();
+            if (i + 1 != Subtypes.size())
                 str += split;
         }
 

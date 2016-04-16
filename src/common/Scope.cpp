@@ -2,25 +2,25 @@
 
 namespace common {
     Scope::Scope(common::Scope *p)
-            : parent(p) { }
+            : Parent(p) { }
 
     bool common::Scope::exists(std::string id) {
-        auto got = decls.find(id);
+        auto got = Decls.find(id);
 
-        if (got != decls.end())
+        if (got != Decls.end())
             return true;
 
-        if (parent)
-            return parent->exists(id);
+        if (Parent)
+            return Parent->exists(id);
         else
             return false;
     }
 
-    Type Scope::get_type(std::string id) {
-        auto got = this->decls.find(id);
+    Type Scope::getType(std::string id) {
+        auto got = this->Decls.find(id);
 
-        if (got == this->decls.end()) {
-            return this->parent->get_type(id);
+        if (got == this->Decls.end()) {
+            return this->Parent->getType(id);
         } else {
             return got->second;
         }

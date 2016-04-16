@@ -17,8 +17,8 @@ namespace common {
 		static Error Binary(string msg, common::BinaryOp &op);
 		static Error Unary(string msg, common::UnaryOp &op);
 
-		std::string msg;
-		Location loc;
+		std::string Msg;
+		Location Loc;
 	};
 
 	std::ostream &operator<<(ostream &out, const Error &err);

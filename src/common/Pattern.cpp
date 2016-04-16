@@ -13,74 +13,74 @@ namespace common {
     void ListSplit::accept(Visitor &v) { v.visit(*this); }
 
     Pattern::Pattern(Location loc) :
-            Expr(loc) { }
+            Expression(loc) { }
 
     Pattern::Pattern(Type type, Location loc) :
-            Expr(type, loc) { }
+            Expression(type, loc) { }
 
     Int::Int(long value,
              Location loc) :
             Pattern(Type(TypeId::INT), loc),
-            value(value) { }
+            Val(value) { }
 
     Float::Float(double value,
                  Location loc) :
             Pattern(Type(TypeId::FLOAT), loc),
-            value(value) { }
+            Val(value) { }
 
     Bool::Bool(bool value,
                Location loc) :
             Pattern(Type(TypeId::BOOL), loc),
-            value(value) { }
+            Val(value) { }
 
     Char::Char(char value,
                Location loc) :
             Pattern(Type(TypeId::CHAR), loc),
-            value(value) { }
+            Val(value) { }
 
     String::String(string value,
                    Location loc) :
             Pattern(Type(TypeId::STRING), loc),
-            value(value) { }
+            Val(value) { }
 
     ListPattern::ListPattern(vector<unique_ptr<Pattern>> patterns,
                              Location loc) :
             Pattern(loc),
-            patterns(move(patterns)) { }
+            Patterns(move(patterns)) { }
 
     TuplePattern::TuplePattern(vector<unique_ptr<Pattern>> patterns,
                                Location loc) :
             Pattern(loc),
-            patterns(move(patterns)) { }
+            Patterns(move(patterns)) { }
 
     ListSplit::ListSplit(unique_ptr<Pattern> left,
                          unique_ptr<Pattern> right,
                          Location loc) :
             Pattern(loc),
-            left(move(left)),
-            right(move(right)) { }
+            Left(move(left)),
+            Right(move(right)) { }
 
-    List::List(vector<unique_ptr<Expr>> exprs,
+    List::List(vector<unique_ptr<Expression>> exprs,
                Location loc) :
-            Expr(Type(TypeId::LIST), loc),
-            exprs(move(exprs)) { }
+            Expression(Type(TypeId::LIST), loc),
+            Elements(move(exprs)) { }
 
-    Tuple::Tuple(vector<unique_ptr<Expr>> exprs,
+    Tuple::Tuple(vector<unique_ptr<Expression>> exprs,
                  Location loc) :
-            Expr(Type(TypeId::TUPLE), loc),
-            exprs(move(exprs)) { }
+            Expression(Type(TypeId::TUPLE), loc),
+            Elements(move(exprs)) { }
 
     Id::Id(string id,
            Location loc) :
             Pattern(loc),
-            id(id) { }
+            Val(id) { }
 
     string List::str() {
         string str("[");
 
-        for (size_t i = 0; i < exprs.size(); i++) {
-            str += exprs[i]->str();
-            if (i + 1 != exprs.size())
+        for (size_t i = 0; i < Elements.size(); i++) {
+            str += Elements[i]->str();
+            if (i + 1 != Elements.size())
                 str += ", ";
         }
 
@@ -90,9 +90,9 @@ namespace common {
     string Tuple::str() {
         string str("(");
 
-        for (size_t i = 0; i < exprs.size(); i++) {
-            str += exprs[i]->str();
-            if (i + 1 != exprs.size())
+        for (size_t i = 0; i < Elements.size(); i++) {
+            str += Elements[i]->str();
+            if (i + 1 != Elements.size())
                 str += ", ";
         }
 
@@ -100,15 +100,15 @@ namespace common {
     }
 
     string Id::str() {
-        return id;
+        return Val;
     }
 
     string Int::str() {
-        return to_string(value);
+        return to_string(Val);
     }
 
     string Float::str() {
-        string res = to_string(value);
+        string res = to_string(Val);
 
         if (res.find('.') == res.npos)
             res += ".0";
@@ -117,27 +117,27 @@ namespace common {
     }
 
     string Bool::str() {
-        return value ? "True" : "False";
+        return Val ? "True" : "False";
     }
 
     string Char::str() {
         string res = "\'";
-        res += value;
+        res += Val;
         res += "\'";
 
         return res;
     }
 
     string String::str() {
-        return "\"" + value + "\"";
+        return "\"" + Val + "\"";
     }
 
     string ListPattern::str() {
         string str("[");
 
-        for (size_t i = 0; i < patterns.size(); i++) {
-            str += patterns[i]->str();
-            if (i + 1 != patterns.size())
+        for (size_t i = 0; i < Patterns.size(); i++) {
+            str += Patterns[i]->str();
+            if (i + 1 != Patterns.size())
                 str += ", ";
         }
 
@@ -147,9 +147,9 @@ namespace common {
     string TuplePattern::str() {
         string str("(");
 
-        for (size_t i = 0; i < patterns.size(); i++) {
-            str += patterns[i]->str();
-            if (i + 1 != patterns.size())
+        for (size_t i = 0; i < Patterns.size(); i++) {
+            str += Patterns[i]->str();
+            if (i + 1 != Patterns.size())
                 str += ", ";
         }
 
@@ -157,6 +157,6 @@ namespace common {
     }
 
     string ListSplit::str() {
-        return "(" + left->str() + " : " + right->str() + ")";
+        return "(" + Left->str() + " : " + Right->str() + ")";
     }
 }

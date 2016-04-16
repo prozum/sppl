@@ -2,7 +2,7 @@
 
 namespace compiler {
     Compiler::Compiler() :
-            scope_generator(semantics::ScopeGenerator(&global)) {
+            scope_generator(semantics::ScopeGenerator(&Global)) {
 
     }
 
@@ -40,7 +40,7 @@ namespace compiler {
 
     int Compiler::compile() {
 
-        if (!parse_files())
+        if (!parseFiles())
             return 1;
 
         if (!accept(scope_generator))

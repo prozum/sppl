@@ -6,11 +6,11 @@
 
 namespace common {
 
-	class UnaryOp : public Expr {
+	class UnaryOp : public Expression {
 	public:
-		unique_ptr<Expr> child;
+		unique_ptr<Expression> Child;
 
-		UnaryOp(unique_ptr<Expr>, Location);
+		UnaryOp(unique_ptr<Expression>, Location);
 
 		virtual void accept(Visitor &) = 0;
 	};
@@ -18,20 +18,18 @@ namespace common {
 	class Par : public UnaryOp {
 	public:
 
-		Par(unique_ptr<Expr>, Location);
+		Par(unique_ptr<Expression>, Location);
 
 		virtual void accept(Visitor &);
-
 		string str();
 	};
 
 	class Not : public UnaryOp {
 	public:
 
-		Not(unique_ptr<Expr>, Location);
+		Not(unique_ptr<Expression>, Location);
 
 		virtual void accept(Visitor &);
-
 		string str();
 	};
 }

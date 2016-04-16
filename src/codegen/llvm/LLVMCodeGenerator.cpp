@@ -9,18 +9,18 @@ namespace codegen {
               Module(std::make_unique<llvm::Module>("SpplModule", getGlobalContext())) {}
 
     void LLVMCodeGenerator::visit(common::Program &node) {
-        for (auto &func : node.funcs) {
+        for (auto &func : node.Funcs) {
             func->accept(*this);
         }
 
-        *driver.out << ModuleString();
+        *Drv.Out << ModuleString();
     }
 
     llvm::Type *LLVMCodeGenerator::get_type(common::Type type, bool ptr)
     {
         llvm::Type *new_type;
 
-        switch (type.id)
+        switch (type.Id)
         {
             case common::TypeId::FLOAT:
                 new_type = llvm::Type::getDoubleTy(getGlobalContext());
@@ -60,7 +60,7 @@ namespace codegen {
             return old_type->second;
         
         std::vector<llvm::Type *> tmp_vec;
-        for (auto &subtype: type.subtypes)
+        for (auto &subtype: type.Subtypes)
             tmp_vec.push_back(get_type(subtype));
         llvm::ArrayRef<llvm::Type *> subtypes(tmp_vec);
 
@@ -77,7 +77,7 @@ namespace codegen {
         if (old_type != list_types.end())
             return old_type->second;
 
-        vector<llvm::Type *> tmp_vec = { get_type(type.subtypes[0], true), llvm::Type::getInt64Ty(getGlobalContext()) };
+        vector<llvm::Type *> tmp_vec = { get_type(type.Subtypes[0], true), llvm::Type::getInt64Ty(getGlobalContext()) };
         llvm::ArrayRef<llvm::Type *> subtypes(tmp_vec);
 
         auto new_type = StructType::create(getGlobalContext(), subtypes);
@@ -93,10 +93,10 @@ namespace codegen {
         if (old_type != func_types.end())
             return old_type->second;
 
-        auto output_type = get_type(type.subtypes.back());
+        auto output_type = get_type(type.Subtypes.back());
         std::vector<llvm::Type *> input_types;
-        for (size_t i = 0; i < type.subtypes.size() - 1; i++) {
-            input_types.push_back(get_type(type.subtypes[i]));
+        for (size_t i = 0; i < type.Subtypes.size() - 1; i++) {
+            input_types.push_back(get_type(type.Subtypes[i]));
         }
 
         auto new_type = FunctionType::get(output_type, input_types, false);
@@ -108,7 +108,7 @@ namespace codegen {
     void LLVMCodeGenerator::visit(common::Function &node) {
 
         // Create function and entry block
-        cur_func = llvm::Function::Create(get_func_type(node.signature), llvm::Function::ExternalLinkage, node.id, Module.get());
+        cur_func = llvm::Function::Create(get_func_type(node.Signature), llvm::Function::ExternalLinkage, node.Id, Module.get());
         BasicBlock *entry = BasicBlock::Create(getGlobalContext(), "entry", cur_func);
 
         // Create error block
@@ -119,7 +119,7 @@ namespace codegen {
         // Setup return block and phi node
         cur_ret_block = BasicBlock::Create(getGlobalContext(), "ret", cur_func);
         Builder.SetInsertPoint(cur_ret_block);
-        cur_phi_node = Builder.CreatePHI(cur_func->getReturnType(), node.cases.size(), "rettmp");
+        cur_phi_node = Builder.CreatePHI(cur_func->getReturnType(), node.Cases.size(), "rettmp");
         Builder.CreateRet(cur_phi_node);
 
         // Setup names for arguments
@@ -139,8 +139,8 @@ namespace codegen {
         }*/
 
         // Visit cases
-        cur_case_id = last_case_id = node.cases.size() - 1;
-        for (auto &_case : node.cases) {
+        cur_case_id = last_case_id = node.Cases.size() - 1;
+        for (auto &_case : node.Cases) {
             _case->accept(*this);
             cur_case_id--;
         }
@@ -150,7 +150,7 @@ namespace codegen {
         Builder.CreateBr(cur_pattern_block);
 
         verifyFunction(*cur_func);
-        Functions[node.id] = move(cur_func);
+        Functions[node.Id] = move(cur_func);
     }
 
     Value *LLVMCodeGenerator::compare(Value *val1, Value *val2)
@@ -175,13 +175,13 @@ namespace codegen {
             false_block = cur_pattern_block;
 
 
-        if (node.patterns.size()) {
+        if (node.Patterns.size()) {
             ctx = PATTERN;
             ContextValues.clear();
-            for (size_t i = node.patterns.size(); i != 0; --i) {
+            for (size_t i = node.Patterns.size(); i != 0; --i) {
 
                 // Last pattern should branch to next case
-                if (i == node.patterns.size())
+                if (i == node.Patterns.size())
                     true_block = cur_case_block;
                 else
                     true_block = cur_pattern_block;
@@ -194,7 +194,7 @@ namespace codegen {
 
                 // Check arguments
                 cur_val = arguments[i - 1];
-                node.patterns[i - 1]->accept(*this);
+                node.Patterns[i - 1]->accept(*this);
                 cur_val = compare(cur_val, arguments[i - 1]);
 
                 // Create condition
@@ -213,7 +213,7 @@ namespace codegen {
         // Generate expression in case block
         Builder.SetInsertPoint(cur_case_block);
         ctx = EXPR;
-        node.expr->accept(*this);
+        node.Expr->accept(*this);
 
         // Add return value to phi node
         cur_phi_node->addIncoming(cur_val, cur_case_block);
@@ -221,12 +221,12 @@ namespace codegen {
     }
 
     void LLVMCodeGenerator::visit(common::Add &node) {
-        node.left->accept(*this);
+        node.Left->accept(*this);
         auto left = cur_val;
-        node.right->accept(*this);
+        node.Right->accept(*this);
         auto right = cur_val;
 
-        if ( node.left->type.id == common::TypeId::FLOAT && node.right->type.id == common::TypeId::FLOAT) {
+        if ( node.Left->Ty.Id == common::TypeId::FLOAT && node.Right->Ty.Id == common::TypeId::FLOAT) {
             cur_val = Builder.CreateFAdd(left, right, "addtmp");
         } else {
             cur_val = Builder.CreateAdd(left, right, "addtmp");
@@ -234,12 +234,12 @@ namespace codegen {
     }
 
     void LLVMCodeGenerator::visit(common::Sub &node) {
-        node.left->accept(*this);
+        node.Left->accept(*this);
         auto left = cur_val;
-        node.right->accept(*this);
+        node.Right->accept(*this);
         auto right = cur_val;
 
-        if ( node.left->type.id == common::TypeId::FLOAT && node.right->type.id == common::TypeId::FLOAT) {
+        if ( node.Left->Ty.Id == common::TypeId::FLOAT && node.Right->Ty.Id == common::TypeId::FLOAT) {
             cur_val = Builder.CreateFSub(left, right, "subtmp");
         } else {
             cur_val = Builder.CreateSub(left, right, "subtmp");
@@ -247,12 +247,12 @@ namespace codegen {
     }
 
     void LLVMCodeGenerator::visit(common::Mul &node) {
-        node.left->accept(*this);
+        node.Left->accept(*this);
         auto left = cur_val;
-        node.right->accept(*this);
+        node.Right->accept(*this);
         auto right = cur_val;
 
-        if ( node.left->type.id == common::TypeId::FLOAT && node.right->type.id == common::TypeId::FLOAT) {
+        if ( node.Left->Ty.Id == common::TypeId::FLOAT && node.Right->Ty.Id == common::TypeId::FLOAT) {
             cur_val = Builder.CreateFMul(left, right, "multmp");
         } else {
             cur_val = Builder.CreateMul(left, right, "multmp");
@@ -260,12 +260,12 @@ namespace codegen {
     }
 
     void LLVMCodeGenerator::visit(common::Div &node) {
-        node.left->accept(*this);
+        node.Left->accept(*this);
         auto left = cur_val;
-        node.right->accept(*this);
+        node.Right->accept(*this);
         auto right = cur_val;
 
-        if ( node.left->type.id == common::TypeId::FLOAT && node.right->type.id == common::TypeId::FLOAT) {
+        if ( node.Left->Ty.Id == common::TypeId::FLOAT && node.Right->Ty.Id == common::TypeId::FLOAT) {
             cur_val = Builder.CreateFDiv(left, right, "divtmp");
         } else {
             cur_val = Builder.CreateSDiv(left, right, "divtmp");
@@ -273,12 +273,12 @@ namespace codegen {
     }
 
     void LLVMCodeGenerator::visit(common::Mod &node) {
-        node.left->accept(*this);
+        node.Left->accept(*this);
         auto left = cur_val;
-        node.right->accept(*this);
+        node.Right->accept(*this);
         auto right = cur_val;
 
-        if ( node.left->type.id == common::TypeId::FLOAT && node.right->type.id == common::TypeId::FLOAT) {
+        if ( node.Left->Ty.Id == common::TypeId::FLOAT && node.Right->Ty.Id == common::TypeId::FLOAT) {
             cur_val = Builder.CreateFRem(left, right, "modtmp");
         } else {
             cur_val = Builder.CreateSRem(left, right, "modtmp");
@@ -286,12 +286,12 @@ namespace codegen {
     }
 
     void LLVMCodeGenerator::visit(common::Equal &node) {
-        node.left->accept(*this);
+        node.Left->accept(*this);
         auto left = cur_val;
-        node.right->accept(*this);
+        node.Right->accept(*this);
         auto right = cur_val;
 
-        if ( node.left->type.id == common::TypeId::FLOAT && node.right->type.id == common::TypeId::FLOAT) {
+        if ( node.Left->Ty.Id == common::TypeId::FLOAT && node.Right->Ty.Id == common::TypeId::FLOAT) {
             cur_val = Builder.CreateFCmpOEQ(left, right, "eqtmp");
         } else {
             cur_val = Builder.CreateICmpEQ(left, right, "eqtmp");
@@ -299,12 +299,12 @@ namespace codegen {
     }
 
     void LLVMCodeGenerator::visit(common::NotEqual &node) {
-        node.left->accept(*this);
+        node.Left->accept(*this);
         auto left = cur_val;
-        node.right->accept(*this);
+        node.Right->accept(*this);
         auto right = cur_val;
 
-        if ( node.left->type.id == common::TypeId::FLOAT && node.right->type.id == common::TypeId::FLOAT) {
+        if ( node.Left->Ty.Id == common::TypeId::FLOAT && node.Right->Ty.Id == common::TypeId::FLOAT) {
             cur_val = Builder.CreateFCmpONE(left, right, "neqtmp");
         } else {
             cur_val = Builder.CreateICmpNE(left, right, "neqtmp");
@@ -312,12 +312,12 @@ namespace codegen {
     }
 
     void LLVMCodeGenerator::visit(common::Lesser &node) {
-        node.left->accept(*this);
+        node.Left->accept(*this);
         auto left = cur_val;
-        node.right->accept(*this);
+        node.Right->accept(*this);
         auto right = cur_val;
 
-        if ( node.left->type.id == common::TypeId::FLOAT && node.right->type.id == common::TypeId::FLOAT) {
+        if ( node.Left->Ty.Id == common::TypeId::FLOAT && node.Right->Ty.Id == common::TypeId::FLOAT) {
             cur_val = Builder.CreateFCmpOLT(left, right, "lttmp");
         } else {
             cur_val = Builder.CreateICmpSLT(left, right, "lttmp");
@@ -325,12 +325,12 @@ namespace codegen {
     }
 
     void LLVMCodeGenerator::visit(common::Greater &node) {
-        node.left->accept(*this);
+        node.Left->accept(*this);
         auto left = cur_val;
-        node.right->accept(*this);
+        node.Right->accept(*this);
         auto right = cur_val;
 
-        if ( node.left->type.id == common::TypeId::FLOAT && node.right->type.id == common::TypeId::FLOAT) {
+        if ( node.Left->Ty.Id == common::TypeId::FLOAT && node.Right->Ty.Id == common::TypeId::FLOAT) {
             cur_val = Builder.CreateFCmpOGT(left, right, "lttmp");
         } else {
             cur_val = Builder.CreateICmpSGT(left, right, "lttmp");
@@ -338,12 +338,12 @@ namespace codegen {
     }
 
     void LLVMCodeGenerator::visit(common::LesserEq &node) {
-        node.left->accept(*this);
+        node.Left->accept(*this);
         auto left = cur_val;
-        node.right->accept(*this);
+        node.Right->accept(*this);
         auto right = cur_val;
 
-        if ( node.left->type.id == common::TypeId::FLOAT && node.right->type.id == common::TypeId::FLOAT) {
+        if ( node.Left->Ty.Id == common::TypeId::FLOAT && node.Right->Ty.Id == common::TypeId::FLOAT) {
             cur_val = Builder.CreateFCmpOLE(left, right, "lttmp");
         } else {
             cur_val = Builder.CreateICmpSLE(left, right, "lttmp");
@@ -351,12 +351,12 @@ namespace codegen {
     }
 
     void LLVMCodeGenerator::visit(common::GreaterEq &node) {
-        node.left->accept(*this);
+        node.Left->accept(*this);
         auto left = cur_val;
-        node.right->accept(*this);
+        node.Right->accept(*this);
         auto right = cur_val;
 
-        if ( node.left->type.id == common::TypeId::FLOAT && node.right->type.id == common::TypeId::FLOAT) {
+        if ( node.Left->Ty.Id == common::TypeId::FLOAT && node.Right->Ty.Id == common::TypeId::FLOAT) {
             cur_val = Builder.CreateFCmpOGE(left, right, "lttmp");
         } else {
             cur_val = Builder.CreateICmpSGE(left, right, "lttmp");
@@ -364,32 +364,32 @@ namespace codegen {
     }
 
     void LLVMCodeGenerator::visit(common::Float &node) {
-        cur_val = ConstantFP::get(get_type(node.type), node.value);
+        cur_val = ConstantFP::get(get_type(node.Ty), node.Val);
     }
 
     void LLVMCodeGenerator::visit(common::Int &node) {
-        cur_val = ConstantInt::get(get_type(node.type), node.value);
+        cur_val = ConstantInt::get(get_type(node.Ty), node.Val);
     }
 
     void LLVMCodeGenerator::visit(common::Bool &node) {
-        cur_val = ConstantInt::get(get_type(node.type), node.value);
+        cur_val = ConstantInt::get(get_type(node.Ty), node.Val);
     }
 
     void LLVMCodeGenerator::visit(common::Char &node) {
-        cur_val = ConstantInt::get(get_type(node.type), node.value);
+        cur_val = ConstantInt::get(get_type(node.Ty), node.Val);
     }
 
     void LLVMCodeGenerator::visit(common::String &node) {
-        cur_val = Builder.CreateGlobalString(node.value, cur_func->getName() + ".str");
+        cur_val = Builder.CreateGlobalString(node.Val, cur_func->getName() + ".str");
 
     }
 
     void LLVMCodeGenerator::visit(common::Call &node) {
-        node.callee->accept(*this);
+        node.Callee->accept(*this);
         auto callee = cur_val;
 
         std::vector<Value *> args;
-        for (auto &arg : node.exprs) {
+        for (auto &arg : node.Args) {
             arg->accept(*this);
             args.push_back(cur_val);
         }
@@ -401,22 +401,22 @@ namespace codegen {
         switch (ctx)
         {
             case PATTERN:
-                ContextValues[node.id] = cur_val;
+                ContextValues[node.Val] = cur_val;
                 break;
             case EXPR:
                 // Pattern value
-                cur_val = ContextValues[node.id];
+                cur_val = ContextValues[node.Val];
                 if (cur_val)
                     return;
 
                 // Current module
-                cur_val = Module->getFunction(node.id);
+                cur_val = Module->getFunction(node.Val);
                 if (cur_val)
                     return;
 
                 // External module
-                if (driver.global.decls.count(node.id))
-                    cur_val = llvm::Function::Create(get_func_type(driver.global.decls[node.id]), llvm::Function::ExternalLinkage, node.id, Module.get());
+                if (Drv.Global.Decls.count(node.Val))
+                    cur_val = llvm::Function::Create(get_func_type(Drv.Global.Decls[node.Val]), llvm::Function::ExternalLinkage, node.Val, Module.get());
 
                 // TODO ERROR NOT FOUND
                 break;
@@ -425,20 +425,20 @@ namespace codegen {
 
 
     void LLVMCodeGenerator::visit(common::Par &node) {
-        node.child->accept(*this);
+        node.Child->accept(*this);
     }
 
     void LLVMCodeGenerator::visit(common::Tuple &node) {
         std::vector<llvm::Constant *> tmp;
 
-        for (auto &expr: node.exprs) {
+        for (auto &expr: node.Elements) {
             expr->accept(*this);
             tmp.push_back((Constant *)cur_val);
         }
 
         ArrayRef<Constant *> tuple_val(tmp);
 
-        auto const_val = ConstantStruct::get(get_tuple_type(node.type), tuple_val);
+        auto const_val = ConstantStruct::get(get_tuple_type(node.Ty), tuple_val);
         cur_val = new GlobalVariable(*Module.get(), const_val->getType(), true, GlobalVariable::ExternalLinkage, const_val);
 
     }
@@ -446,14 +446,14 @@ namespace codegen {
     void LLVMCodeGenerator::visit(common::List &node) {
         std::vector<llvm::Constant *> tmp;
 
-        for (auto &expr: node.exprs) {
+        for (auto &expr: node.Elements) {
             expr->accept(*this);
             tmp.push_back(dynamic_cast<Constant *>(cur_val));
         }
 
         ArrayRef<Constant *> list_data(tmp);
 
-        auto list_type = ArrayType::get(get_type(node.type), node.exprs.size());
+        auto list_type = ArrayType::get(get_type(node.Ty), node.Elements.size());
         auto const_val = ConstantArray::get(list_type, list_data);
 
         cur_val = new GlobalVariable(*Module.get(), const_val->getType(), true, GlobalVariable::ExternalLinkage, const_val);

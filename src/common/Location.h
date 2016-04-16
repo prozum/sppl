@@ -9,13 +9,13 @@ using namespace std;
 namespace common {
 
 	struct Position {
-
 		Position() = default;
 		Position(unsigned l, unsigned c, string src = "") :
-			line(l), column(c), source(src) { }
-		unsigned line = 1;
-		unsigned column = 1;
-		string source;
+			Line(l), Column(c), Src(src) { }
+
+		unsigned Line = 1;
+		unsigned Column = 1;
+		string Src;
 	};
 
 	class Location {

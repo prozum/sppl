@@ -15,64 +15,64 @@ namespace common {
     void Call::accept(Visitor &v) { v.visit(*this); }
 
     Node::Node(Location loc) :
-            type(TypeId::UNKNOWN), loc(loc) { }
+            Ty(TypeId::UNKNOWN), Loc(loc) { }
 
     Node::Node(Type type, Location loc) :
-            type(type), loc(loc) { }
+            Ty(type), Loc(loc) { }
 
-    Expr::Expr(Location loc) :
+    Expression::Expression(Location loc) :
             Node(loc) { }
 
-    Expr::Expr(Type type, Location loc) :
+    Expression::Expression(Type type, Location loc) :
             Node(type, loc) { }
 
 
     Program::Program(vector<unique_ptr<Function>> funcs,
                      Location loc) :
             Node(loc),
-            funcs(move(funcs)) { }
+            Funcs(move(funcs)) { }
 
-    Program::Program(unique_ptr<Expr> expr,
+    Program::Program(unique_ptr<Expression> expr,
                      Location loc) :
                      Node(loc) {
 
-        funcs.push_back(make_unique<Function>(move(expr)));
+        Funcs.push_back(make_unique<Function>(move(expr)));
     }
 
-    Function::Function(unique_ptr<Expr> expr) :
-            Node(expr->loc),
-            id(ANON_FUNC_NAME),
-            signature(Type(TypeId::UNKNOWN)),
-            is_anon(true) {
-        cases.push_back(make_unique<Case>(move(expr), vector<unique_ptr<Pattern>>(), expr->loc));
+    Function::Function(unique_ptr<Expression> expr) :
+            Node(expr->Loc),
+            Id(ANON_FUNC_NAME),
+            Signature(Type(TypeId::UNKNOWN)),
+            Anon(true) {
+        Cases.push_back(make_unique<Case>(move(expr), vector<unique_ptr<Pattern>>(), expr->Loc));
     }
 
     Function::Function(string id,
                        Type sign,
                        Location loc) :
-            Node(sign.subtypes.front(), loc),
-            id(id),
-            signature(sign) { }
+            Node(sign.Subtypes.front(), loc),
+            Id(id),
+            Signature(sign) { }
 
-    Case::Case(unique_ptr<Expr> expr,
+    Case::Case(unique_ptr<Expression> expr,
                vector<unique_ptr<Pattern>> patterns,
                Location loc) :
             Node(loc),
-            expr(move(expr)),
-            patterns(move(patterns)) { }
+            Expr(move(expr)),
+            Patterns(move(patterns)) { }
 
-    Call::Call(unique_ptr<Expr> callee,
-               vector<unique_ptr<Expr>> exprs,
+    Call::Call(unique_ptr<Expression> callee,
+               vector<unique_ptr<Expression>> exprs,
                Location loc) :
-            Expr(loc),
-            callee(move(callee)),
-            exprs(move(exprs))
+            Expression(loc),
+            Callee(move(callee)),
+            Args(move(exprs))
     {
     }
 
     string Program::str() {
         string str;
-        for (auto &func : funcs) {
+        for (auto &func : Funcs) {
             str += func->str();
         }
 
@@ -80,17 +80,17 @@ namespace common {
     }
 
     string Function::str() {
-        string str("def " + id + " : ");
+        string str("def " + Id + " : ");
 
-        for (auto &type : signature.subtypes) {
+        for (auto &type : Signature.Subtypes) {
             str += type.str();
-            if (type != signature.subtypes.back())
+            if (type != Signature.Subtypes.back())
                 str += " -> ";
         }
 
         str += '\n';
 
-        for (auto &cse : cases) {
+        for (auto &cse : Cases) {
             str += cse->str() + "\n";
         }
 
@@ -100,21 +100,21 @@ namespace common {
     string Case::str() {
         string str("\t| ");
 
-        for (auto &pattern : patterns) {
+        for (auto &pattern : Patterns) {
             str += pattern->str();
-            if (pattern != patterns.back())
+            if (pattern != Patterns.back())
                 str += ' ';
         }
 
-        return str + " = " + expr->str();
+        return str + " = " + Expr->str();
     }
 
     string Call::str() {
-        string str(callee->str() + "(");
+        string str(Callee->str() + "(");
 
-        for (auto &expr : exprs) {
+        for (auto &expr : Args) {
             str += expr->str();
-            if (expr != exprs.back())
+            if (expr != Args.back())
                 str += ", ";
         }
 

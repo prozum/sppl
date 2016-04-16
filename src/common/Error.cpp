@@ -1,12 +1,12 @@
 #include "Error.h"
 
 namespace common {
-    Error::Error(std::string msg) : msg(msg), loc() { }
-    Error::Error(std::string msg, common::Location loc) : msg(msg), loc(loc) { }
+    Error::Error(std::string msg) : Msg(msg), Loc() { }
+    Error::Error(std::string msg, common::Location loc) : Msg(msg), Loc(loc) { }
 
     std::ostream &operator<<(ostream& stream, const Error &err)
     {
-        return (stream << err.loc << "|" << err.msg);
+        return (stream << err.Loc << "|" << err.Msg);
     }
 
     Error Error::NotImplemented(string msg) {
@@ -18,10 +18,10 @@ namespace common {
     }
 
     Error Error::Binary(string msg, common::BinaryOp &op) {
-        return Error("'" + op.str() + "' " + msg + ": Left: '" + op.left->str() + "' Right: '" + op.right->str() + "'", op.loc);
+        return Error("'" + op.str() + "' " + msg + ": Left: '" + op.Left->str() + "' Right: '" + op.Right->str() + "'", op.Loc);
     }
 
     Error Error::Unary(string msg, common::UnaryOp &op) {
-        return Error("'" + op.str() + "' " + msg + ": Child: '" + op.child->str() + "'", op.loc);
+        return Error("'" + op.str() + "' " + msg + ": Child: '" + op.Child->str() + "'", op.Loc);
     }
 }
