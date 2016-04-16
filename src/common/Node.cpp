@@ -72,7 +72,7 @@ namespace common {
 
     string Program::str() {
         string str;
-        for (auto& func: funcs) {
+        for (auto &func : funcs) {
             str += func->str();
         }
 
@@ -82,7 +82,7 @@ namespace common {
     string Function::str() {
         string str("def " + id + " : ");
 
-        for (auto &type: signature.subtypes) {
+        for (auto &type : signature.subtypes) {
             str += type.str();
             if (type != signature.subtypes.back())
                 str += " -> ";
@@ -100,7 +100,7 @@ namespace common {
     string Case::str() {
         string str("\t| ");
 
-        for (auto &pattern: patterns) {
+        for (auto &pattern : patterns) {
             str += pattern->str();
             if (pattern != patterns.back())
                 str += ' ';
@@ -112,7 +112,7 @@ namespace common {
     string Call::str() {
         string str(callee->str() + "(");
 
-        for (auto &expr: exprs) {
+        for (auto &expr : exprs) {
             str += expr->str();
             if (expr != exprs.back())
                 str += ", ";

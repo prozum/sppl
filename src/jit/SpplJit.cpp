@@ -44,7 +44,7 @@ namespace jit {
 
 
     JITSymbol SpplJit::findMangledSymbol(const std::string &name) {
-        for (auto handler: make_range(ModuleHandles.rbegin(), ModuleHandles.rend()))
+        for (auto handler : make_range(ModuleHandles.rbegin(), ModuleHandles.rend()))
             if (auto Sym = CompileLayer.findSymbolIn(handler, name, true))
                 return Sym;
 

@@ -6,10 +6,10 @@
 using namespace common;
 
 namespace codegen {
-    class HCodeGenerator: public CodeGenerator
+    class HCodeGenerator: public parser::CodeGenerator
     {
         public:
-            HCodeGenerator(std::ostream &);
+            HCodeGenerator(parser::Driver &);
 
             void visit(Program &node);
 
@@ -72,8 +72,6 @@ namespace codegen {
             void visit(Id &node);
 
             void visit(Call &node);
-
-            void visit(Type &node);
 
         private:
             Function *curr_fun;

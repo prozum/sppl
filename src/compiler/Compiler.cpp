@@ -17,12 +17,12 @@ namespace compiler {
 #endif
 #ifdef CGNUASM
             case Backend::GNUASM:
-                generator = make_unique<codegen::GasCodeGenerator>(driver);
+                generator = make_unique<codegen::GasCodeGenerator>(*this);
                 break;
 #endif
 #ifdef CHASKELL
             case Backend::HASKELL:
-                generator = make_unique<codegen::HCodeGenerator>(*output);
+                generator = make_unique<codegen::HCodeGenerator>(*this);
                 break;
 #endif
 #ifdef CLLVM

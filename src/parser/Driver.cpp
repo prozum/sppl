@@ -95,7 +95,7 @@ namespace parser {
             visitor.Errors.push_back(err);
         }
 
-        for (auto &error: visitor.Errors) {
+        for (auto &error : visitor.Errors) {
             show_error(error);
         }
 

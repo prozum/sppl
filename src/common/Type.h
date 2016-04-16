@@ -55,7 +55,7 @@ namespace std
         {
             size_t res = std::hash<int>()(static_cast<int>(type.id));
 
-            for (auto &subtype: type.subtypes) {
+            for (auto &subtype : type.subtypes) {
                 res ^= (hash<common::Type>()(subtype) << 1);
             }
 
