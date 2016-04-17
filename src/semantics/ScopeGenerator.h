@@ -53,8 +53,8 @@ namespace semantics {
         void visit(Type &node);
 
     private:
-        Scope *current_scope;
-        Function *current_func;
-        ScopeContext context;
+        Scope *CurScope;
+        Function *CurFunc;
+        ScopeContext Ctx;
     };
 }

@@ -39,7 +39,7 @@ namespace semantics
     }
 
     void TypeChecker::visit(Function &node) {
-        current_func = &node;
+        CurFunc = &node;
 
         // Visit children
         for (auto &cse: node.Cases) {
@@ -66,37 +66,37 @@ namespace semantics
         node.Expr->accept(*this);
 
         // Set signature for anonymous function
-        if (current_func->Anon) {
-            current_func->Signature = Type(TypeId::SIGNATURE, vector<Type>({node.Expr->Ty}));
+        if (CurFunc->Anon) {
+            CurFunc->Signature = Type(TypeId::SIGNATURE, vector<Type>({node.Expr->Ty}));
         }
 
-        if (node.Patterns.size() == current_func->Signature.Subtypes.size() - 1) {
+        if (node.Patterns.size() == CurFunc->Signature.Subtypes.size() - 1) {
             for (size_t i = 0; i < node.Patterns.size(); ++i) {
                 if (node.Patterns[i]->Ty.Id == TypeId::EMPTYLIST &&
-                        current_func->Signature.Subtypes[i].Id == TypeId::LIST) {
-                    node.Patterns[i]->Ty = current_func->Signature.Subtypes[i];
+                        CurFunc->Signature.Subtypes[i].Id == TypeId::LIST) {
+                    node.Patterns[i]->Ty = CurFunc->Signature.Subtypes[i];
                 }
 
-                if (node.Patterns[i]->Ty != current_func->Signature.Subtypes[i]) {
+                if (node.Patterns[i]->Ty != CurFunc->Signature.Subtypes[i]) {
                     throw Error::Expected("Wrong pattern type",
-                                             current_func->Signature.Subtypes[i].str(),
+                                             CurFunc->Signature.Subtypes[i].str(),
                                              node.Patterns[i]->Ty.str(),
                                              node.Patterns[i]->Loc);
                 }
             }
         } else {
             throw Error::Expected("Wrong pattern count",
-                                     to_string(current_func->Signature.Subtypes.size() - 1),
+                                     to_string(CurFunc->Signature.Subtypes.size() - 1),
                                      to_string(node.Patterns.size()),
                                      node.Loc);
         }
 
         if (node.Expr->Ty.Id == TypeId::EMPTYLIST &&
-                current_func->Signature.Subtypes.back().Id == TypeId::LIST)
-            node.Expr->Ty = current_func->Signature.Subtypes.back();
-        else if (current_func->Signature.Subtypes.back() != node.Expr->Ty) {
+                CurFunc->Signature.Subtypes.back().Id == TypeId::LIST)
+            node.Expr->Ty = CurFunc->Signature.Subtypes.back();
+        else if (CurFunc->Signature.Subtypes.back() != node.Expr->Ty) {
             throw Error::Expected("Wrong return type",
-                                     current_func->Ty.str(),
+                                     CurFunc->Ty.str(),
                                      node.Expr->Ty.str(),
                                      node.Loc);
         }

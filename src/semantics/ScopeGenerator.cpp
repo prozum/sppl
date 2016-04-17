@@ -4,7 +4,7 @@
 
 namespace semantics {
     ScopeGenerator::ScopeGenerator(Scope* global)
-            : current_scope(global) { }
+            : CurScope(global) { }
 
     void ScopeGenerator::visit(Program &node) {
         // Visit children
@@ -15,11 +15,11 @@ namespace semantics {
     }
 
     void ScopeGenerator::visit(Function &node) {
-        current_func = &node;
-        node.Scp = current_scope;
+        CurFunc = &node;
+        node.Scp = CurScope;
 
-        if (!current_scope->exists(node.Id) || node.Anon) {
-            current_scope->Decls.insert({node.Id, node.Signature});
+        if (!CurScope->exists(node.Id) || node.Anon) {
+            CurScope->Decls.insert({node.Id, node.Signature});
 
             // Visit children
             for (auto &cse: node.Cases) {
@@ -33,22 +33,22 @@ namespace semantics {
 
 
     void ScopeGenerator::visit(Case &node) {
-        auto case_scope = new Scope(current_scope);
-        current_scope->Children.push_back(unique_ptr<Scope>(case_scope));
-        current_scope = case_scope;
+        auto case_scope = new Scope(CurScope);
+        CurScope->Children.push_back(unique_ptr<Scope>(case_scope));
+        CurScope = case_scope;
 
         // Visit children
-        context = ScopeContext::PATTERN;
+        Ctx = ScopeContext::PATTERN;
 
         for (size_t i = 0; i < node.Patterns.size(); i++) {
-            node.Patterns[i]->Ty = current_func->Signature[i];
+            node.Patterns[i]->Ty = CurFunc->Signature[i];
             node.Patterns[i]->accept(*this);
         }
 
-        context = ScopeContext::EXPR;
+        Ctx = ScopeContext::EXPR;
         node.Expr->accept(*this);
 
-        current_scope = current_scope->Parent;
+        CurScope = CurScope->Parent;
     }
 
     void ScopeGenerator::visit(Or &node) {
@@ -211,11 +211,11 @@ namespace semantics {
     }
 
     void ScopeGenerator::visit(Id &node) {
-        node.Scp = current_scope;
+        node.Scp = CurScope;
 
-        if (context == ScopeContext::PATTERN) {
-            if (!current_scope->exists(node.Val)) {
-                current_scope->Decls.insert({node.Val, node.Ty});
+        if (Ctx == ScopeContext::PATTERN) {
+            if (!CurScope->exists(node.Val)) {
+                CurScope->Decls.insert({node.Val, node.Ty});
             }
         }
     }

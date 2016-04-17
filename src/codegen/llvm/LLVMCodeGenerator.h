@@ -37,22 +37,22 @@ class LLVMCodeGenerator : public CodeGenerator {
 
 	string ModuleString();
 
-	std::unordered_map<common::Type, llvm::StructType *> tuple_types;
-	std::unordered_map<common::Type, llvm::StructType *> list_types;
-    std::unordered_map<common::Type, llvm::FunctionType *> func_types;
+	std::unordered_map<common::Type, llvm::StructType *> TupleTypes;
+	std::unordered_map<common::Type, llvm::StructType *> ListTypes;
+    std::unordered_map<common::Type, llvm::FunctionType *> FuncTypes;
 	std::map<std::string, llvm::Function *> Functions;
 
-    llvm::Function *cur_func;
-    llvm::Value *cur_val;
-    llvm::BasicBlock *cur_pattern_block;
-    llvm::BasicBlock *cur_case_block;
-    llvm::BasicBlock *cur_error_block;
-    llvm::BasicBlock *cur_ret_block;
-    llvm::PHINode *cur_phi_node;
-    std::vector<llvm::Argument *> arguments;
-    size_t cur_case_id;
-    size_t last_case_id;
-    Context ctx;
+    llvm::Function *CurFunc;
+    llvm::Value *CurVal;
+    llvm::BasicBlock *CurPatternBlock;
+    llvm::BasicBlock *CurCaseBlock;
+    llvm::BasicBlock *CurErrorBlock;
+    llvm::BasicBlock *CurRetBlock;
+    llvm::PHINode *CurPhiNode;
+    std::vector<llvm::Argument *> Arguments;
+    size_t CurCaseId;
+    size_t LastCaseId;
+    Context Ctx;
 
     void visit(common::Function &node);
     void visit(common::Case &node);
@@ -82,10 +82,10 @@ class LLVMCodeGenerator : public CodeGenerator {
     void visit(common::Call &node);
 	void visit(common::Par &node);
 
-    llvm::Type *get_type(common::Type node_type, bool ptr = false);
-	llvm::StructType *get_tuple_type(common::Type type);
-	llvm::StructType *get_list_type(common::Type type);
-    llvm::FunctionType *get_func_type(common::Type type);
+    llvm::Type *getType(common::Type node_type, bool ptr = false);
+	llvm::StructType *getTupleType(common::Type type);
+	llvm::StructType *getListType(common::Type type);
+    llvm::FunctionType *getFuncType(common::Type type);
 
     llvm::Value *compare(llvm::Value *val1, llvm::Value *val2);
 
