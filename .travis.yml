@@ -4,6 +4,8 @@ dist: trusty
 compiler:
   - clang
   - gcc
+services:
+  - docker
 
 env:
   global:
@@ -11,35 +13,35 @@ env:
    #   via the "travis encrypt" command using the project repo's public key
    - secure: "VZAD1Z4vBX0woYGIwAwXa7GHf/PqeV80hzBVJO8Oa5hiSTgSwmvupBMaLpdLobwy9iMjFMBETeiJVG3beW7JExHVBjzyDmGFHYymIQTIgwHpZgL1TyO5b4m69TCPqs21NRGIJhi8FqGp5Jb24gE5JWAxu5xUzhrWzOKsTt326eD4Qvf6vDY260HeX0n7fhuEJCOWcQ7SyA+U9fCb5ROVGBCFxWMYDtafaOo+orDYZnu42TXGB3NJbWX/jtwdKyHECv9XQtQYnG2ev6Y4S7rEbzX9PkBqVRxjH3WUMd0U0VYobU+JLx/bIi1U9iYG3E2ugRWEWnqgIRP9N0wXkIzoVz28Rkwmm8UHdJGI4wvtFsWH9sXN1d6v/YtfoCtLh/MYK9aI/jjk1wwYyjAaVvdEALrgeLiOK3Okd8w1jZEwItfx54Dw8HIBa3fmKyzs7izNUEXbo5jae6QX6jCItW6XqJyjaL4h5xSd15sp/f7pKYRsrKNtBMKTwRgU1ofs6RXq3HJWYMdYYzidGRHTk9cRys/eKELidU5Q+8dq+wnj3tyBbke2LJse+ThLqcX+dFSU86cLykyyVIRNH5jutQXYuRi2W2/kjRRt0FVIOoR1+mzVyd5tW3x37I5LJkCcr3CXNvD/kAUsO0o4Z1bizjHOe2W1yayxZ0j5+5r+fXMnZvo="
 
-
-
 before_install:
-  - echo "deb http://llvm.org/apt/trusty/ llvm-toolchain-trusty main" | sudo tee --append /etc/apt/sources.list
-  - wget -O - http://llvm.org/apt/llvm-snapshot.gpg.key | sudo apt-key add -
-  - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
-  - sudo apt-get -qq update
-  - sudo apt-get -qq install clang-3.8 gcc-5 g++-5 libstdc++-5-dev libcppunit-1.13-0 libcppunit-dev
+  - docker pull ubuntu:xenial
+  - docker run --name xenial -dti ubuntu:xenial bash
+  - docker cp . xenial:/root/source
+  - docker exec xenial apt-get -qq update
+  - docker exec xenial apt-get -qq install software-properties-common
+  - docker exec xenial apt-add-repository ppa:nimoov/llvm-cmake
+  - docker exec xenial apt-get -qq update
+  - docker exec xenial apt-get -qq install llvm-3.8 llvm-3.8-dev llvm llvm-dev
   - if [ "$CXX" = "g++" ]; then export CXX="g++-5" CC="gcc-5"; fi
   - if [ "$CXX" = "clang++" ]; then export CXX="clang++-3.8" CC="clang-3.8"; fi
     # Debug Data:
-  - make --version
-  - clang --version
-  - gcc-5 --version
-  - cmake --version
+  - docker exec xenial make --version
+  - docker exec xenial clang --version
+  - docker exec xenial gcc-5 --version
+  - docker exec xenial cmake --version
 
 install:
-  - mkdir build && cd build
-  - cmake .. -DDEBUG=1 -DCLLVM=1 
-
+  - docker exec xenial /bin/sh -c "mkdir /root/source/build && cd /root/source/build"
+  - docker exec xenial /bin/sh -c "cd /root/source/build && cmake .. -DDEBUG=1 -DCCPP=1 -DCLLVM=1 -DCHASKELL=1 -DCGNUASM=1 -DJIT=1"
 script:
-  - make -j 8
-  - sudo make install
+  - docker exec xenial /bin/sh -c "cd /root/source/build && make -j 8"
+  - docker exec xenial /bin/sh -c "cd /root/source/build && make install"
   - # C TEST
-  - cd ..
-  - mkdir test-c && cd test-c
-  - cmake .. -DDEBUG=1 -DCCPP=1 -DTESTS=1 --build-target tests
-  - make -j 8
-  - sudo make install
+  - #cd ..
+  - #mkdir test-c && cd test-c
+  - #cmake .. -DDEBUG=1 -DCCPP=1 -DTESTS=1 --build-target tests
+  - #make -j 8
+  - #sudo make install
 
 after_script:
   - pwd
