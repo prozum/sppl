@@ -8,110 +8,110 @@ namespace parser {
 
 
     Driver::Driver(ostream *out, ostream *hout, ostream *mout) :
-            out(out),
-            hout(hout),
-            mout(mout),
-            scanner(* this),
-            parser(* this),
-            global(new common::Scope()) { }
+            Out(out),
+            HOut(hout),
+            MOut(mout),
+            Snr(* this),
+            Psr(* this),
+            Global(new common::Scope()) { }
 
-    bool Driver::next_input() {
-        if (input_type != InputType::FILES)
+    bool Driver::nextInput() {
+        if (SrcType != SourceType::FILES)
             return false;
-        if (filenames.size() > cur_file) {
-            fin = ifstream(filenames[cur_file]);
-            in = &fin;
-            if (!fin.good())
+        if (Filenames.size() > CurFile) {
+            FIn = ifstream(Filenames[CurFile]);
+            In = &FIn;
+            if (!FIn.good())
                 return false;
-            scanner.switch_streams(in, mout);
-            source = filenames[cur_file++];
+            Snr.switch_streams(In, MOut);
+            Source = Filenames[CurFile++];
             return true;
         }
         return false;
     }
 
-    void Driver::set_output(string filename) {
-        fout =  ofstream(filename);
-        out = &fout;
+    void Driver::setOutput(string Filename) {
+        FOut =  ofstream(Filename);
+        Out = &FOut;
     }
 
-    void Driver::set_inputs(vector<string> filenames) {
-        this->filenames = filenames;
+    void Driver::setInputs(vector<string> Filenames) {
+        this->Filenames = Filenames;
     }
 
-    void Driver::set_header_output(string filename) {
-        fhout =  ofstream(filename);
-        hout = &fhout;
+    void Driver::setHeaderOutput(string Filename) {
+        FHOut =  ofstream(Filename);
+        HOut = &FHOut;
     }
 
-    bool Driver::parse_stream(std::istream &in, const std::string &sname) {
-        input_type = InputType::STREAM;
-        source = sname;
+    bool Driver::parseStream(std::istream &In, const std::string &Src) {
+        SrcType = SourceType::STREAM;
+        Source = Src;
 
-        scanner.switch_streams(&in, mout);
-        scanner.set_debug(trace_scanning);
-        parser.set_debug_level(trace_parsing);
+        Snr.switch_streams(&In, MOut);
+        Snr.set_debug(TraceScanning);
+        Psr.set_debug_level(TraceParsing);
 
-        return (parser.parse() == 0);
+        return (Psr.parse() == 0);
     }
 
-    bool Driver::parse_file(const std::string &filename) {
-        input_type = InputType::FILE;
-        source = filename;
+    bool Driver::parseFile(const std::string &Filename) {
+        SrcType = SourceType::FILE;
+        Source = Filename;
 
-        std::ifstream in(filename.c_str());
+        std::ifstream in(Filename.c_str());
         if (!in.good()) return false;
 
-        return parse_stream(in, filename);
+        return parseStream(in, Filename);
     }
 
-    bool Driver::parse_files() {
-        input_type = InputType::FILES;
+    bool Driver::parseFiles() {
+        SrcType = SourceType::FILES;
 
-        if (!next_input())
+        if (!nextInput())
             return false;
-        if (parser.parse() != 0)
+        if (Psr.parse() != 0)
             return false;
 
         return true;
     }
 
-    bool Driver::parse_string(const std::string &input, const std::string &sname) {
-        input_type = InputType::STRING;
-        source = sname;
+    bool Driver::parseString(const std::string &Input, const std::string &Src) {
+        SrcType = SourceType::STRING;
+        Source = Src;
 
-        std::istringstream iss(input);
+        std::istringstream iss(Input);
 
-        return parse_stream(iss, sname);
+        return parseStream(iss, Src);
     }
 
-    bool Driver::accept(common::Visitor &visitor) {
-        visitor.Errors.clear();
+    bool Driver::accept(common::Visitor &V) {
+        V.Errors.clear();
 
         try {
-            program->accept(visitor);
+            Prog->accept(V);
         }
         catch (Error err) {
-            visitor.Errors.push_back(err);
+            V.Errors.push_back(err);
         }
 
-        for (auto &error: visitor.Errors) {
-            show_error(error);
+        for (auto &error : V.Errors) {
+            showError(error);
         }
 
-        return !visitor.hasError();
+        return !V.hasError();
     }
 
-    void Driver::error(const common::Location& loc,
-                       const std::string &msg) {
-        show_error(Error(msg, loc));
+    void Driver::error(const common::Location& Loc,
+                       const std::string &Msg) {
+        showError(Error(Msg, Loc));
     }
 
-    void Driver::error(const std::string &msg) {
-         show_error(Error(msg));
+    void Driver::error(const std::string &Msg) {
+        showError(Error(Msg));
     }
 
-    void Driver::show_error(Error err) {
-        *mout << err << endl;
+    void Driver::showError(Error Err) {
+        *MOut << Err << endl;
     }
 }

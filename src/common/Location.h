@@ -9,28 +9,29 @@ using namespace std;
 namespace common {
 
 	struct Position {
-
 		Position() = default;
-		Position(unsigned l, unsigned c, string src = "") :
-			line(l), column(c), source(src) { }
-		unsigned line = 1;
-		unsigned column = 1;
-		string source;
+		Position(unsigned Line, unsigned Column, string Src) :
+			Line(Line), Column(Column), Src(Src) { }
+
+		unsigned Line = 1;
+		unsigned Column = 1;
+		string Src;
 	};
 
 	class Location {
 	public:
 		Location();
-		Location(unsigned l, unsigned c, string src = "");
+		Location(unsigned Line, unsigned Column, string Src);
+		Location(const Location &Other);
 
 		void step();
-		void columns(unsigned count = 1);
-		void lines(unsigned count = 1);
-		void sources(string src = "");
+		void columns(unsigned Count = 1);
+		void lines(unsigned Count = 1);
+		void sources(string Src);
 
 		Position begin;
 		Position end;
 	};
 
-	ostream &operator<<(ostream &o, const Location &s);
+	ostream &operator<<(ostream &Out, const Location &Loc);
 }

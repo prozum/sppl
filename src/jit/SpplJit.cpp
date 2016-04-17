@@ -7,136 +7,135 @@ namespace jit {
             Layout(Machine->createDataLayout()),
             CompileLayer(ObjectLayer, SimpleCompiler(*Machine)),
             Generator(Driver),
-            ScopeGenerator(&Driver.global)
+            ScopeGenerator(&Driver.Global)
     {
         llvm::sys::DynamicLibrary::LoadLibraryPermanently(nullptr);
-        init_module_passmanager();
+        createModule();
 
-        // Life is too short
-        Driver.set_output("/dev/null");
-        Driver.set_header_output("/dev/null");
+        // Time is short, mortal
+        Driver.setOutput("/dev/null");
+        Driver.setHeaderOutput("/dev/null");
     }
 
-    SpplJit::ModuleHandleT SpplJit::add_module(std::unique_ptr<llvm::Module> module) {
-        auto resolver = createLambdaResolver(
+    SpplJit::ModuleHandleT SpplJit::addModule(std::unique_ptr<llvm::Module> M) {
+        auto Resolver = createLambdaResolver(
                 [&](const std::string &Name) {
-                    if (auto Sym = find_mangled_symbol(Name))
+                    if (auto Sym = findMangledSymbol(Name))
                         return RuntimeDyld::SymbolInfo(Sym.getAddress(), Sym.getFlags());
                     return RuntimeDyld::SymbolInfo(nullptr);
                 },
                 [](const std::string &S) { return nullptr; });
-        auto handler = CompileLayer.addModuleSet(singletonSet(std::move(module)),
+        auto Handler = CompileLayer.addModuleSet(singletonSet(std::move(M)),
                                                  std::make_unique<SectionMemoryManager>(),
-                                                 std::move(resolver));
+                                                 std::move(Resolver));
 
-        ModuleHandles.push_back(handler);
-        return handler;
+        ModuleHandles.push_back(Handler);
+        return Handler;
     }
 
-    void SpplJit::remove_module(ModuleHandleT handler) {
-        ModuleHandles.erase(std::find(ModuleHandles.begin(), ModuleHandles.end(), handler));
-        CompileLayer.removeModuleSet(handler);
+    void SpplJit::removeModule(ModuleHandleT Handler) {
+        ModuleHandles.erase(std::find(ModuleHandles.begin(), ModuleHandles.end(), Handler));
+        CompileLayer.removeModuleSet(Handler);
     }
 
-    JITSymbol SpplJit::find_symbol(const std::string name) {
-        return find_mangled_symbol(mangle(name));
+    JITSymbol SpplJit::findSymbol(const std::string Name) {
+        return findMangledSymbol(mangle(Name));
     }
 
 
-    JITSymbol SpplJit::find_mangled_symbol(const std::string &name) {
-        for (auto handler: make_range(ModuleHandles.rbegin(), ModuleHandles.rend()))
-            if (auto Sym = CompileLayer.findSymbolIn(handler, name, true))
+    JITSymbol SpplJit::findMangledSymbol(const std::string &Name) {
+        for (auto Handler : make_range(ModuleHandles.rbegin(), ModuleHandles.rend()))
+            if (auto Sym = CompileLayer.findSymbolIn(Handler, Name, true))
                 return Sym;
 
-        if (auto sym_addr = RTDyldMemoryManager::getSymbolAddressInProcess(name))
-            return JITSymbol(sym_addr, JITSymbolFlags::Exported);
+        if (auto SymAddr = RTDyldMemoryManager::getSymbolAddressInProcess(Name))
+            return JITSymbol(SymAddr, JITSymbolFlags::Exported);
 
         return nullptr;
     }
 
-    std::string SpplJit::mangle(const std::string &name) {
-        std::string mangled_name;
+    std::string SpplJit::mangle(const std::string &Name) {
+        std::string MangledName;
         {
-            raw_string_ostream MangledNameStream(mangled_name);
-            Mangler::getNameWithPrefix(MangledNameStream, name, Layout);
+            raw_string_ostream MangledNameStream(MangledName);
+            Mangler::getNameWithPrefix(MangledNameStream, Name, Layout);
         }
-        return mangled_name;
+        return MangledName;
     }
 
-    void SpplJit::init_module_passmanager() {
+    void SpplJit::createModule() {
         // Open a new module
         Generator.Module = llvm::make_unique<llvm::Module>("SpplJit", getGlobalContext());
         Generator.Module->setDataLayout(Machine->createDataLayout());
 
         // Create a new pass manager attached to it
-        PassManager = llvm::make_unique<legacy::FunctionPassManager>(Generator.Module.get());
+        PassMgr = llvm::make_unique<legacy::FunctionPassManager>(Generator.Module.get());
 
-        // Optimization
-        PassManager->add(createInstructionCombiningPass());
-        PassManager->add(createReassociatePass());
-        PassManager->add(createGVNPass());
-        PassManager->add(createCFGSimplificationPass());
-
-        PassManager->doInitialization();
+        // Add optimization passes
+        PassMgr->add(createInstructionCombiningPass());
+        PassMgr->add(createReassociatePass());
+        PassMgr->add(createGVNPass());
+        PassMgr->add(createCFGSimplificationPass());
+        PassMgr->doInitialization();
     }
 
 
-    string SpplJit::get_output(intptr_t data, common::Type type) {
-        string out;
+    string SpplJit::getOutput(intptr_t data, common::Type Type) {
+        string Out;
 
-        switch (type.id) {
+        switch (Type.Id) {
             case common::TypeId::INT:
                 return to_string((int64_t) data);
             case common::TypeId::FLOAT:
                 // WTF is double type a pointer
                 return to_string(*(double *) data);
             case common::TypeId::STRING:
-                out += "\"";
-                out += (char *) data;
-                out += "\"";
-                return out;
+                Out += "\"";
+                Out += (char *) data;
+                Out += "\"";
+                return Out;
             case common::TypeId::TUPLE:
-                return get_tuple_output(data, type.subtypes);
+                return getOutputTuple(data, Type.Subtypes);
             case common::TypeId::SIGNATURE:
-                return type.str();
+                return Type.str();
             default:
-                throw Error::NotImplemented("Cannot convert to C data: " + type.str());
+                throw runtime_error("Cannot convert to C data: " + Type.str());
         }
     }
 
-    string SpplJit::get_tuple_output(intptr_t addr, vector<common::Type> types) {
-        string out("(");
-        for (size_t i = 0; i < types.size(); i++) {
-            switch (types[i].id) {
+    string SpplJit::getOutputTuple(intptr_t addr, vector<common::Type> Subtypes) {
+        string Out("(");
+        for (size_t i = 0; i < Subtypes.size(); i++) {
+            switch (Subtypes[i].Id) {
                 case common::TypeId::INT:
-                    out += get_output(*(int64_t *) addr, types[i]);
+                    Out += getOutput(*(int64_t *) addr, Subtypes[i]);
                     addr += sizeof(int64_t);
                     break;
                 case common::TypeId::FLOAT:
-                    out += get_output(addr, types[i]);
+                    Out += getOutput(addr, Subtypes[i]);
                     addr += sizeof(double);
                     break;
                 case common::TypeId::STRING:
-                    out += get_output(*(intptr_t *) addr, types[i]);
+                    Out += getOutput(*(intptr_t *) addr, Subtypes[i]);
                     addr += sizeof(intptr_t *);
                     break;
                 case common::TypeId::TUPLE:
-                    out += get_tuple_output(*(intptr_t *) addr, types[i].subtypes);
+                    Out += getOutputTuple(*(intptr_t *) addr, Subtypes[i].Subtypes);
                     addr += sizeof(intptr_t *);
                     break;
                 default:
-                    throw Error::NotImplemented("Cannot convert to C data: " + types[i].str());
+                    throw runtime_error("Cannot convert to C data: " + Subtypes[i].str());
             }
-            if (types[i] != types[i].subtypes.back())
-                out += ", ";
+            if (i + 1 != Subtypes.size())
+                Out += ", ";
         }
 
-        return  out + ")";
+        return  Out + ")";
     }
 
 
-    void SpplJit::Eval(std::string str) {
-        if (!Driver.parse_string(str))
+    void SpplJit::eval(std::string Str) {
+        if (!Driver.parseString(Str))
             return;
 
         if (!Driver.accept(ScopeGenerator)) {
@@ -151,25 +150,25 @@ namespace jit {
         if (!Driver.accept(Generator)) {
             return;
         }
-        auto func_node = Driver.program->funcs[0].get();
-        auto func_ir = Generator.Module->getFunction(func_node->id);
-        PassManager->run(*func_ir);
+        auto FuncNode = Driver.Prog->Funcs[0].get();
+        auto FuncIR = Generator.Module->getFunction(FuncNode->Id);
+        PassMgr->run(* FuncIR);
 
         // Store function in seperate module
-        module_handler = add_module(std::move(Generator.Module));
-        init_module_passmanager();
+        ModuleHandler = addModule(std::move(Generator.Module));
+        createModule();
 
         // Only run anonymous functions
-        if (func_node->is_anon) {
-            auto func = find_symbol(func_node->id);
-            auto func_jit = (size_t (*)()) func.getAddress();
+        if (FuncNode->Anon) {
+            auto Func = findSymbol(FuncNode->Id);
+            auto FuncJIT = (size_t (*)()) Func.getAddress();
 
-            assert(func_jit != NULL);
-            string output = get_output(func_jit(), func_node->type);
-            cout << output << "\t\ttype: " << func_node->type.str() << endl;
+            assert(FuncJIT != NULL);
+            string Output = getOutput(FuncJIT(), FuncNode->Ty);
+            cout << Output << "\t\ttype: " << FuncNode->Ty.str() << endl;
 
             // Remove module
-            remove_module(module_handler);
+            removeModule(ModuleHandler);
         }
 
     }

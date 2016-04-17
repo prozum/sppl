@@ -6,120 +6,108 @@ using namespace std;
 
 namespace common {
 
-    void Program::accept(Visitor &v) { v.visit(*this); }
-    void Function::accept(Visitor &v) { v.visit(*this); }
-    void Case::accept(Visitor &v) { v.visit(*this); }
+    void Program::accept(Visitor &V) { V.visit(*this); }
+    void Function::accept(Visitor &V) { V.visit(*this); }
+    void Case::accept(Visitor &V) { V.visit(*this); }
 
-    void List::accept(Visitor &v) { v.visit(*this); }
-    void Tuple::accept(Visitor &v) { v.visit(*this); }
-    void Call::accept(Visitor &v) { v.visit(*this); }
+    void List::accept(Visitor &V) { V.visit(*this); }
+    void Tuple::accept(Visitor &V) { V.visit(*this); }
+    void Call::accept(Visitor &V) { V.visit(*this); }
 
-    Node::Node(Location loc) :
-            type(TypeId::UNKNOWN), loc(loc) { }
+    Node::Node(Location Loc) :
+            Ty(TypeId::UNKNOWN), Loc(Loc) { }
 
-    Node::Node(Type type, Location loc) :
-            type(type), loc(loc) { }
+    Node::Node(Type Ty, Location Loc) :
+            Ty(Ty), Loc(Loc) { }
 
-    Expr::Expr(Location loc) :
-            Node(loc) { }
+    Expression::Expression(Location Loc) :
+            Node(Loc) { }
 
-    Expr::Expr(Type type, Location loc) :
-            Node(type, loc) { }
+    Expression::Expression(Type Ty, Location Loc) :
+            Node(Ty, Loc) { }
 
 
-    Program::Program(vector<unique_ptr<Function>> funcs,
-                     Location loc) :
-            Node(loc),
-            funcs(move(funcs)) { }
+    Program::Program(vector<unique_ptr<Function>> Funcs,
+                     Location Loc) :
+            Node(Loc),
+            Funcs(move(Funcs)) { }
 
-    Program::Program(unique_ptr<Expr> expr,
-                     Location loc) :
-                     Node(loc) {
+    Program::Program(unique_ptr<Expression> AnonFunc,
+                     Location Loc) :
+                     Node(Loc) {
 
-        funcs.push_back(make_unique<Function>(move(expr)));
+        Funcs.push_back(make_unique<Function>(move(AnonFunc)));
     }
 
-    Function::Function(unique_ptr<Expr> expr) :
-            Node(expr->loc),
-            id(ANON_FUNC_NAME),
-            signature(Type(TypeId::UNKNOWN)),
-            is_anon(true) {
-        cases.push_back(make_unique<Case>(move(expr), vector<unique_ptr<Pattern>>(), expr->loc));
+    Function::Function(unique_ptr<Expression> AnonFunc) :
+            Node(AnonFunc->Loc),
+            Id(ANON_FUNC_NAME),
+            Signature(Type(TypeId::UNKNOWN)),
+            Anon(true) {
+        Cases.push_back(make_unique<Case>(move(AnonFunc), vector<unique_ptr<Pattern>>(), AnonFunc->Loc));
     }
 
-    Function::Function(string id,
-                       Type sign,
-                       Location loc) :
-            Node(sign.subtypes.front(), loc),
-            id(id),
-            signature(sign) { }
+    Function::Function(string Id,
+                       Type Ty,
+                       Location Loc) :
+            Node(Ty.Subtypes.front(), Loc),
+            Id(Id),
+            Signature(Ty) { }
 
-    Case::Case(unique_ptr<Expr> expr,
-               vector<unique_ptr<Pattern>> patterns,
-               Location loc) :
-            Node(loc),
-            expr(move(expr)),
-            patterns(move(patterns)) { }
+    Case::Case(unique_ptr<Expression> Expr,
+               vector<unique_ptr<Pattern>> Patterns,
+               Location Loc) :
+            Node(Loc),
+            Expr(move(Expr)),
+            Patterns(move(Patterns)) { }
 
-    Call::Call(unique_ptr<Expr> callee,
-               vector<unique_ptr<Expr>> exprs,
-               Location loc) :
-            Expr(loc),
-            callee(move(callee)),
-            exprs(move(exprs))
+    Call::Call(unique_ptr<Expression> Callee,
+               vector<unique_ptr<Expression>> Args,
+               Location Loc) :
+            Expression(Loc),
+            Callee(move(Callee)),
+            Args(move(Args))
     {
     }
 
     string Program::str() {
-        string str;
-        for (auto& func: funcs) {
-            str += func->str();
+        string Str;
+        for (auto &Func : Funcs) {
+            Str += Func->str();
         }
 
-        return str;
+        return Str;
     }
 
     string Function::str() {
-        string str("def " + id + " : ");
+        string Str("def " + Id + " : ");
 
-        for (auto &type: signature.subtypes) {
-            str += type.str();
-            if (type != signature.subtypes.back())
-                str += " -> ";
+        Str += Signature.str() + "\n";
+
+        for (auto &Case : Cases) {
+            Str += Case->str() + "\n";
         }
 
-        str += '\n';
-
-        for (auto &cse : cases) {
-            str += cse->str() + "\n";
-        }
-
-        return str + "\n";
+        return Str + "\n";
     }
 
     string Case::str() {
-        string str("\t| ");
-
-        for (auto &pattern: patterns) {
-            str += pattern->str();
-            if (pattern != patterns.back())
-                str += ' ';
-        }
-
-        return str + " = " + expr->str();
+        return "\t| " + strJoin(Patterns, " ") + " = " + Expr->str();
     }
 
     string Call::str() {
-        string str(callee->str() + "(");
-
-        for (auto &expr: exprs) {
-            str += expr->str();
-            if (expr != exprs.back())
-                str += ", ";
-        }
-
-        return str + ")";
+        return Callee->str() + "(" + strJoin(Args, ", ") + ")";
     }
 
+    template<class T>
+	string strJoin(T &List, const std::string JoinStr) {
+		string Str("(");
+		for (size_t i = 0; i < List.size(); ++i) {
+			Str += List[i]->str();
+			if (i + 1 != List.size())
+				Str += JoinStr;
+		}
 
+		return Str + ")";
+	}
 }

@@ -3,8 +3,8 @@
 using namespace std;
 
 namespace common {
-    void Visitor::addError(Error err) {
-        Errors.push_back(err);
+    void Visitor::addError(Error Err) {
+        Errors.push_back(Err);
     }
 
     bool Visitor::hasError() {

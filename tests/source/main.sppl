@@ -1,2 +1,2 @@
-def mai: [String] -> Int
+def mai: Int -> Int
 	| n = 100

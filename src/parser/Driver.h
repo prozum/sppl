@@ -15,7 +15,7 @@
 
 namespace parser {
 
-    enum class InputType {
+    enum class SourceType {
         UNKNOWN,
         FILE,
         FILES,
@@ -28,47 +28,45 @@ namespace parser {
     public:
         Driver(ostream *out = &cout, ostream *hout = &cout, ostream *mout = &cout);
 
-        InputType input_type;
+        SourceType SrcType;
+        std::string Source;
 
         // Code, header and message streams
-        istream *in;
-        ostream *out;
-        ostream *hout;
-        ostream *mout;
+        istream *In;
+        ostream *Out;
+        ostream *HOut;
+        ostream *MOut;
 
         // File streams
-        ifstream fin;
-        ofstream fout;
-        ofstream fhout;
+        ifstream FIn;
+        ofstream FOut;
+        ofstream FHOut;
 
+        unique_ptr<common::Program> Prog;
+        Scanner Snr;
+        Parser Psr;
+        common::Scope Global;
 
-        Scanner scanner;
-        Parser parser;
+        bool TraceScanning = false;
+        bool TraceParsing = false;
 
-        bool trace_scanning = false;
-        bool trace_parsing = false;
-        common::Scope global;
-        std::string source;
+        bool nextInput();
+        vector<string> Filenames;
+        size_t CurFile = 0;
 
-        bool next_input();
-        vector<string> filenames;
-        size_t cur_file = 0;
+        void setOutput(string Filename);
+        void setInputs(vector<string> Filenames);
+        void setHeaderOutput(string Filename);
 
-        void set_output(string filename);
-        void set_inputs(vector<string> filenames);
-        void set_header_output(string filename);
+        bool parseStream(std::istream &In, const std::string &Src = "stream input");
+        bool parseString(const std::string &Input, const std::string &Src = "string stream");
+        bool parseFile(const std::string &Filename);
+        bool parseFiles();
 
-        bool parse_stream(std::istream& in, const std::string& src = "stream input");
-        bool parse_string(const std::string& input, const std::string& src = "string stream");
-        bool parse_file(const std::string& filename);
-        bool parse_files();
+        bool accept(common::Visitor &V);
 
-        bool accept(common::Visitor &visitor);
-
-        void error(const common::Location &loc, const std::string &msg);
-        void error(const std::string &msg);
-        void show_error(Error err);
-
-        unique_ptr<common::Program> program;
+        void error(const common::Location &Loc, const std::string &Msg);
+        void error(const std::string &Msg);
+        void showError(Error Err);
     };
 }

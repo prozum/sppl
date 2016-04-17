@@ -1,0 +1,4 @@
+def test: Int
+| = 10
+test()
+q

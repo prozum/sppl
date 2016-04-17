@@ -3,28 +3,28 @@
 
 namespace common {
 
-    void Par::accept(Visitor &v) { v.visit(*this); }
-    void Not::accept(Visitor &v) { v.visit(*this); }
+    void Par::accept(Visitor &V) { V.visit(*this); }
+    void Not::accept(Visitor &V) { V.visit(*this); }
 
-    UnaryOp::UnaryOp(unique_ptr<Expr> child,
-                 Location loc) :
-        Expr(loc),
-        child(move(child)) { }
+    UnaryOp::UnaryOp(unique_ptr<Expression> Child,
+                 Location Loc) :
+        Expression(Loc),
+        Child(move(Child)) { }
 
-    Par::Par(unique_ptr<Expr> child,
-             Location loc) :
-            UnaryOp(move(child), loc) { }
+    Par::Par(unique_ptr<Expression> Child,
+             Location Loc) :
+            UnaryOp(move(Child), Loc) { }
 
-    Not::Not(unique_ptr<Expr> child,
-             Location loc) :
-            UnaryOp(move(child), loc) { }
+    Not::Not(unique_ptr<Expression> Child,
+             Location Loc) :
+            UnaryOp(move(Child), Loc) { }
 
     string Par::str() {
-        return "(" + child->str() + ")";
+        return "(" + Child->str() + ")";
     }
 
     string Not::str() {
-        return "!" + child->str();
+        return "!" + Child->str();
     }
 
 }

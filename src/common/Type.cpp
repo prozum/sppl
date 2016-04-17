@@ -1,4 +1,5 @@
 #include "Type.h"
+#include "Node.h"
 
 namespace common {
 
@@ -7,39 +8,39 @@ namespace common {
     Type::~Type() {
     }
 
-    Type::Type(TypeId id) :
-            id(id) { }
+    Type::Type(TypeId Id) :
+            Id(Id) { }
 
-    Type::Type(TypeId id,
-           Location loc) :
-            id(id),
-            loc(loc) { }
+    Type::Type(TypeId Id,
+           Location Loc) :
+            Id(Id),
+            Loc(Loc) { }
 
-    Type::Type(TypeId id,
-               vector<Type> subtypes) :
-                id(id),
-                subtypes(subtypes) { }
+    Type::Type(TypeId Id,
+               vector<Type> Subtypes) :
+                Id(Id),
+                Subtypes(Subtypes) { }
 
-    Type::Type(TypeId id,
-               vector<Type> subtypes,
-               Location loc) :
-                id(id),
-                subtypes(subtypes),
-                loc(loc) { }
+    Type::Type(TypeId Id,
+               vector<Type> Subtypes,
+               Location Loc) :
+                Id(Id),
+                Subtypes(Subtypes),
+                Loc(Loc) { }
 
-    bool Type::operator==(const Type &other) const {
-        if (id != other.id)
+    bool Type::operator==(const Type &Other) const {
+        if (Id != Other.Id)
             return false;
-        switch (id) {
+        switch (Id) {
             case TypeId::LIST:
-                return subtypes[0] == other.subtypes[0];
+                return Subtypes[0] == Other.Subtypes[0];
             case TypeId::SIGNATURE:
             case TypeId::TUPLE:
-                if (subtypes.size() != other.subtypes.size())
+                if (Subtypes.size() != Other.Subtypes.size())
                     return false;
 
-                for (unsigned i = 0; i < subtypes.size(); ++i) {
-                    if (subtypes[i] != other.subtypes[i]) {
+                for (unsigned i = 0; i < Subtypes.size(); ++i) {
+                    if (Subtypes[i] != Other.Subtypes[i]) {
                         return false;
                     }
                 }
@@ -48,16 +49,16 @@ namespace common {
         }
     }
 
-    bool Type::operator!=(const Type &other) const {
-        return !(*this == other);
+    bool Type::operator!=(const Type &Other) const {
+        return !(*this == Other);
     }
 
-    Type Type::operator[](const size_t i) {
-        return  subtypes[i];
+    Type Type::operator[](const size_t Index) {
+        return  Subtypes[Index];
     }
 
     std::string Type::str() {
-        switch (id) {
+        switch (Id) {
             case TypeId::INT:
                 return "Int";
             case TypeId::FLOAT:
@@ -69,28 +70,26 @@ namespace common {
             case TypeId::STRING:
                 return "String";
             case TypeId::LIST:
-                return "[" + subtypes[0].str() + "]";
+                return "[" + Subtypes[0].str() + "]";
             case TypeId::TUPLE:
-                return subtype_str(", ");
+                return strJoin(", ");
             case TypeId::SIGNATURE:
-                return subtype_str(" -> ");
+                return strJoin(" -> ");
             case TypeId::EMPTYLIST:
                 return "[]";
             default:
-                return "Unknown";
+                throw runtime_error("This should not happen!");
         }
     }
 
-    string Type::subtype_str(const std::string split) {
-        string str("(");
-        for (size_t i = 0; i < subtypes.size(); i++) {
-            str += subtypes[i].str();
-            if (i + 1 != subtypes.size())
-                str += split;
+    string Type::strJoin(const std::string JoinStr) {
+        string Str("(");
+        for (size_t i = 0; i < Subtypes.size(); i++) {
+            Str += Subtypes[i].str();
+            if (i + 1 != Subtypes.size())
+                Str += JoinStr;
         }
 
-        return str + ")";
+        return "(" + Str + ")";
     }
-
-
 }
