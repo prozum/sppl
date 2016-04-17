@@ -1,4 +1,9 @@
 cmake_minimum_required(VERSION 2.8)
+
+# Ignore CMake tests which is broken with clang + static compilation
+set(CMAKE_C_COMPILER_FORCED TRUE)
+set(CMAKE_CXX_COMPILER_FORCED TRUE)
+
 project(sppl)
 
 option(DEBUG "Debug mode" ON)
@@ -11,9 +16,12 @@ option(INTERPRETER "Interpreter description" OFF)
 option(JIT "LLVM JIT Compiler" OFF)
 option(TESTS "Tests" OFF)
 
-# Flags that enable C++14 and use of static libraries
+# Enable C++14 and use of static libraries
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -static")
-# Flags that allow compilation with clang
+set(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "")
+set(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "")
+
+# Fix compilation with clang
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -fPIE")
 
 if(DEBUG)
