@@ -1,0 +1,8 @@
+def main : [String]->Float
+| n = func1(func2)
+
+def func1 : (Float->Float)->Float
+| f = f(2.0)
+
+def func2 : Float->Float
+| n = n

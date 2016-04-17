@@ -1,0 +1,5 @@
+def main : [String]->Float
+| s = func()
+
+def func : Float
+|  = -2.0-2.0
