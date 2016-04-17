@@ -201,9 +201,9 @@ using namespace std;
 
 namespace parser {
 
-    Scanner::Scanner(Driver &driver) :
+    Scanner::Scanner(Driver &Drv) :
         SpplFlexLexer(),
-        driver(driver) { }
+        Drv(Drv) { }
 
     Scanner::~Scanner() { }
 
