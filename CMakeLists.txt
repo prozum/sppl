@@ -43,6 +43,9 @@ endif()
 if (CLLVM)
     add_definitions(-DCLLVM)
 endif()
+if (INTERPRETER)
+	set(JIT TRUE)
+endif()
 
 include_directories(
         src/common
@@ -59,7 +62,6 @@ include_directories(
 )
 
 add_subdirectory(src)
-add_subdirectory(samples)
 add_subdirectory(tools)
 if (TESTS)
     add_subdirectory(tests)
