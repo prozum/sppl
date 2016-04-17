@@ -113,16 +113,16 @@ namespace codegen {
             Program* Prog;
             Function* CurFunc;
 
-            string getType(Type &);
-            string generateList(Type &);
-            string generateTuple(Type &);
-            string generateEnvironment(Type &);
-            string getList(Type &);
-            string getTuple(Type &);
-            string getEnvironment(Type &);
+            string getType(Type &Ty);
+            string generateList(Type &Ty);
+            string generateTuple(Type &Ty);
+            string generateEnvironment(Type &Ty);
+            string getList(Type &Ty);
+            string getTuple(Type &Ty);
+            string getEnvironment(Type &Ty);
             void generateStd();
             void outputBuffer();
-            void outputEqual(Type &, Expression &, Expression &);
+            void outputEqual(Type &Ty, Expression &Left, Expression &Right);
 
     };
 }

@@ -223,34 +223,34 @@ namespace codegen
         ExprStack.top() << ")";
     }
 
-    void CCodeGenerator::outputEqual(Type &type, Expression &left, Expression &right) {
+    void CCodeGenerator::outputEqual(Type &Ty, Expression &Left, Expression &Right) {
         string name;
 
-        switch (type.Id) {
+        switch (Ty.Id) {
             case TypeId::TUPLE:
-                name = getTuple(left.Ty);
+                name = getTuple(Left.Ty);
 
                 ExprStack.top() << GGenerated << GCompare << name << "(";
-                left.accept(*this);
+                Left.accept(*this);
                 ExprStack.top() << ", ";
-                right.accept(*this);
+                Right.accept(*this);
                 ExprStack.top() << ")";
                 break;
             case TypeId::LIST:
             case TypeId::STRING:
-                name = getList(left.Ty);
+                name = getList(Left.Ty);
 
                 ExprStack.top() << GGenerated << GCompare << name << "(";
-                left.accept(*this);
+                Left.accept(*this);
                 ExprStack.top() << ", ";
-                right.accept(*this);
+                Right.accept(*this);
                 ExprStack.top() << ")";
                 break;
             default:
                 ExprStack.top() << "(";
-                left.accept(*this);
+                Left.accept(*this);
                 ExprStack.top() << "==";
-                right.accept(*this);
+                Right.accept(*this);
                 ExprStack.top() << ")";
                 break;
         }
@@ -688,11 +688,11 @@ namespace codegen
         ExprStack.top() << ")";
     }
 
-    string CCodeGenerator::getType(Type &type) {
+    string CCodeGenerator::getType(Type &Ty) {
         unordered_map<Type, string>::iterator got;
 
         // generate the currect c type, based on sppl's types
-        switch (type.Id) {
+        switch (Ty.Id) {
             case TypeId::FLOAT:
                 return GFloat;
             case TypeId::CHAR:
@@ -703,24 +703,24 @@ namespace codegen
                 return GBool;
                 // for tuples, lists, closures and strings, custom types will be generated
             case TypeId::TUPLE:
-                return getTuple(type);
+                return getTuple(Ty);
             case TypeId::SIGNATURE:
-                return getEnvironment(type) + "*";
+                return getEnvironment(Ty) + "*";
             case TypeId::STRING:
                 return StringTypeName + "*";
             case TypeId::LIST:
-                return getList(type) + "*";
+                return getList(Ty) + "*";
             default:
                 // This should never happen. If it does, the type checker made a mistake.
                 return "This really shouldn't happen.";
         }
     }
 
-    string CCodeGenerator::generateList(Type &type) {
+    string CCodeGenerator::generateList(Type &Ty) {
         // save the generated list in a result stream
         stringstream result;
         string name = GGenerated + GList + to_string(ListCount);
-        string children_type = getType(type.Subtypes.front());
+        string children_type = getType(Ty.Subtypes.front());
 
         // increase list count, so next list doesn't have the same name
         ListCount++;
@@ -810,7 +810,7 @@ namespace codegen
                    "    for (i = 0; i < list1->" << GSize << "; i++) { \n"
                    "        if(";
 
-        switch (type.Subtypes.front().Id) {
+        switch (Ty.Subtypes.front().Id) {
             case TypeId::LIST:
             case TypeId::TUPLE:
                 Buffer << "!" << GGenerated << GCompare << children_type <<
@@ -850,16 +850,16 @@ namespace codegen
                    "\n";
 
         // generation of tostring
-        ToStrings[type] = GGenerated + GToString + name;
+        ToStrings[Ty] = GGenerated + GToString + name;
 
-        *Header << StringTypeName << "* " << ToStrings[type] << "(" << name << "* value); \n";
-        Buffer << StringTypeName << "* " << ToStrings[type] << "(" << name << "* value) { \n"
+        *Header << StringTypeName << "* " << ToStrings[Ty] << "(" << name << "* value); \n";
+        Buffer << StringTypeName << "* " << ToStrings[Ty] << "(" << name << "* value) { \n"
                 "    " << StringTypeName << "* comma = " << GGenerated << GCreate << GString << "(\", \"); \n"
                 "    " << StringTypeName << "* res = " << GGenerated << GCreate << GString << "(\"]\"); \n"
                 "    int i; \n"
                 "\n"
                 "    for (i = value->" << GSize << " - 1; i >= 0; i--) { \n"
-                "        res = " << GGenerated << GConcat << StringTypeName << "(" << ToStrings[type.Subtypes.front()] << "(" << GGenerated << GValueAt << name << "(value, i)), res); \n"
+                "        res = " << GGenerated << GConcat << StringTypeName << "(" << ToStrings[Ty.Subtypes.front()] << "(" << GGenerated << GValueAt << name << "(value, i)), res); \n"
                 " \n"
                 "        if (i != 0) \n"
                 "            res = " << GGenerated << GConcat << StringTypeName << "(comma, res); \n"
@@ -871,13 +871,13 @@ namespace codegen
                 " \n";
 
 
-        Lists[type] = name;
+        Lists[Ty] = name;
 
         // return name of list generated
         return name;
     }
 
-    string CCodeGenerator::generateEnvironment(Type &type) {
+    string CCodeGenerator::generateEnvironment(Type &Ty) {
         // result is needed, so we don't generate something inside the signature, while generating other types
         stringstream result;
         string name = GGenerated + GSignature + to_string(SigCount);
@@ -886,13 +886,13 @@ namespace codegen
         SigCount++;
 
         result << "typedef struct " << name << " {\n"
-               << "    " << getType(type.Subtypes.back()) << " (* call)(struct " << name << "*";
+               << "    " << getType(Ty.Subtypes.back()) << " (* call)(struct " << name << "*";
 
-        for (size_t i = 0; i < type.Subtypes.size() - 1; ++i) {
+        for (size_t i = 0; i < Ty.Subtypes.size() - 1; ++i) {
             result << ", ";
 
             // get the actual type of the argument
-            result << getType(type.Subtypes[i]);
+            result << getType(Ty.Subtypes[i]);
         }
 
         result << "); \n"
@@ -901,22 +901,22 @@ namespace codegen
         *Header << "\n" << result.str();
 
         // generation of signature to string
-        ToStrings[type] = GGenerated + GToString + name;
+        ToStrings[Ty] = GGenerated + GToString + name;
 
-        *Header << StringTypeName << "* " << ToStrings[type] << "(" << name << " value); \n";
-        Buffer << StringTypeName << "* " << ToStrings[type] << "(" << name << " value) { \n"
-                   "    return " << GGenerated << GCreate << GString << "(\"" << type.str() << "\"); \n"
+        *Header << StringTypeName << "* " << ToStrings[Ty] << "(" << name << " value); \n";
+        Buffer << StringTypeName << "* " << ToStrings[Ty] << "(" << name << " value) { \n"
+                   "    return " << GGenerated << GCreate << GString << "(\"" << Ty.str() << "\"); \n"
                    "} \n"
                    " \n";
 
         // save signature in signature hash map
-        Closures[type] = name;
+        Closures[Ty] = name;
 
         // return name of signature generated
         return name;
     }
 
-    string CCodeGenerator::generateTuple(Type &type) {
+    string CCodeGenerator::generateTuple(Type &Ty) {
         // result is needed, so we don't start generating something while generating the tuple
         stringstream result;
         string name = GGenerated + GTuple + to_string(TupleCount);
@@ -928,9 +928,9 @@ namespace codegen
         result << " \n"
                   "typedef struct " << name << " {" << endl;
         // generate an item for each type in the tuple
-        for (size_t i = 0; i < type.Subtypes.size(); ++i) {
+        for (size_t i = 0; i < Ty.Subtypes.size(); ++i) {
             // get the actual type of the item
-            result << "    " << getType(type.Subtypes[i]) << " " << GGenerated << GItem << i << ";" << endl; // give this item a unique name
+            result << "    " << getType(Ty.Subtypes[i]) << " " << GGenerated << GItem << i << ";" << endl; // give this item a unique name
 
         }
         result << "} " << name << "; \n";
@@ -943,11 +943,11 @@ namespace codegen
         result << name << " " << GGenerated << GCreate << name << "(";
 
         // generate an argument for each item in the struct
-        for (size_t i = 0; i < type.Subtypes.size(); ++i) {
+        for (size_t i = 0; i < Ty.Subtypes.size(); ++i) {
             // get the actual type of the argument
-            result << getType(type.Subtypes[i]) << " " << GGenerated << GItem << i;
+            result << getType(Ty.Subtypes[i]) << " " << GGenerated << GItem << i;
 
-            if (i < type.Subtypes.size() - 1) // don't print ", " after the last argument
+            if (i < Ty.Subtypes.size() - 1) // don't print ", " after the last argument
                 result << ", ";
         }
 
@@ -960,7 +960,7 @@ namespace codegen
         Buffer << "    " << name << " " << "res; \n";
 
         // for each item in res, assign values
-        for (size_t i = 0; i < type.Subtypes.size(); ++i) {
+        for (size_t i = 0; i < Ty.Subtypes.size(); ++i) {
             Buffer << "    res." << GGenerated << GItem << i << " = " << GGenerated << GItem << i << "; \n";
         }
         Buffer << " \n"
@@ -972,17 +972,17 @@ namespace codegen
         *Header << "int " << GGenerated << GCompare << name << "(" << name << " tuple1, " << name << " tuple2); \n";
         Buffer << "int " << GGenerated << GCompare << name << "(" << name << " tuple1, " << name << " tuple2) { \n";
 
-        for (size_t i = 0; i < type.Subtypes.size(); ++i) {
+        for (size_t i = 0; i < Ty.Subtypes.size(); ++i) {
             Buffer << "    if (";
 
-            switch (type.Subtypes[i].Id) {
+            switch (Ty.Subtypes[i].Id) {
                 case TypeId::STRING:
                 case TypeId::LIST:
-                    Buffer << "!" << GGenerated << GCompare << Lists[type.Subtypes[i]] <<
+                    Buffer << "!" << GGenerated << GCompare << Lists[Ty.Subtypes[i]] <<
                                "(tuple1." << GGenerated << GItem << i << ", tuple2." << GGenerated << GItem << i << ")";
                     break;
                 case TypeId::TUPLE:
-                    Buffer << "!" << GGenerated << GCompare << Tuples[type.Subtypes[i]] <<
+                    Buffer << "!" << GGenerated << GCompare << Tuples[Ty.Subtypes[i]] <<
                                "(tuple1." << GGenerated << GItem << i << ", tuple2." << GGenerated << GItem << i << ")";
                     break;
                 default:
@@ -1001,21 +1001,21 @@ namespace codegen
 
 
         // generate a to_string for the tuple
-        ToStrings[type] = GGenerated + GToString + name;
+        ToStrings[Ty] = GGenerated + GToString + name;
 
-        *Header << StringTypeName << "* " << ToStrings[type] << "(" << name << " value); \n";
-        Buffer << StringTypeName << "* " << ToStrings[type] << "(" << name << " value) { \n"
+        *Header << StringTypeName << "* " << ToStrings[Ty] << "(" << name << " value); \n";
+        Buffer << StringTypeName << "* " << ToStrings[Ty] << "(" << name << " value) { \n"
                    "    " << StringTypeName << "* comma = " << GGenerated << GCreate << GString << "(\", \"); \n"
                    "    " << StringTypeName << "* res = " << GGenerated << GCreate << GString << "(\")\"); \n"
                    "\n";
 
-        for (size_t i = type.Subtypes.size() - 1; i != 0; --i) {
-            Buffer << "    res = " << GGenerated << GConcat << StringTypeName << "(" << ToStrings[type.Subtypes[i]] << "(value." << GGenerated << GItem << i << ")" << ", res); \n";
+        for (size_t i = Ty.Subtypes.size() - 1; i != 0; --i) {
+            Buffer << "    res = " << GGenerated << GConcat << StringTypeName << "(" << ToStrings[Ty.Subtypes[i]] << "(value." << GGenerated << GItem << i << ")" << ", res); \n";
             Buffer << "    res = " << GGenerated << GConcat << StringTypeName << "(comma, res); \n";
         }
 
 
-        Buffer << "    res = " << GGenerated << GConcat << StringTypeName << "(" << ToStrings[type.Subtypes[0]] << "(value." << GGenerated << GItem << "0)" << ", res); \n"
+        Buffer << "    res = " << GGenerated << GConcat << StringTypeName << "(" << ToStrings[Ty.Subtypes[0]] << "(value." << GGenerated << GItem << "0)" << ", res); \n"
                    "    res = " << GGenerated << GAdd << StringTypeName << "(res, '('); \n"
                    " \n"
                    "    return res; \n"
@@ -1023,7 +1023,7 @@ namespace codegen
                    "\n";
 
         // save tuple in tuple hash map
-        Tuples[type] = name;
+        Tuples[Ty] = name;
 
         // return name of tuple generated
         return name;
@@ -1149,31 +1149,31 @@ namespace codegen
                    " \n";
     }
 
-    string CCodeGenerator::getList(Type &type) {
-        auto got = Lists.find(type);
+    string CCodeGenerator::getList(Type &Ty) {
+        auto got = Lists.find(Ty);
 
         if (got == Lists.end()) {
-            return generateList(type);
+            return generateList(Ty);
         } else {
             return got->second;
         }
     }
 
-    string CCodeGenerator::getTuple(Type &type) {
-        auto got = Tuples.find(type);
+    string CCodeGenerator::getTuple(Type &Ty) {
+        auto got = Tuples.find(Ty);
 
         if (got == Tuples.end()) {
-            return generateTuple(type);
+            return generateTuple(Ty);
         } else {
             return got->second;
         }
     }
 
-    string CCodeGenerator::getEnvironment(Type &type) {
-        auto got = Closures.find(type);
+    string CCodeGenerator::getEnvironment(Type &Ty) {
+        auto got = Closures.find(Ty);
 
         if (got == Closures.end()) {
-            return generateEnvironment(type);
+            return generateEnvironment(Ty);
         } else {
             return got->second;
         }
