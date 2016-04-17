@@ -1,6 +1,3 @@
-[submodule "tools/gtest"]
-	path = tools/gtest
-	url = https://github.com/google/googletest.git
 [submodule "tools/gsl"]
 	path = tools/gsl
 	url = https://github.com/Microsoft/GSL.git
