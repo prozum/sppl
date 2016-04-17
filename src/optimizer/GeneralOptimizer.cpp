@@ -10,13 +10,13 @@ using namespace common;
 namespace optimizer {
 
     void GeneralOptimizer::visit(Program &Node) {
-        for (auto &Func: Node.Funcs){
+        for (auto &Func : Node.Funcs){
             Func->accept(*this);
         }
     }
 
     void GeneralOptimizer::visit(Function &Node) {
-        for (auto &Case: Node.Cases) {
+        for (auto &Case : Node.Cases) {
             auto Expr = Case->Expr.get();
 
             if (typeid(*Expr) == typeid(Call) &&
@@ -30,7 +30,7 @@ namespace optimizer {
     }
 
     void GeneralOptimizer::visit(Case &Node) {
-        for (auto &Pattern: Node.Patterns) {
+        for (auto &Pattern : Node.Patterns) {
             Pattern->accept(*this);
         }
 
@@ -116,13 +116,13 @@ namespace optimizer {
     }
 
     void GeneralOptimizer::visit(ListPattern &Node) {
-        for (auto &Pattern: Node.Patterns) {
+        for (auto &Pattern : Node.Patterns) {
             Pattern->accept(*this);
         }
     }
 
     void GeneralOptimizer::visit(TuplePattern &Node) {
-        for (auto &Pattern: Node.Patterns) {
+        for (auto &Pattern : Node.Patterns) {
             Pattern->accept(*this);
         }
     }
@@ -148,7 +148,7 @@ namespace optimizer {
     }
 
     void GeneralOptimizer::visit(List &Node) {
-        for (auto &Element: Node.Elements) {
+        for (auto &Element : Node.Elements) {
             Element->accept(*this);
         }
     }
@@ -159,7 +159,7 @@ namespace optimizer {
     void GeneralOptimizer::visit(Call &Node) {
         Node.Callee->accept(*this);
 
-        for (auto &Arg: Node.Args) {
+        for (auto &Arg : Node.Args) {
             Arg->accept(*this);
         }
     }
@@ -168,7 +168,7 @@ namespace optimizer {
     }
 
     void GeneralOptimizer::visit(Tuple &Node) {
-        for (auto &Element: Node.Elements) {
+        for (auto &Element : Node.Elements) {
             Element->accept(*this);
         }
     }

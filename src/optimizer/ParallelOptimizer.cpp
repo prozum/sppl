@@ -10,14 +10,14 @@ namespace optimizer {
 
     void ParallelOptimizer::visit(Program &Node)
     {
-        for (auto &Func: Node.Funcs){
+        for (auto &Func : Node.Funcs){
             Func->accept(*this);
         }
     }
 
     void ParallelOptimizer::visit(Function &Node)
     {
-        for (auto &Case: Node.Cases) {
+        for (auto &Case : Node.Cases) {
             Case->accept(*this);
         }
 
@@ -25,7 +25,7 @@ namespace optimizer {
 
     void ParallelOptimizer::visit(Case &Node)
     {
-        for (auto &Pattern: Node.Patterns) {
+        for (auto &Pattern : Node.Patterns) {
             Pattern->accept(*this);
         }
     }

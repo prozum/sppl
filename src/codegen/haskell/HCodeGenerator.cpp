@@ -41,7 +41,7 @@ namespace codegen {
 
         *Drv.Out << endl;
 
-        for (auto &Case: Node.Cases) {
+        for (auto &Case : Node.Cases) {
             Case->accept(*this);
         }
 
@@ -52,7 +52,7 @@ namespace codegen {
     {
         *Drv.Out << CurFunc->Id << " ";
 
-        for (auto &Pattern: Node.Patterns) {
+        for (auto &Pattern : Node.Patterns) {
             Pattern->accept(*this);
             *Drv.Out << " ";
         }

@@ -12,7 +12,7 @@ namespace semantics
         auto StrList = Type(TypeId::LIST, vector<Type>({ Type(TypeId::STRING) }));
 
         // Visit children
-        for (auto &Func: Node.Funcs) {
+        for (auto &Func : Node.Funcs) {
             Func->accept(*this);
 
             try {
@@ -42,7 +42,7 @@ namespace semantics
         CurFunc = &Node;
 
         // Visit children
-        for (auto &Case: Node.Cases) {
+        for (auto &Case : Node.Cases) {
             try {
                 Case->accept(*this);
             }
@@ -59,7 +59,7 @@ namespace semantics
 
     void TypeChecker::visit(Case &Node) {
         // Visit children
-        for (auto &Pattern: Node.Patterns) {
+        for (auto &Pattern : Node.Patterns) {
             Pattern->accept(*this);
         }
         Node.Expr->accept(*this);
@@ -364,7 +364,7 @@ namespace semantics
 
     void TypeChecker::visit(ListPattern &Node) {
         // Visit children
-        for (auto &pattern: Node.Patterns) {
+        for (auto &pattern : Node.Patterns) {
             pattern->accept(*this);
         }
         // Visit stops here
@@ -388,14 +388,14 @@ namespace semantics
 
     void TypeChecker::visit(TuplePattern &Node) {
         // Visit children
-        for (auto &Pattern: Node.Patterns) {
+        for (auto &Pattern : Node.Patterns) {
             Pattern->accept(*this);
         }
         // Visit stops here
 
         Node.Ty = Type(TypeId::TUPLE);
 
-        for (auto &Pattern: Node.Patterns) {
+        for (auto &Pattern : Node.Patterns) {
             Node.Ty.Subtypes.push_back(Pattern->Ty);
         }
     }
@@ -437,7 +437,7 @@ namespace semantics
 
     void TypeChecker::visit(List &Node) {
         // Visit children
-        for (auto &Element: Node.Elements) {
+        for (auto &Element : Node.Elements) {
             Element->accept(*this);
         }
         // Visit stops here
@@ -460,7 +460,7 @@ namespace semantics
 
     void TypeChecker::visit(Tuple &Node) {
         // Visit children
-        for (auto &Element: Node.Elements) {
+        for (auto &Element : Node.Elements) {
             Element->accept(*this);
         }
         // Visit stops here
@@ -486,7 +486,7 @@ namespace semantics
 
         // Visit children
         Node.Callee->accept(*this);
-        for (auto &Arg: Node.Args) {
+        for (auto &Arg : Node.Args) {
             Arg->accept(*this);
         }
         // Visit stops here

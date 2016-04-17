@@ -8,7 +8,7 @@ namespace semantics {
 
     void ScopeGenerator::visit(Program &Node) {
         // Visit children
-        for (auto &Func: Node.Funcs) {
+        for (auto &Func : Node.Funcs) {
             Func->accept(*this);
         }
         // Visit stops here
@@ -22,7 +22,7 @@ namespace semantics {
             CurScope->Decls.insert({Node.Id, Node.Signature});
 
             // Visit children
-            for (auto &Case: Node.Cases) {
+            for (auto &Case : Node.Cases) {
                 Case->accept(*this);
             }
             // Visit stops here
@@ -196,7 +196,7 @@ namespace semantics {
 
     void ScopeGenerator::visit(List &Node) {
         // Visit children
-        for (auto &Element: Node.Elements) {
+        for (auto &Element : Node.Elements) {
             Element->accept(*this);
         }
         // Visit stops here
@@ -204,7 +204,7 @@ namespace semantics {
 
     void ScopeGenerator::visit(Tuple &Node) {
         // Visit children
-        for (auto &Element: Node.Elements) {
+        for (auto &Element : Node.Elements) {
             Element->accept(*this);
         }
         // Visit stops here
@@ -223,7 +223,7 @@ namespace semantics {
     void ScopeGenerator::visit(Call &Node) {
         // Visit children
         Node.Callee->accept(*this);
-        for (auto &Arg: Node.Args) {
+        for (auto &Arg : Node.Args) {
             Arg->accept(*this);
         }
         // Visit stops here

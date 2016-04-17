@@ -60,7 +60,7 @@ namespace codegen {
             return OldType->second;
         
         std::vector<llvm::Type *> TmpVec;
-        for (auto &Subtype: Ty.Subtypes)
+        for (auto &Subtype : Ty.Subtypes)
             TmpVec.push_back(getType(Subtype));
         llvm::ArrayRef<llvm::Type *> Subtypes(TmpVec);
 
@@ -431,7 +431,7 @@ namespace codegen {
     void LLVMCodeGenerator::visit(common::Tuple &Node) {
         std::vector<llvm::Constant *> TmpVec;
 
-        for (auto &Element: Node.Elements) {
+        for (auto &Element : Node.Elements) {
             Element->accept(*this);
             TmpVec.push_back((Constant *)CurVal);
         }
@@ -446,7 +446,7 @@ namespace codegen {
     void LLVMCodeGenerator::visit(common::List &Node) {
         std::vector<llvm::Constant *> TmpVec;
 
-        for (auto &Element: Node.Elements) {
+        for (auto &Element : Node.Elements) {
             Element->accept(*this);
             TmpVec.push_back(dynamic_cast<Constant *>(CurVal));
         }
