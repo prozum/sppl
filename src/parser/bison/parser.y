@@ -1,4 +1,3 @@
-%skeleton "lalr1.cc"
 %name-prefix "parser"
 %define "parser_class_name" {Parser}
 %locations

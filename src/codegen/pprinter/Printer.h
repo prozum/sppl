@@ -1,8 +1,9 @@
 #pragma once
 
-#include <string>
 #include "CodeGenerator.h"
 #include "Node.h"
+
+#include <string>
 
 using namespace std;
 using namespace common;
