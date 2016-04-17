@@ -10,7 +10,7 @@ namespace common {
 
 	struct Position {
 		Position() = default;
-		Position(unsigned l, unsigned c, string src = "") :
+		Position(unsigned l, unsigned c, string src) :
 			Line(l), Column(c), Src(src) { }
 
 		unsigned Line = 1;
@@ -21,12 +21,13 @@ namespace common {
 	class Location {
 	public:
 		Location();
-		Location(unsigned l, unsigned c, string src = "");
+		Location(unsigned l, unsigned c, string src);
+		Location(const Location &other);
 
 		void step();
 		void columns(unsigned count = 1);
 		void lines(unsigned count = 1);
-		void sources(string src = "");
+		void sources(string src);
 
 		Position begin;
 		Position end;

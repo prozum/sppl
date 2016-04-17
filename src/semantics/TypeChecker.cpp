@@ -52,7 +52,6 @@ namespace semantics
         }
         // Visit stops here
 
-        //auto t = !hasError();
         // Set return type
         if (!hasError())
             node.Ty = node.Signature.Subtypes.back();
@@ -64,31 +63,32 @@ namespace semantics
             pattern->accept(*this);
         }
         node.Expr->accept(*this);
+        // Visit stops here
 
         // Set signature for anonymous function
         if (CurFunc->Anon) {
             CurFunc->Signature = Type(TypeId::SIGNATURE, vector<Type>({node.Expr->Ty}));
         }
 
-        if (node.Patterns.size() == CurFunc->Signature.Subtypes.size() - 1) {
-            for (size_t i = 0; i < node.Patterns.size(); ++i) {
-                if (node.Patterns[i]->Ty.Id == TypeId::EMPTYLIST &&
-                        CurFunc->Signature.Subtypes[i].Id == TypeId::LIST) {
-                    node.Patterns[i]->Ty = CurFunc->Signature.Subtypes[i];
-                }
-
-                if (node.Patterns[i]->Ty != CurFunc->Signature.Subtypes[i]) {
-                    throw Error::Expected("Wrong pattern type",
-                                             CurFunc->Signature.Subtypes[i].str(),
-                                             node.Patterns[i]->Ty.str(),
-                                             node.Patterns[i]->Loc);
-                }
-            }
-        } else {
+        if (node.Patterns.size() != CurFunc->Signature.Subtypes.size() - 1) {
             throw Error::Expected("Wrong pattern count",
-                                     to_string(CurFunc->Signature.Subtypes.size() - 1),
-                                     to_string(node.Patterns.size()),
-                                     node.Loc);
+                                  to_string(CurFunc->Signature.Subtypes.size() - 1),
+                                  to_string(node.Patterns.size()),
+                                  node.Loc);
+        }
+
+        for (size_t i = 0; i < node.Patterns.size(); ++i) {
+            if (node.Patterns[i]->Ty.Id == TypeId::EMPTYLIST &&
+                    CurFunc->Signature.Subtypes[i].Id == TypeId::LIST) {
+                node.Patterns[i]->Ty = CurFunc->Signature.Subtypes[i];
+            }
+
+            if (node.Patterns[i]->Ty != CurFunc->Signature.Subtypes[i]) {
+                throw Error::Expected("Wrong pattern type",
+                                         CurFunc->Signature.Subtypes[i].str(),
+                                         node.Patterns[i]->Ty.str(),
+                                         node.Patterns[i]->Loc);
+            }
         }
 
         if (node.Expr->Ty.Id == TypeId::EMPTYLIST &&
@@ -465,7 +465,7 @@ namespace semantics
     }
 
     void TypeChecker::visit(Tuple &node) {
-          // Visit children
+        // Visit children
         for (auto &expr: node.Elements) {
             expr->accept(*this);
         }
@@ -497,31 +497,32 @@ namespace semantics
         }
         // Visit stops here
 
-        if (node.Callee->Ty.Id == TypeId::SIGNATURE) {
-            if (node.Args.size() + 1 == node.Callee->Ty.Subtypes.size()) {
-                for (size_t i = 0; i < node.Args.size(); ++i) {
-                    if (node.Args[i]->Ty.Id == TypeId::EMPTYLIST &&
-                            node.Callee->Ty.Subtypes[i].Id == TypeId::LIST)
-                        node.Args[i]->Ty = node.Callee->Ty.Subtypes[i];
-                    else if (node.Args[i]->Ty != node.Callee->Ty.Subtypes[i]) {
-                        throw Error::Expected("Function was called with an invalid argument",
-                                                 node.Callee->Ty.Subtypes[i].str(),
-                                                 node.Args[i]->Ty.str(),
-                                                 node.Args[i]->Loc);
-                    }
-                }
-            } else {
-                throw Error::Expected("Wrong number of arguments",
-                                         to_string(node.Callee->Ty.Subtypes.size() - 1),
-                                         to_string(node.Args.size()),
-                                         node.Loc);
-            }
-            node.Ty = node.Callee->Ty.Subtypes.back();
-        } else {
+        if (node.Callee->Ty.Id != TypeId::SIGNATURE) {
             throw Error::Expected("Can't call a type that is not a Signature",
-                                     "Signature",
-                                     node.Callee->Ty.str(),
-                                     node.Callee->Loc);
+                         "Signature",
+                         node.Callee->Ty.str(),
+                         node.Callee->Loc);
         }
+
+        if (node.Args.size() + 1 != node.Callee->Ty.Subtypes.size()) {
+            throw Error::Expected("Wrong number of arguments",
+                                  to_string(node.Callee->Ty.Subtypes.size() - 1),
+                                  to_string(node.Args.size()),
+                                  node.Loc);
+        }
+
+        for (size_t i = 0; i < node.Args.size(); ++i) {
+            if (node.Args[i]->Ty.Id == TypeId::EMPTYLIST &&
+                    node.Callee->Ty.Subtypes[i].Id == TypeId::LIST)
+                node.Args[i]->Ty = node.Callee->Ty.Subtypes[i];
+            else if (node.Args[i]->Ty != node.Callee->Ty.Subtypes[i]) {
+                throw Error::Expected("Function was called with an invalid argument",
+                                         node.Callee->Ty.Subtypes[i].str(),
+                                         node.Args[i]->Ty.str(),
+                                         node.Args[i]->Loc);
+            }
+        }
+
+        node.Ty = node.Callee->Ty.Subtypes.back();
     }
 }

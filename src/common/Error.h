@@ -9,8 +9,11 @@
 namespace common {
 	class Error {
 	public:
+		Error() = default;
 		Error(string msg);
 		Error(string msg, Location loc);
+
+		Error(const Error &other);
 
 		static Error NotImplemented(string msg);
 		static Error Expected(string msg, string expected, string actual, Location loc);

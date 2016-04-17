@@ -91,7 +91,7 @@ using namespace std;
 "\""[^"]*"\"" {
     yylval->str = new string(yytext);
     yylval->str->pop_back();
-    yylval->str->erase (0,1);
+    yylval->str->erase(0, 1);
     return token::STRINGLITERAL;
 }
 
