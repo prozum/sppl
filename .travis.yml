@@ -21,7 +21,7 @@ before_install:
   - docker exec xenial apt-get -qq install software-properties-common
   - docker exec xenial apt-add-repository ppa:nimoov/llvm-cmake
   - docker exec xenial apt-get -qq update
-  - docker exec xenial apt-get -qq install llvm-3.8 llvm-3.8-dev llvm llvm-dev clang-3.8 clang-3.8-dev clang cmake bison flex
+  - docker exec xenial apt-get -qq install llvm-3.8 llvm-3.8-dev llvm llvm-dev clang-3.8 clang-3.8-dev clang cmake bison flex zlib1g-dev
   - if [ "$CXX" = "g++" ]; then export CXX="g++-5" CC="gcc-5"; fi
   - if [ "$CXX" = "clang++" ]; then export CXX="clang++-3.8" CC="clang-3.8"; fi
     # Debug Data:
