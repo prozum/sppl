@@ -5,9 +5,9 @@ namespace common {
             : Parent(Scp) { }
 
     bool common::Scope::exists(std::string Id) {
-        auto got = Decls.find(Id);
+        auto Got = Decls.find(Id);
 
-        if (got != Decls.end())
+        if (Got != Decls.end())
             return true;
 
         if (Parent)
@@ -17,12 +17,12 @@ namespace common {
     }
 
     Type Scope::getType(std::string Id) {
-        auto got = this->Decls.find(Id);
+        auto Got = this->Decls.find(Id);
 
-        if (got == this->Decls.end()) {
+        if (Got == this->Decls.end()) {
             return this->Parent->getType(Id);
         } else {
-            return got->second;
+            return Got->second;
         }
     }
 }

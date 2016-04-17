@@ -53,7 +53,7 @@ namespace compiler {
 
         int compile();
 
-        void set_backend(Backend backend);
+        void set_backend(Backend B);
     };
 
 }

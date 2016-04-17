@@ -14,21 +14,21 @@ namespace codegen {
     void GasCodeGenerator::visit(Program &Node) {
         // Visit all functions
 
-        for (auto &func : Node.Funcs) {
-            func->accept(*this);
+        for (auto &Func : Node.Funcs) {
+            Func->accept(*this);
         }
 
-        string source = buildSource();  // Build source.S file
-        *Drv.Out << source << endl;
+        string Source = buildSource();  // Build source.S file
+        *Drv.Out << Source << endl;
     }
 
     void GasCodeGenerator::visit(Function &Node) {
         FuncName = Node.Id;                     // Function name used for anything function related including
                                                 // names and labels.
 
-        string globl = ".globl ";               // Build the globl
-        globl += FuncName;
-        FuncGlobl.push_back(globl);
+        string Globl = ".globl ";               // Build the globl
+        Globl += FuncName;
+        FuncGlobl.push_back(Globl);
         Func += FuncName;                   // Function entry
         Func += ":\n";
         Func += "pushl %ebp\n";             // Save base pointer
@@ -40,8 +40,8 @@ namespace codegen {
         CaseCount = 0;
         Cases = Node.Cases.size();             // Get number of cases
 
-        for (auto &funcCase : Node.Cases) {     // Build cases
-            funcCase->accept(*this);
+        for (auto &Case : Node.Cases) {     // Build cases
+            Case->accept(*this);
         }
 
         Func += ".";
@@ -59,7 +59,7 @@ namespace codegen {
             Func += "ret\n";
         }
 
-        FuncVector.push_back(Func);         // adds function to vector with completed functions
+        FuncVector.push_back(Func);         // Adds function to vector with completed functions
 
         Func.clear();                       // Prepare string variable for next function
     }
@@ -67,21 +67,21 @@ namespace codegen {
     void GasCodeGenerator::visit(Case &Node) {
         CaseCount++;
 
-        int argc = 0;
-        for (auto &c : Node.Patterns) {
-            c->accept(*this);
+        int ArgCount = 0;
+        for (auto &Pattern : Node.Patterns) {
+            Pattern->accept(*this);
             cout << "PATTERN IN THIS SCOPE => " << Hpr.TypeName << "    " << Hpr.TypeValue << endl;
 
             if (Hpr.TypeName.compare("Id") == 0) {
-                int mempos = argc*4+8;
-                string var = "";
-                var += "movl ";
-                var += to_string(mempos);
-                var += ", %eax\n";
-                VarMap[Hpr.TypeValue] = var;
+                int MemPos = ArgCount*4+8;
+                string Var = "";
+                Var += "movl ";
+                Var += to_string(MemPos);
+                Var += ", %eax\n";
+                VarMap[Hpr.TypeValue] = Var;
             }
             Hpr = {};
-            argc++;
+            ArgCount++;
         }
 
         if (Cases == CaseCount) {   // Default case
@@ -96,9 +96,9 @@ namespace codegen {
             Func += to_string(CaseCount);
             Func += ":\n";
 
-            int argNum = 0;                         // first argument have index 0
-            for (auto &c : Node.Patterns) {
-                c->accept(*this);                    // Gets the pattern, and puts it in "helper"
+            int ArgNum = 0;                         // First argument have index 0
+            for (auto &Pattern : Node.Patterns) {
+                Pattern->accept(*this);                    // Gets the pattern, and puts it in "helper"
 
                 cout << "Working on pattern" << endl;
 
@@ -107,11 +107,11 @@ namespace codegen {
                     Func += "cmpl $";
                     Func += Hpr.TypeValue;
                     Func += ", ";
-                    int mempos = argNum*4+8;            // Stack starts at 8, each arg with 4 space
-                    Func += to_string(mempos);
+                    int MemPos = ArgNum*4+8;            // Stack starts at 8, each arg with 4 space
+                    Func += to_string(MemPos);
                     Func += "(%ebp)\n";
 
-                    argNum++;                           // Prepare for next argument
+                    ArgNum++;                           // Prepare for next argument
 
                     // If not different move on
                     Func += "jne .";
@@ -125,7 +125,7 @@ namespace codegen {
                     Func += "\n";
                     continue;
                 }
-                // repeat for all possebilities
+                // Repeat for all possibilities
             }
             Node.Expr->accept(*this);
 
@@ -210,14 +210,14 @@ namespace codegen {
 
     void GasCodeGenerator::visit(Int &Node) {
         Func += "movl $";
-        Func += to_string(Node.Val);
+        Func += Node.str();
         Func += ", %eax\n";
 
         Hpr.TypeName = "Int";
-        Hpr.TypeValue = to_string(Node.Val);
+        Hpr.TypeValue = Node.str();
 
 
-        cout << "Got integer => " << to_string(Node.Val) << endl;
+        cout << "Got integer => " << Node.str() << endl;
     }
 
     void GasCodeGenerator::visit(Float &Node) {
@@ -263,11 +263,10 @@ namespace codegen {
     }
 
     void GasCodeGenerator::visit(Call &Node) {
-
         // TODO: Find way pu push arguments to stack.
-        vector<string> params;
-        for (auto &arg : Node.Args) {
-            arg->accept(*this);
+        vector<string> Params;
+        for (auto &Arg : Node.Args) {
+            Arg->accept(*this);
 
             if(Hpr.TypeName.compare("Int") == 0) {
                 Func += "pushl %eax\n";
@@ -295,21 +294,21 @@ namespace codegen {
     }
 
     string GasCodeGenerator::buildSource() {
-        string source = "";
+        string Source = "";
 
-        source += ".data\n";
-        source += "fmt:\n";
-        source += ".string \"%d\\n\"\n";        // Allow printing of numbers in printf
+        Source += ".data\n";
+        Source += "fmt:\n";
+        Source += ".string \"%d\\n\"\n";        // Allow printing of numbers in printf
 
-        source += ".text\n";
-        for (auto &f : FuncGlobl) {
-            source += f;
-            source += "\n";
+        Source += ".text\n";
+        for (auto &Func : FuncGlobl) {
+            Source += Func;
+            Source += "\n";
         }
 
-        for (auto &f : FuncVector) {
-            source += f;
+        for (auto &Func : FuncVector) {
+            Source += Func;
         }
-        return source;
+        return Source;
     }
 }

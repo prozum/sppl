@@ -8,162 +8,162 @@ using namespace common;
 
 namespace optimizer {
 
-    void ParallelOptimizer::visit(Program &node)
+    void ParallelOptimizer::visit(Program &Node)
     {
-        for (auto &f: node.Funcs){
-            f->accept(*this);
+        for (auto &Func: Node.Funcs){
+            Func->accept(*this);
         }
     }
 
-    void ParallelOptimizer::visit(Function &node)
+    void ParallelOptimizer::visit(Function &Node)
     {
-        for (auto &c: node.Cases) {
-            c->accept(*this);
+        for (auto &Case: Node.Cases) {
+            Case->accept(*this);
         }
 
     }
 
-    void ParallelOptimizer::visit(Case &node)
+    void ParallelOptimizer::visit(Case &Node)
     {
-        for (auto &p: node.Patterns) {
-            p->accept(*this);
+        for (auto &Pattern: Node.Patterns) {
+            Pattern->accept(*this);
         }
     }
 
-    void ParallelOptimizer::visit(Or &node)
+    void ParallelOptimizer::visit(Or &Node)
     {
 
     }
 
-    void ParallelOptimizer::visit(And &node)
+    void ParallelOptimizer::visit(And &Node)
     {
 
     }
 
-    void ParallelOptimizer::visit(Equal &node)
+    void ParallelOptimizer::visit(Equal &Node)
     {
 
     }
 
-    void ParallelOptimizer::visit(NotEqual &node)
+    void ParallelOptimizer::visit(NotEqual &Node)
     {
 
     }
 
-    void ParallelOptimizer::visit(Lesser &node)
+    void ParallelOptimizer::visit(Lesser &Node)
     {
 
     }
 
-    void ParallelOptimizer::visit(LesserEq &node)
+    void ParallelOptimizer::visit(LesserEq &Node)
     {
 
     }
 
-    void ParallelOptimizer::visit(Greater &node)
+    void ParallelOptimizer::visit(Greater &Node)
     {
 
     }
 
-    void ParallelOptimizer::visit(GreaterEq &node)
+    void ParallelOptimizer::visit(GreaterEq &Node)
     {
 
     }
 
-    void ParallelOptimizer::visit(Add &node)
+    void ParallelOptimizer::visit(Add &Node)
     {
 
     }
 
-    void ParallelOptimizer::visit(Sub &node)
+    void ParallelOptimizer::visit(Sub &Node)
     {
 
     }
 
-    void ParallelOptimizer::visit(Mul &node)
+    void ParallelOptimizer::visit(Mul &Node)
     {
 
     }
 
-    void ParallelOptimizer::visit(Div &node)
+    void ParallelOptimizer::visit(Div &Node)
     {
 
     }
 
-    void ParallelOptimizer::visit(Mod &node)
+    void ParallelOptimizer::visit(Mod &Node)
     {
 
     }
 
-    void ParallelOptimizer::visit(ListAdd &node)
+    void ParallelOptimizer::visit(ListAdd &Node)
     {
 
     }
 
-    void ParallelOptimizer::visit(Par &node)
+    void ParallelOptimizer::visit(Par &Node)
     {
 
     }
 
-    void ParallelOptimizer::visit(Not &node)
+    void ParallelOptimizer::visit(Not &Node)
     {
 
     }
 
-    void ParallelOptimizer::visit(ListPattern &node)
+    void ParallelOptimizer::visit(ListPattern &Node)
     {
 
     }
 
-    void ParallelOptimizer::visit(TuplePattern &node)
+    void ParallelOptimizer::visit(TuplePattern &Node)
     {
 
     }
 
-    void ParallelOptimizer::visit(ListSplit &node)
+    void ParallelOptimizer::visit(ListSplit &Node)
     {
 
     }
 
-    void ParallelOptimizer::visit(Int &node)
+    void ParallelOptimizer::visit(Int &Node)
     {
     }
 
-    void ParallelOptimizer::visit(Float &node)
+    void ParallelOptimizer::visit(Float &Node)
     {
     }
 
-    void ParallelOptimizer::visit(Bool &node)
+    void ParallelOptimizer::visit(Bool &Node)
     {
     }
 
-    void ParallelOptimizer::visit(Char &node)
+    void ParallelOptimizer::visit(Char &Node)
     {
     }
 
-    void ParallelOptimizer::visit(String &node)
+    void ParallelOptimizer::visit(String &Node)
     {
     }
 
-    void ParallelOptimizer::visit(List &node)
-    {
-
-    }
-
-    void ParallelOptimizer::visit(Id &node)
-    {
-    }
-
-    void ParallelOptimizer::visit(Call &node)
+    void ParallelOptimizer::visit(List &Node)
     {
 
     }
 
-    void ParallelOptimizer::visit(Type &node)
+    void ParallelOptimizer::visit(Id &Node)
     {
     }
 
-    void ParallelOptimizer::visit(Tuple &node) {
+    void ParallelOptimizer::visit(Call &Node)
+    {
+
+    }
+
+    void ParallelOptimizer::visit(Type &Node)
+    {
+    }
+
+    void ParallelOptimizer::visit(Tuple &Node) {
 
     }
 }

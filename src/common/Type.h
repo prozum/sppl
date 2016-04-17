@@ -40,7 +40,7 @@ namespace common {
 		Type operator[](const size_t Index);
 
 		string str();
-		string subtypeStr(const std::string Split);
+        string strJoin(string JoinStr);
 	};
 }
 

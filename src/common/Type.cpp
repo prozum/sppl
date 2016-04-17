@@ -1,4 +1,5 @@
 #include "Type.h"
+#include "Node.h"
 
 namespace common {
 
@@ -71,9 +72,9 @@ namespace common {
             case TypeId::LIST:
                 return "[" + Subtypes[0].str() + "]";
             case TypeId::TUPLE:
-                return subtypeStr(", ");
+                return strJoin(", ");
             case TypeId::SIGNATURE:
-                return subtypeStr(" -> ");
+                return strJoin(" -> ");
             case TypeId::EMPTYLIST:
                 return "[]";
             default:
@@ -81,14 +82,14 @@ namespace common {
         }
     }
 
-    string Type::subtypeStr(const std::string Split) {
-        string str("(");
+    string Type::strJoin(const std::string JoinStr) {
+        string Str("(");
         for (size_t i = 0; i < Subtypes.size(); i++) {
-            str += Subtypes[i].str();
+            Str += Subtypes[i].str();
             if (i + 1 != Subtypes.size())
-                str += Split;
+                Str += JoinStr;
         }
 
-        return str + ")";
+        return "(" + Str + ")";
     }
 }

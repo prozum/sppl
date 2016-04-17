@@ -123,6 +123,5 @@ namespace codegen {
             void generateStd();
             void outputBuffer();
             void outputEqual(Type &Ty, Expression &Left, Expression &Right);
-
     };
 }

@@ -14,12 +14,12 @@ namespace codegen {
     {
         //os << "module PlaceHolder where" << endl;
 
-        for (auto &f : Node.Funcs) {
-            if (f->Id != "main") {
-                f->accept(*this);
+        for (auto &Func : Node.Funcs) {
+            if (Func->Id != "main") {
+                Func->accept(*this);
             } else {
                 *Drv.Out << "main = putStrLn (show (";
-                f->Cases.front()->Expr->accept(*this);
+                Func->Cases.front()->Expr->accept(*this);
                 *Drv.Out << "))\n";
             }
         }
@@ -41,8 +41,8 @@ namespace codegen {
 
         *Drv.Out << endl;
 
-        for (auto &c: Node.Cases) {
-            c->accept(*this);
+        for (auto &Case: Node.Cases) {
+            Case->accept(*this);
         }
 
         *Drv.Out << endl;
@@ -52,8 +52,8 @@ namespace codegen {
     {
         *Drv.Out << CurFunc->Id << " ";
 
-        for (auto &p: Node.Patterns) {
-            p->accept(*this);
+        for (auto &Pattern: Node.Patterns) {
+            Pattern->accept(*this);
             *Drv.Out << " ";
         }
 

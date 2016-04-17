@@ -9,24 +9,24 @@ namespace semantics
     TypeChecker::TypeChecker() { }
 
     void TypeChecker::visit(Program &Node) {
-        auto strlist = Type(TypeId::LIST, vector<Type>({ Type(TypeId::STRING) }));
+        auto StrList = Type(TypeId::LIST, vector<Type>({ Type(TypeId::STRING) }));
 
         // Visit children
-        for (auto &func: Node.Funcs) {
-            func->accept(*this);
+        for (auto &Func: Node.Funcs) {
+            Func->accept(*this);
 
             try {
-                if (func->Id == "main") {
-                    if (func->Signature.Subtypes.front() != strlist) {
+                if (Func->Id == "main") {
+                    if (Func->Signature.Subtypes.front() != StrList) {
                         throw Error::Expected("Declaration of \"main\" had wrong input type",
-                                              strlist.str(),
-                                              func->Signature.Subtypes.front().str(),
-                                              func->Loc);
-                    } else if (func->Signature.Subtypes.size() != 2) {
+                                              StrList.str(),
+                                              Func->Signature.Subtypes.front().str(),
+                                              Func->Loc);
+                    } else if (Func->Signature.Subtypes.size() != 2) {
                         throw Error::Expected("Function \"main\" had wrong number of input",
                                               "2",
-                                              to_string(func->Signature.Subtypes.size()),
-                                              func->Loc);
+                                              to_string(Func->Signature.Subtypes.size()),
+                                              Func->Loc);
                     }
                 }
             }
@@ -42,9 +42,9 @@ namespace semantics
         CurFunc = &Node;
 
         // Visit children
-        for (auto &cse: Node.Cases) {
+        for (auto &Case: Node.Cases) {
             try {
-                cse->accept(*this);
+                Case->accept(*this);
             }
             catch (Error err) {
                 Errors.push_back(err);
@@ -59,8 +59,8 @@ namespace semantics
 
     void TypeChecker::visit(Case &Node) {
         // Visit children
-        for (auto &pattern: Node.Patterns) {
-            pattern->accept(*this);
+        for (auto &Pattern: Node.Patterns) {
+            Pattern->accept(*this);
         }
         Node.Expr->accept(*this);
         // Visit stops here
@@ -103,7 +103,6 @@ namespace semantics
     }
 
     void TypeChecker::visit(Or &Node) {
-
         // Visit children
         Node.Left->accept(*this);
         Node.Right->accept(*this);
@@ -118,7 +117,6 @@ namespace semantics
     }
 
     void TypeChecker::visit(And &Node) {
-
         // Visit children
         Node.Left->accept(*this);
         Node.Right->accept(*this);
@@ -133,7 +131,6 @@ namespace semantics
     }
 
     void TypeChecker::visit(Equal &Node) {
-
         // Visit children
         Node.Left->accept(*this);
         Node.Right->accept(*this);
@@ -148,7 +145,6 @@ namespace semantics
     }
 
     void TypeChecker::visit(NotEqual &Node) {
-
         // Visit children
         Node.Left->accept(*this);
         Node.Right->accept(*this);
@@ -163,7 +159,6 @@ namespace semantics
     }
 
     void TypeChecker::visit(Lesser &Node) {
-
         // Visit children
         Node.Left->accept(*this);
         Node.Right->accept(*this);
@@ -179,7 +174,6 @@ namespace semantics
     }
 
     void TypeChecker::visit(Greater &Node) {
-
         // Visit children
         Node.Left->accept(*this);
         Node.Right->accept(*this);
@@ -394,15 +388,15 @@ namespace semantics
 
     void TypeChecker::visit(TuplePattern &Node) {
         // Visit children
-        for (auto &pattern: Node.Patterns) {
-            pattern->accept(*this);
+        for (auto &Pattern: Node.Patterns) {
+            Pattern->accept(*this);
         }
         // Visit stops here
 
         Node.Ty = Type(TypeId::TUPLE);
 
-        for (auto &pattern: Node.Patterns) {
-            Node.Ty.Subtypes.push_back(pattern->Ty);
+        for (auto &Pattern: Node.Patterns) {
+            Node.Ty.Subtypes.push_back(Pattern->Ty);
         }
     }
 
@@ -443,8 +437,8 @@ namespace semantics
 
     void TypeChecker::visit(List &Node) {
         // Visit children
-        for (auto &expr: Node.Elements) {
-            expr->accept(*this);
+        for (auto &Element: Node.Elements) {
+            Element->accept(*this);
         }
         // Visit stops here
 
@@ -466,8 +460,8 @@ namespace semantics
 
     void TypeChecker::visit(Tuple &Node) {
         // Visit children
-        for (auto &expr: Node.Elements) {
-            expr->accept(*this);
+        for (auto &Element: Node.Elements) {
+            Element->accept(*this);
         }
         // Visit stops here
 
@@ -492,8 +486,8 @@ namespace semantics
 
         // Visit children
         Node.Callee->accept(*this);
-        for (auto &expr: Node.Args) {
-            expr->accept(*this);
+        for (auto &Arg: Node.Args) {
+            Arg->accept(*this);
         }
         // Visit stops here
 

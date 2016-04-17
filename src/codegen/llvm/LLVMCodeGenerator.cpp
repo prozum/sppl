@@ -54,62 +54,62 @@ namespace codegen {
 
     llvm::StructType *LLVMCodeGenerator::getTupleType(common::Type Ty)
     {
-        auto old_type = TupleTypes.find(Ty);
+        auto OldType = TupleTypes.find(Ty);
 
-        if (old_type != TupleTypes.end())
-            return old_type->second;
+        if (OldType != TupleTypes.end())
+            return OldType->second;
         
-        std::vector<llvm::Type *> tmp_vec;
-        for (auto &subtype: Ty.Subtypes)
-            tmp_vec.push_back(getType(subtype));
-        llvm::ArrayRef<llvm::Type *> subtypes(tmp_vec);
+        std::vector<llvm::Type *> TmpVec;
+        for (auto &Subtype: Ty.Subtypes)
+            TmpVec.push_back(getType(Subtype));
+        llvm::ArrayRef<llvm::Type *> Subtypes(TmpVec);
 
-        auto new_type = StructType::create(getGlobalContext(), subtypes);
-        TupleTypes[Ty] = new_type;
+        auto NewType = StructType::create(getGlobalContext(), Subtypes);
+        TupleTypes[Ty] = NewType;
 
-        return new_type;
+        return NewType;
     }
 
     llvm::StructType *LLVMCodeGenerator::getListType(common::Type Ty)
     {
-        auto old_type = ListTypes.find(Ty);
+        auto OldType = ListTypes.find(Ty);
 
-        if (old_type != ListTypes.end())
-            return old_type->second;
+        if (OldType != ListTypes.end())
+            return OldType->second;
 
-        vector<llvm::Type *> tmp_vec = {getType(Ty.Subtypes[0], true), llvm::Type::getInt64Ty(getGlobalContext()) };
-        llvm::ArrayRef<llvm::Type *> subtypes(tmp_vec);
+        vector<llvm::Type *> TmpVec = {getType(Ty.Subtypes[0], true), llvm::Type::getInt64Ty(getGlobalContext()) };
+        llvm::ArrayRef<llvm::Type *> Subtypes(TmpVec);
 
-        auto new_type = StructType::create(getGlobalContext(), subtypes);
-        ListTypes[Ty] = new_type;
+        auto NewType = StructType::create(getGlobalContext(), Subtypes);
+        ListTypes[Ty] = NewType;
 
-        return new_type;
+        return NewType;
     }
 
     llvm::FunctionType *LLVMCodeGenerator::getFuncType(common::Type Ty)
     {
-        auto old_type = FuncTypes.find(Ty);
+        auto OldType = FuncTypes.find(Ty);
 
-        if (old_type != FuncTypes.end())
-            return old_type->second;
+        if (OldType != FuncTypes.end())
+            return OldType->second;
 
-        auto output_type = getType(Ty.Subtypes.back());
-        std::vector<llvm::Type *> input_types;
+        auto OutputType = getType(Ty.Subtypes.back());
+        std::vector<llvm::Type *> InputTypes;
         for (size_t i = 0; i < Ty.Subtypes.size() - 1; i++) {
-            input_types.push_back(getType(Ty.Subtypes[i]));
+            InputTypes.push_back(getType(Ty.Subtypes[i]));
         }
 
-        auto new_type = FunctionType::get(output_type, input_types, false);
-        FuncTypes[Ty] = new_type;
+        auto NewType = FunctionType::get(OutputType, InputTypes, false);
+        FuncTypes[Ty] = NewType;
 
-        return new_type;
+        return NewType;
     }
 
     void LLVMCodeGenerator::visit(common::Function &Node) {
 
         // Create function and entry block
         CurFunc = llvm::Function::Create(getFuncType(Node.Signature), llvm::Function::ExternalLinkage, Node.Id, Module.get());
-        BasicBlock *entry = BasicBlock::Create(getGlobalContext(), "entry", CurFunc);
+        BasicBlock *Entry = BasicBlock::Create(getGlobalContext(), "entry", CurFunc);
 
         // Create error block
         CurErrorBlock = BasicBlock::Create(getGlobalContext(), "error", CurFunc);
@@ -119,14 +119,14 @@ namespace codegen {
         // Setup return block and phi node
         CurRetBlock = BasicBlock::Create(getGlobalContext(), "ret", CurFunc);
         Builder.SetInsertPoint(CurRetBlock);
-        CurPhiNode = Builder.CreatePHI(CurFunc->getReturnType(), Node.Cases.size(), "rettmp");
+        CurPhiNode = Builder.CreatePHI(CurFunc->getReturnType(), (unsigned int)Node.Cases.size(), "rettmp");
         Builder.CreateRet(CurPhiNode);
 
         // Setup names for arguments
         auto i = 0;
-        for (auto &arg : CurFunc->args()) {
-            arg.setName("_arg" + to_string(i++));
-            Arguments.push_back(&arg);
+        for (auto &Arg : CurFunc->args()) {
+            Arg.setName("_arg" + to_string(i++));
+            Arguments.push_back(&Arg);
         }
 
         // Setup case and pattern blocks
@@ -140,13 +140,13 @@ namespace codegen {
 
         // Visit cases
         CurCaseId = LastCaseId = Node.Cases.size() - 1;
-        for (auto &_case : Node.Cases) {
-            _case->accept(*this);
+        for (auto &Case : Node.Cases) {
+            Case->accept(*this);
             CurCaseId--;
         }
 
         // Make entry point to first pattern
-        Builder.SetInsertPoint(entry);
+        Builder.SetInsertPoint(Entry);
         Builder.CreateBr(CurPatternBlock);
 
         verifyFunction(*CurFunc);
@@ -167,12 +167,12 @@ namespace codegen {
 
         CurCaseBlock = BasicBlock::Create(getGlobalContext(), "case" + to_string(CurCaseId), CurFunc);
 
-        BasicBlock *true_block;
-        BasicBlock *false_block;
+        BasicBlock *TrueBlock;
+        BasicBlock *FalseBlock;
         if (CurCaseId == LastCaseId)
-            false_block = CurErrorBlock;
+            FalseBlock = CurErrorBlock;
         else
-            false_block = CurPatternBlock;
+            FalseBlock = CurPatternBlock;
 
 
         if (Node.Patterns.size()) {
@@ -182,9 +182,9 @@ namespace codegen {
 
                 // Last pattern should branch to next case
                 if (i == Node.Patterns.size())
-                    true_block = CurCaseBlock;
+                    TrueBlock = CurCaseBlock;
                 else
-                    true_block = CurPatternBlock;
+                    TrueBlock = CurPatternBlock;
 
                 // Create new branch
                 CurPatternBlock = BasicBlock::Create(getGlobalContext(),
@@ -198,7 +198,7 @@ namespace codegen {
                 CurVal = compare(CurVal, Arguments[i - 1]);
 
                 // Create condition
-                Builder.CreateCondBr(CurVal, true_block, false_block);
+                Builder.CreateCondBr(CurVal, TrueBlock, FalseBlock);
             }
         }
         else
@@ -368,15 +368,15 @@ namespace codegen {
     }
 
     void LLVMCodeGenerator::visit(common::Int &Node) {
-        CurVal = ConstantInt::get(getType(Node.Ty), Node.Val);
+        CurVal = ConstantInt::get(getType(Node.Ty), (uint64_t)Node.Val);
     }
 
     void LLVMCodeGenerator::visit(common::Bool &Node) {
-        CurVal = ConstantInt::get(getType(Node.Ty), Node.Val);
+        CurVal = ConstantInt::get(getType(Node.Ty), (uint64_t)Node.Val);
     }
 
     void LLVMCodeGenerator::visit(common::Char &Node) {
-        CurVal = ConstantInt::get(getType(Node.Ty), Node.Val);
+        CurVal = ConstantInt::get(getType(Node.Ty), (uint64_t)Node.Val);
     }
 
     void LLVMCodeGenerator::visit(common::String &Node) {
@@ -386,15 +386,15 @@ namespace codegen {
 
     void LLVMCodeGenerator::visit(common::Call &Node) {
         Node.Callee->accept(*this);
-        auto callee = CurVal;
+        auto Callee = CurVal;
 
-        std::vector<Value *> args;
-        for (auto &arg : Node.Args) {
-            arg->accept(*this);
-            args.push_back(CurVal);
+        std::vector<Value *> Args;
+        for (auto &Arg : Node.Args) {
+            Arg->accept(*this);
+            Args.push_back(CurVal);
         }
 
-        CurVal = Builder.CreateCall(callee, args, "calltmp");
+        CurVal = Builder.CreateCall(Callee, Args, "calltmp");
     }
 
     void LLVMCodeGenerator::visit(common::Id &Node) {
@@ -429,39 +429,39 @@ namespace codegen {
     }
 
     void LLVMCodeGenerator::visit(common::Tuple &Node) {
-        std::vector<llvm::Constant *> tmp;
+        std::vector<llvm::Constant *> TmpVec;
 
-        for (auto &expr: Node.Elements) {
-            expr->accept(*this);
-            tmp.push_back((Constant *)CurVal);
+        for (auto &Element: Node.Elements) {
+            Element->accept(*this);
+            TmpVec.push_back((Constant *)CurVal);
         }
 
-        ArrayRef<Constant *> tuple_val(tmp);
+        ArrayRef<Constant *> TupleVal(TmpVec);
 
-        auto const_val = ConstantStruct::get(getTupleType(Node.Ty), tuple_val);
-        CurVal = new GlobalVariable(*Module.get(), const_val->getType(), true, GlobalVariable::ExternalLinkage, const_val);
+        auto ConstVal = ConstantStruct::get(getTupleType(Node.Ty), TupleVal);
+        CurVal = new GlobalVariable(*Module.get(), ConstVal->getType(), true, GlobalVariable::ExternalLinkage, ConstVal);
 
     }
 
     void LLVMCodeGenerator::visit(common::List &Node) {
-        std::vector<llvm::Constant *> tmp;
+        std::vector<llvm::Constant *> TmpVec;
 
-        for (auto &expr: Node.Elements) {
-            expr->accept(*this);
-            tmp.push_back(dynamic_cast<Constant *>(CurVal));
+        for (auto &Element: Node.Elements) {
+            Element->accept(*this);
+            TmpVec.push_back(dynamic_cast<Constant *>(CurVal));
         }
 
-        ArrayRef<Constant *> list_data(tmp);
+        ArrayRef<Constant *> ListData(TmpVec);
 
-        auto list_type = ArrayType::get(getType(Node.Ty), Node.Elements.size());
-        auto const_val = ConstantArray::get(list_type, list_data);
+        auto ListType = ArrayType::get(getType(Node.Ty), Node.Elements.size());
+        auto ConstVal = ConstantArray::get(ListType, ListData);
 
-        CurVal = new GlobalVariable(*Module.get(), const_val->getType(), true, GlobalVariable::ExternalLinkage, const_val);
+        CurVal = new GlobalVariable(*Module.get(), ConstVal->getType(), true, GlobalVariable::ExternalLinkage, ConstVal);
     }
 
     string LLVMCodeGenerator::ModuleString() {
-        string module_str;
-        raw_string_ostream out(module_str);
+        string ModuleStr;
+        raw_string_ostream out(ModuleStr);
         out << *Module.get();
         return out.str();
     }

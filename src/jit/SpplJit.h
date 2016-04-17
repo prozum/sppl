@@ -62,7 +62,7 @@ namespace jit {
 
         std::unique_ptr<legacy::FunctionPassManager> PassMgr;
         std::vector<ModuleHandleT> ModuleHandles;
-        ModuleHandleT moduleHandler;
+        ModuleHandleT ModuleHandler;
 
         parser::Driver Driver;
         codegen::LLVMCodeGenerator Generator;
