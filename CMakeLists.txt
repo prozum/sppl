@@ -11,7 +11,11 @@ option(INTERPRETER "Interpreter description" OFF)
 option(JIT "LLVM JIT Compiler" OFF)
 option(TESTS "Tests" OFF)
 
+# C++ flags for using C++14 and static libraries
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -static")
+# llvm-config flags that allow compilation with clang
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS")
+
 if(DEBUG)
     set(CMAKE_BUILD_TYPE Debug)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall -pedantic -Wno-unused-parameter")
