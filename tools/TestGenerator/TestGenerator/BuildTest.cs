@@ -504,53 +504,53 @@ namespace TestGenerator
 			GenerateSimpleTestCase (writer, "precNotEqualTrue", "Bool", "True!=True!=True", "true", "", "False");
 			GenerateSimpleTestCase (writer, "precNotEqualFalse", "Bool", "False!=False!=False", "true", "", "False");
 			GenerateSimpleTestCase (writer, "precNotEqualMixFalse", "Bool", "True!=False!=True", "true", "", "False");
-			GenerateSimpleTestCase (writer, "procNotEqualMixTrue", "Bool", "True!=False!=False", "true", "", "True");
+			GenerateSimpleTestCase (writer, "precNotEqualMixTrue", "Bool", "True!=False!=False", "true", "", "True");
 
-			GenerateSimpleTestCase (writer, "procLessLess", "Bool", "2<3", "true", "", "True");
-			GenerateSimpleTestCase (writer, "procLessMore", "Bool", "3<2", "true", "", "False");
-			GenerateSimpleTestCase (writer, "procLessSame", "Bool", "2<2", "true", "", "False");
+			GenerateSimpleTestCase (writer, "precLessLess", "Bool", "2<3", "true", "", "True");
+			GenerateSimpleTestCase (writer, "precLessMore", "Bool", "3<2", "true", "", "False");
+			GenerateSimpleTestCase (writer, "precLessSame", "Bool", "2<2", "true", "", "False");
 
-			GenerateSimpleTestCase (writer, "procGreatLess", "Bool", "2>3", "true", "", "False");
+			GenerateSimpleTestCase (writer, "precGreatLess", "Bool", "2>3", "true", "", "False");
 			GenerateSimpleTestCase (writer, "precGreatMore", "Bool", "3>2", "true", "", "True");
-			GenerateSimpleTestCase (writer, "procGreatSame", "Bool", "2>2", "true", "", "False");
+			GenerateSimpleTestCase (writer, "precGreatSame", "Bool", "2>2", "true", "", "False");
 
-			GenerateSimpleTestCase (writer, "procLessEqualLess", "Bool", "2<=3", "true", "", "True");
-			GenerateSimpleTestCase (writer, "procLessEqualMore", "Bool", "3<=2", "true", "", "False");
-			GenerateSimpleTestCase (writer, "procLessEqualSame", "Bool", "2<=2", "true", "", "True");
+			GenerateSimpleTestCase (writer, "precLessEqualLess", "Bool", "2<=3", "true", "", "True");
+			GenerateSimpleTestCase (writer, "precLessEqualMore", "Bool", "3<=2", "true", "", "False");
+			GenerateSimpleTestCase (writer, "precLessEqualSame", "Bool", "2<=2", "true", "", "True");
 
-			GenerateSimpleTestCase (writer, "procGreatLess", "Bool", "2>=3", "true", "", "False");
-			GenerateSimpleTestCase (writer, "precGreatMore", "Bool", "3>=2", "true", "", "True");
-			GenerateSimpleTestCase (writer, "procGreatSame", "Bool", "2>=2", "true", "", "True");
+			GenerateSimpleTestCase (writer, "precGreatEqualLess", "Bool", "2>=3", "true", "", "False");
+			GenerateSimpleTestCase (writer, "precGreatEqualMore", "Bool", "3>=2", "true", "", "True");
+			GenerateSimpleTestCase (writer, "precGreatEqualSame", "Bool", "2>=2", "true", "", "True");
 
-			GenerateSimpleTestCase (writer, "procAdd", "Bool", "2+2+2", "true", "", "6");
-			GenerateSimpleTestCase (writer, "procSub", "Bool", "2-2-2", "true", "", "-2");
+			GenerateSimpleTestCase (writer, "precAdd", "Bool", "2+2+2", "true", "", "6");
+			GenerateSimpleTestCase (writer, "precSub", "Bool", "2-2-2", "true", "", "-2");
 
-			GenerateSimpleTestCase (writer, "procMul", "Bool", "2*2*2", "true", "", "8");
-			GenerateSimpleTestCase (writer, "procDiv", "Bool", "2/2/2", "true", "", "0");
-			GenerateSimpleTestCase (writer, "procMod", "Bool", "2%2%2", "true", "", "0");
+			GenerateSimpleTestCase (writer, "precMul", "Bool", "2*2*2", "true", "", "8");
+			GenerateSimpleTestCase (writer, "precDiv", "Bool", "2/2/2", "true", "", "0");
+			GenerateSimpleTestCase (writer, "precMod", "Bool", "2%2%2", "true", "", "0");
 
-			GenerateSimpleTestCase (writer, "procNotTrue", "Bool", "!True", "true", "", "False");
-			GenerateSimpleTestCase (writer, "procNotFalse", "Bool", "!False", "true", "", "True");
+			GenerateSimpleTestCase (writer, "precNotTrue", "Bool", "!True", "true", "", "False");
+			GenerateSimpleTestCase (writer, "precNotFalse", "Bool", "!False", "true", "", "True");
 
 			// DIFFERENT
 
-			GenerateSimpleTestCase (writer, "procOrAndTrue", "Bool", "True || True && True", "true", "", "True");
-			GenerateSimpleTestCase (writer, "procOrAndFalse", "Bool", "False || False && False", "true", "", "False");
-			GenerateSimpleTestCase (writer, "procOrAndMixFalseTrue", "Bool", "False || True && True", "true", "", "False");
-			GenerateSimpleTestCase (writer, "procOrAndMixTrueFalse", "Bool", "True || False && False", "true", "", "False");
-			GenerateSimpleTestCase (writer, "procOrAndMixFalseTrueFalse", "Bool", "False || True && False", "true", "", "False");
+			GenerateSimpleTestCase (writer, "precOrAndTrue", "Bool", "True || True && True", "true", "", "True");
+			GenerateSimpleTestCase (writer, "precOrAndFalse", "Bool", "False || False && False", "true", "", "False");
+			GenerateSimpleTestCase (writer, "precOrAndMixFalseTrue", "Bool", "False || True && True", "true", "", "False");
+			GenerateSimpleTestCase (writer, "precOrAndMixTrueFalse", "Bool", "True || False && False", "true", "", "False");
+			GenerateSimpleTestCase (writer, "precOrAndMixFalseTrueFalse", "Bool", "False || True && False", "true", "", "False");
 
-			GenerateSimpleTestCase (writer, "procAndOrTrue", "Bool", "True && True || True", "true", "", "True");
-			GenerateSimpleTestCase (writer, "procAndOrFalse", "Bool", "False && False || False", "true", "", "False");
-			GenerateSimpleTestCase (writer, "procAndOrMixTrueFalse", "Bool", "True && True || False", "true", "", "True");
-			GenerateSimpleTestCase (writer, "procAndOrMixFalseTrue", "Bool", "False && False || True", "true", "", "True");
-			GenerateSimpleTestCase (writer, "procAndOrMixFalseTrueFalse", "Bool", "False && True || False", "true", "", "False");
+			GenerateSimpleTestCase (writer, "precAndOrTrue", "Bool", "True && True || True", "true", "", "True");
+			GenerateSimpleTestCase (writer, "precAndOrFalse", "Bool", "False && False || False", "true", "", "False");
+			GenerateSimpleTestCase (writer, "precAndOrMixTrueFalse", "Bool", "True && True || False", "true", "", "True");
+			GenerateSimpleTestCase (writer, "precAndOrMixFalseTrue", "Bool", "False && False || True", "true", "", "True");
+			GenerateSimpleTestCase (writer, "precAndOrMixFalseTrueFalse", "Bool", "False && True || False", "true", "", "False");
 
-			GenerateSimpleTestCase (writer, "procAndEqualTrue", "Bool", "True && True == True", "true", "", "True");
-			GenerateSimpleTestCase (writer, "procAndEqualFalse", "Bool", "False && False == False", "true", "", "False");
-			GenerateSimpleTestCase (writer, "procAndEqualMixTrueFalse", "Bool", "True && True == False", "true", "", "False");
-			GenerateSimpleTestCase (writer, "procAndEqualMixFalseTrue", "Bool", "False && False == True", "true", "", "False");
-			GenerateSimpleTestCase (writer, "procAndEqualMixFalseTrueTrue", "Bool", "False && True == True", "true", "", "False");
+			GenerateSimpleTestCase (writer, "precAndEqualTrue", "Bool", "True && True == True", "true", "", "True");
+			GenerateSimpleTestCase (writer, "precAndEqualFalse", "Bool", "False && False == False", "true", "", "False");
+			GenerateSimpleTestCase (writer, "precAndEqualMixTrueFalse", "Bool", "True && True == False", "true", "", "False");
+			GenerateSimpleTestCase (writer, "precAndEqualMixFalseTrue", "Bool", "False && False == True", "true", "", "False");
+			GenerateSimpleTestCase (writer, "precAndEqualMixFalseTrueTrue", "Bool", "False && True == True", "true", "", "False");
 
 
 
