@@ -11,9 +11,9 @@ using namespace parser;
 namespace codegen {
     class Printer : public CodeGenerator {
     public:
-        Printer(Driver &driver);
+        Printer(Driver &Drv);
 
-        virtual void visit(Program &node);
+        virtual void visit(Program &Node);
     };
 
 }

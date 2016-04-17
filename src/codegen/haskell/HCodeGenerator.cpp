@@ -27,7 +27,7 @@ namespace codegen {
 
     void HCodeGenerator::visit(Function &node)
     {
-        curr_fun = &node;
+        CurFunc = &node;
 
         *Drv.Out << node.Id << " :: ";
 
@@ -50,7 +50,7 @@ namespace codegen {
 
     void HCodeGenerator::visit(Case &node)
     {
-        *Drv.Out << curr_fun->Id << " ";
+        *Drv.Out << CurFunc->Id << " ";
 
         for (auto &p: node.Patterns) {
             p->accept(*this);

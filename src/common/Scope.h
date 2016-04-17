@@ -14,9 +14,9 @@ namespace common {
         std::vector<unique_ptr<Scope>> Children;
 
         Scope() : Scope(nullptr) { }
-        Scope(Scope* p);
+        Scope(Scope* Scp);
 
-        bool exists(std::string id);
-        Type getType(std::string id);
+        bool exists(std::string Id);
+        Type getType(std::string Id);
     };
 }

@@ -2,78 +2,78 @@
 #include "Visitor.h"
 
 namespace common {
-    void Int::accept(Visitor &v) { v.visit(*this); }
-    void Float::accept(Visitor &v) { v.visit(*this); }
-    void Bool::accept(Visitor &v) { v.visit(*this); }
-    void Char::accept(Visitor &v) { v.visit(*this); }
-    void String::accept(Visitor &v) { v.visit(*this); }
-    void Id::accept(Visitor &v) { v.visit(*this); }
-    void ListPattern::accept(Visitor &v) { v.visit(*this); }
-    void TuplePattern::accept(Visitor &v) { v.visit(*this); }
-    void ListSplit::accept(Visitor &v) { v.visit(*this); }
+    void Int::accept(Visitor &V) { V.visit(*this); }
+    void Float::accept(Visitor &V) { V.visit(*this); }
+    void Bool::accept(Visitor &V) { V.visit(*this); }
+    void Char::accept(Visitor &V) { V.visit(*this); }
+    void String::accept(Visitor &V) { V.visit(*this); }
+    void Id::accept(Visitor &V) { V.visit(*this); }
+    void ListPattern::accept(Visitor &V) { V.visit(*this); }
+    void TuplePattern::accept(Visitor &V) { V.visit(*this); }
+    void ListSplit::accept(Visitor &V) { V.visit(*this); }
 
-    Pattern::Pattern(Location loc) :
-            Expression(loc) { }
+    Pattern::Pattern(Location Loc) :
+            Expression(Loc) { }
 
-    Pattern::Pattern(Type type, Location loc) :
-            Expression(type, loc) { }
+    Pattern::Pattern(Type Ty, Location Loc) :
+            Expression(Ty, Loc) { }
 
-    Int::Int(long value,
-             Location loc) :
-            Pattern(Type(TypeId::INT), loc),
-            Val(value) { }
+    Int::Int(long Val,
+             Location Loc) :
+            Pattern(Type(TypeId::INT), Loc),
+            Val(Val) { }
 
-    Float::Float(double value,
-                 Location loc) :
-            Pattern(Type(TypeId::FLOAT), loc),
-            Val(value) { }
+    Float::Float(double Val,
+                 Location Loc) :
+            Pattern(Type(TypeId::FLOAT), Loc),
+            Val(Val) { }
 
-    Bool::Bool(bool value,
-               Location loc) :
-            Pattern(Type(TypeId::BOOL), loc),
-            Val(value) { }
+    Bool::Bool(bool Val,
+               Location Loc) :
+            Pattern(Type(TypeId::BOOL), Loc),
+            Val(Val) { }
 
-    Char::Char(char value,
-               Location loc) :
-            Pattern(Type(TypeId::CHAR), loc),
-            Val(value) { }
+    Char::Char(char Val,
+               Location Loc) :
+            Pattern(Type(TypeId::CHAR), Loc),
+            Val(Val) { }
 
-    String::String(string value,
-                   Location loc) :
-            Pattern(Type(TypeId::STRING), loc),
-            Val(value) { }
+    String::String(string Val,
+                   Location Loc) :
+            Pattern(Type(TypeId::STRING), Loc),
+            Val(Val) { }
 
-    ListPattern::ListPattern(vector<unique_ptr<Pattern>> patterns,
-                             Location loc) :
-            Pattern(loc),
-            Patterns(move(patterns)) { }
+    ListPattern::ListPattern(vector<unique_ptr<Pattern>> Patterns,
+                             Location Loc) :
+            Pattern(Loc),
+            Patterns(move(Patterns)) { }
 
-    TuplePattern::TuplePattern(vector<unique_ptr<Pattern>> patterns,
+    TuplePattern::TuplePattern(vector<unique_ptr<Pattern>> Patterns,
                                Location loc) :
             Pattern(loc),
-            Patterns(move(patterns)) { }
+            Patterns(move(Patterns)) { }
 
     ListSplit::ListSplit(unique_ptr<Pattern> left,
-                         unique_ptr<Pattern> right,
+                         unique_ptr<Pattern> Patterns,
                          Location loc) :
             Pattern(loc),
             Left(move(left)),
-            Right(move(right)) { }
+            Right(move(Patterns)) { }
 
-    List::List(vector<unique_ptr<Expression>> exprs,
-               Location loc) :
-            Expression(Type(TypeId::LIST), loc),
-            Elements(move(exprs)) { }
+    List::List(vector<unique_ptr<Expression>> Elements,
+               Location Loc) :
+            Expression(Type(TypeId::LIST), Loc),
+            Elements(move(Elements)) { }
 
-    Tuple::Tuple(vector<unique_ptr<Expression>> exprs,
-                 Location loc) :
-            Expression(Type(TypeId::TUPLE), loc),
-            Elements(move(exprs)) { }
+    Tuple::Tuple(vector<unique_ptr<Expression>> Elements,
+                 Location Loc) :
+            Expression(Type(TypeId::TUPLE), Loc),
+            Elements(move(Elements)) { }
 
-    Id::Id(string id,
-           Location loc) :
-            Pattern(loc),
-            Val(id) { }
+    Id::Id(string Val,
+           Location Loc) :
+            Pattern(Loc),
+            Val(Val) { }
 
     string List::str() {
         string str("[");

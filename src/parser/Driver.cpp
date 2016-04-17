@@ -24,45 +24,45 @@ namespace parser {
             if (!FIn.good())
                 return false;
             Snr.switch_streams(In, MOut);
-            Src = Filenames[CurFile++];
+            Source = Filenames[CurFile++];
             return true;
         }
         return false;
     }
 
-    void Driver::setOutput(string filename) {
-        FOut =  ofstream(filename);
+    void Driver::setOutput(string Filename) {
+        FOut =  ofstream(Filename);
         Out = &FOut;
     }
 
-    void Driver::setInputs(vector<string> filenames) {
-        this->Filenames = filenames;
+    void Driver::setInputs(vector<string> Filenames) {
+        this->Filenames = Filenames;
     }
 
-    void Driver::setHeaderOutput(string filename) {
-        FHOut =  ofstream(filename);
+    void Driver::setHeaderOutput(string Filename) {
+        FHOut =  ofstream(Filename);
         HOut = &FHOut;
     }
 
-    bool Driver::parseStream(std::istream &in, const std::string &sname) {
+    bool Driver::parseStream(std::istream &In, const std::string &Src) {
         SrcType = SourceType::STREAM;
-        Src = sname;
+        Source = Src;
 
-        Snr.switch_streams(&in, MOut);
+        Snr.switch_streams(&In, MOut);
         Snr.set_debug(TraceScanning);
         Psr.set_debug_level(TraceParsing);
 
         return (Psr.parse() == 0);
     }
 
-    bool Driver::parseFile(const std::string &filename) {
+    bool Driver::parseFile(const std::string &Filename) {
         SrcType = SourceType::FILE;
-        Src = filename;
+        Source = Filename;
 
-        std::ifstream in(filename.c_str());
+        std::ifstream in(Filename.c_str());
         if (!in.good()) return false;
 
-        return parseStream(in, filename);
+        return parseStream(in, Filename);
     }
 
     bool Driver::parseFiles() {
@@ -76,42 +76,42 @@ namespace parser {
         return true;
     }
 
-    bool Driver::parseString(const std::string &input, const std::string &sname) {
+    bool Driver::parseString(const std::string &Input, const std::string &Src) {
         SrcType = SourceType::STRING;
-        Src = sname;
+        Source = Src;
 
-        std::istringstream iss(input);
+        std::istringstream iss(Input);
 
-        return parseStream(iss, sname);
+        return parseStream(iss, Src);
     }
 
-    bool Driver::accept(common::Visitor &visitor) {
-        visitor.Errors.clear();
+    bool Driver::accept(common::Visitor &V) {
+        V.Errors.clear();
 
         try {
-            Prog->accept(visitor);
+            Prog->accept(V);
         }
         catch (Error err) {
-            visitor.Errors.push_back(err);
+            V.Errors.push_back(err);
         }
 
-        for (auto &error : visitor.Errors) {
+        for (auto &error : V.Errors) {
             showError(error);
         }
 
-        return !visitor.hasError();
+        return !V.hasError();
     }
 
-    void Driver::error(const common::Location& loc,
-                       const std::string &msg) {
-        showError(Error(msg, loc));
+    void Driver::error(const common::Location& Loc,
+                       const std::string &Msg) {
+        showError(Error(Msg, Loc));
     }
 
-    void Driver::error(const std::string &msg) {
-        showError(Error(msg));
+    void Driver::error(const std::string &Msg) {
+        showError(Error(Msg));
     }
 
-    void Driver::showError(Error err) {
-        *MOut << err << endl;
+    void Driver::showError(Error Err) {
+        *MOut << Err << endl;
     }
 }

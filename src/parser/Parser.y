@@ -4,7 +4,7 @@
 %locations
 %define api.location.type {Location}
 %initial-action {
-    @$.begin.Src = @$.end.Src = Drv.Src;
+    @$.begin.Src = @$.end.Src = Drv.Source;
 }
 %debug
 %parse-param { class Driver &Drv }

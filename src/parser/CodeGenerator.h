@@ -15,7 +15,7 @@ namespace parser {
     public:
         Driver &Drv;
 
-        CodeGenerator(Driver &driver);
+        CodeGenerator(Driver &Drv);
     };
 
 }

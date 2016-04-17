@@ -10,19 +10,19 @@ namespace common {
 	class Error {
 	public:
 		Error() = default;
-		Error(string msg);
-		Error(string msg, Location loc);
+		Error(string Msg);
+		Error(string Msg, Location Loc);
 
-		Error(const Error &other);
+		Error(const Error &Other);
 
-		static Error NotImplemented(string msg);
-		static Error Expected(string msg, string expected, string actual, Location loc);
-		static Error Binary(string msg, common::BinaryOp &op);
-		static Error Unary(string msg, common::UnaryOp &op);
+		static Error NotImplemented(string Msg);
+		static Error Expected(string Msg, string Expected, string Actual, Location Loc);
+		static Error Binary(string Msg, common::BinaryOp &Op);
+		static Error Unary(string Msg, common::UnaryOp &Op);
 
 		std::string Msg;
 		Location Loc;
 	};
 
-	std::ostream &operator<<(ostream &out, const Error &err);
+	std::ostream &operator<<(ostream &Out, const Error &Err);
 }

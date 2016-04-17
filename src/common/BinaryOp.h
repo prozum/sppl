@@ -9,120 +9,120 @@ namespace common {
 		unique_ptr<Expression> Left;
 		unique_ptr<Expression> Right;
 
-		BinaryOp(unique_ptr<Expression>, unique_ptr<Expression>, Location);
+		BinaryOp(unique_ptr<Expression> Left, unique_ptr<Expression> Right, Location Loc);
 
-		virtual void accept(Visitor &) = 0;
+		virtual void accept(Visitor &V) = 0;
 	};
 
 	class Add : public BinaryOp {
 	public:
-		Add(unique_ptr<Expression>, unique_ptr<Expression>, Location);
+		Add(unique_ptr<Expression> Left, unique_ptr<Expression> Right, Location Loc);
 
-		virtual void accept(Visitor &);
+		virtual void accept(Visitor &V);
 		string str();
 	};
 
 	class Sub : public BinaryOp {
 	public:
-		Sub(unique_ptr<Expression>, unique_ptr<Expression>, Location);
+		Sub(unique_ptr<Expression> Left, unique_ptr<Expression> Right, Location Loc);
 
-		virtual void accept(Visitor &);
+		virtual void accept(Visitor &V);
 		string str();
 	};
 
 	class Mul : public BinaryOp {
 	public:
-		Mul(unique_ptr<Expression>, unique_ptr<Expression>, Location);
+		Mul(unique_ptr<Expression> Left, unique_ptr<Expression> Right, Location Loc);
 
-		virtual void accept(Visitor &);
+		virtual void accept(Visitor &V);
 		string str();
 	};
 
 	class Div : public BinaryOp {
 	public:
-		Div(unique_ptr<Expression>, unique_ptr<Expression>, Location);
+		Div(unique_ptr<Expression> Left, unique_ptr<Expression> Right, Location Loc);
 
-		virtual void accept(Visitor &);
+		virtual void accept(Visitor &v);
 		string str();
 	};
 
 	class Mod : public BinaryOp {
 	public:
-		Mod(unique_ptr<Expression>, unique_ptr<Expression>, Location);
+		Mod(unique_ptr<Expression> Left, unique_ptr<Expression> Right, Location Loc);
 
-		virtual void accept(Visitor &);
+		virtual void accept(Visitor &V);
 		string str();
 	};
 
 	class ListAdd : public BinaryOp {
 	public:
-		ListAdd(unique_ptr<Expression>, unique_ptr<Expression>, Location);
+		ListAdd(unique_ptr<Expression> Left, unique_ptr<Expression> Right, Location Loc);
 
-		virtual void accept(Visitor &);
+		virtual void accept(Visitor &V);
 		string str();
 	};
 
 		class Or : public BinaryOp {
 	public:
-		Or(unique_ptr<Expression>, unique_ptr<Expression>, Location);
+		Or(unique_ptr<Expression> Left, unique_ptr<Expression> Right, Location Loc);
 
-		virtual void accept(Visitor &);
+		virtual void accept(Visitor &V);
 		string str();
 	};
 
 	class And : public BinaryOp {
 	public:
-		And(unique_ptr<Expression>, unique_ptr<Expression>, Location);
+		And(unique_ptr<Expression> Left, unique_ptr<Expression> Right, Location Loc);
 
-		virtual void accept(Visitor &);
+		virtual void accept(Visitor &V);
 		string str();
 	};
 
 	class Equal : public BinaryOp {
 	public:
-		Equal(unique_ptr<Expression>, unique_ptr<Expression>, Location);
+		Equal(unique_ptr<Expression> Left, unique_ptr<Expression> Right, Location Loc);
 
-		virtual void accept(Visitor &);
+		virtual void accept(Visitor &V);
 		string str();
 	};
 
 	class NotEqual : public BinaryOp {
 	public:
-		NotEqual(unique_ptr<Expression>, unique_ptr<Expression>, Location);
+		NotEqual(unique_ptr<Expression> Left, unique_ptr<Expression> Right, Location Loc);
 
-		virtual void accept(Visitor &);
+		virtual void accept(Visitor &V);
 		string str();
 	};
 
 	class Lesser : public BinaryOp {
 	public:
-		Lesser(unique_ptr<Expression>, unique_ptr<Expression>, Location);
+		Lesser(unique_ptr<Expression> Left, unique_ptr<Expression> Right, Location Loc);
 
-		virtual void accept(Visitor &);
+		virtual void accept(Visitor &V);
 		string str();
 	};
 
 	class Greater : public BinaryOp {
 	public:
-		Greater(unique_ptr<Expression>, unique_ptr<Expression>, Location);
+		Greater(unique_ptr<Expression> Left, unique_ptr<Expression> Right, Location Loc);
 
-		virtual void accept(Visitor &);
+		virtual void accept(Visitor &V);
 		string str();
 	};
 
 	class LesserEq : public BinaryOp {
 	public:
-		LesserEq(unique_ptr<Expression>, unique_ptr<Expression>, Location);
+		LesserEq(unique_ptr<Expression> Left, unique_ptr<Expression> Right, Location Loc);
 
-		virtual void accept(Visitor &);
+		virtual void accept(Visitor &V);
 		string str();
 	};
 
 	class GreaterEq : public BinaryOp {
 	public:
-		GreaterEq(unique_ptr<Expression>, unique_ptr<Expression>, Location);
+		GreaterEq(unique_ptr<Expression> Left, unique_ptr<Expression> Right, Location Loc);
 
-		virtual void accept(Visitor &);
+		virtual void accept(Visitor &V);
 		string str();
 	};
 }

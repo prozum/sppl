@@ -3,36 +3,36 @@
 #include "ScopeGenerator.h"
 
 namespace semantics {
-    ScopeGenerator::ScopeGenerator(Scope* global)
-            : CurScope(global) { }
+    ScopeGenerator::ScopeGenerator(Scope* Scp)
+            : CurScope(Scp) { }
 
-    void ScopeGenerator::visit(Program &node) {
+    void ScopeGenerator::visit(Program &Node) {
         // Visit children
-        for (auto &func: node.Funcs) {
+        for (auto &func: Node.Funcs) {
             func->accept(*this);
         }
         // Visit stops here
     }
 
-    void ScopeGenerator::visit(Function &node) {
-        CurFunc = &node;
-        node.Scp = CurScope;
+    void ScopeGenerator::visit(Function &Node) {
+        CurFunc = &Node;
+        Node.Scp = CurScope;
 
-        if (!CurScope->exists(node.Id) || node.Anon) {
-            CurScope->Decls.insert({node.Id, node.Signature});
+        if (!CurScope->exists(Node.Id) || Node.Anon) {
+            CurScope->Decls.insert({Node.Id, Node.Signature});
 
             // Visit children
-            for (auto &cse: node.Cases) {
+            for (auto &cse: Node.Cases) {
                 cse->accept(*this);
             }
             // Visit stops here
         } else {
-            throw Error(node.Id + " has already been declared", node.Loc);
+            throw Error(Node.Id + " has already been declared", Node.Loc);
         }
     }
 
 
-    void ScopeGenerator::visit(Case &node) {
+    void ScopeGenerator::visit(Case &Node) {
         auto case_scope = new Scope(CurScope);
         CurScope->Children.push_back(unique_ptr<Scope>(case_scope));
         CurScope = case_scope;
@@ -40,209 +40,209 @@ namespace semantics {
         // Visit children
         Ctx = ScopeContext::PATTERN;
 
-        for (size_t i = 0; i < node.Patterns.size(); i++) {
-            node.Patterns[i]->Ty = CurFunc->Signature[i];
-            node.Patterns[i]->accept(*this);
+        for (size_t i = 0; i < Node.Patterns.size(); i++) {
+            Node.Patterns[i]->Ty = CurFunc->Signature[i];
+            Node.Patterns[i]->accept(*this);
         }
 
         Ctx = ScopeContext::EXPR;
-        node.Expr->accept(*this);
+        Node.Expr->accept(*this);
 
         CurScope = CurScope->Parent;
     }
 
-    void ScopeGenerator::visit(Or &node) {
+    void ScopeGenerator::visit(Or &Node) {
         // Visit children
-        node.Left->accept(*this);
-        node.Right->accept(*this);
+        Node.Left->accept(*this);
+        Node.Right->accept(*this);
         // Visit stops here
     }
 
-    void ScopeGenerator::visit(And &node) {
+    void ScopeGenerator::visit(And &Node) {
         // Visit children
-        node.Left->accept(*this);
-        node.Right->accept(*this);
+        Node.Left->accept(*this);
+        Node.Right->accept(*this);
         // Visit stops here
     }
 
-    void ScopeGenerator::visit(Equal &node) {
+    void ScopeGenerator::visit(Equal &Node) {
         // Visit children
-        node.Left->accept(*this);
-        node.Right->accept(*this);
+        Node.Left->accept(*this);
+        Node.Right->accept(*this);
         // Visit stops here
     }
 
-    void ScopeGenerator::visit(NotEqual &node) {
+    void ScopeGenerator::visit(NotEqual &Node) {
         // Visit children
-        node.Left->accept(*this);
-        node.Right->accept(*this);
+        Node.Left->accept(*this);
+        Node.Right->accept(*this);
         // Visit stops here
     }
 
-    void ScopeGenerator::visit(Lesser &node) {
+    void ScopeGenerator::visit(Lesser &Node) {
         // Visit children
-        node.Left->accept(*this);
-        node.Right->accept(*this);
+        Node.Left->accept(*this);
+        Node.Right->accept(*this);
         // Visit stops here
     }
 
-    void ScopeGenerator::visit(Greater &node) {
+    void ScopeGenerator::visit(Greater &Node) {
         // Visit children
-        node.Left->accept(*this);
-        node.Right->accept(*this);
+        Node.Left->accept(*this);
+        Node.Right->accept(*this);
         // Visit stops here
     }
 
-    void ScopeGenerator::visit(LesserEq &node) {
+    void ScopeGenerator::visit(LesserEq &Node) {
         // Visit children
-        node.Left->accept(*this);
-        node.Right->accept(*this);
+        Node.Left->accept(*this);
+        Node.Right->accept(*this);
         // Visit stops here
     }
 
-    void ScopeGenerator::visit(GreaterEq &node) {
+    void ScopeGenerator::visit(GreaterEq &Node) {
         // Visit children
-        node.Left->accept(*this);
-        node.Right->accept(*this);
+        Node.Left->accept(*this);
+        Node.Right->accept(*this);
         // Visit stops here
     }
 
-    void ScopeGenerator::visit(Add &node) {
+    void ScopeGenerator::visit(Add &Node) {
         // Visit children
-        node.Left->accept(*this);
-        node.Right->accept(*this);
+        Node.Left->accept(*this);
+        Node.Right->accept(*this);
         // Visit stops here
     }
 
-    void ScopeGenerator::visit(Sub &node) {
+    void ScopeGenerator::visit(Sub &Node) {
         // Visit children
-        node.Left->accept(*this);
-        node.Right->accept(*this);
+        Node.Left->accept(*this);
+        Node.Right->accept(*this);
         // Visit stops here
     }
 
-    void ScopeGenerator::visit(Mul &node) {
+    void ScopeGenerator::visit(Mul &Node) {
         // Visit children
-        node.Left->accept(*this);
-        node.Right->accept(*this);
+        Node.Left->accept(*this);
+        Node.Right->accept(*this);
         // Visit stops here
     }
 
-    void ScopeGenerator::visit(Div &node) {
+    void ScopeGenerator::visit(Div &Node) {
         // Visit children
-        node.Left->accept(*this);
-        node.Right->accept(*this);
+        Node.Left->accept(*this);
+        Node.Right->accept(*this);
         // Visit stops here
     }
 
-    void ScopeGenerator::visit(Mod &node) {
+    void ScopeGenerator::visit(Mod &Node) {
         // Visit children
-        node.Left->accept(*this);
-        node.Right->accept(*this);
+        Node.Left->accept(*this);
+        Node.Right->accept(*this);
         // Visit stops here
     }
 
-    void ScopeGenerator::visit(ListAdd &node) {
+    void ScopeGenerator::visit(ListAdd &Node) {
         // Visit children
-        node.Left->accept(*this);
-        node.Right->accept(*this);
+        Node.Left->accept(*this);
+        Node.Right->accept(*this);
         // Visit stops here
     }
 
-    void ScopeGenerator::visit(Par &node) {
+    void ScopeGenerator::visit(Par &Node) {
         // Visit children
-        node.Child->accept(*this);
+        Node.Child->accept(*this);
         // Visit stops here
     }
 
-    void ScopeGenerator::visit(Not &node) {
+    void ScopeGenerator::visit(Not &Node) {
         // Visit children
-        node.Child->accept(*this);
+        Node.Child->accept(*this);
         // Visit stops here
     }
 
-    void ScopeGenerator::visit(ListPattern &node) {
-        if (node.Ty.Id == TypeId::LIST) {
-            for (size_t i = 0; i < node.Patterns.size(); ++i) {
-                node.Patterns[i]->Ty = node.Ty.Subtypes[i];
-                node.Patterns[i]->accept(*this);
+    void ScopeGenerator::visit(ListPattern &Node) {
+        if (Node.Ty.Id == TypeId::LIST) {
+            for (size_t i = 0; i < Node.Patterns.size(); ++i) {
+                Node.Patterns[i]->Ty = Node.Ty.Subtypes[i];
+                Node.Patterns[i]->accept(*this);
             }
         }
     }
 
-    void ScopeGenerator::visit(TuplePattern &node) {
-        if (node.Ty.Id == TypeId::TUPLE) {
-            if (node.Patterns.size() == node.Ty.Subtypes.size()) {
-                for (size_t i = 0; i < node.Patterns.size(); i++) {
-                    node.Patterns[i]->Ty = node.Ty.Subtypes[i];
-                    node.Patterns[i]->accept(*this);
+    void ScopeGenerator::visit(TuplePattern &Node) {
+        if (Node.Ty.Id == TypeId::TUPLE) {
+            if (Node.Patterns.size() == Node.Ty.Subtypes.size()) {
+                for (size_t i = 0; i < Node.Patterns.size(); i++) {
+                    Node.Patterns[i]->Ty = Node.Ty.Subtypes[i];
+                    Node.Patterns[i]->accept(*this);
                 }
             }
         }
     }
 
-    void ScopeGenerator::visit(ListSplit &node) {
-        if (node.Ty.Id == TypeId::LIST) {
-            node.Left->Ty = node.Ty.Subtypes.front();
-            node.Right->Ty = node.Ty;
-        } else if (node.Ty.Id == TypeId::STRING){
-            node.Left->Ty = Type(TypeId::CHAR);
-            node.Right->Ty = node.Ty;
+    void ScopeGenerator::visit(ListSplit &Node) {
+        if (Node.Ty.Id == TypeId::LIST) {
+            Node.Left->Ty = Node.Ty.Subtypes.front();
+            Node.Right->Ty = Node.Ty;
+        } else if (Node.Ty.Id == TypeId::STRING){
+            Node.Left->Ty = Type(TypeId::CHAR);
+            Node.Right->Ty = Node.Ty;
         }
 
-        node.Left->accept(*this);
-        node.Right->accept(*this);
+        Node.Left->accept(*this);
+        Node.Right->accept(*this);
     }
 
-    void ScopeGenerator::visit(List &node) {
+    void ScopeGenerator::visit(List &Node) {
         // Visit children
-        for (auto &expr: node.Elements) {
+        for (auto &expr: Node.Elements) {
             expr->accept(*this);
         }
         // Visit stops here
     }
 
-    void ScopeGenerator::visit(Tuple &node) {
+    void ScopeGenerator::visit(Tuple &Node) {
         // Visit children
-        for (auto &expr: node.Elements) {
+        for (auto &expr: Node.Elements) {
             expr->accept(*this);
         }
         // Visit stops here
     }
 
-    void ScopeGenerator::visit(Id &node) {
-        node.Scp = CurScope;
+    void ScopeGenerator::visit(Id &Node) {
+        Node.Scp = CurScope;
 
         if (Ctx == ScopeContext::PATTERN) {
-            if (!CurScope->exists(node.Val)) {
-                CurScope->Decls.insert({node.Val, node.Ty});
+            if (!CurScope->exists(Node.Val)) {
+                CurScope->Decls.insert({Node.Val, Node.Ty});
             }
         }
     }
 
-    void ScopeGenerator::visit(Call &node) {
+    void ScopeGenerator::visit(Call &Node) {
         // Visit children
-        node.Callee->accept(*this);
-        for (auto &expr: node.Args) {
+        Node.Callee->accept(*this);
+        for (auto &expr: Node.Args) {
             expr->accept(*this);
         }
         // Visit stops here
     }
 
-    void ScopeGenerator::visit(Type &node) { }
+    void ScopeGenerator::visit(Type &Node) { }
 
-    void ScopeGenerator::visit(Int &node) {
+    void ScopeGenerator::visit(Int &Node) {
     }
 
-    void ScopeGenerator::visit(Float &node) {
+    void ScopeGenerator::visit(Float &Node) {
     }
 
-    void ScopeGenerator::visit(Bool &node) {
+    void ScopeGenerator::visit(Bool &Node) {
     }
 
-    void ScopeGenerator::visit(Char &node) {
+    void ScopeGenerator::visit(Char &Node) {
     }
 
-    void ScopeGenerator::visit(String &node) {
+    void ScopeGenerator::visit(String &Node) {
     }
 }

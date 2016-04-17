@@ -7,39 +7,39 @@ namespace common {
     Type::~Type() {
     }
 
-    Type::Type(TypeId id) :
-            Id(id) { }
+    Type::Type(TypeId Id) :
+            Id(Id) { }
 
-    Type::Type(TypeId id,
-           Location loc) :
-            Id(id),
-            Loc(loc) { }
+    Type::Type(TypeId Id,
+           Location Loc) :
+            Id(Id),
+            Loc(Loc) { }
 
-    Type::Type(TypeId id,
-               vector<Type> subtypes) :
-                Id(id),
-                Subtypes(subtypes) { }
+    Type::Type(TypeId Id,
+               vector<Type> Subtypes) :
+                Id(Id),
+                Subtypes(Subtypes) { }
 
-    Type::Type(TypeId id,
-               vector<Type> subtypes,
-               Location loc) :
-                Id(id),
-                Subtypes(subtypes),
-                Loc(loc) { }
+    Type::Type(TypeId Id,
+               vector<Type> Subtypes,
+               Location Loc) :
+                Id(Id),
+                Subtypes(Subtypes),
+                Loc(Loc) { }
 
-    bool Type::operator==(const Type &other) const {
-        if (Id != other.Id)
+    bool Type::operator==(const Type &Other) const {
+        if (Id != Other.Id)
             return false;
         switch (Id) {
             case TypeId::LIST:
-                return Subtypes[0] == other.Subtypes[0];
+                return Subtypes[0] == Other.Subtypes[0];
             case TypeId::SIGNATURE:
             case TypeId::TUPLE:
-                if (Subtypes.size() != other.Subtypes.size())
+                if (Subtypes.size() != Other.Subtypes.size())
                     return false;
 
                 for (unsigned i = 0; i < Subtypes.size(); ++i) {
-                    if (Subtypes[i] != other.Subtypes[i]) {
+                    if (Subtypes[i] != Other.Subtypes[i]) {
                         return false;
                     }
                 }
@@ -48,12 +48,12 @@ namespace common {
         }
     }
 
-    bool Type::operator!=(const Type &other) const {
-        return !(*this == other);
+    bool Type::operator!=(const Type &Other) const {
+        return !(*this == Other);
     }
 
-    Type Type::operator[](const size_t i) {
-        return  Subtypes[i];
+    Type Type::operator[](const size_t Index) {
+        return  Subtypes[Index];
     }
 
     std::string Type::str() {
@@ -77,20 +77,18 @@ namespace common {
             case TypeId::EMPTYLIST:
                 return "[]";
             default:
-                return "Unknown";
+                throw runtime_error("This should not happen!");
         }
     }
 
-    string Type::subtypeStr(const std::string split) {
+    string Type::subtypeStr(const std::string Split) {
         string str("(");
         for (size_t i = 0; i < Subtypes.size(); i++) {
             str += Subtypes[i].str();
             if (i + 1 != Subtypes.size())
-                str += split;
+                str += Split;
         }
 
         return str + ")";
     }
-
-
 }

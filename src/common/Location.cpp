@@ -4,36 +4,36 @@ namespace common {
 
     Location::Location() { }
 
-    Location::Location(unsigned l, unsigned c, string src) :
-            begin(l, c, src),
-            end(l, c, src) { }
+    Location::Location(unsigned Line, unsigned Column, string Src) :
+            begin(Line, Column, Src),
+            end(Line, Column, Src) { }
 
     void Location::step() {
         begin = end;
     }
 
-    void Location::columns(unsigned count) {
-        end.Column = max(1u, end.Column + count);
+    void Location::columns(unsigned Count) {
+        end.Column = max(1u, end.Column + Count);
     }
 
-    void Location::lines(unsigned count) {
+    void Location::lines(unsigned Count) {
         end.Column = 1;
-        end.Line += count;
+        end.Line += Count;
     }
 
-    void Location::sources(string src) {
-        end.Src = src;
+    void Location::sources(string Src) {
+        end.Src = Src;
     }
 
-    Location::Location(const Location &other) {
-        begin = other.begin;
-        end = other.end;
+    Location::Location(const Location &Other) {
+        begin = Other.begin;
+        end = Other.end;
     }
 
-    ostream &operator<<(ostream &out, const Location &loc) {
-        if (loc.begin.Src.empty())
-            return out << loc.begin.Line << ":" << loc.begin.Column;
-        return out << loc.begin.Src << ":"
-               << loc.begin.Line << ":" << loc.begin.Column;
+    ostream &operator<<(ostream &Out, const Location &Loc) {
+        if (Loc.begin.Src.empty())
+            return Out << Loc.begin.Line << ":" << Loc.begin.Column;
+        return Out << Loc.begin.Src << ":"
+               << Loc.begin.Line << ":" << Loc.begin.Column;
     }
 }

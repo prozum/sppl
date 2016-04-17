@@ -29,7 +29,7 @@ namespace parser {
         Driver(ostream *out = &cout, ostream *hout = &cout, ostream *mout = &cout);
 
         SourceType SrcType;
-        std::string Src;
+        std::string Source;
 
         // Code, header and message streams
         istream *In;
@@ -54,19 +54,19 @@ namespace parser {
         vector<string> Filenames;
         size_t CurFile = 0;
 
-        void setOutput(string filename);
-        void setInputs(vector<string> filenames);
-        void setHeaderOutput(string filename);
+        void setOutput(string Filename);
+        void setInputs(vector<string> Filenames);
+        void setHeaderOutput(string Filename);
 
-        bool parseStream(std::istream &in, const std::string &src = "stream input");
-        bool parseString(const std::string &input, const std::string &src = "string stream");
-        bool parseFile(const std::string &filename);
+        bool parseStream(std::istream &In, const std::string &Src = "stream input");
+        bool parseString(const std::string &Input, const std::string &Src = "string stream");
+        bool parseFile(const std::string &Filename);
         bool parseFiles();
 
-        bool accept(common::Visitor &visitor);
+        bool accept(common::Visitor &V);
 
-        void error(const common::Location &loc, const std::string &msg);
-        void error(const std::string &msg);
-        void showError(Error err);
+        void error(const common::Location &Loc, const std::string &Msg);
+        void error(const std::string &Msg);
+        void showError(Error Err);
     };
 }

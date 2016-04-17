@@ -9,25 +9,24 @@ using namespace std;
 
 namespace codegen
 {
-    CCodeGenerator::CCodeGenerator(Driver &driver) :
-            CodeGenerator(driver),
-            Output(driver.Out),
-            Header(driver.HOut),
+    CCodeGenerator::CCodeGenerator(Driver &Drv) :
+            CodeGenerator(Drv),
+            Output(Drv.Out),
+            Header(Drv.HOut),
             ListOffsets(vector<int>({ 0 })),
             StringList(Type(TypeId::LIST, vector<Type>({ Type(TypeId::STRING) }))),
-            RealString(Type(TypeId::LIST, vector<Type>({ Type(TypeId::CHAR) })))
-    { }
+            RealString(Type(TypeId::LIST, vector<Type>({ Type(TypeId::CHAR) }))) { }
 
-    void CCodeGenerator::visit(Program &node)
+    void CCodeGenerator::visit(Program &Node)
     {
-        Prog = &node;
+        Prog = &Node;
         Function* main = nullptr;
 
         // generate the standard functionality for every program
         generateStd();
 
         // find the main function
-        for (auto &i: node.Funcs)
+        for (auto &i: Node.Funcs)
             if (i->Id == "main")
                 main = i.get();
 
@@ -53,31 +52,31 @@ namespace codegen
                    "} \n"
                    " \n";
 
-        for (auto &f: node.Funcs) {
+        for (auto &f: Node.Funcs) {
             f->accept(*this);
             *Output << endl;
             outputBuffer();
         }
     }
 
-    void CCodeGenerator::visit(Function &node)
+    void CCodeGenerator::visit(Function &Node)
     {
         stringstream function;
         stringstream arg_name;
-        string return_type = getType(node.Ty);
+        string return_type = getType(Node.Ty);
         string argument_type;
-        string signature = getEnvironment(node.Signature);
+        string signature = getEnvironment(Node.Signature);
 
-        CurFunc = &node;
+        CurFunc = &Node;
 
         // generate function name and return type
-        function << return_type << " " << GUser << node.Id << "(" << signature << " *" << GGenerated << GSignature;
+        function << return_type << " " << GUser << Node.Id << "(" << signature << " *" << GGenerated << GSignature;
 
         // generate function arguments
-        for (size_t i = 0; i < node.Signature.Subtypes.size() - 1; i++) {
+        for (size_t i = 0; i < Node.Signature.Subtypes.size() - 1; i++) {
             function << ", ";
 
-            argument_type = getType(node.Signature.Subtypes[i]);
+            argument_type = getType(Node.Signature.Subtypes[i]);
             arg_name << GGenerated << GArg << i;
             ArgNames.push_back(arg_name.str());
             function << argument_type << " " << arg_name.str();
@@ -90,7 +89,7 @@ namespace codegen
         // generate function decleration in header
         *Header << function.str() << "; \n \n";
 
-        *Header << signature << " " << GGlobal << GUser << node.Id << " = { " << GUser << node.Id << " }; \n\n";
+        *Header << signature << " " << GGlobal << GUser << Node.Id << " = { " << GUser << Node.Id << " }; \n\n";
 
         // generate function in *output
         *Output << function.str() << " { \n"
@@ -99,7 +98,7 @@ namespace codegen
 
 
         // generate cases
-        for (auto &c: node.Cases) {
+        for (auto &c: Node.Cases) {
             c->accept(*this);
             *Output << endl;
 
@@ -117,7 +116,7 @@ namespace codegen
         ArgNames.clear();
     }
 
-    void CCodeGenerator::visit(Case &node)
+    void CCodeGenerator::visit(Case &Node)
     {
         stringstream pattern;
         bool empty = true;
@@ -126,13 +125,13 @@ namespace codegen
         pattern << "    if (";
 
         IdCtx = IdContext::PATTERN;
-        for (size_t i = 0; i < node.Patterns.size(); i++) {
+        for (size_t i = 0; i < Node.Patterns.size(); i++) {
             // push arg_name on get_value_builder. get_value_builder is used for generate
             // assignments in a case
             GetValueBuilder.push_back(ArgNames[i]);
 
             // generate pattern
-            node.Patterns[i]->accept(*this);
+            Node.Patterns[i]->accept(*this);
 
             // cleanup
             GetValueBuilder.pop_back();
@@ -169,8 +168,8 @@ namespace codegen
         IdCtx = IdContext::EXPR;
         ExprStack.push(stringstream());
 
-        if (node.TailRec) {
-            auto call = (Call*)node.Expr.get();
+        if (Node.TailRec) {
+            auto call = (Call*)Node.Expr.get();
             for (size_t i = 0; i < CurFunc->Signature.Subtypes.size() - 1; i++) {
                 ExprStack.push(stringstream());
                 call->Args[i]->accept(*this);
@@ -184,7 +183,7 @@ namespace codegen
             string result_type = getType(CurFunc->Signature.Subtypes.back());
             ExprStack.push(stringstream());
 
-            node.Expr->accept(*this);
+            Node.Expr->accept(*this);
             *Output << "        " << result_type << " res = " << ExprStack.top().str() << "; \n";
             *Output << "        return res; \n";
             ExprStack.pop();
@@ -194,33 +193,33 @@ namespace codegen
                    " \n";
     }
 
-    void CCodeGenerator::visit(Or &node)
+    void CCodeGenerator::visit(Or &Node)
     {
         ExprStack.top() << "(";
-        node.Left->accept(*this);
+        Node.Left->accept(*this);
         ExprStack.top() << "||";
-        node.Right->accept(*this);
+        Node.Right->accept(*this);
         ExprStack.top() << ")";
     }
 
-    void CCodeGenerator::visit(And &node)
+    void CCodeGenerator::visit(And &Node)
     {
         ExprStack.top() << "(";
-        node.Left->accept(*this);
+        Node.Left->accept(*this);
         ExprStack.top() << "&&";
-        node.Right->accept(*this);
+        Node.Right->accept(*this);
         ExprStack.top() << ")";
     }
 
-    void CCodeGenerator::visit(Equal &node)
+    void CCodeGenerator::visit(Equal &Node)
     {
-        outputEqual(node.Ty, *node.Left.get(), *node.Right.get());
+        outputEqual(Node.Ty, *Node.Left.get(), *Node.Right.get());
     }
 
-    void CCodeGenerator::visit(NotEqual &node)
+    void CCodeGenerator::visit(NotEqual &Node)
     {
         ExprStack.top() << "(!";
-        outputEqual(node.Ty, *node.Left.get(), *node.Right.get());
+        outputEqual(Node.Ty, *Node.Left.get(), *Node.Right.get());
         ExprStack.top() << ")";
     }
 
@@ -257,130 +256,130 @@ namespace codegen
         }
     }
 
-    void CCodeGenerator::visit(Lesser &node)
+    void CCodeGenerator::visit(Lesser &Node)
     {
         ExprStack.top() << "(";
-        node.Left->accept(*this);
+        Node.Left->accept(*this);
         ExprStack.top() << "<";
-        node.Right->accept(*this);
+        Node.Right->accept(*this);
         ExprStack.top() << ")";
     }
 
-    void CCodeGenerator::visit(LesserEq &node)
+    void CCodeGenerator::visit(LesserEq &Node)
     {
         ExprStack.top() << "(";
-        node.Left->accept(*this);
+        Node.Left->accept(*this);
         ExprStack.top() << "<=";
-        node.Right->accept(*this);
+        Node.Right->accept(*this);
         ExprStack.top() << ")";
     }
 
-    void CCodeGenerator::visit(Greater &node)
+    void CCodeGenerator::visit(Greater &Node)
     {
         ExprStack.top() << "(";
-        node.Left->accept(*this);
+        Node.Left->accept(*this);
         ExprStack.top() << ">";
-        node.Right->accept(*this);
+        Node.Right->accept(*this);
         ExprStack.top() << ")";
     }
 
-    void CCodeGenerator::visit(GreaterEq &node)
+    void CCodeGenerator::visit(GreaterEq &Node)
     {
         ExprStack.top() << "(";
-        node.Left->accept(*this);
+        Node.Left->accept(*this);
         ExprStack.top() << ">=";
-        node.Right->accept(*this);
+        Node.Right->accept(*this);
         ExprStack.top() << ")";
     }
 
-    void CCodeGenerator::visit(Add &node)
+    void CCodeGenerator::visit(Add &Node)
     {
         ExprStack.top() << "(";
-        node.Left->accept(*this);
+        Node.Left->accept(*this);
         ExprStack.top() << "+";
-        node.Right->accept(*this);
+        Node.Right->accept(*this);
         ExprStack.top() << ")";
     }
 
-    void CCodeGenerator::visit(Sub &node)
+    void CCodeGenerator::visit(Sub &Node)
     {
         ExprStack.top() << "(";
-        node.Left->accept(*this);
+        Node.Left->accept(*this);
         ExprStack.top() << "-";
-        node.Right->accept(*this);
+        Node.Right->accept(*this);
         ExprStack.top() << ")";
     }
 
-    void CCodeGenerator::visit(Mul &node)
+    void CCodeGenerator::visit(Mul &Node)
     {
         ExprStack.top() << "(";
-        node.Left->accept(*this);
+        Node.Left->accept(*this);
         ExprStack.top() << "*";
-        node.Right->accept(*this);
+        Node.Right->accept(*this);
         ExprStack.top() << ")";
     }
 
-    void CCodeGenerator::visit(Div &node)
+    void CCodeGenerator::visit(Div &Node)
     {
         ExprStack.top() << "(";
-        node.Left->accept(*this);
+        Node.Left->accept(*this);
         ExprStack.top() << "/";
-        node.Right->accept(*this);
+        Node.Right->accept(*this);
         ExprStack.top() << ")";
     }
 
-    void CCodeGenerator::visit(Mod &node)
+    void CCodeGenerator::visit(Mod &Node)
     {
         ExprStack.top() << "(";
-        node.Left->accept(*this);
+        Node.Left->accept(*this);
         ExprStack.top() << "%";
-        node.Right->accept(*this);
+        Node.Right->accept(*this);
         ExprStack.top() << ")";
     }
 
-    void CCodeGenerator::visit(ListAdd &node)
+    void CCodeGenerator::visit(ListAdd &Node)
     {
-        string name = getList(node.Ty);
+        string name = getList(Node.Ty);
 
         // use pregenerated push function to push thing onto list
         // look at generate_list(Type &type) for the generation of this function
         ExprStack.top() << GGenerated << GAdd << name << "(";
-        node.Right->accept(*this);
+        Node.Right->accept(*this);
         ExprStack.top() << ", ";
-        node.Left->accept(*this);
+        Node.Left->accept(*this);
         ExprStack.top() << ")";
     }
 
-    void CCodeGenerator::visit(Par &node)
+    void CCodeGenerator::visit(Par &Node)
     {
         ExprStack.top() << "(";
-        node.Child->accept(*this);
+        Node.Child->accept(*this);
         ExprStack.top() << ")";
     }
 
-    void CCodeGenerator::visit(Not &node)
+    void CCodeGenerator::visit(Not &Node)
     {
         ExprStack.top() << "(";
         ExprStack.top() << "!";
-        node.Child->accept(*this);
+        Node.Child->accept(*this);
         ExprStack.top() << ")";
     }
 
-    void CCodeGenerator::visit(ListPattern &node)
+    void CCodeGenerator::visit(ListPattern &Node)
     {
         // result is needed, so we don't generate something else, while the ListPattern is being generated
         stringstream result;
         string value_gotten;
-        string type_name = getList(node.Ty);
+        string type_name = getList(Node.Ty);
 
         // generate the gotten value from get_value_builder
         for (auto str : GetValueBuilder) {
             value_gotten += str;
         }
 
-        result << "(" << value_gotten << "->" << GSize << " - " << ListOffsets.back() << " == " << node.Patterns.size() << ")";
+        result << "(" << value_gotten << "->" << GSize << " - " << ListOffsets.back() << " == " << Node.Patterns.size() << ")";
 
-        for (size_t i = 0; i < node.Patterns.size(); i++) {
+        for (size_t i = 0; i < Node.Patterns.size(); i++) {
             // add "gat_"name"(" and ", i + offset)" to get_value_builder
             GetValueBuilder.insert(GetValueBuilder.begin(),  GGenerated + GValueAt + type_name + "(");
             GetValueBuilder.push_back(", " + to_string(i + ListOffsets.back()) + ")");
@@ -390,7 +389,7 @@ namespace codegen
             ListOffsets.push_back(0);
 
             // generate pattern
-            node.Patterns[i]->accept(*this);
+            Node.Patterns[i]->accept(*this);
 
             // cleanup
             ListOffsets.pop_back();
@@ -406,20 +405,20 @@ namespace codegen
         LastPattern = "(" + result.str() + ")";
     }
 
-    void CCodeGenerator::visit(TuplePattern &node)
+    void CCodeGenerator::visit(TuplePattern &Node)
     {
         // result is needed, so we don't start generating something in a signature in the header file
         stringstream result;
-        string type_name = getTuple(node.Ty);
+        string type_name = getTuple(Node.Ty);
         bool empty = true;
 
         // iterate through all items in tuple
-        for (size_t i = 0; i < node.Patterns.size(); i++) {
+        for (size_t i = 0; i < Node.Patterns.size(); i++) {
             // add ".gi"i"" to get_value_builder
             GetValueBuilder.push_back("." + GGenerated + GItem + to_string(i));
 
             // generate pattern
-            node.Patterns[i]->accept(*this);
+            Node.Patterns[i]->accept(*this);
 
             // cleanup
             GetValueBuilder.pop_back();
@@ -443,10 +442,10 @@ namespace codegen
         }
     }
 
-    void CCodeGenerator::visit(ListSplit &node)
+    void CCodeGenerator::visit(ListSplit &Node)
     {
         stringstream result;
-        string type_name = getList(node.Ty);
+        string type_name = getList(Node.Ty);
         bool empty = true;
 
         // add "gat_"name"(" and ", offset)" to get_value_builder
@@ -460,7 +459,7 @@ namespace codegen
         ListOffsets.push_back(0);
 
         // generate pattern
-        node.Left->accept(*this);
+        Node.Left->accept(*this);
 
         // cleanup
         ListOffsets.pop_back();
@@ -478,7 +477,7 @@ namespace codegen
         ListOffsets[ListOffsets.size() - 1]++;
 
         // generate pattern
-        node.Right->accept(*this);
+        Node.Right->accept(*this);
 
         // reverse offset back to what it was
         ListOffsets[ListOffsets.size() - 1]--;
@@ -500,7 +499,7 @@ namespace codegen
         }
     }
 
-    void CCodeGenerator::visit(Int &node)
+    void CCodeGenerator::visit(Int &Node)
     {
         // if pattern, then generate an expression for matching on this pattern
         if (IdCtx == IdContext::PATTERN) {
@@ -510,15 +509,15 @@ namespace codegen
                 value += str;
             }
 
-            LastPattern = value + " == " + node.str();
+            LastPattern = value + " == " + Node.str();
 
         // else, just output value
         } else {
-            ExprStack.top() << "(" << node.Val << ")";
+            ExprStack.top() << "(" << Node.Val << ")";
         }
     }
 
-    void CCodeGenerator::visit(Float &node)
+    void CCodeGenerator::visit(Float &Node)
     {
         // if pattern, then generate an expression for matching on this pattern
         if (IdCtx == IdContext::PATTERN) {
@@ -528,16 +527,16 @@ namespace codegen
                 value += str;
             }
 
-            LastPattern = value + " == " + node.str();
+            LastPattern = value + " == " + Node.str();
 
         // else, just output value
         } else {
-            ExprStack.top() << "(" << node.str() << ")";
+            ExprStack.top() << "(" << Node.str() << ")";
         }
 
     }
 
-    void CCodeGenerator::visit(Bool &node)
+    void CCodeGenerator::visit(Bool &Node)
     {
         // if pattern, then generate an expression for matching on this pattern
         if (IdCtx == IdContext::PATTERN) {
@@ -547,15 +546,15 @@ namespace codegen
                 value += str;
             }
 
-            LastPattern = value + " == " + to_string(node.Val);
+            LastPattern = value + " == " + to_string(Node.Val);
 
         // else, just output value
         } else {
-            ExprStack.top() << node.Val;
+            ExprStack.top() << Node.Val;
         }
     }
 
-    void CCodeGenerator::visit(Char &node)
+    void CCodeGenerator::visit(Char &Node)
     {
         // if pattern, then generate an expression for matching on this pattern
         if (IdCtx == IdContext::PATTERN) {
@@ -565,15 +564,15 @@ namespace codegen
                 value += str;
             }
 
-            LastPattern = value + " == " + node.str();
+            LastPattern = value + " == " + Node.str();
 
         // else, just output value
         } else {
-            ExprStack.top() << node.str();
+            ExprStack.top() << Node.str();
         }
     }
 
-    void CCodeGenerator::visit(String &node)
+    void CCodeGenerator::visit(String &Node)
     {
         // if pattern, then generate an expression for matching on this pattern
         if (IdCtx == IdContext::PATTERN) {
@@ -585,46 +584,46 @@ namespace codegen
 
             // gcompare_string is generated by generate_std. it compares the custome string type, to a char*
             // it also takes an offset, for when list splits occur on strings
-            LastPattern = GGenerated + GCompare + GString + "(" + value + ", " + node.str() + ", " + to_string(ListOffsets.back()) + ")";
+            LastPattern = GGenerated + GCompare + GString + "(" + value + ", " + Node.str() + ", " + to_string(ListOffsets.back()) + ")";
 
         // else, just output value
         } else {
             // gcreate_string is generate by generate_std. It creates string base on a char*
-            ExprStack.top() << GGenerated << GCreate << GString << "(" << node.str() << ")";
+            ExprStack.top() << GGenerated << GCreate << GString << "(" << Node.str() << ")";
         }
     }
 
-    void CCodeGenerator::visit(List &node)
+    void CCodeGenerator::visit(List &Node)
     {
-        string name = getList(node.Ty);
+        string name = getList(Node.Ty);
 
         // create list
-        ExprStack.top() << GGenerated << GCreate << name << "(" << node.Elements.size();
-        for (int i = node.Elements.size() - 1; i >= 0; i--) {
+        ExprStack.top() << GGenerated << GCreate << name << "(" << Node.Elements.size();
+        for (int i = Node.Elements.size() - 1; i >= 0; i--) {
             ExprStack.top() << ", ";
 
-            node.Elements[i]->accept(*this);
+            Node.Elements[i]->accept(*this);
         }
 
         ExprStack.top() << ")";
     }
 
-    void CCodeGenerator::visit(Tuple &node)
+    void CCodeGenerator::visit(Tuple &Node)
     {
-        string name = getTuple(node.Ty);
+        string name = getTuple(Node.Ty);
 
         // create tuple
         ExprStack.top() << GGenerated << GCreate << name << "(";
-        for (auto &expr: node.Elements){
+        for (auto &expr: Node.Elements){
             expr->accept(*this);
 
-            if (expr != node.Elements.back())
+            if (expr != Node.Elements.back())
                 ExprStack.top() << ", ";
         }
         ExprStack.top() << ")";
     }
 
-    void CCodeGenerator::visit(Id &node)
+    void CCodeGenerator::visit(Id &Node)
     {
         stringstream assign;
         string name = "";
@@ -636,11 +635,11 @@ namespace codegen
             }
 
             // generate an assignment for the id, which should occur after the if-statement
-            assign << getType(node.Ty) << " " << GUser << node.Val << " = ";
+            assign << getType(Node.Ty) << " " << GUser << Node.Val << " = ";
 
-            if ((node.Ty.Id == TypeId::LIST || node.Ty.Id == TypeId::STRING) &&
+            if ((Node.Ty.Id == TypeId::LIST || Node.Ty.Id == TypeId::STRING) &&
                  ListOffsets.back() > 0) {
-                assign << GGenerated << GAt << getList(node.Ty) << "(" << name << ", " << ListOffsets.back() << ");";
+                assign << GGenerated << GAt << getList(Node.Ty) << "(" << name << ", " << ListOffsets.back() << ");";
             } else {
                 assign << name << ";";
             }
@@ -654,7 +653,7 @@ namespace codegen
             bool is_declared = false;
 
             for (auto &func: Prog->Funcs) {
-                if (func->Id == node.Val) {
+                if (func->Id == Node.Val) {
                     is_declared = true;
                     break;
                 }
@@ -664,24 +663,24 @@ namespace codegen
                 ExprStack.top() << "&" << GGlobal;
             }
 
-            ExprStack.top() << GUser << node.Val;
+            ExprStack.top() << GUser << Node.Val;
         }
     }
 
-    void CCodeGenerator::visit(Call &node)
+    void CCodeGenerator::visit(Call &Node)
     {
         string name = GGenerated + GClosure + to_string(EnvCount++);
-        string assignment = getEnvironment(node.Callee->Ty) + "* " + name + " = ";
+        string assignment = getEnvironment(Node.Callee->Ty) + "* " + name + " = ";
 
         ExprStack.push(stringstream());
         // generate the callee (aka, the function being called)
-        node.Callee->accept(*this);
+        Node.Callee->accept(*this);
         *Output << "        " << assignment << ExprStack.top().str() << "; \n";
         ExprStack.pop();
 
         // generate the arguments the function is being called with
         ExprStack.top() << name << "->call(" << name;
-        for (auto &expr: node.Args){
+        for (auto &expr: Node.Args){
             ExprStack.top() << ", ";
 
             expr->accept(*this);

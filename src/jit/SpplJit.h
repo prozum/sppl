@@ -32,7 +32,7 @@ namespace jit {
     public:
         SpplJit();
 
-        void eval(string str);
+        void eval(string Str);
 
         static void initLLVM() {
             InitializeNativeTarget();
@@ -45,15 +45,15 @@ namespace jit {
         typedef CompileLayerT::ModuleSetHandleT ModuleHandleT;
 
         void createModule();
-        ModuleHandleT addModule(std::unique_ptr<llvm::Module> m);
-        void removeModule(ModuleHandleT handler);
+        ModuleHandleT addModule(std::unique_ptr<llvm::Module> M);
+        void removeModule(ModuleHandleT Handler);
 
-        JITSymbol findSymbol(const std::string name);
-        JITSymbol findMangledSymbol(const std::string &name);
-        std::string mangle(const std::string &name);
+        JITSymbol findSymbol(const std::string Name);
+        JITSymbol findMangledSymbol(const std::string &Name);
+        std::string mangle(const std::string &Name);
 
-        string getOutput(intptr_t data, common::Type type);
-        string getOutputTuple(intptr_t addr, vector<common::Type> types);
+        string getOutput(intptr_t data, common::Type Type);
+        string getOutputTuple(intptr_t addr, vector<common::Type> Subtypes);
 
         std::unique_ptr<TargetMachine> Machine;
         const DataLayout Layout;
@@ -71,9 +71,9 @@ namespace jit {
 
 
         template<typename T>
-        static std::vector<T> singletonSet(T t) {
+        static std::vector<T> singletonSet(T Item) {
             std::vector<T> Vec;
-            Vec.push_back(std::move(t));
+            Vec.push_back(std::move(Item));
             return Vec;
         }
     };

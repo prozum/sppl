@@ -5,10 +5,10 @@ using namespace std;
 
 namespace codegen {
 
-    Printer::Printer(Driver &driver)
-        : CodeGenerator(driver) { }
+    Printer::Printer(Driver &Drv)
+        : CodeGenerator(Drv) { }
 
-    void Printer::visit(Program &node) {
-        *Drv.Out << node.str();
+    void Printer::visit(Program &Node) {
+        *Drv.Out << Node.str();
     }
 }

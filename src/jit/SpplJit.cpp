@@ -17,7 +17,7 @@ namespace jit {
         Driver.setHeaderOutput("/dev/null");
     }
 
-    SpplJit::ModuleHandleT SpplJit::addModule(std::unique_ptr<llvm::Module> module) {
+    SpplJit::ModuleHandleT SpplJit::addModule(std::unique_ptr<llvm::Module> M) {
         auto resolver = createLambdaResolver(
                 [&](const std::string &Name) {
                     if (auto Sym = findMangledSymbol(Name))
@@ -25,7 +25,7 @@ namespace jit {
                     return RuntimeDyld::SymbolInfo(nullptr);
                 },
                 [](const std::string &S) { return nullptr; });
-        auto handler = CompileLayer.addModuleSet(singletonSet(std::move(module)),
+        auto handler = CompileLayer.addModuleSet(singletonSet(std::move(M)),
                                                  std::make_unique<SectionMemoryManager>(),
                                                  std::move(resolver));
 
@@ -33,32 +33,32 @@ namespace jit {
         return handler;
     }
 
-    void SpplJit::removeModule(ModuleHandleT handler) {
-        ModuleHandles.erase(std::find(ModuleHandles.begin(), ModuleHandles.end(), handler));
-        CompileLayer.removeModuleSet(handler);
+    void SpplJit::removeModule(ModuleHandleT Handler) {
+        ModuleHandles.erase(std::find(ModuleHandles.begin(), ModuleHandles.end(), Handler));
+        CompileLayer.removeModuleSet(Handler);
     }
 
-    JITSymbol SpplJit::findSymbol(const std::string name) {
-        return findMangledSymbol(mangle(name));
+    JITSymbol SpplJit::findSymbol(const std::string Name) {
+        return findMangledSymbol(mangle(Name));
     }
 
 
-    JITSymbol SpplJit::findMangledSymbol(const std::string &name) {
+    JITSymbol SpplJit::findMangledSymbol(const std::string &Name) {
         for (auto handler : make_range(ModuleHandles.rbegin(), ModuleHandles.rend()))
-            if (auto Sym = CompileLayer.findSymbolIn(handler, name, true))
+            if (auto Sym = CompileLayer.findSymbolIn(handler, Name, true))
                 return Sym;
 
-        if (auto sym_addr = RTDyldMemoryManager::getSymbolAddressInProcess(name))
+        if (auto sym_addr = RTDyldMemoryManager::getSymbolAddressInProcess(Name))
             return JITSymbol(sym_addr, JITSymbolFlags::Exported);
 
         return nullptr;
     }
 
-    std::string SpplJit::mangle(const std::string &name) {
+    std::string SpplJit::mangle(const std::string &Name) {
         std::string mangled_name;
         {
             raw_string_ostream MangledNameStream(mangled_name);
-            Mangler::getNameWithPrefix(MangledNameStream, name, Layout);
+            Mangler::getNameWithPrefix(MangledNameStream, Name, Layout);
         }
         return mangled_name;
     }
@@ -80,10 +80,10 @@ namespace jit {
     }
 
 
-    string SpplJit::getOutput(intptr_t data, common::Type type) {
+    string SpplJit::getOutput(intptr_t data, common::Type Type) {
         string out;
 
-        switch (type.Id) {
+        switch (Type.Id) {
             case common::TypeId::INT:
                 return to_string((int64_t) data);
             case common::TypeId::FLOAT:
@@ -95,38 +95,38 @@ namespace jit {
                 out += "\"";
                 return out;
             case common::TypeId::TUPLE:
-                return getOutputTuple(data, type.Subtypes);
+                return getOutputTuple(data, Type.Subtypes);
             case common::TypeId::SIGNATURE:
-                return type.str();
+                return Type.str();
             default:
-                throw runtime_error("Cannot convert to C data: " + type.str());
+                throw runtime_error("Cannot convert to C data: " + Type.str());
         }
     }
 
-    string SpplJit::getOutputTuple(intptr_t addr, vector<common::Type> types) {
+    string SpplJit::getOutputTuple(intptr_t addr, vector<common::Type> Subtypes) {
         string out("(");
-        for (size_t i = 0; i < types.size(); i++) {
-            switch (types[i].Id) {
+        for (size_t i = 0; i < Subtypes.size(); i++) {
+            switch (Subtypes[i].Id) {
                 case common::TypeId::INT:
-                    out += getOutput(*(int64_t *) addr, types[i]);
+                    out += getOutput(*(int64_t *) addr, Subtypes[i]);
                     addr += sizeof(int64_t);
                     break;
                 case common::TypeId::FLOAT:
-                    out += getOutput(addr, types[i]);
+                    out += getOutput(addr, Subtypes[i]);
                     addr += sizeof(double);
                     break;
                 case common::TypeId::STRING:
-                    out += getOutput(*(intptr_t *) addr, types[i]);
+                    out += getOutput(*(intptr_t *) addr, Subtypes[i]);
                     addr += sizeof(intptr_t *);
                     break;
                 case common::TypeId::TUPLE:
-                    out += getOutputTuple(*(intptr_t *) addr, types[i].Subtypes);
+                    out += getOutputTuple(*(intptr_t *) addr, Subtypes[i].Subtypes);
                     addr += sizeof(intptr_t *);
                     break;
                 default:
-                    throw runtime_error("Cannot convert to C data: " + types[i].str());
+                    throw runtime_error("Cannot convert to C data: " + Subtypes[i].str());
             }
-            if (i + 1 != types.size())
+            if (i + 1 != Subtypes.size())
                 out += ", ";
         }
 
@@ -134,8 +134,8 @@ namespace jit {
     }
 
 
-    void SpplJit::eval(std::string str) {
-        if (!Driver.parseString(str))
+    void SpplJit::eval(std::string Str) {
+        if (!Driver.parseString(Str))
             return;
 
         if (!Driver.accept(ScopeGenerator)) {

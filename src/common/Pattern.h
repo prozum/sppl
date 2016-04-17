@@ -6,10 +6,10 @@ namespace common {
 
 	class Pattern : public Expression {
 	public:
-		Pattern(Location);
-		Pattern(Type, Location);
+		Pattern(Location Loc);
+		Pattern(Type Ty, Location Loc);
 
-		virtual void accept(Visitor &) = 0;
+		virtual void accept(Visitor &V) = 0;
 	};
 
 	class Id : public Pattern {
@@ -17,9 +17,9 @@ namespace common {
 		string Val;
 		Scope* Scp;
 
-		Id(string, Location);
+		Id(string Val, Location Loc);
 
-		virtual void accept(Visitor &);
+		virtual void accept(Visitor &V);
 		string str();
 	};
 
@@ -27,9 +27,9 @@ namespace common {
 	public:
 		long Val;
 
-		Int(long, Location);
+		Int(long Val, Location Loc);
 
-		virtual void accept(Visitor &);
+		virtual void accept(Visitor &V);
 		string str();
 	};
 
@@ -37,9 +37,9 @@ namespace common {
 	public:
 		double Val;
 
-		Float(double, Location);
+		Float(double Val, Location Loc);
 
-		virtual void accept(Visitor &);
+		virtual void accept(Visitor &V);
 		string str();
 	};
 
@@ -47,9 +47,9 @@ namespace common {
 	public:
 		bool Val;
 
-		Bool(bool, Location);
+		Bool(bool Val, Location Loc);
 
-		virtual void accept(Visitor &);
+		virtual void accept(Visitor &V);
 		string str();
 	};
 
@@ -57,9 +57,9 @@ namespace common {
 	public:
 		char Val;
 
-		Char(char, Location);
+		Char(char Val, Location Loc);
 
-		virtual void accept(Visitor &);
+		virtual void accept(Visitor &V);
 		string str();
 	};
 
@@ -67,9 +67,9 @@ namespace common {
 	public:
 		string Val;
 
-		String(string, Location);
+		String(string Val, Location Loc);
 
-		virtual void accept(Visitor &);
+		virtual void accept(Visitor &V);
 		string str();
 	};
 
@@ -77,9 +77,9 @@ namespace common {
 	public:
 		vector<unique_ptr<Pattern>> Patterns;
 
-		ListPattern(vector<unique_ptr<Pattern>>, Location);
+		ListPattern(vector<unique_ptr<Pattern>> Patterns, Location Loc);
 
-		virtual void accept(Visitor &);
+		virtual void accept(Visitor &V);
 		string str();
 	};
 
@@ -87,9 +87,9 @@ namespace common {
 	public:
 		vector<unique_ptr<Pattern>> Patterns;
 
-		TuplePattern(vector<unique_ptr<Pattern>>, Location);
+		TuplePattern(vector<unique_ptr<Pattern>> Patterns, Location loc);
 
-		virtual void accept(Visitor &);
+		virtual void accept(Visitor &V);
 		string str();
 	};
 
@@ -98,9 +98,9 @@ namespace common {
 		unique_ptr<Pattern> Left;
 		unique_ptr<Pattern> Right;
 
-		ListSplit(unique_ptr<Pattern>, unique_ptr<Pattern>, Location);
+		ListSplit(unique_ptr<Pattern>, unique_ptr<Pattern> Patterns, Location loc);
 
-		virtual void accept(Visitor &);
+		virtual void accept(Visitor &V);
 		string str();
 	};
 }

@@ -1,33 +1,33 @@
 #include "Error.h"
 
 namespace common {
-    Error::Error(std::string msg) : Msg(msg), Loc() { }
-    Error::Error(std::string msg, common::Location loc) : Msg(msg), Loc(loc) { }
+    Error::Error(std::string Msg) : Msg(Msg), Loc() { }
+    Error::Error(std::string Msg, common::Location Loc) : Msg(Msg), Loc(Loc) { }
 
-    std::ostream &operator<<(ostream& stream, const Error &err)
+    std::ostream &operator<<(ostream& Out, const Error &Err)
     {
-        return (stream << err.Loc << "|" << err.Msg);
+        return (Out << Err.Loc << "|" << Err.Msg);
     }
 
-    Error::Error(const Error &other) {
-        Msg = other.Msg;
-        Loc = other.Loc;
+    Error::Error(const Error &Other) {
+        Msg = Other.Msg;
+        Loc = Other.Loc;
     }
 
-    Error Error::NotImplemented(string msg) {
-        return Error ("NotImplemented: " + msg);
+    Error Error::NotImplemented(string Msg) {
+        return Error ("NotImplemented: " + Msg);
     }
 
-    Error Error::Expected(string msg, string expected, string actual, Location loc) {
-        return Error(msg + ": Expected: '" + expected + "' Actual: '" + actual + "'", loc);
+    Error Error::Expected(string Msg, string Expected, string Actual, Location Loc) {
+        return Error(Msg + ": Expected: '" + Expected + "' Actual: '" + Actual + "'", Loc);
     }
 
-    Error Error::Binary(string msg, common::BinaryOp &op) {
-        return Error("'" + op.str() + "' " + msg + ": Left: '" + op.Left->str() + "' Right: '" + op.Right->str() + "'", op.Loc);
+    Error Error::Binary(string Msg, common::BinaryOp &Op) {
+        return Error("'" + Op.str() + "' " + Msg + ": Left: '" + Op.Left->str() + "' Right: '" + Op.Right->str() + "'", Op.Loc);
     }
 
-    Error Error::Unary(string msg, common::UnaryOp &op) {
-        return Error("'" + op.str() + "' " + msg + ": Child: '" + op.Child->str() + "'", op.Loc);
+    Error Error::Unary(string Msg, common::UnaryOp &Op) {
+        return Error("'" + Op.str() + "' " + Msg + ": Child: '" + Op.Child->str() + "'", Op.Loc);
     }
 
 }

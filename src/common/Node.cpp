@@ -6,67 +6,67 @@ using namespace std;
 
 namespace common {
 
-    void Program::accept(Visitor &v) { v.visit(*this); }
-    void Function::accept(Visitor &v) { v.visit(*this); }
-    void Case::accept(Visitor &v) { v.visit(*this); }
+    void Program::accept(Visitor &V) { V.visit(*this); }
+    void Function::accept(Visitor &V) { V.visit(*this); }
+    void Case::accept(Visitor &V) { V.visit(*this); }
 
-    void List::accept(Visitor &v) { v.visit(*this); }
-    void Tuple::accept(Visitor &v) { v.visit(*this); }
-    void Call::accept(Visitor &v) { v.visit(*this); }
+    void List::accept(Visitor &V) { V.visit(*this); }
+    void Tuple::accept(Visitor &V) { V.visit(*this); }
+    void Call::accept(Visitor &V) { V.visit(*this); }
 
-    Node::Node(Location loc) :
-            Ty(TypeId::UNKNOWN), Loc(loc) { }
+    Node::Node(Location Loc) :
+            Ty(TypeId::UNKNOWN), Loc(Loc) { }
 
-    Node::Node(Type type, Location loc) :
-            Ty(type), Loc(loc) { }
+    Node::Node(Type Ty, Location Loc) :
+            Ty(Ty), Loc(Loc) { }
 
-    Expression::Expression(Location loc) :
-            Node(loc) { }
+    Expression::Expression(Location Loc) :
+            Node(Loc) { }
 
-    Expression::Expression(Type type, Location loc) :
-            Node(type, loc) { }
+    Expression::Expression(Type Ty, Location Loc) :
+            Node(Ty, Loc) { }
 
 
-    Program::Program(vector<unique_ptr<Function>> funcs,
-                     Location loc) :
-            Node(loc),
-            Funcs(move(funcs)) { }
+    Program::Program(vector<unique_ptr<Function>> Funcs,
+                     Location Loc) :
+            Node(Loc),
+            Funcs(move(Funcs)) { }
 
-    Program::Program(unique_ptr<Expression> expr,
-                     Location loc) :
-                     Node(loc) {
+    Program::Program(unique_ptr<Expression> AnonFunc,
+                     Location Loc) :
+                     Node(Loc) {
 
-        Funcs.push_back(make_unique<Function>(move(expr)));
+        Funcs.push_back(make_unique<Function>(move(AnonFunc)));
     }
 
-    Function::Function(unique_ptr<Expression> expr) :
-            Node(expr->Loc),
+    Function::Function(unique_ptr<Expression> AnonFunc) :
+            Node(AnonFunc->Loc),
             Id(ANON_FUNC_NAME),
             Signature(Type(TypeId::UNKNOWN)),
             Anon(true) {
-        Cases.push_back(make_unique<Case>(move(expr), vector<unique_ptr<Pattern>>(), expr->Loc));
+        Cases.push_back(make_unique<Case>(move(AnonFunc), vector<unique_ptr<Pattern>>(), AnonFunc->Loc));
     }
 
-    Function::Function(string id,
-                       Type sign,
-                       Location loc) :
-            Node(sign.Subtypes.front(), loc),
-            Id(id),
-            Signature(sign) { }
+    Function::Function(string Id,
+                       Type Ty,
+                       Location Loc) :
+            Node(Ty.Subtypes.front(), Loc),
+            Id(Id),
+            Signature(Ty) { }
 
-    Case::Case(unique_ptr<Expression> expr,
-               vector<unique_ptr<Pattern>> patterns,
-               Location loc) :
-            Node(loc),
-            Expr(move(expr)),
-            Patterns(move(patterns)) { }
+    Case::Case(unique_ptr<Expression> Expr,
+               vector<unique_ptr<Pattern>> Patterns,
+               Location Loc) :
+            Node(Loc),
+            Expr(move(Expr)),
+            Patterns(move(Patterns)) { }
 
-    Call::Call(unique_ptr<Expression> callee,
-               vector<unique_ptr<Expression>> exprs,
-               Location loc) :
-            Expression(loc),
-            Callee(move(callee)),
-            Args(move(exprs))
+    Call::Call(unique_ptr<Expression> Callee,
+               vector<unique_ptr<Expression>> Args,
+               Location Loc) :
+            Expression(Loc),
+            Callee(move(Callee)),
+            Args(move(Args))
     {
     }
 

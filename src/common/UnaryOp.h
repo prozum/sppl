@@ -10,26 +10,26 @@ namespace common {
 	public:
 		unique_ptr<Expression> Child;
 
-		UnaryOp(unique_ptr<Expression>, Location);
+		UnaryOp(unique_ptr<Expression> Child, Location Loc);
 
-		virtual void accept(Visitor &) = 0;
+		virtual void accept(Visitor &V) = 0;
 	};
 
 	class Par : public UnaryOp {
 	public:
 
-		Par(unique_ptr<Expression>, Location);
+		Par(unique_ptr<Expression> Child, Location Loc);
 
-		virtual void accept(Visitor &);
+		virtual void accept(Visitor &V);
 		string str();
 	};
 
 	class Not : public UnaryOp {
 	public:
 
-		Not(unique_ptr<Expression>, Location);
+		Not(unique_ptr<Expression> Child, Location Loc);
 
-		virtual void accept(Visitor &);
+		virtual void accept(Visitor &V);
 		string str();
 	};
 }

@@ -11,39 +11,39 @@ namespace common {
 		friend class Node;
 	public:
 		std::vector<Error> Errors;
-		void addError(Error error);
+		void addError(Error Err);
 		bool hasError();
 
-		virtual void visit(Program &node) { throw runtime_error( "Not implemented"); }
-		virtual void visit(Function &node) { throw runtime_error( "Not implemented"); }
-		virtual void visit(Case &node) { throw runtime_error( "Not implemented"); }
-		virtual void visit(Or &node) { throw runtime_error( "Not implemented"); }
-		virtual void visit(And &node) { throw runtime_error( "Not implemented"); }
-		virtual void visit(Equal &node) { throw runtime_error( "Not implemented"); }
-		virtual void visit(NotEqual &node) { throw runtime_error( "Not implemented"); }
-		virtual void visit(Lesser &node) { throw runtime_error( "Not implemented"); }
-		virtual void visit(Greater &node) { throw runtime_error( "Not implemented"); }
-		virtual void visit(LesserEq &node) { throw runtime_error( "Not implemented"); }
-		virtual void visit(GreaterEq &node) { throw runtime_error( "Not implemented"); }
-		virtual void visit(Add &node) { throw runtime_error( "Not implemented"); }
-		virtual void visit(Sub &node) { throw runtime_error( "Not implemented"); }
-		virtual void visit(Mul &node) { throw runtime_error( "Not implemented"); }
-		virtual void visit(Div &node) { throw runtime_error( "Not implemented"); }
-		virtual void visit(Mod &node) { throw runtime_error( "Not implemented"); }
-		virtual void visit(ListAdd &node) { throw runtime_error( "Not implemented"); }
-		virtual void visit(Par &node) { throw runtime_error( "Not implemented"); }
-		virtual void visit(Not &node) { throw runtime_error( "Not implemented"); }
-		virtual void visit(Int &node) { throw runtime_error( "Not implemented"); }
-		virtual void visit(Float &node) { throw runtime_error( "Not implemented"); }
-		virtual void visit(Bool &node) { throw runtime_error( "Not implemented"); }
-		virtual void visit(Char &node) { throw runtime_error( "Not implemented"); }
-		virtual void visit(String &node) { throw runtime_error( "Not implemented"); }
-		virtual void visit(ListPattern &node) { throw runtime_error( "Not implemented"); }
-		virtual void visit(TuplePattern &node) { throw runtime_error( "Not implemented"); }
-		virtual void visit(ListSplit &node) { throw runtime_error( "Not implemented"); }
-		virtual void visit(List &node) { throw runtime_error( "Not implemented"); }
-		virtual void visit(Tuple &node) { throw runtime_error( "Not implemented"); }
-		virtual void visit(Id &node) { throw runtime_error( "Not implemented"); }
-		virtual void visit(Call &node) { throw runtime_error( "Not implemented"); }
+		virtual void visit(Program &Node) { throw runtime_error( "Not implemented"); }
+		virtual void visit(Function &Node) { throw runtime_error( "Not implemented"); }
+		virtual void visit(Case &Node) { throw runtime_error( "Not implemented"); }
+		virtual void visit(Or &Node) { throw runtime_error( "Not implemented"); }
+		virtual void visit(And &Node) { throw runtime_error( "Not implemented"); }
+		virtual void visit(Equal &Node) { throw runtime_error( "Not implemented"); }
+		virtual void visit(NotEqual &Node) { throw runtime_error( "Not implemented"); }
+		virtual void visit(Lesser &Node) { throw runtime_error( "Not implemented"); }
+		virtual void visit(Greater &Node) { throw runtime_error( "Not implemented"); }
+		virtual void visit(LesserEq &Node) { throw runtime_error( "Not implemented"); }
+		virtual void visit(GreaterEq &Node) { throw runtime_error( "Not implemented"); }
+		virtual void visit(Add &Node) { throw runtime_error( "Not implemented"); }
+		virtual void visit(Sub &Node) { throw runtime_error( "Not implemented"); }
+		virtual void visit(Mul &Node) { throw runtime_error( "Not implemented"); }
+		virtual void visit(Div &Node) { throw runtime_error( "Not implemented"); }
+		virtual void visit(Mod &Node) { throw runtime_error( "Not implemented"); }
+		virtual void visit(ListAdd &Node) { throw runtime_error( "Not implemented"); }
+		virtual void visit(Par &Node) { throw runtime_error( "Not implemented"); }
+		virtual void visit(Not &Node) { throw runtime_error( "Not implemented"); }
+		virtual void visit(Int &Node) { throw runtime_error( "Not implemented"); }
+		virtual void visit(Float &Node) { throw runtime_error( "Not implemented"); }
+		virtual void visit(Bool &Node) { throw runtime_error( "Not implemented"); }
+		virtual void visit(Char &Node) { throw runtime_error( "Not implemented"); }
+		virtual void visit(String &Node) { throw runtime_error( "Not implemented"); }
+		virtual void visit(ListPattern &Node) { throw runtime_error( "Not implemented"); }
+		virtual void visit(TuplePattern &Node) { throw runtime_error( "Not implemented"); }
+		virtual void visit(ListSplit &Node) { throw runtime_error( "Not implemented"); }
+		virtual void visit(List &Node) { throw runtime_error( "Not implemented"); }
+		virtual void visit(Tuple &Node) { throw runtime_error( "Not implemented"); }
+		virtual void visit(Id &Node) { throw runtime_error( "Not implemented"); }
+		virtual void visit(Call &Node) { throw runtime_error( "Not implemented"); }
 	};
 }

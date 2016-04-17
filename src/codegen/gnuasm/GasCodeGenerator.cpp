@@ -11,10 +11,10 @@ namespace codegen {
     GasCodeGenerator::GasCodeGenerator(parser::Driver &Drv) : parser::CodeGenerator(Drv) {
     }
 
-    void GasCodeGenerator::visit(Program &node) {
+    void GasCodeGenerator::visit(Program &Node) {
         // Visit all functions
 
-        for (auto &func : node.Funcs) {
+        for (auto &func : Node.Funcs) {
             func->accept(*this);
         }
 
@@ -22,8 +22,8 @@ namespace codegen {
         *Drv.Out << source << endl;
     }
 
-    void GasCodeGenerator::visit(Function &node) {
-        FuncName = node.Id;                     // Function name used for anything function related including
+    void GasCodeGenerator::visit(Function &Node) {
+        FuncName = Node.Id;                     // Function name used for anything function related including
                                                 // names and labels.
 
         string globl = ".globl ";               // Build the globl
@@ -38,9 +38,9 @@ namespace codegen {
         Func += "funcstart:\n";
 
         CaseCount = 0;
-        Cases = node.Cases.size();             // Get number of cases
+        Cases = Node.Cases.size();             // Get number of cases
 
-        for (auto &funcCase : node.Cases) {     // Build cases
+        for (auto &funcCase : Node.Cases) {     // Build cases
             funcCase->accept(*this);
         }
 
@@ -64,23 +64,23 @@ namespace codegen {
         Func.clear();                       // Prepare string variable for next function
     }
 
-    void GasCodeGenerator::visit(Case &node) {
+    void GasCodeGenerator::visit(Case &Node) {
         CaseCount++;
 
         int argc = 0;
-        for (auto &c : node.Patterns) {
+        for (auto &c : Node.Patterns) {
             c->accept(*this);
-            cout << "PATTERN IN THIS SCOPE => " << Helper.TypeName << "    " << Helper.TypeValue << endl;
+            cout << "PATTERN IN THIS SCOPE => " << Hpr.TypeName << "    " << Hpr.TypeValue << endl;
 
-            if (Helper.TypeName.compare("Id") == 0) {
+            if (Hpr.TypeName.compare("Id") == 0) {
                 int mempos = argc*4+8;
                 string var = "";
                 var += "movl ";
                 var += to_string(mempos);
                 var += ", %eax\n";
-                VarMap[Helper.TypeValue] = var;
+                VarMap[Hpr.TypeValue] = var;
             }
-            Helper = {};
+            Hpr = {};
             argc++;
         }
 
@@ -88,7 +88,7 @@ namespace codegen {
             Func += ".";
             Func += FuncName;
             Func += "casedefault:\n";
-            node.Expr->accept(*this);
+            Node.Expr->accept(*this);
         } else {                    // Other cases
             Func += ".";
             Func += FuncName;
@@ -97,15 +97,15 @@ namespace codegen {
             Func += ":\n";
 
             int argNum = 0;                         // first argument have index 0
-            for (auto &c : node.Patterns) {
+            for (auto &c : Node.Patterns) {
                 c->accept(*this);                    // Gets the pattern, and puts it in "helper"
 
                 cout << "Working on pattern" << endl;
 
-                if (Helper.TypeName.compare("Int") == 0) {     // Case where pattern is an Int
+                if (Hpr.TypeName.compare("Int") == 0) {     // Case where pattern is an Int
                     // Compare input argument with pattern
                     Func += "cmpl $";
-                    Func += Helper.TypeValue;
+                    Func += Hpr.TypeValue;
                     Func += ", ";
                     int mempos = argNum*4+8;            // Stack starts at 8, each arg with 4 space
                     Func += to_string(mempos);
@@ -127,170 +127,170 @@ namespace codegen {
                 }
                 // repeat for all possebilities
             }
-            node.Expr->accept(*this);
+            Node.Expr->accept(*this);
 
-            Helper = {};
+            Hpr = {};
         }
 
         cout << "CaseNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(Or &node) {
+    void GasCodeGenerator::visit(Or &Node) {
         cout << "OrNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(And &node) {
+    void GasCodeGenerator::visit(And &Node) {
         cout << "AndNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(Equal &node) {
+    void GasCodeGenerator::visit(Equal &Node) {
         cout << "EqualNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(NotEqual &node) {
+    void GasCodeGenerator::visit(NotEqual &Node) {
         cout << "NotEqualNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(Lesser &node) {
+    void GasCodeGenerator::visit(Lesser &Node) {
         cout << "LesserNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(Greater &node) {
+    void GasCodeGenerator::visit(Greater &Node) {
         cout << "GreaterNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(LesserEq &node) {
+    void GasCodeGenerator::visit(LesserEq &Node) {
         cout << "LesserEqNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(GreaterEq &node) {
+    void GasCodeGenerator::visit(GreaterEq &Node) {
         cout << "GreaterEqNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(Add &node) {
+    void GasCodeGenerator::visit(Add &Node) {
         cout << "ADD" << endl;
 
-        node.Left->accept(*this);
+        Node.Left->accept(*this);
 
         Func += "pushl %eax\n";
-        node.Right->accept(*this);
+        Node.Right->accept(*this);
 
         Func += "popl %ebx\n";
         Func += "addl %ebx, %eax\n";
         cout << "AddNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(Sub &node) {
+    void GasCodeGenerator::visit(Sub &Node) {
         cout << "SubNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(Mul &node) {
+    void GasCodeGenerator::visit(Mul &Node) {
         cout << "MulNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(Div &node) {
+    void GasCodeGenerator::visit(Div &Node) {
         cout << "DivNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(Mod &node) {
+    void GasCodeGenerator::visit(Mod &Node) {
         cout << "ModNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(ListAdd &node) {
+    void GasCodeGenerator::visit(ListAdd &Node) {
         cout << "ListAddNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(Par &node) {
+    void GasCodeGenerator::visit(Par &Node) {
         cout << "ParNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(Not &node) {
+    void GasCodeGenerator::visit(Not &Node) {
         cout << "NotNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(Int &node) {
+    void GasCodeGenerator::visit(Int &Node) {
         Func += "movl $";
-        Func += to_string(node.Val);
+        Func += to_string(Node.Val);
         Func += ", %eax\n";
 
-        Helper.TypeName = "Int";
-        Helper.TypeValue = to_string(node.Val);
+        Hpr.TypeName = "Int";
+        Hpr.TypeValue = to_string(Node.Val);
 
 
-        cout << "Got integer => " << to_string(node.Val) << endl;
+        cout << "Got integer => " << to_string(Node.Val) << endl;
     }
 
-    void GasCodeGenerator::visit(Float &node) {
+    void GasCodeGenerator::visit(Float &Node) {
         cout << "FloatNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(Bool &node) {
+    void GasCodeGenerator::visit(Bool &Node) {
         cout << "BoolNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(Char &node) {
+    void GasCodeGenerator::visit(Char &Node) {
         cout << "CharNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(String &node) {
+    void GasCodeGenerator::visit(String &Node) {
         cout << "StringNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(ListPattern &node) {
+    void GasCodeGenerator::visit(ListPattern &Node) {
         cout << "ListPatternNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(TuplePattern &node) {
+    void GasCodeGenerator::visit(TuplePattern &Node) {
         cout << "TuplePatternNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(ListSplit &node) {
+    void GasCodeGenerator::visit(ListSplit &Node) {
         cout << "ListSplitNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(List &node) {
+    void GasCodeGenerator::visit(List &Node) {
         cout << "ListNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(Tuple &node) {
+    void GasCodeGenerator::visit(Tuple &Node) {
         cout << "TupleNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(Id &node) {
-        Helper.TypeName = "Id";
-        Helper.TypeValue = FuncName + node.Val;
-        cout << "Got ID => " << node.Val << endl;
+    void GasCodeGenerator::visit(Id &Node) {
+        Hpr.TypeName = "Id";
+        Hpr.TypeValue = FuncName + Node.Val;
+        cout << "Got ID => " << Node.Val << endl;
     }
 
-    void GasCodeGenerator::visit(Call &node) {
+    void GasCodeGenerator::visit(Call &Node) {
 
         // TODO: Find way pu push arguments to stack.
         vector<string> params;
-        for (auto &arg : node.Args) {
+        for (auto &arg : Node.Args) {
             arg->accept(*this);
 
-            if(Helper.TypeName.compare("Int") == 0) {
+            if(Hpr.TypeName.compare("Int") == 0) {
                 Func += "pushl %eax\n";
-            } else if (Helper.TypeName.compare("Id") == 0) {
+            } else if (Hpr.TypeName.compare("Id") == 0) {
 
             }
         }
 
-        node.Callee->accept(*this); // function to call;
+        Node.Callee->accept(*this); // function to call;
         Func += "call ";
-        Func += Helper.TypeValue;
+        Func += Hpr.TypeValue;
         Func += "\n";
 
-        Helper = {};
+        Hpr = {};
 
         cout << "CallNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(Type &node) {
+    void GasCodeGenerator::visit(Type &Node) {
         cout << "TypeNotImplemented" << endl;
     }
 
-    string GasCodeGenerator::get_type(Type *) {
+    string GasCodeGenerator::getType(Type * Ty) {
         return "GasCodeGenerator";
     }
 

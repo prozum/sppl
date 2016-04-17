@@ -59,13 +59,13 @@ namespace common {
 		Type Ty;
 		Location Loc;
 
-		Node(Location);
-		Node(Type, Location);
+		Node(Location Loc);
+		Node(Type Ty, Location Loc);
         Node(const Node&) = delete;
         Node& operator=(const Node&) = delete;
         ~Node() = default;
 
-		virtual void accept(Visitor &) = 0;
+		virtual void accept(Visitor &V) = 0;
 		virtual string str() = 0;
 	};
 
@@ -73,19 +73,19 @@ namespace common {
 	public:
 		vector<unique_ptr<Function>> Funcs;
 
-		Program(vector<unique_ptr<Function>>, Location);
-		Program(unique_ptr<Expression> expr, Location);
+		Program(vector<unique_ptr<Function>> Funcs, Location Loc);
+		Program(unique_ptr<Expression> AnonFunc, Location Loc);
 
-		virtual void accept(Visitor &);
+		virtual void accept(Visitor &V);
 		string str();
 	};
 
 	class Expression : public Node {
 	public:
-		Expression(Location);
-		Expression(Type, Location);
+		Expression(Location Loc);
+		Expression(Type Ty, Location Loc);
 
-		virtual void accept(Visitor &) = 0;
+		virtual void accept(Visitor &V) = 0;
 	};
 
 	/* Declaration */
@@ -98,10 +98,10 @@ namespace common {
 		Scope* Scp;
 		bool Anon = false;
 
-		Function(unique_ptr<Expression>);
-		Function(string, Type, Location);
+		Function(unique_ptr<Expression> AnonFunc);
+		Function(string Id, Type Ty, Location Loc);
 
-		virtual void accept(Visitor &);
+		virtual void accept(Visitor &V);
 		string str();
 	};
 
@@ -111,9 +111,9 @@ namespace common {
 		vector<unique_ptr<Pattern>> Patterns;
 		bool TailRec = false;
 
-		Case(unique_ptr<Expression>, vector<unique_ptr<Pattern>>, Location);
+		Case(unique_ptr<Expression> Expr, vector<unique_ptr<Pattern>> Patterns, Location Loc);
 
-		virtual void accept(Visitor &);
+		virtual void accept(Visitor &V);
 		string str();
 	};
 
@@ -122,9 +122,9 @@ namespace common {
 		unique_ptr<Expression> Callee;
 		vector<unique_ptr<Expression>> Args;
 
-		Call(unique_ptr<Expression>, vector<unique_ptr<Expression>>, Location);
+		Call(unique_ptr<Expression> Callee, vector<unique_ptr<Expression>> Args, Location Loc);
 
-		virtual void accept(Visitor &);
+		virtual void accept(Visitor &V);
 		string str();
 	};
 
@@ -134,9 +134,9 @@ namespace common {
 	public:
 		vector<unique_ptr<Expression>> Elements;
 
-		List(vector<unique_ptr<Expression>>, Location);
+		List(vector<unique_ptr<Expression>> Elements, Location Loc);
 
-		virtual void accept(Visitor &);
+		virtual void accept(Visitor &V);
 		string str();
 	};
 
@@ -144,9 +144,9 @@ namespace common {
 	public:
 		vector<unique_ptr<Expression>> Elements;
 
-		Tuple(vector<unique_ptr<Expression>>, Location);
+		Tuple(vector<unique_ptr<Expression>> Elements, Location Loc);
 
-		virtual void accept(Visitor &);
+		virtual void accept(Visitor &V);
 		string str();
 	};
 }
