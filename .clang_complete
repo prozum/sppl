@@ -1,10 +1,11 @@
 -Isrc/common
--Isrc/codegen/cpp
+-Isrc/semantics
 -Isrc/parser
+-Isrc/codegen/cpp
 -Isrc/codegen/haskell
 -Isrc/codegen/gnuasm
 -Isrc/codegen/llvm
 -Isrc/codegen/pprinter
 -Isrc/compiler
--Itools/profiler
--Itools/interpreter
+-Isrc/optimizer
+-Isrc/jit
