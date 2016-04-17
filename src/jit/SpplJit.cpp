@@ -105,7 +105,7 @@ namespace jit {
 
     string SpplJit::getOutputTuple(intptr_t addr, vector<common::Type> Subtypes) {
         string Out("(");
-        for (size_t i = 0; i < Subtypes.size(); i++) {
+        for (size_t i = 0; i < Subtypes.size(); ++i) {
             switch (Subtypes[i].Id) {
                 case common::TypeId::INT:
                     Out += getOutput(*(int64_t *) addr, Subtypes[i]);

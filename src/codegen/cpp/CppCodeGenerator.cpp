@@ -73,7 +73,7 @@ namespace codegen
         Func << RetType << " " << GUser << Node.Id << "(" << Signature << " *" << GGenerated << GSignature;
 
         // Generate function arguments
-        for (size_t i = 0; i < Node.Signature.Subtypes.size() - 1; i++) {
+        for (size_t i = 0; i < Node.Signature.Subtypes.size() - 1; ++i) {
             Func << ", ";
 
             ArgType = getType(Node.Signature.Subtypes[i]);
@@ -125,7 +125,7 @@ namespace codegen
         Pattern << "    if (";
 
         IdCtx = IdContext::PATTERN;
-        for (size_t i = 0; i < Node.Patterns.size(); i++) {
+        for (size_t i = 0; i < Node.Patterns.size(); ++i) {
             // Push arg_name on get_value_builder. get_value_builder is used for generate
             // Assignments in a case
             GetValueBuilder.push_back(ArgNames[i]);
@@ -170,7 +170,7 @@ namespace codegen
 
         if (Node.TailRec) {
             auto C = (Call*)Node.Expr.get();
-            for (size_t i = 0; i < CurFunc->Signature.Subtypes.size() - 1; i++) {
+            for (size_t i = 0; i < CurFunc->Signature.Subtypes.size() - 1; ++i) {
                 ExprStack.push(stringstream());
                 C->Args[i]->accept(*this);
                 *Output << "        " << GGenerated << GArg << i << " = " << ExprStack.top().str() << "; \n";
@@ -379,7 +379,7 @@ namespace codegen
 
         Res << "(" << ValGotten << "->" << GSize << " - " << ListOffsets.back() << " == " << Node.Patterns.size() << ")";
 
-        for (size_t i = 0; i < Node.Patterns.size(); i++) {
+        for (size_t i = 0; i < Node.Patterns.size(); ++i) {
             // Add "gat_"name"(" and ", i + offset)" to get_value_builder
             GetValueBuilder.insert(GetValueBuilder.begin(),  GGenerated + GValueAt + TypeName + "(");
             GetValueBuilder.push_back(", " + to_string(i + ListOffsets.back()) + ")");
@@ -413,7 +413,7 @@ namespace codegen
         bool Empty = true;
 
         // Iterate through all items in tuple
-        for (size_t i = 0; i < Node.Patterns.size(); i++) {
+        for (size_t i = 0; i < Node.Patterns.size(); ++i) {
             // Add ".gi"i"" to get_value_builder
             GetValueBuilder.push_back("." + GGenerated + GItem + to_string(i));
 

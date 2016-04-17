@@ -84,7 +84,7 @@ namespace common {
 
     string Type::strJoin(const std::string JoinStr) {
         string Str("(");
-        for (size_t i = 0; i < Subtypes.size(); i++) {
+        for (size_t i = 0; i < Subtypes.size(); ++i) {
             Str += Subtypes[i].str();
             if (i + 1 != Subtypes.size())
                 Str += JoinStr;

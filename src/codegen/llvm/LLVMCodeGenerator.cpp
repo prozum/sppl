@@ -95,7 +95,7 @@ namespace codegen {
 
         auto OutputType = getType(Ty.Subtypes.back());
         std::vector<llvm::Type *> InputTypes;
-        for (size_t i = 0; i < Ty.Subtypes.size() - 1; i++) {
+        for (size_t i = 0; i < Ty.Subtypes.size() - 1; ++i) {
             InputTypes.push_back(getType(Ty.Subtypes[i]));
         }
 
@@ -131,7 +131,7 @@ namespace codegen {
 
         // Setup case and pattern blocks
         //CaseBlocks.clear();
-        /*for (size_t i = 0; i < node.cases.size(); i++) {
+        /*for (size_t i = 0; i < node.cases.size(); ++i) {
             PatternBlocks[i].clear();
             for (size_t j = 0; j < node.cases[i]->patterns.size() ; j++)
                 PatternBlocks[i].push_back(BasicBlock::Create(getGlobalContext(), "case" + to_string(i) + "_pattern" + to_string(j), cur_func));

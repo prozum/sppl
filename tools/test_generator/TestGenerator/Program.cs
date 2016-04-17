@@ -40,7 +40,7 @@ namespace TestGenerator
 		static void GenerateSigTest(StreamWriter writer, string testCaseName, int argCount, string compArg, string shouldCompile, string execArg, string expected, int mod = 0) {
 			Append (testCaseName);
 			string s = string.Empty;
-			for (int i = 0; i < argCount; i++) {
+			for (int i = 0; i < argCount; ++i) {
 				s += "Int->";
 			}
 			s += "Int";
@@ -51,7 +51,7 @@ namespace TestGenerator
 			string[] args = new string[] {"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l"};
 
 			source += "    shared_ptr<std::stringstream> source = buildSimple(\"" + s + "\", \""; //);\n";
-			for (int i = 0; i < argCount + mod; i++) {
+			for (int i = 0; i < argCount + mod; ++i) {
 				source += " " + args [i];
 			}
 
@@ -73,7 +73,7 @@ namespace TestGenerator
 			string source = "void Test::" + testCaseName + "() {\n";
 			source += "    std::vector<std::string> pattern;\n";
 
-			for (int i = 0; i < caseCount; i++) {
+			for (int i = 0; i < caseCount; ++i) {
 				source += "    pattern.push_back(\"" + i + "\");\n";
 			}
 

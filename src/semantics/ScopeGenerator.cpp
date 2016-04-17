@@ -40,7 +40,7 @@ namespace semantics {
         // Visit children
         Ctx = ScopeContext::PATTERN;
 
-        for (size_t i = 0; i < Node.Patterns.size(); i++) {
+        for (size_t i = 0; i < Node.Patterns.size(); ++i) {
             Node.Patterns[i]->Ty = CurFunc->Signature[i];
             Node.Patterns[i]->accept(*this);
         }
@@ -173,7 +173,7 @@ namespace semantics {
     void ScopeGenerator::visit(TuplePattern &Node) {
         if (Node.Ty.Id == TypeId::TUPLE) {
             if (Node.Patterns.size() == Node.Ty.Subtypes.size()) {
-                for (size_t i = 0; i < Node.Patterns.size(); i++) {
+                for (size_t i = 0; i < Node.Patterns.size(); ++i) {
                     Node.Patterns[i]->Ty = Node.Ty.Subtypes[i];
                     Node.Patterns[i]->accept(*this);
                 }
