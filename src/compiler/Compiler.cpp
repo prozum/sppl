@@ -2,7 +2,7 @@
 
 namespace compiler {
     Compiler::Compiler() :
-            scope_generator(semantics::ScopeGenerator(&global)) {
+            scope_generator(semantics::ScopeGenerator(&Global)) {
 
     }
 
@@ -17,12 +17,12 @@ namespace compiler {
 #endif
 #ifdef CGNUASM
             case Backend::GNUASM:
-                generator = make_unique<codegen::GasCodeGenerator>(driver);
+                generator = make_unique<codegen::GasCodeGenerator>(*this);
                 break;
 #endif
 #ifdef CHASKELL
             case Backend::HASKELL:
-                generator = make_unique<codegen::HCodeGenerator>(*output);
+                generator = make_unique<codegen::HCodeGenerator>(*this);
                 break;
 #endif
 #ifdef CLLVM
@@ -40,7 +40,7 @@ namespace compiler {
 
     int Compiler::compile() {
 
-        if (!parse_files())
+        if (!parseFiles())
             return 1;
 
         if (!accept(scope_generator))

@@ -25,11 +25,12 @@ namespace parser {
 
     class Driver;
 
-
-
     class Scanner : public SpplFlexLexer
     {
     public:
+        bool NewSource;
+        Driver &Drv;
+
         Scanner(Driver &driver);
         virtual ~Scanner();
 
@@ -40,8 +41,5 @@ namespace parser {
         int yywrap();
 
         void set_debug(bool b);
-
-
-        Driver &driver;
     };
 }

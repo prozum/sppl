@@ -6,4 +6,4 @@ Simple Parallel Programming Language
 
 C++ Style
 --------------------
-https://google.github.io/styleguide/cppguide.html
+http://llvm.org/docs/CodingStandards.html

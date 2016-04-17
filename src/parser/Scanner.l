@@ -7,6 +7,7 @@
 
 #include "Node.h"
 #include "Scanner.h"
+#include "Driver.h"
 
 #define YY_NO_UNISTD_H
 
@@ -17,7 +18,7 @@ typedef parser::Parser::token token;
 typedef parser::Parser::token_type token_type;
 
 #define yyterminate() return token::END
-#define YY_USER_ACTION  yylloc->columns = yyleng;
+#define YY_USER_ACTION  yylloc->columns(yyleng);
 
 using namespace std;
 %}
@@ -26,17 +27,25 @@ using namespace std;
 %%
 
 %{
-    yylloc->columns += yyleng;
+    if (NewSource) {
+        yylloc->sources(Drv.Src);
+        NewSource = false;
+    }
+    yylloc->step();
 %}
 
-[ \t] {  }
+[ \t]+ {
+    yylloc->step();
+}
 
-[\n] {
-    yylloc->lines = 1;
-    yylloc->columns = 1;
+[\n]+ {
+    yylloc->lines(yyleng);
+    yylloc->step();
 }
 
 "#"[^\n]* {
+    yylloc->lines(yyleng);
+    yylloc->step();
 }
 
 "def" {
@@ -82,7 +91,7 @@ using namespace std;
 "\""[^"]*"\"" {
     yylval->str = new string(yytext);
     yylval->str->pop_back();
-    yylval->str->erase (0,1);
+    yylval->str->erase(0, 1);
     return token::STRINGLITERAL;
 }
 
@@ -192,9 +201,9 @@ using namespace std;
 
 namespace parser {
 
-    Scanner::Scanner(Driver &driver) :
+    Scanner::Scanner(Driver &Drv) :
         SpplFlexLexer(),
-        driver(driver) { }
+        Drv(Drv) { }
 
     Scanner::~Scanner() { }
 
@@ -203,7 +212,8 @@ namespace parser {
     }
 
     int Scanner::yywrap() {
-        if (driver.next_input()) {
+        if (Drv.nextInput()) {
+            NewSource = true;
             return 0;
         }
 

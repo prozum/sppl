@@ -88,9 +88,9 @@ int main(int argc, char *argv[])
     }
 
     Compiler compiler;
-    compiler.set_output(output);
-    compiler.set_header_output(header_output);
-    compiler.set_inputs(inputs);
+    compiler.setOutput(output);
+    compiler.setHeaderOutput(header_output);
+    compiler.setInputs(inputs);
     compiler.set_backend(backend);
 
     return compiler.compile();

@@ -1,27 +1,33 @@
 #include "Error.h"
 
 namespace common {
-    Error::Error(std::string msg) : msg(msg), loc() { }
-    Error::Error(std::string msg, common::Location loc) : msg(msg), loc(loc) { }
+    Error::Error(std::string Msg) : Msg(Msg), Loc() { }
+    Error::Error(std::string Msg, common::Location Loc) : Msg(Msg), Loc(Loc) { }
 
-    std::ostream &operator<<(ostream& stream, const Error &err)
+    std::ostream &operator<<(ostream& Out, const Error &Err)
     {
-        return (stream << err.loc << "|" << err.msg);
+        return (Out << Err.Loc << "|" << Err.Msg);
     }
 
-    Error Error::NotImplemented(string msg) {
-        return Error ("NotImplemented: " + msg);
+    Error::Error(const Error &Other) {
+        Msg = Other.Msg;
+        Loc = Other.Loc;
     }
 
-    Error Error::Expected(string msg, string expected, string actual, Location loc) {
-        return Error(msg + ": Expected: '" + expected + "' Actual: '" + actual + "'", loc);
+    Error Error::NotImplemented(string Msg) {
+        return Error ("NotImplemented: " + Msg);
     }
 
-    Error Error::Binary(string msg, common::BinaryOp &op) {
-        return Error("'" + op.str() + "' " + msg + ": Left: '" + op.left->str() + "' Right: '" + op.right->str() + "'", op.loc);
+    Error Error::Expected(string Msg, string Expected, string Actual, Location Loc) {
+        return Error(Msg + ": Expected: '" + Expected + "' Actual: '" + Actual + "'", Loc);
     }
 
-    Error Error::Unary(string msg, common::UnaryOp &op) {
-        return Error("'" + op.str() + "' " + msg + ": Child: '" + op.child->str() + "'", op.loc);
+    Error Error::Binary(string Msg, common::BinaryOp &Op) {
+        return Error("'" + Op.str() + "' " + Msg + ": Left: '" + Op.Left->str() + "' Right: '" + Op.Right->str() + "'", Op.Loc);
     }
+
+    Error Error::Unary(string Msg, common::UnaryOp &Op) {
+        return Error("'" + Op.str() + "' " + Msg + ": Child: '" + Op.Child->str() + "'", Op.Loc);
+    }
+
 }

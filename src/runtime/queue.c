@@ -1,11 +1,6 @@
 #include "queue.h"
 
-#ifndef _cas
-# define _cas(ptr, oldval, newval) \
-         __sync_bool_compare_and_swap(ptr, oldval, newval)
-#endif
-
-queue_root *alloc_queue_root()
+queue_root *create_queue()
 {
     queue_root *root = malloc(sizeof(queue_root));
 
@@ -16,7 +11,7 @@ queue_root *alloc_queue_root()
     return root;
 }
 
-void queue_put(queue_head *new, queue_root *root)
+void queue_add(queue_head *new, queue_root *root)
 {
     do {
         new->next = root->in_queue;

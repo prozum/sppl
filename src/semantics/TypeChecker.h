@@ -14,69 +14,39 @@ namespace semantics {
     public:
         TypeChecker();
 
-        virtual void visit(Program &node);
-
-        virtual void visit(Function &node);
-
-        virtual void visit(Case &node);
-
-        virtual void visit(Or &node);
-
-        virtual void visit(And &node);
-
-        virtual void visit(Equal &node);
-
-        virtual void visit(NotEqual &node);
-
-        virtual void visit(Lesser &node);
-
-        virtual void visit(Greater &node);
-
-        virtual void visit(LesserEq &node);
-
-        virtual void visit(GreaterEq &node);
-
-        virtual void visit(Add &node);
-
-        virtual void visit(Sub &node);
-
-        virtual void visit(Mul &node);
-
-        virtual void visit(Div &node);
-
-        virtual void visit(Mod &node);
-
-        virtual void visit(ListAdd &node);
-
-        virtual void visit(Par &node);
-
-        virtual void visit(Not &node);
-
-        virtual void visit(Int &node);
-
-        virtual void visit(Float &node);
-
-        virtual void visit(Bool &node);
-
-        virtual void visit(Char &node);
-
-        virtual void visit(String &node);
-
-        virtual void visit(ListPattern &node);
-
-        virtual void visit(TuplePattern &node);
-
-        virtual void visit(ListSplit &node);
-
-        virtual void visit(List &node);
-
-        virtual void visit(Tuple &node);
-
-        virtual void visit(Id &node);
-
-        virtual void visit(Call &node);
+        virtual void visit(Program &Node);
+        virtual void visit(Function &Node);
+        virtual void visit(Case &Node);
+        virtual void visit(Or &Node);
+        virtual void visit(And &Node);
+        virtual void visit(Equal &Node);
+        virtual void visit(NotEqual &Node);
+        virtual void visit(Lesser &Node);
+        virtual void visit(Greater &Node);
+        virtual void visit(LesserEq &Node);
+        virtual void visit(GreaterEq &Node);
+        virtual void visit(Add &Node);
+        virtual void visit(Sub &Node);
+        virtual void visit(Mul &Node);
+        virtual void visit(Div &Node);
+        virtual void visit(Mod &Node);
+        virtual void visit(ListAdd &Node);
+        virtual void visit(Par &Node);
+        virtual void visit(Not &Node);
+        virtual void visit(Int &Node);
+        virtual void visit(Float &Node);
+        virtual void visit(Bool &Node);
+        virtual void visit(Char &Node);
+        virtual void visit(String &Node);
+        virtual void visit(ListPattern &Node);
+        virtual void visit(TuplePattern &Node);
+        virtual void visit(ListSplit &Node);
+        virtual void visit(List &Node);
+        virtual void visit(Tuple &Node);
+        virtual void visit(Id &Node);
+        virtual void visit(Call &Node);
 
     private:
-        Function *current_func;
+        Function *CurFunc;
     };
 }

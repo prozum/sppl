@@ -24,26 +24,24 @@ namespace common {
 
 	class Type {
 	public:
-		TypeId id;
-		vector<Type> subtypes;
-		Location loc;
+		TypeId Id;
+		vector<Type> Subtypes;
+		Location Loc;
 
 		Type();
 		~Type();
-		Type(TypeId);
-		Type(TypeId, Location);
-		Type(TypeId, std::vector<Type>);
-		Type(TypeId, std::vector<Type>, Location);
+		Type(TypeId Id);
+		Type(TypeId Id, Location Loc);
+		Type(TypeId Id, std::vector<Type> Subtypes);
+		Type(TypeId Id, std::vector<Type> Subtypes, Location Loc);
 
-		bool operator==(const Type &other) const;
-		bool operator!=(const Type &other) const;
-		Type operator[](const size_t i);
+		bool operator==(const Type &Other) const;
+		bool operator!=(const Type &Other) const;
+		Type operator[](const size_t Index);
 
 		string str();
-		string subtype_str(const std::string split);
-
+		string subtypeStr(const std::string Split);
 	};
-
 }
 
 namespace std
@@ -51,15 +49,15 @@ namespace std
 	template <>
     struct hash<common::Type>
     {
-        std::size_t operator()(const common::Type& type) const
+        std::size_t operator()(const common::Type& Ty) const
         {
-            size_t res = std::hash<int>()(static_cast<int>(type.id));
+            size_t Res = hash<int>()(static_cast<int>(Ty.Id));
 
-            for (auto &subtype: type.subtypes) {
-                res ^= (hash<common::Type>()(subtype) << 1);
+            for (auto &Subtype : Ty.Subtypes) {
+                Res ^= (hash<common::Type>()(Subtype) << 1);
             }
 
-            return res;
+            return Res;
         }
     };
 }

@@ -1,7 +1,6 @@
 #include "CodeGenerator.h"
 
 namespace parser {
-
-    CodeGenerator::CodeGenerator(Driver &driver) :
-            driver(driver) { }
+    CodeGenerator::CodeGenerator(Driver &Drv) :
+            Drv(Drv) { }
 }

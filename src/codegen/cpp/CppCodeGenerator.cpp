@@ -9,77 +9,77 @@ using namespace std;
 
 namespace codegen
 {
-    CCodeGenerator::CCodeGenerator(Driver &driver) :
-            CodeGenerator(driver),
-            real_string(Type(TypeId::LIST, vector<Type>({ Type(TypeId::CHAR) }))),
-            string_list(Type(TypeId::LIST, vector<Type>({ Type(TypeId::STRING) }))),
-            list_offsets(vector<int>({ 0 })),
-            header(driver.hout),
-            output(driver.out)
-    { }
+    CCodeGenerator::CCodeGenerator(Driver &Drv) :
+            CodeGenerator(Drv),
+            Output(Drv.Out),
+            Header(Drv.HOut),
+            ListOffsets(vector<int>({ 0 })),
+            StringList(Type(TypeId::LIST, vector<Type>({ Type(TypeId::STRING) }))),
+            RealString(Type(TypeId::LIST, vector<Type>({ Type(TypeId::CHAR) }))) { }
 
-    void CCodeGenerator::visit(Program &node)
+    void CCodeGenerator::visit(Program &Node)
     {
+        Prog = &Node;
         Function* main = nullptr;
 
         // generate the standard functionality for every program
-        generate_std();
+        generateStd();
 
         // find the main function
-        for (auto &i: node.funcs)
-            if (i->id == "main")
+        for (auto &i: Node.Funcs)
+            if (i->Id == "main")
                 main = i.get();
 
         if (!main)
             throw "No main, help!";
 
         // get the type of main, so that return type of main is generated.
-        get_type(main->type);
+        getType(main->Ty);
 
         // generate real main function, that calls the users main
-        string strlistname = get_list(string_list);
+        string strlistname = getList(StringList);
 
-        *output << "int main(int argc, char** argv) { \n"
-                   "    " << strlistname << " *args = " << g_generated << g_create << strlistname << "(0); \n"
+        *Output << "int main(int argc, char** argv) { \n"
+                   "    " << strlistname << " *args = " << GGenerated << GCreate << strlistname << "(0); \n"
                    "    int i; \n"
                    " \n"
                    "    for(i = argc - 1; i >= 0; i--) { \n"
-                   "        args = " << g_generated << g_add << strlistname << "(args, " << g_generated << g_create << g_string << "(argv[i])); \n"
+                   "        args = " << GGenerated << GAdd << strlistname << "(args, " << GGenerated << GCreate << GString << "(argv[i])); \n"
                    "    } \n"
                    " \n"
-                   "    " << g_generated << g_print << g_string << "("  << to_strings[main->type] << "(" <<  g_user << g_main << "(args))); \n"
+                   "    " << GGenerated << GPrint << GString << "("  << ToStrings[main->Ty] << "(" << GGlobal << GUser << GMain << ".call(&" << GGlobal << GUser << GMain << ", args))); \n"
                    "    return 0; \n"
                    "} \n"
                    " \n";
 
-        for (auto &f: node.funcs) {
+        for (auto &f: Node.Funcs) {
             f->accept(*this);
-            *output << endl;
-            output_buffer();
+            *Output << endl;
+            outputBuffer();
         }
     }
 
-    void CCodeGenerator::visit(Function &node)
+    void CCodeGenerator::visit(Function &Node)
     {
         stringstream function;
         stringstream arg_name;
-        string return_type = get_type(node.type);
+        string return_type = getType(Node.Ty);
         string argument_type;
+        string signature = getEnvironment(Node.Signature);
 
-        current_func = &node;
+        CurFunc = &Node;
 
         // generate function name and return type
-        function << return_type << " " << g_user << node.id << "(";
+        function << return_type << " " << GUser << Node.Id << "(" << signature << " *" << GGenerated << GSignature;
 
         // generate function arguments
-        for (size_t i = 0; i < node.signature.subtypes.size() - 1; i++) {
-            argument_type = get_type(node.signature.subtypes[i]);
-            arg_name << g_generated << g_arg << i;
-            arg_names.push_back(arg_name.str());
-            function << argument_type << " " << arg_name.str();
+        for (size_t i = 0; i < Node.Signature.Subtypes.size() - 1; i++) {
+            function << ", ";
 
-            if (i < node.signature.subtypes.size() - 2) // don't generate ", " after last argument
-                function << ", ";
+            argument_type = getType(Node.Signature.Subtypes[i]);
+            arg_name << GGenerated << GArg << i;
+            ArgNames.push_back(arg_name.str());
+            function << argument_type << " " << arg_name.str();
 
             arg_name.str("");
         }
@@ -87,34 +87,36 @@ namespace codegen
         function << ")";
 
         // generate function decleration in header
-        *header << function.str() << ";" << endl;
-        *header << endl;
+        *Header << function.str() << "; \n \n";
+
+        *Header << signature << " " << GGlobal << GUser << Node.Id << " = { " << GUser << Node.Id << " }; \n\n";
 
         // generate function in *output
-        *output << function.str() << " { \n"
+        *Output << function.str() << " { \n"
                    "Start: \n"
                    "\n";
 
+
         // generate cases
-        for (auto &c: node.cases) {
+        for (auto &c: Node.Cases) {
             c->accept(*this);
-            *output << endl;
+            *Output << endl;
 
             // clear assigments specific for current case
-            assignments.clear();
+            Assignments.clear();
         }
 
         // generate error, for when program doesn't realize a case
-        *output << "    printf(\"No cases realized!\\n\"); \n"
+        *Output << "    printf(\"No cases realized!\\n\"); \n"
                    "    exit(1); \n"
                    "} \n"
                    " \n";
 
         // clear arg_names for current function
-        arg_names.clear();
+        ArgNames.clear();
     }
 
-    void CCodeGenerator::visit(Case &node)
+    void CCodeGenerator::visit(Case &Node)
     {
         stringstream pattern;
         bool empty = true;
@@ -122,26 +124,26 @@ namespace codegen
         // generate if-statement for matching
         pattern << "    if (";
 
-        id_context = IdContext::PATTERN;
-        for (size_t i = 0; i < node.patterns.size(); i++) {
+        IdCtx = IdContext::PATTERN;
+        for (size_t i = 0; i < Node.Patterns.size(); i++) {
             // push arg_name on get_value_builder. get_value_builder is used for generate
             // assignments in a case
-            get_value_builder.push_back(arg_names[i]);
+            GetValueBuilder.push_back(ArgNames[i]);
 
             // generate pattern
-            node.patterns[i]->accept(*this);
+            Node.Patterns[i]->accept(*this);
 
             // cleanup
-            get_value_builder.pop_back();
+            GetValueBuilder.pop_back();
 
             // only add pattern, if pattern is not "1"
-            if (last_pattern != "1") {
+            if (LastPattern != "1") {
 
                 if (!empty)
                     pattern << " && ";
 
                 empty = false;
-                pattern << last_pattern;
+                pattern << LastPattern;
             }
         }
 
@@ -149,600 +151,617 @@ namespace codegen
 
         // only generate if statement, if the pattern wasn't empty
         if (!empty) {
-            *output << pattern.str() << endl;
+            *Output << pattern.str() << endl;
         }
 
-        *output << "    { \n";
+        *Output << "    { \n";
 
         // generate all nessesary assigments
-        for (auto &assign: assignments) {
-            *output << "        " << assign << endl;
+        for (auto &assign: Assignments) {
+            *Output << "        " << assign << endl;
 
-            if (assign == assignments.back())
-                *output << endl;
+            if (assign == Assignments.back())
+                *Output << endl;
         }
 
         // generate return expression
-        id_context = IdContext::EXPR;
+        IdCtx = IdContext::EXPR;
+        ExprStack.push(stringstream());
 
-        if (node.tail_rec) {
-            auto call = (Call*)node.expr.get();
-            for (size_t i = 0; i < current_func->signature.subtypes.size() - 1; i++) {
-                *output << "        " << g_generated << g_arg << i << " = ";
-                call->exprs[i]->accept(*this);
-                *output << "; \n";
+        if (Node.TailRec) {
+            auto call = (Call*)Node.Expr.get();
+            for (size_t i = 0; i < CurFunc->Signature.Subtypes.size() - 1; i++) {
+                ExprStack.push(stringstream());
+                call->Args[i]->accept(*this);
+                *Output << "        " << GGenerated << GArg << i << " = " << ExprStack.top().str() << "; \n";
+                ExprStack.pop();
             }
 
-            *output << "\n"
+            *Output << "\n"
                        "        goto Start; \n";
         } else {
-            string result_type = get_type(current_func->signature.subtypes.back());
+            string result_type = getType(CurFunc->Signature.Subtypes.back());
+            ExprStack.push(stringstream());
 
-            *output << "        " << result_type << " res = ";
-            node.expr->accept(*this);
-            *output << "; \n";
-
-            *output << "        return res; \n";
+            Node.Expr->accept(*this);
+            *Output << "        " << result_type << " res = " << ExprStack.top().str() << "; \n";
+            *Output << "        return res; \n";
+            ExprStack.pop();
         }
 
-        *output << "    } \n"
+        *Output << "    } \n"
                    " \n";
     }
 
-    void CCodeGenerator::visit(Or &node)
+    void CCodeGenerator::visit(Or &Node)
     {
-        *output << "(";
-        node.left->accept(*this);
-        *output << "||";
-        node.right->accept(*this);
-        *output << ")";
+        ExprStack.top() << "(";
+        Node.Left->accept(*this);
+        ExprStack.top() << "||";
+        Node.Right->accept(*this);
+        ExprStack.top() << ")";
     }
 
-    void CCodeGenerator::visit(And &node)
+    void CCodeGenerator::visit(And &Node)
     {
-        *output << "(";
-        node.left->accept(*this);
-        *output << "&&";
-        node.right->accept(*this);
-        *output << ")";
+        ExprStack.top() << "(";
+        Node.Left->accept(*this);
+        ExprStack.top() << "&&";
+        Node.Right->accept(*this);
+        ExprStack.top() << ")";
     }
 
-    void CCodeGenerator::visit(Equal &node)
+    void CCodeGenerator::visit(Equal &Node)
     {
-        output_equal(node.type, *node.left.get(), *node.right.get());
+        outputEqual(Node.Ty, *Node.Left.get(), *Node.Right.get());
     }
 
-    void CCodeGenerator::visit(NotEqual &node)
+    void CCodeGenerator::visit(NotEqual &Node)
     {
-        *output << "(!";
-        output_equal(node.type, *node.left.get(), *node.right.get());
-        *output << ")";
+        ExprStack.top() << "(!";
+        outputEqual(Node.Ty, *Node.Left.get(), *Node.Right.get());
+        ExprStack.top() << ")";
     }
 
-    void CCodeGenerator::output_equal(Type &type, Expr &left, Expr &right) {
+    void CCodeGenerator::outputEqual(Type &Ty, Expression &Left, Expression &Right) {
         string name;
 
-        switch (type.id) {
+        switch (Ty.Id) {
             case TypeId::TUPLE:
-                name = get_tuple(left.type);
+                name = getTuple(Left.Ty);
 
-                *output << g_generated << g_compare << name << "(";
-                left.accept(*this);
-                *output << ", ";
-                right.accept(*this);
-                *output << ")";
+                ExprStack.top() << GGenerated << GCompare << name << "(";
+                Left.accept(*this);
+                ExprStack.top() << ", ";
+                Right.accept(*this);
+                ExprStack.top() << ")";
                 break;
             case TypeId::LIST:
             case TypeId::STRING:
-                name = get_list(left.type);
+                name = getList(Left.Ty);
 
-                *output << g_generated << g_compare << name << "(";
-                left.accept(*this);
-                *output << ", ";
-                right.accept(*this);
-                *output << ")";
+                ExprStack.top() << GGenerated << GCompare << name << "(";
+                Left.accept(*this);
+                ExprStack.top() << ", ";
+                Right.accept(*this);
+                ExprStack.top() << ")";
                 break;
             default:
-                *output << "(";
-                left.accept(*this);
-                *output << "==";
-                right.accept(*this);
-                *output << ")";
+                ExprStack.top() << "(";
+                Left.accept(*this);
+                ExprStack.top() << "==";
+                Right.accept(*this);
+                ExprStack.top() << ")";
                 break;
         }
     }
 
-    void CCodeGenerator::visit(Lesser &node)
+    void CCodeGenerator::visit(Lesser &Node)
     {
-        *output << "(";
-        node.left->accept(*this);
-        *output << "<";
-        node.right->accept(*this);
-        *output << ")";
+        ExprStack.top() << "(";
+        Node.Left->accept(*this);
+        ExprStack.top() << "<";
+        Node.Right->accept(*this);
+        ExprStack.top() << ")";
     }
 
-    void CCodeGenerator::visit(LesserEq &node)
+    void CCodeGenerator::visit(LesserEq &Node)
     {
-        *output << "(";
-        node.left->accept(*this);
-        *output << "<=";
-        node.right->accept(*this);
-        *output << ")";
+        ExprStack.top() << "(";
+        Node.Left->accept(*this);
+        ExprStack.top() << "<=";
+        Node.Right->accept(*this);
+        ExprStack.top() << ")";
     }
 
-    void CCodeGenerator::visit(Greater &node)
+    void CCodeGenerator::visit(Greater &Node)
     {
-        *output << "(";
-        node.left->accept(*this);
-        *output << ">";
-        node.right->accept(*this);
-        *output << ")";
+        ExprStack.top() << "(";
+        Node.Left->accept(*this);
+        ExprStack.top() << ">";
+        Node.Right->accept(*this);
+        ExprStack.top() << ")";
     }
 
-    void CCodeGenerator::visit(GreaterEq &node)
+    void CCodeGenerator::visit(GreaterEq &Node)
     {
-        *output << "(";
-        node.left->accept(*this);
-        *output << ">=";
-        node.right->accept(*this);
-        *output << ")";
+        ExprStack.top() << "(";
+        Node.Left->accept(*this);
+        ExprStack.top() << ">=";
+        Node.Right->accept(*this);
+        ExprStack.top() << ")";
     }
 
-    void CCodeGenerator::visit(Add &node)
+    void CCodeGenerator::visit(Add &Node)
     {
-        *output << "(";
-        node.left->accept(*this);
-        *output << "+";
-        node.right->accept(*this);
-        *output << ")";
+        ExprStack.top() << "(";
+        Node.Left->accept(*this);
+        ExprStack.top() << "+";
+        Node.Right->accept(*this);
+        ExprStack.top() << ")";
     }
 
-    void CCodeGenerator::visit(Sub &node)
+    void CCodeGenerator::visit(Sub &Node)
     {
-        *output << "(";
-        node.left->accept(*this);
-        *output << "-";
-        node.right->accept(*this);
-        *output << ")";
+        ExprStack.top() << "(";
+        Node.Left->accept(*this);
+        ExprStack.top() << "-";
+        Node.Right->accept(*this);
+        ExprStack.top() << ")";
     }
 
-    void CCodeGenerator::visit(Mul &node)
+    void CCodeGenerator::visit(Mul &Node)
     {
-        *output << "(";
-        node.left->accept(*this);
-        *output << "*";
-        node.right->accept(*this);
-        *output << ")";
+        ExprStack.top() << "(";
+        Node.Left->accept(*this);
+        ExprStack.top() << "*";
+        Node.Right->accept(*this);
+        ExprStack.top() << ")";
     }
 
-    void CCodeGenerator::visit(Div &node)
+    void CCodeGenerator::visit(Div &Node)
     {
-        *output << "(";
-        node.left->accept(*this);
-        *output << "/";
-        node.right->accept(*this);
-        *output << ")";
+        ExprStack.top() << "(";
+        Node.Left->accept(*this);
+        ExprStack.top() << "/";
+        Node.Right->accept(*this);
+        ExprStack.top() << ")";
     }
 
-    void CCodeGenerator::visit(Mod &node)
+    void CCodeGenerator::visit(Mod &Node)
     {
-        *output << "(";
-        node.left->accept(*this);
-        *output << "%";
-        node.right->accept(*this);
-        *output << ")";
+        ExprStack.top() << "(";
+        Node.Left->accept(*this);
+        ExprStack.top() << "%";
+        Node.Right->accept(*this);
+        ExprStack.top() << ")";
     }
 
-    void CCodeGenerator::visit(ListAdd &node)
+    void CCodeGenerator::visit(ListAdd &Node)
     {
-        string name = get_list(node.type);
+        string name = getList(Node.Ty);
 
         // use pregenerated push function to push thing onto list
         // look at generate_list(Type &type) for the generation of this function
-        *output << g_generated << g_add << name << "(";
-        node.right->accept(*this);
-        *output << ", ";
-        node.left->accept(*this);
-        *output << ")";
+        ExprStack.top() << GGenerated << GAdd << name << "(";
+        Node.Right->accept(*this);
+        ExprStack.top() << ", ";
+        Node.Left->accept(*this);
+        ExprStack.top() << ")";
     }
 
-    void CCodeGenerator::visit(Par &node)
+    void CCodeGenerator::visit(Par &Node)
     {
-        *output << "(";
-        node.child->accept(*this);
-        *output << ")";
+        ExprStack.top() << "(";
+        Node.Child->accept(*this);
+        ExprStack.top() << ")";
     }
 
-    void CCodeGenerator::visit(Not &node)
+    void CCodeGenerator::visit(Not &Node)
     {
-        *output << "(";
-        *output << "!";
-        node.child->accept(*this);
-        *output << ")";
+        ExprStack.top() << "(";
+        ExprStack.top() << "!";
+        Node.Child->accept(*this);
+        ExprStack.top() << ")";
     }
 
-    void CCodeGenerator::visit(ListPattern &node)
+    void CCodeGenerator::visit(ListPattern &Node)
     {
         // result is needed, so we don't generate something else, while the ListPattern is being generated
         stringstream result;
         string value_gotten;
-        string type_name = get_list(node.type);
+        string type_name = getList(Node.Ty);
 
         // generate the gotten value from get_value_builder
-        for (auto str : get_value_builder) {
+        for (auto str : GetValueBuilder) {
             value_gotten += str;
         }
 
-        result << "(" << value_gotten << "->" << g_size << " - " << list_offsets.back() << " == " << node.patterns.size() << ")";
+        result << "(" << value_gotten << "->" << GSize << " - " << ListOffsets.back() << " == " << Node.Patterns.size() << ")";
 
-        for (size_t i = 0; i < node.patterns.size(); i++) {
+        for (size_t i = 0; i < Node.Patterns.size(); i++) {
             // add "gat_"name"(" and ", i + offset)" to get_value_builder
-            get_value_builder.insert(get_value_builder.begin(),  g_generated + g_valueat + type_name + "(");
-            get_value_builder.push_back(", " + to_string(i + list_offsets.back()) + ")");
+            GetValueBuilder.insert(GetValueBuilder.begin(),  GGenerated + GValueAt + type_name + "(");
+            GetValueBuilder.push_back(", " + to_string(i + ListOffsets.back()) + ")");
 
             // push new offset.
             // lists accesed later down in pattern should not be offseted by the same as current list.
-            list_offsets.push_back(0);
+            ListOffsets.push_back(0);
 
             // generate pattern
-            node.patterns[i]->accept(*this);
+            Node.Patterns[i]->accept(*this);
 
             // cleanup
-            list_offsets.pop_back();
-            get_value_builder.pop_back();
-            get_value_builder.erase(get_value_builder.begin());
+            ListOffsets.pop_back();
+            GetValueBuilder.pop_back();
+            GetValueBuilder.erase(GetValueBuilder.begin());
 
             // don't add pattern, if pattern is "1"
-            if (last_pattern != "1") {
-                result << " && " << last_pattern;
+            if (LastPattern != "1") {
+                result << " && " << LastPattern;
             }
         }
 
-        last_pattern = "(" + result.str() + ")";
+        LastPattern = "(" + result.str() + ")";
     }
 
-    void CCodeGenerator::visit(TuplePattern &node)
+    void CCodeGenerator::visit(TuplePattern &Node)
     {
         // result is needed, so we don't start generating something in a signature in the header file
         stringstream result;
-        string type_name = get_tuple(node.type);
+        string type_name = getTuple(Node.Ty);
         bool empty = true;
 
         // iterate through all items in tuple
-        for (size_t i = 0; i < node.patterns.size(); i++) {
+        for (size_t i = 0; i < Node.Patterns.size(); i++) {
             // add ".gi"i"" to get_value_builder
-            get_value_builder.push_back("." + g_generated + g_item + to_string(i));
+            GetValueBuilder.push_back("." + GGenerated + GItem + to_string(i));
 
             // generate pattern
-            node.patterns[i]->accept(*this);
+            Node.Patterns[i]->accept(*this);
 
             // cleanup
-            get_value_builder.pop_back();
+            GetValueBuilder.pop_back();
 
             // don't add pattern, if pattern is "1"
-            if (last_pattern != "1") {
+            if (LastPattern != "1") {
                 if (!empty)
                     result << " && ";
 
                 empty = false;
-                result << last_pattern;
+                result << LastPattern;
             }
 
         }
 
         // if empty, then let last_pattern be "1"
         if (empty) {
-            last_pattern = "1";
+            LastPattern = "1";
         } else {
-            last_pattern = "(" + result.str() + ")";
+            LastPattern = "(" + result.str() + ")";
         }
     }
 
-    void CCodeGenerator::visit(ListSplit &node)
+    void CCodeGenerator::visit(ListSplit &Node)
     {
         stringstream result;
-        string type_name = get_list(node.type);
+        string type_name = getList(Node.Ty);
         bool empty = true;
 
         // add "gat_"name"(" and ", offset)" to get_value_builder
         // this is done, so that patterns on the left of node, will use
         // the first + offset item in the list
-        get_value_builder.insert(get_value_builder.begin(), g_generated + g_valueat + type_name + "(");
-        get_value_builder.push_back(", " + to_string(list_offsets.back()) + ")");
+        GetValueBuilder.insert(GetValueBuilder.begin(), GGenerated + GValueAt + type_name + "(");
+        GetValueBuilder.push_back(", " + to_string(ListOffsets.back()) + ")");
 
         // push new offset.
         // lists accesed later down in pattern should not be offseted by the same as current list.
-        list_offsets.push_back(0);
+        ListOffsets.push_back(0);
 
         // generate pattern
-        node.left->accept(*this);
+        Node.Left->accept(*this);
 
         // cleanup
-        list_offsets.pop_back();
-        get_value_builder.pop_back();
-        get_value_builder.erase(get_value_builder.begin());
+        ListOffsets.pop_back();
+        GetValueBuilder.pop_back();
+        GetValueBuilder.erase(GetValueBuilder.begin());
 
         // don't add pattern, if pattern is "1"
-        if (last_pattern != "1") {
+        if (LastPattern != "1") {
             empty = false;
-            result << last_pattern;
+            result << LastPattern;
         }
 
         // right side of a list split, will be the list, but with the first + offset elements missing.
         // this is why we track an offset, so that we don't clone a list, unless we have to.
-        list_offsets[list_offsets.size() - 1]++;
+        ListOffsets[ListOffsets.size() - 1]++;
 
         // generate pattern
-        node.right->accept(*this);
+        Node.Right->accept(*this);
 
         // reverse offset back to what it was
-        list_offsets[list_offsets.size() - 1]--;
+        ListOffsets[ListOffsets.size() - 1]--;
 
         // don't add pattern, if pattern is "1"
-        if (last_pattern != "1") {
+        if (LastPattern != "1") {
             if (!empty)
                 result << " && ";
 
             empty = false;
-            result << last_pattern;
+            result << LastPattern;
         }
 
         // if empty, then let last_pattern be "1"
         if (empty) {
-            last_pattern = "1";
+            LastPattern = "1";
         } else {
-            last_pattern = "(" + result.str() + ")";
+            LastPattern = "(" + result.str() + ")";
         }
     }
 
-    void CCodeGenerator::visit(Int &node)
+    void CCodeGenerator::visit(Int &Node)
     {
         // if pattern, then generate an expression for matching on this pattern
-        if (id_context == IdContext::PATTERN) {
+        if (IdCtx == IdContext::PATTERN) {
             string value = "";
 
-            for (auto str : get_value_builder) {
+            for (auto str : GetValueBuilder) {
                 value += str;
             }
 
-            last_pattern = value + " == " + node.str();
+            LastPattern = value + " == " + Node.str();
 
         // else, just output value
         } else {
-            *output << "(" << node.value << ")";
+            ExprStack.top() << "(" << Node.Val << ")";
         }
     }
 
-    void CCodeGenerator::visit(Float &node)
+    void CCodeGenerator::visit(Float &Node)
     {
         // if pattern, then generate an expression for matching on this pattern
-        if (id_context == IdContext::PATTERN) {
+        if (IdCtx == IdContext::PATTERN) {
             string value = "";
 
-            for (auto str : get_value_builder) {
+            for (auto str : GetValueBuilder) {
                 value += str;
             }
 
-            last_pattern = value + " == " + node.str();
+            LastPattern = value + " == " + Node.str();
 
         // else, just output value
         } else {
-            *output << "(" << node.str() << ")";
+            ExprStack.top() << "(" << Node.str() << ")";
         }
 
     }
 
-    void CCodeGenerator::visit(Bool &node)
+    void CCodeGenerator::visit(Bool &Node)
     {
         // if pattern, then generate an expression for matching on this pattern
-        if (id_context == IdContext::PATTERN) {
+        if (IdCtx == IdContext::PATTERN) {
             string value = "";
 
-            for (auto str : get_value_builder) {
+            for (auto str : GetValueBuilder) {
                 value += str;
             }
 
-            last_pattern = value + " == " + to_string(node.value);
+            LastPattern = value + " == " + to_string(Node.Val);
 
         // else, just output value
         } else {
-            *output << node.value;
+            ExprStack.top() << Node.Val;
         }
     }
 
-    void CCodeGenerator::visit(Char &node)
+    void CCodeGenerator::visit(Char &Node)
     {
         // if pattern, then generate an expression for matching on this pattern
-        if (id_context == IdContext::PATTERN) {
+        if (IdCtx == IdContext::PATTERN) {
             string value = "";
 
-            for (auto str : get_value_builder) {
+            for (auto str : GetValueBuilder) {
                 value += str;
             }
 
-            last_pattern = value + " == " + node.str();
+            LastPattern = value + " == " + Node.str();
 
         // else, just output value
         } else {
-            *output << node.str();
+            ExprStack.top() << Node.str();
         }
     }
 
-    void CCodeGenerator::visit(String &node)
+    void CCodeGenerator::visit(String &Node)
     {
         // if pattern, then generate an expression for matching on this pattern
-        if (id_context == IdContext::PATTERN) {
+        if (IdCtx == IdContext::PATTERN) {
             string value = "";
 
-            for (auto str : get_value_builder) {
+            for (auto str : GetValueBuilder) {
                 value += str;
             }
 
             // gcompare_string is generated by generate_std. it compares the custome string type, to a char*
             // it also takes an offset, for when list splits occur on strings
-            last_pattern = g_generated + g_compare + g_string + "(" + value + ", " + node.str() + ", " + to_string(list_offsets.back()) + ")";
+            LastPattern = GGenerated + GCompare + GString + "(" + value + ", " + Node.str() + ", " + to_string(ListOffsets.back()) + ")";
 
         // else, just output value
         } else {
             // gcreate_string is generate by generate_std. It creates string base on a char*
-            *output << g_generated << g_create << g_string << "(" << node.str() << ")";
+            ExprStack.top() << GGenerated << GCreate << GString << "(" << Node.str() << ")";
         }
     }
 
-    void CCodeGenerator::visit(List &node)
+    void CCodeGenerator::visit(List &Node)
     {
-        string name = get_list(node.type);
+        string name = getList(Node.Ty);
 
         // create list
-        *output << g_generated << g_create << name << "(" << node.exprs.size();
-        for (int i = node.exprs.size() - 1; i >= 0; i--) {
-            *output << ", ";
+        ExprStack.top() << GGenerated << GCreate << name << "(" << Node.Elements.size();
+        for (int i = Node.Elements.size() - 1; i >= 0; i--) {
+            ExprStack.top() << ", ";
 
-            node.exprs[i]->accept(*this);
+            Node.Elements[i]->accept(*this);
         }
 
-        *output << ")";
+        ExprStack.top() << ")";
     }
 
-    void CCodeGenerator::visit(Tuple &node)
+    void CCodeGenerator::visit(Tuple &Node)
     {
-        string name = get_tuple(node.type);
+        string name = getTuple(Node.Ty);
 
         // create tuple
-        *output << g_generated << g_create << name << "(";
-        for (auto &expr: node.exprs){
+        ExprStack.top() << GGenerated << GCreate << name << "(";
+        for (auto &expr: Node.Elements){
             expr->accept(*this);
 
-            if (expr != node.exprs.back())
-                *output << ", ";
+            if (expr != Node.Elements.back())
+                ExprStack.top() << ", ";
         }
-        *output << ")";
+        ExprStack.top() << ")";
     }
 
-    void CCodeGenerator::visit(Id &node)
+    void CCodeGenerator::visit(Id &Node)
     {
         stringstream assign;
         string name = "";
 
-        if (id_context == IdContext::PATTERN) {
+        if (IdCtx == IdContext::PATTERN) {
             // created name from get_value_builder
-            for (auto str : get_value_builder) {
+            for (auto str : GetValueBuilder) {
                 name += str;
             }
 
             // generate an assignment for the id, which should occur after the if-statement
-            assign << get_type(node.type) << " " << g_user << node.id << " = ";
+            assign << getType(Node.Ty) << " " << GUser << Node.Val << " = ";
 
-            if ((node.type.id == TypeId::LIST || node.type.id == TypeId::STRING) &&
-                 list_offsets.back() > 0) {
-                assign << g_generated << g_at << get_list(node.type) << "(" << name << ", " << list_offsets.back() << ");";
+            if ((Node.Ty.Id == TypeId::LIST || Node.Ty.Id == TypeId::STRING) &&
+                 ListOffsets.back() > 0) {
+                assign << GGenerated << GAt << getList(Node.Ty) << "(" << name << ", " << ListOffsets.back() << ");";
             } else {
                 assign << name << ";";
             }
 
             // save the assigment untill after the pattern has been generated
-            assignments.push_back(assign.str());
+            Assignments.push_back(assign.str());
 
             // since and id, in a pattern is allways true, then last_pattern is just set to "1"
-            last_pattern = "1";
+            LastPattern = "1";
         } else {
-            *output << g_user << node.id;
+            bool is_declared = false;
+
+            for (auto &func: Prog->Funcs) {
+                if (func->Id == Node.Val) {
+                    is_declared = true;
+                    break;
+                }
+            }
+
+            if (is_declared) {
+                ExprStack.top() << "&" << GGlobal;
+            }
+
+            ExprStack.top() << GUser << Node.Val;
         }
     }
 
-    void CCodeGenerator::visit(Call &node)
+    void CCodeGenerator::visit(Call &Node)
     {
-        *output << "(";
+        string name = GGenerated + GClosure + to_string(EnvCount++);
+        string assignment = getEnvironment(Node.Callee->Ty) + "* " + name + " = ";
+
+        ExprStack.push(stringstream());
         // generate the callee (aka, the function being called)
-        node.callee->accept(*this);
+        Node.Callee->accept(*this);
+        *Output << "        " << assignment << ExprStack.top().str() << "; \n";
+        ExprStack.pop();
 
         // generate the arguments the function is being called with
-        *output << "(";
-        for (auto &expr: node.exprs){
+        ExprStack.top() << name << "->call(" << name;
+        for (auto &expr: Node.Args){
+            ExprStack.top() << ", ";
+
             expr->accept(*this);
-
-            if (expr != node.exprs.back())
-                *output << ", ";
         }
-        *output << ")";
-
-        *output << ")";
+        ExprStack.top() << ")";
     }
 
-    string CCodeGenerator::get_type(Type &type) {
+    string CCodeGenerator::getType(Type &Ty) {
         unordered_map<Type, string>::iterator got;
 
         // generate the currect c type, based on sppl's types
-        switch (type.id) {
+        switch (Ty.Id) {
             case TypeId::FLOAT:
-                return g_float;
+                return GFloat;
             case TypeId::CHAR:
-                return g_char;
+                return GChar;
             case TypeId::INT:
-                return g_int;
+                return GInt;
             case TypeId::BOOL:
-                return g_bool;
-                // for tuples, lists, signatures and strings, custom types will be generated
+                return GBool;
+                // for tuples, lists, closures and strings, custom types will be generated
             case TypeId::TUPLE:
-                return get_tuple(type);
+                return getTuple(Ty);
             case TypeId::SIGNATURE:
-                return get_signature(type);
+                return getEnvironment(Ty) + "*";
             case TypeId::STRING:
-                return string_type_name + "*";
+                return StringTypeName + "*";
             case TypeId::LIST:
-                return get_list(type) + "*";
+                return getList(Ty) + "*";
             default:
                 // This should never happen. If it does, the type checker made a mistake.
-                break;
+                return "This really shouldn't happen.";
         }
     }
 
-    string CCodeGenerator::generate_list(Type &type) {
+    string CCodeGenerator::generateList(Type &Ty) {
         // save the generated list in a result stream
         stringstream result;
-        string name = g_generated + g_list + to_string(list_count);
-        string children_type = get_type(type.subtypes.front());
+        string name = GGenerated + GList + to_string(ListCount);
+        string children_type = getType(Ty.Subtypes.front());
 
         // increase list count, so next list doesn't have the same name
-        list_count++;
+        ListCount++;
 
         // generate the list struct
-        *header << " \n"
+        *Header << " \n"
                    "typedef struct " << name << " { \n"
-                   "    struct " << name << "* " << g_next << "; \n"
-                   "    " << children_type << " " << g_value << "; \n"
-                   "    int " << g_empty << "; \n"
-                   "    int " << g_size << "; \n"
+                   "    struct " << name << "* " << GNext << "; \n"
+                   "    " << children_type << " " << GValue << "; \n"
+                   "    int " << GEmpty << "; \n"
+                   "    int " << GSize << "; \n"
                    "} " << name << "; \n"
                    " \n";
 
 
         // generate add function for list
-        *header << name << "* " << g_generated << g_add << name << "(" << name << "* current, " << children_type << " item); \n";
-        buffer << name << "* " << g_generated << g_add << name << "(" << name << "* current, " << children_type << " item) { \n"
+        *Header << name << "* " << GGenerated << GAdd << name << "(" << name << "* current, " << children_type << " item); \n";
+        Buffer << name << "* " << GGenerated << GAdd << name << "(" << name << "* current, " << children_type << " item) { \n"
                    "    " << name << "* res = malloc(sizeof(" << name << "));\n"
-                   "    res->" << g_value << " = item; \n"
-                   "    res->" << g_next << " = current; \n"
-                   "    res->" << g_empty << " = 0; \n"
-                   "    res->" << g_size << " = current->" << g_size << " + 1; \n"
+                   "    res->" << GValue << " = item; \n"
+                   "    res->" << GNext << " = current; \n"
+                   "    res->" << GEmpty << " = 0; \n"
+                   "    res->" << GSize << " = current->" << GSize << " + 1; \n"
                    "    return res; \n"
                    "} \n"
                    " \n";
 
 
         // generate create function for list
-        *header << name << "* " << g_generated << g_create << name << "(int count, ...); \n";
-        buffer << name << "* " << g_generated << g_create << name << "(int count, ...) { \n"
+        *Header << name << "* " << GGenerated << GCreate << name << "(int count, ...); \n";
+        Buffer << name << "* " << GGenerated << GCreate << name << "(int count, ...) { \n"
                   "    int i; \n"
                   "    va_list args; \n"
                   "    " << name << "* res = malloc(sizeof(" << name << ")); \n"
-                  "    res->" << g_empty << " = 1; \n"
-                  "    res->" << g_size << " = 0; \n"
+                  "    res->" << GEmpty << " = 1; \n"
+                  "    res->" << GSize << " = 0; \n"
                   "\n"
                   "    va_start(args, count); \n"
                   "\n"
                   "    for (i = 0; i < count; i++) { \n"
-                  "        res = " << g_generated << g_add << name << "(res, va_arg(args, " << children_type << ")); \n"
+                  "        res = " << GGenerated << GAdd << name << "(res, va_arg(args, " << children_type << ")); \n"
                   "    } \n"
                   "\n"
                   "    va_end(args); \n"
@@ -752,14 +771,14 @@ namespace codegen
 
 
         // generate at function for list
-        *header << name << "* " << g_generated << g_at << name << "(" << name << "* current, int index); \n";
-        buffer << name << "* " << g_generated << g_at << name << "(" << name << "* current, int index) { \n"
+        *Header << name << "* " << GGenerated << GAt << name << "(" << name << "* current, int index); \n";
+        Buffer << name << "* " << GGenerated << GAt << name << "(" << name << "* current, int index) { \n"
                    "    while (index-- > 0) { \n"
-                   "        if (current->" << g_empty << ") { \n"
+                   "        if (current->" << GEmpty << ") { \n"
                    "            return current; \n"
                    "        } \n"
                    "\n"
-                   "        current = current->" << g_next << "; \n"
+                   "        current = current->" << GNext << "; \n"
                    "    } \n"
                    "\n"
                    "    return current; \n"
@@ -767,42 +786,42 @@ namespace codegen
                    " \n";
 
         // generate valueat function for list
-        *header << children_type << " " << g_generated << g_valueat << name << "(" << name << "* current, int index); \n";
-        buffer << children_type << " " << g_generated << g_valueat << name << "(" << name << "* current, int index) { \n"
-                   "    " << name << "* res = " << g_generated << g_at << name << "(current, index); \n"
+        *Header << children_type << " " << GGenerated << GValueAt << name << "(" << name << "* current, int index); \n";
+        Buffer << children_type << " " << GGenerated << GValueAt << name << "(" << name << "* current, int index) { \n"
+                   "    " << name << "* res = " << GGenerated << GAt << name << "(current, index); \n"
                    "\n"
-                   "    if (res->" << g_empty << ") { \n"
-                   "        printf(\"Out of bound! " << oob_count++ << "\\n\"); \n"
+                   "    if (res->" << GEmpty << ") { \n"
+                   "        printf(\"Out of bound! " << OobCount++ << "\\n\"); \n"
                    "        exit(1); \n"
                    "    }"
                    "\n"
-                   "    return res->" << g_value << "; \n"
+                   "    return res->" << GValue << "; \n"
                    "} \n"
                    " \n";
 
         // generate compare function for list
-        *header << "int " << g_generated << g_compare << name << "(" << name << "* list1, " << name << "* list2); \n";
-        buffer << "int " << g_generated << g_compare << name << "(" << name << "* list1, " << name << "* list2) { \n"
+        *Header << "int " << GGenerated << GCompare << name << "(" << name << "* list1, " << name << "* list2); \n";
+        Buffer << "int " << GGenerated << GCompare << name << "(" << name << "* list1, " << name << "* list2) { \n"
                    "    int i; \n"
-                   "    if (list1->" << g_size << " != list2->" << g_size << ") { \n"
+                   "    if (list1->" << GSize << " != list2->" << GSize << ") { \n"
                    "         return 0; \n"
                    "    } \n"
                    " \n"
-                   "    for (i = 0; i < list1->" << g_size << "; i++) { \n"
+                   "    for (i = 0; i < list1->" << GSize << "; i++) { \n"
                    "        if(";
 
-        switch (type.subtypes.front().id) {
+        switch (Ty.Subtypes.front().Id) {
             case TypeId::LIST:
             case TypeId::TUPLE:
-                buffer << "!" << g_generated << g_compare << children_type <<
-                        "(" << g_generated << g_valueat << name << "(list1, i), " << g_generated << g_valueat << name << "(list2, i))";
+                Buffer << "!" << GGenerated << GCompare << children_type <<
+                        "(" << GGenerated << GValueAt << name << "(list1, i), " << GGenerated << GValueAt << name << "(list2, i))";
                 break;
             default:
-                buffer << g_generated << g_valueat << name << "(list1, i) != " << g_generated << g_valueat << name << "(list2, i)";
+                Buffer << GGenerated << GValueAt << name << "(list1, i) != " << GGenerated << GValueAt << name << "(list2, i)";
                 break;
         }
 
-        buffer << ") \n"
+        Buffer << ") \n"
                   "            return 0; \n"
                   "    } \n"
                   " \n"
@@ -810,19 +829,19 @@ namespace codegen
                   "} \n"
                   " \n";
 
-        // generation of concat 43 sec old
-        *header << name << "* " << g_generated << g_concat << name << "(" << name << "* list1, " << name << "* list2); \n";
-        buffer << name << "* " << g_generated << g_concat << name << "(" << name << "* list1, " << name << "* list2) { \n"
+        // generation of concat
+        *Header << name << "* " << GGenerated << GConcat << name << "(" << name << "* list1, " << name << "* list2); \n";
+        Buffer << name << "* " << GGenerated << GConcat << name << "(" << name << "* list1, " << name << "* list2) { \n"
                    "    int i; \n"
-                   "    " << name << "** elements = malloc(sizeof(" << name << "*) * list1->" << g_size <<"); \n"
+                   "    " << name << "** elements = malloc(sizeof(" << name << "*) * list1->" << GSize <<"); \n"
                    " \n"
-                   "    for (i = 0; !list1->" << g_empty << "; ++i) { \n"
+                   "    for (i = 0; !list1->" << GEmpty << "; ++i) { \n"
                    "        elements[i] = list1; \n"
-                   "        list1 = list1->" << g_next << "; \n"
+                   "        list1 = list1->" << GNext << "; \n"
                    "    } \n"
                    " \n"
                    "    for (--i; i >= 0; --i) { \n"
-                   "        list2 = " << g_generated << g_add << name << "(list2, elements[i]->" << g_value << "); \n"
+                   "        list2 = " << GGenerated << GAdd << name << "(list2, elements[i]->" << GValue << "); \n"
                    "    } \n"
                    " \n"
                    "    free(elements); \n"
@@ -831,216 +850,217 @@ namespace codegen
                    "\n";
 
         // generation of tostring
-        to_strings[type] = g_generated + g_tostring + name;
+        ToStrings[Ty] = GGenerated + GToString + name;
 
-        *header << string_type_name << "* " << to_strings[type] << "(" << name << "* value); \n";
-        buffer << string_type_name << "* " << to_strings[type] << "(" << name << "* value) { \n"
-                "    " << string_type_name << "* comma = " << g_generated << g_create << g_string << "(\", \"); \n"
-                "    " << string_type_name << "* res = " << g_generated << g_create << g_string << "(\"]\"); \n"
+        *Header << StringTypeName << "* " << ToStrings[Ty] << "(" << name << "* value); \n";
+        Buffer << StringTypeName << "* " << ToStrings[Ty] << "(" << name << "* value) { \n"
+                "    " << StringTypeName << "* comma = " << GGenerated << GCreate << GString << "(\", \"); \n"
+                "    " << StringTypeName << "* res = " << GGenerated << GCreate << GString << "(\"]\"); \n"
                 "    int i; \n"
                 "\n"
-                "    for (i = value->" << g_size << " - 1; i >= 0; i--) { \n"
-                "        res = " << g_generated << g_concat << string_type_name << "(" << to_strings[type.subtypes.front()] << "(" << g_generated << g_valueat << name << "(value, i)), res); \n"
+                "    for (i = value->" << GSize << " - 1; i >= 0; i--) { \n"
+                "        res = " << GGenerated << GConcat << StringTypeName << "(" << ToStrings[Ty.Subtypes.front()] << "(" << GGenerated << GValueAt << name << "(value, i)), res); \n"
                 " \n"
                 "        if (i != 0) \n"
-                "            res = " << g_generated << g_concat << string_type_name << "(comma, res); \n"
+                "            res = " << GGenerated << GConcat << StringTypeName << "(comma, res); \n"
                 "    } \n"
                 " \n"
-                "    res = " << g_generated << g_add << string_type_name << "(res, '['); \n"
+                "    res = " << GGenerated << GAdd << StringTypeName << "(res, '['); \n"
                 "    return res; \n"
                 "} \n"
                 " \n";
 
-        // save list in signature hash map
-        lists[type] = name;
+
+        Lists[Ty] = name;
 
         // return name of list generated
         return name;
     }
 
-    string CCodeGenerator::generate_signature(Type &type) {
+    string CCodeGenerator::generateEnvironment(Type &Ty) {
         // result is needed, so we don't generate something inside the signature, while generating other types
         stringstream result;
-        string name = g_generated + g_signature + to_string(sig_count);
+        string name = GGenerated + GSignature + to_string(SigCount);
 
         // increase signature count, so next signature doesn't have the same name
-        sig_count++;
+        SigCount++;
 
-        result << "typedef " << get_type(type.subtypes.back()) << " (* " << name << ")(";
+        result << "typedef struct " << name << " {\n"
+               << "    " << getType(Ty.Subtypes.back()) << " (* call)(struct " << name << "*";
 
-        for (size_t i = 0; i < type.subtypes.size() - 1; ++i) {
+        for (size_t i = 0; i < Ty.Subtypes.size() - 1; ++i) {
+            result << ", ";
+
             // get the actual type of the argument
-            result << get_type(type.subtypes[i]);
-
-            if (i < type.subtypes.size() - 2) // don't print ", " after the last argument
-                result << ", ";
+            result << getType(Ty.Subtypes[i]);
         }
 
-        result << "); \n";
+        result << "); \n"
+                  "} " << name << ";\n\n";
 
-        *header << result.str();
+        *Header << "\n" << result.str();
 
         // generation of signature to string
-        to_strings[type] = g_generated + g_tostring + name;
+        ToStrings[Ty] = GGenerated + GToString + name;
 
-        *header << string_type_name << "* " << to_strings[type] << "(" << name << " value); \n";
-        buffer << string_type_name << "* " << to_strings[type] << "(" << name << " value) { \n"
-                   "    return " << g_generated << g_create << g_string << "(\"" << type.str() << "\"); \n"
+        *Header << StringTypeName << "* " << ToStrings[Ty] << "(" << name << " value); \n";
+        Buffer << StringTypeName << "* " << ToStrings[Ty] << "(" << name << " value) { \n"
+                   "    return " << GGenerated << GCreate << GString << "(\"" << Ty.str() << "\"); \n"
                    "} \n"
                    " \n";
 
         // save signature in signature hash map
-        signatures[type] = name;
+        Closures[Ty] = name;
 
         // return name of signature generated
         return name;
     }
 
-    string CCodeGenerator::generate_tuple(Type &type) {
+    string CCodeGenerator::generateTuple(Type &Ty) {
         // result is needed, so we don't start generating something while generating the tuple
         stringstream result;
-        string name = g_generated + g_tuple + to_string(tuple_count);
+        string name = GGenerated + GTuple + to_string(TupleCount);
 
         // increase tuple count, so next tuple doesn't have the same name
-        tuple_count++;
+        TupleCount++;
 
         // generate the tuple struct
         result << " \n"
                   "typedef struct " << name << " {" << endl;
         // generate an item for each type in the tuple
-        for (size_t i = 0; i < type.subtypes.size(); ++i) {
+        for (size_t i = 0; i < Ty.Subtypes.size(); ++i) {
             // get the actual type of the item
-            result << "    " << get_type(type.subtypes[i]) << " " << g_generated << g_item << i << ";" << endl; // give this item a unique name
+            result << "    " << getType(Ty.Subtypes[i]) << " " << GGenerated << GItem << i << ";" << endl; // give this item a unique name
 
         }
         result << "} " << name << "; \n";
 
-        *header << result.str();
+        *Header << result.str();
         result.str("");
 
         // generate a create function for the tuple
         // give contructor a unique name
-        result << name << " " << g_generated << g_create << name << "(";
+        result << name << " " << GGenerated << GCreate << name << "(";
 
         // generate an argument for each item in the struct
-        for (size_t i = 0; i < type.subtypes.size(); ++i) {
+        for (size_t i = 0; i < Ty.Subtypes.size(); ++i) {
             // get the actual type of the argument
-            result << get_type(type.subtypes[i]) << " " << g_generated << g_item << i;
+            result << getType(Ty.Subtypes[i]) << " " << GGenerated << GItem << i;
 
-            if (i < type.subtypes.size() - 1) // don't print ", " after the last argument
+            if (i < Ty.Subtypes.size() - 1) // don't print ", " after the last argument
                 result << ", ";
         }
 
         result << ")";
 
-        *header << result.str() << "; \n";
-        buffer << result.str() << " { \n";
+        *Header << result.str() << "; \n";
+        Buffer << result.str() << " { \n";
 
         // generate a result variable
-        buffer << "    " << name << " " << "res; \n";
+        Buffer << "    " << name << " " << "res; \n";
 
         // for each item in res, assign values
-        for (size_t i = 0; i < type.subtypes.size(); ++i) {
-            buffer << "    res." << g_generated << g_item << i << " = " << g_generated << g_item << i << "; \n";
+        for (size_t i = 0; i < Ty.Subtypes.size(); ++i) {
+            Buffer << "    res." << GGenerated << GItem << i << " = " << GGenerated << GItem << i << "; \n";
         }
-        buffer << " \n"
+        Buffer << " \n"
                    "    return res; \n"
                    "} \n"
                    " \n";
 
         // generate a compare function for this tuple
-        *header << "int " << g_generated << g_compare << name << "(" << name << " tuple1, " << name << " tuple2); \n";
-        buffer << "int " << g_generated << g_compare << name << "(" << name << " tuple1, " << name << " tuple2) { \n";
+        *Header << "int " << GGenerated << GCompare << name << "(" << name << " tuple1, " << name << " tuple2); \n";
+        Buffer << "int " << GGenerated << GCompare << name << "(" << name << " tuple1, " << name << " tuple2) { \n";
 
-        for (size_t i = 0; i < type.subtypes.size(); ++i) {
-            buffer << "    if (";
+        for (size_t i = 0; i < Ty.Subtypes.size(); ++i) {
+            Buffer << "    if (";
 
-            switch (type.subtypes[i].id) {
+            switch (Ty.Subtypes[i].Id) {
                 case TypeId::STRING:
                 case TypeId::LIST:
-                    buffer << "!" << g_generated << g_compare << lists[type.subtypes[i]] <<
-                               "(tuple1." << g_generated << g_item << i << ", tuple2." << g_generated << g_item << i << ")";
+                    Buffer << "!" << GGenerated << GCompare << Lists[Ty.Subtypes[i]] <<
+                               "(tuple1." << GGenerated << GItem << i << ", tuple2." << GGenerated << GItem << i << ")";
                     break;
                 case TypeId::TUPLE:
-                    buffer << "!" << g_generated << g_compare << tuples[type.subtypes[i]] <<
-                               "(tuple1." << g_generated << g_item << i << ", tuple2." << g_generated << g_item << i << ")";
+                    Buffer << "!" << GGenerated << GCompare << Tuples[Ty.Subtypes[i]] <<
+                               "(tuple1." << GGenerated << GItem << i << ", tuple2." << GGenerated << GItem << i << ")";
                     break;
                 default:
-                    buffer << "(tuple1." << g_generated << g_item << i << " != tuple2." << g_generated << g_item << i << ")";
+                    Buffer << "(tuple1." << GGenerated << GItem << i << " != tuple2." << GGenerated << GItem << i << ")";
                     break;
             }
 
-            buffer << ") \n"
+            Buffer << ") \n"
                       "        return 0; \n";
         }
 
-        buffer << " \n"
+        Buffer << " \n"
                   "    return 1; \n"
                   "} \n"
                   "\n";
 
 
         // generate a to_string for the tuple
-        to_strings[type] = g_generated + g_tostring + name;
+        ToStrings[Ty] = GGenerated + GToString + name;
 
-        *header << string_type_name << "* " << to_strings[type] << "(" << name << " value); \n";
-        buffer << string_type_name << "* " << to_strings[type] << "(" << name << " value) { \n"
-                   "    " << string_type_name << "* comma = " << g_generated << g_create << g_string << "(\", \"); \n"
-                   "    " << string_type_name << "* res = " << g_generated << g_create << g_string << "(\")\"); \n"
+        *Header << StringTypeName << "* " << ToStrings[Ty] << "(" << name << " value); \n";
+        Buffer << StringTypeName << "* " << ToStrings[Ty] << "(" << name << " value) { \n"
+                   "    " << StringTypeName << "* comma = " << GGenerated << GCreate << GString << "(\", \"); \n"
+                   "    " << StringTypeName << "* res = " << GGenerated << GCreate << GString << "(\")\"); \n"
                    "\n";
 
-        for (size_t i = type.subtypes.size() - 1; i != 0; --i) {
-            buffer << "    res = " << g_generated << g_concat << string_type_name << "(" << to_strings[type.subtypes[i]] << "(value." << g_generated << g_item << i << ")" << ", res); \n";
-            buffer << "    res = " << g_generated << g_concat << string_type_name << "(comma, res); \n";
+        for (size_t i = Ty.Subtypes.size() - 1; i != 0; --i) {
+            Buffer << "    res = " << GGenerated << GConcat << StringTypeName << "(" << ToStrings[Ty.Subtypes[i]] << "(value." << GGenerated << GItem << i << ")" << ", res); \n";
+            Buffer << "    res = " << GGenerated << GConcat << StringTypeName << "(comma, res); \n";
         }
 
 
-        buffer << "    res = " << g_generated << g_concat << string_type_name << "(" << to_strings[type.subtypes[0]] << "(value." << g_generated << g_item << "0)" << ", res); \n"
-                   "    res = " << g_generated << g_add << string_type_name << "(res, '('); \n"
+        Buffer << "    res = " << GGenerated << GConcat << StringTypeName << "(" << ToStrings[Ty.Subtypes[0]] << "(value." << GGenerated << GItem << "0)" << ", res); \n"
+                   "    res = " << GGenerated << GAdd << StringTypeName << "(res, '('); \n"
                    " \n"
                    "    return res; \n"
                    "} \n"
                    "\n";
 
         // save tuple in tuple hash map
-        tuples[type] = name;
+        Tuples[Ty] = name;
 
         // return name of tuple generated
         return name;
     }
 
-    void CCodeGenerator::generate_std() {
-        *output << "#include \"test.h\" \n \n";
+    void CCodeGenerator::generateStd() {
+        *Output << "#include \"test.h\" \n \n";
 
-        *header << "#include <stdarg.h> \n"
+        *Header << "#include <stdarg.h> \n"
                    "#include <stdio.h> \n"
                    "#include <stdlib.h> \n"
                    "#include <string.h> \n"
                    "#include <stdint.h> \n"
                    "#include <inttypes.h> \n";
 
-        to_strings[Type(TypeId::INT)] = g_generated + g_tostring + "int";
-        to_strings[Type(TypeId::BOOL)] = g_generated + g_tostring + "bool";
-        to_strings[Type(TypeId::FLOAT)] = g_generated + g_tostring + "float";
-        to_strings[Type(TypeId::CHAR)] = g_generated + g_tostring + "char";
-        to_strings[Type(TypeId::STRING)] = g_generated + g_tostring + "string";
+        ToStrings[Type(TypeId::INT)] = GGenerated + GToString + "int";
+        ToStrings[Type(TypeId::BOOL)] = GGenerated + GToString + "bool";
+        ToStrings[Type(TypeId::FLOAT)] = GGenerated + GToString + "float";
+        ToStrings[Type(TypeId::CHAR)] = GGenerated + GToString + "char";
+        ToStrings[Type(TypeId::STRING)] = GGenerated + GToString + "string";
 
-        string_type_name = g_generated + g_list + to_string(list_count);
-        lists[Type(TypeId::STRING)] = string_type_name;
+        StringTypeName = GGenerated + GList + to_string(ListCount);
+        Lists[Type(TypeId::STRING)] = StringTypeName;
 
-        generate_list(real_string);
-        generate_list(string_list);
+        generateList(RealString);
+        generateList(StringList);
 
-        output_buffer();
+        outputBuffer();
 
         // generation of string constructer starts here
-        *header << string_type_name << "* " << g_generated << g_create << g_string << "(char* values);\n";
-        *output << string_type_name << "* " << g_generated << g_create << g_string << "(char* values) { \n"
+        *Header << StringTypeName << "* " << GGenerated << GCreate << GString << "(char* values);\n";
+        *Output << StringTypeName << "* " << GGenerated << GCreate << GString << "(char* values) { \n"
                   "    int i, str_length = strlen(values); \n"
-                  "    " << string_type_name << "* res = " << g_generated << g_create << string_type_name << "(0); \n"
+                  "    " << StringTypeName << "* res = " << GGenerated << GCreate << StringTypeName << "(0); \n"
                   " \n"
                   "    for (i = str_length - 1; i >= 0; i--) { \n"
-                  "        res = " << g_generated << g_add << string_type_name << "(res, values[i]); \n"
+                  "        res = " << GGenerated << GAdd << StringTypeName << "(res, values[i]); \n"
                   "    } \n"
                   " \n"
                   "    return res; \n"
@@ -1048,13 +1068,13 @@ namespace codegen
                   " \n";
 
         // generation of string compare
-        *header << "int " << g_generated << g_compare << g_string << "(" << string_type_name << "* string, char* values, int offset); \n";
-        *output << "int " << g_generated << g_compare << g_string << "(" << string_type_name << "* string, char* values, int offset) { \n"
+        *Header << "int " << GGenerated << GCompare << GString << "(" << StringTypeName << "* string, char* values, int offset); \n";
+        *Output << "int " << GGenerated << GCompare << GString << "(" << StringTypeName << "* string, char* values, int offset) { \n"
                    "    int i, size = strlen(values); \n"
                    " \n"
-                   "    if (size == string->" << g_size << ") { \n"
+                   "    if (size == string->" << GSize << ") { \n"
                    "        for (i = 0; i < size; i++) { \n"
-                   "            if (" << g_generated << g_valueat << string_type_name << "(string, i) != values[i]) \n"
+                   "            if (" << GGenerated << GValueAt << StringTypeName << "(string, i) != values[i]) \n"
                    "                return 0; \n"
                    "        } \n"
                    "    } else { \n"
@@ -1068,13 +1088,13 @@ namespace codegen
 
 
         // generation of print string
-        *header << string_type_name << "* " << g_generated << g_print << g_string << "(" << string_type_name << "* string); \n";
-        *output << string_type_name << "* " << g_generated << g_print << g_string << "(" << string_type_name << "* string) { \n"
-                   "    char* buffer = malloc(sizeof(char) * (string->" << g_size << " + 1)); \n"
+        *Header << StringTypeName << "* " << GGenerated << GPrint << GString << "(" << StringTypeName << "* string); \n";
+        *Output << StringTypeName << "* " << GGenerated << GPrint << GString << "(" << StringTypeName << "* string) { \n"
+                   "    char* buffer = malloc(sizeof(char) * (string->" << GSize << " + 1)); \n"
                    "    int i; \n"
                    " \n"
-                   "    for (i = 0; i < string->" << g_size << "; i++) { \n"
-                   "        buffer[i] = (char)" << g_generated << g_valueat << string_type_name << "(string, i); \n"
+                   "    for (i = 0; i < string->" << GSize << "; i++) { \n"
+                   "        buffer[i] = (char)" << GGenerated << GValueAt << StringTypeName << "(string, i); \n"
                    "    } \n"
                    " \n"
                    "    buffer[i] = '\\0'; \n"
@@ -1086,81 +1106,81 @@ namespace codegen
 
 
         // generation of default to_string methods
-        *header << string_type_name << "* " << to_strings[Type(TypeId::INT)] << "(" << g_int << " value); \n";
-        *output << string_type_name << "* " << to_strings[Type(TypeId::INT)] << "(" << g_int << " value) { \n"
+        *Header << StringTypeName << "* " << ToStrings[Type(TypeId::INT)] << "(" << GInt << " value); \n";
+        *Output << StringTypeName << "* " << ToStrings[Type(TypeId::INT)] << "(" << GInt << " value) { \n"
                    "    char buffer[100]; \n"
                    "    sprintf(buffer, \"%\" PRId64 \"\", value); \n"
-                   "    return " << g_generated << g_create << g_string << "(buffer); \n"
+                   "    return " << GGenerated << GCreate << GString << "(buffer); \n"
                    "} \n"
                    " \n";
 
-        *header << string_type_name << "* " << to_strings[Type(TypeId::BOOL)] << "(" << g_bool << " value); \n";
-        *output << string_type_name << "* " << to_strings[Type(TypeId::BOOL)] << "(" << g_bool << " value) { \n"
+        *Header << StringTypeName << "* " << ToStrings[Type(TypeId::BOOL)] << "(" << GBool << " value); \n";
+        *Output << StringTypeName << "* " << ToStrings[Type(TypeId::BOOL)] << "(" << GBool << " value) { \n"
                    "    if (value) \n"
-                   "        return " << g_generated << g_create << g_string << "(\"True\"); \n"
+                   "        return " << GGenerated << GCreate << GString << "(\"True\"); \n"
                    "    else \n"
-                   "        return " << g_generated << g_create << g_string << "(\"False\"); \n"
+                   "        return " << GGenerated << GCreate << GString << "(\"False\"); \n"
                    "} \n"
                    " \n";
 
-        *header << string_type_name << "* " << to_strings[Type(TypeId::FLOAT)] << "(" << g_float << " value); \n";
-        *output << string_type_name << "* " << to_strings[Type(TypeId::FLOAT)] << "(" << g_float << " value) { \n"
+        *Header << StringTypeName << "* " << ToStrings[Type(TypeId::FLOAT)] << "(" << GFloat << " value); \n";
+        *Output << StringTypeName << "* " << ToStrings[Type(TypeId::FLOAT)] << "(" << GFloat << " value) { \n"
                    "    char buffer[100]; \n"
                    "    sprintf(buffer, \"%lf\", value); \n"
-                   "    return " << g_generated << g_create << g_string << "(buffer); \n"
+                   "    return " << GGenerated << GCreate << GString << "(buffer); \n"
                    "} \n"
                    " \n";
 
-        *header << string_type_name << "* " << to_strings[Type(TypeId::CHAR)] << "(" << g_char << " value); \n";
-        *output << string_type_name << "* " << to_strings[Type(TypeId::CHAR)] << "(" << g_char << " value) { \n"
-                   "    " << string_type_name << "* res = " << g_generated << g_create << g_string << "(\"\\'\"); \n"
-                   "    res = " << g_generated << g_add << string_type_name << "(res, value); \n"
-                   "    res = " << g_generated << g_add << string_type_name << "(res, '\\''); \n"
+        *Header << StringTypeName << "* " << ToStrings[Type(TypeId::CHAR)] << "(" << GChar << " value); \n";
+        *Output << StringTypeName << "* " << ToStrings[Type(TypeId::CHAR)] << "(" << GChar << " value) { \n"
+                   "    " << StringTypeName << "* res = " << GGenerated << GCreate << GString << "(\"\\'\"); \n"
+                   "    res = " << GGenerated << GAdd << StringTypeName << "(res, value); \n"
+                   "    res = " << GGenerated << GAdd << StringTypeName << "(res, '\\''); \n"
                    "    return res; \n"
                    "} \n"
                    " \n";
 
-        *header << string_type_name << "* " << to_strings[Type(TypeId::STRING)] << "(" << string_type_name << "* value); \n";
-        *output << string_type_name << "* " << to_strings[Type(TypeId::STRING)] << "(" << string_type_name << "* value) { \n"
-                   "    " << string_type_name << "* res = " << g_generated << g_create << g_string << "(\"\\\"\"); \n"
-                   "    res = " << g_generated << g_concat << string_type_name << "(value, res); \n"
-                   "    res = " << g_generated << g_add << string_type_name << "(res, '\"'); \n"
+        *Header << StringTypeName << "* " << ToStrings[Type(TypeId::STRING)] << "(" << StringTypeName << "* value); \n";
+        *Output << StringTypeName << "* " << ToStrings[Type(TypeId::STRING)] << "(" << StringTypeName << "* value) { \n"
+                   "    " << StringTypeName << "* res = " << GGenerated << GCreate << GString << "(\"\\\"\"); \n"
+                   "    res = " << GGenerated << GConcat << StringTypeName << "(value, res); \n"
+                   "    res = " << GGenerated << GAdd << StringTypeName << "(res, '\"'); \n"
                    "} \n"
                    " \n";
     }
 
-    string CCodeGenerator::get_list(Type &type) {
-        auto got = lists.find(type);
+    string CCodeGenerator::getList(Type &Ty) {
+        auto got = Lists.find(Ty);
 
-        if (got == lists.end()) {
-            return  generate_list(type);
+        if (got == Lists.end()) {
+            return generateList(Ty);
         } else {
             return got->second;
         }
     }
 
-    string CCodeGenerator::get_tuple(Type &type) {
-        auto got = tuples.find(type);
+    string CCodeGenerator::getTuple(Type &Ty) {
+        auto got = Tuples.find(Ty);
 
-        if (got == tuples.end()) {
-            return  generate_tuple(type);
+        if (got == Tuples.end()) {
+            return generateTuple(Ty);
         } else {
             return got->second;
         }
     }
 
-    string CCodeGenerator::get_signature(Type &type) {
-        auto got = signatures.find(type);
+    string CCodeGenerator::getEnvironment(Type &Ty) {
+        auto got = Closures.find(Ty);
 
-        if (got == signatures.end()) {
-            return  generate_signature(type);
+        if (got == Closures.end()) {
+            return generateEnvironment(Ty);
         } else {
             return got->second;
         }
     }
 
-    void CCodeGenerator::output_buffer() {
-        *output << buffer.str(),
-        buffer.str(string());
+    void CCodeGenerator::outputBuffer() {
+        *Output << Buffer.str(),
+        Buffer.str(string());
     }
 }

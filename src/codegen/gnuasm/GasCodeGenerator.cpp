@@ -1,8 +1,4 @@
 #include "GasCodeGenerator.h"
-#include <iostream>
-#include <map>
-#include <bits/stl_map.h>
-#include <Scope.h>
 
 // TODO: Add compile messages and final error messages.
 // TODO: move all debug output lines to debug only.
@@ -12,309 +8,289 @@ using namespace std;
 
 namespace codegen {
 
-    string function;    // Contains the current function
-    string funcName;    // Contains the name of the current function
-
-    vector<string> funcVector;  // Contains all functions that have been read
-    vector<string> funcGlobl;   // Contains a globl for all functions
-
-    int caseCount = 0;          // Used to count the current case
-    int cases = 0;              // Number of cases
-                                // These may be moved into function later
-
-    map<string,string> varmap;
-
-    typedef struct {
-        string typeName;
-        string typeValue;
-    } helper_t;
-
-    helper_t helper;
-
-    GasCodeGenerator::GasCodeGenerator(std::ostream &out) : CodeGenerator::CodeGenerator(out) {
+    GasCodeGenerator::GasCodeGenerator(parser::Driver &Drv) : parser::CodeGenerator(Drv) {
     }
 
-    void GasCodeGenerator::visit(Program &node) {
+    void GasCodeGenerator::visit(Program &Node) {
         // Visit all functions
 
-        for (auto func : node.funcs) {
+        for (auto &func : Node.Funcs) {
             func->accept(*this);
         }
 
         string source = buildSource();  // Build source.S file
-        output << source << endl;
-
+        *Drv.Out << source << endl;
     }
 
-    void GasCodeGenerator::visit(Function &node) {
-        funcName = node.id;                    // Function name used for anything function related including
+    void GasCodeGenerator::visit(Function &Node) {
+        FuncName = Node.Id;                     // Function name used for anything function related including
                                                 // names and labels.
 
         string globl = ".globl ";               // Build the globl
-        globl += funcName;
-        funcGlobl.push_back(globl);
-        function += funcName;                   // Function entry
-        function += ":\n";
-        function += "pushl %ebp\n";             // Save base pointer
-        function += "movl %esp, %ebp\n";        // and move stack pointer
-        function += ".";
-        function += funcName;
-        function += "funcstart:\n";
+        globl += FuncName;
+        FuncGlobl.push_back(globl);
+        Func += FuncName;                   // Function entry
+        Func += ":\n";
+        Func += "pushl %ebp\n";             // Save base pointer
+        Func += "movl %esp, %ebp\n";        // and move stack pointer
+        Func += ".";
+        Func += FuncName;
+        Func += "funcstart:\n";
 
-        caseCount = 0;
-        cases = node.cases.size();             // Get number of cases
+        CaseCount = 0;
+        Cases = Node.Cases.size();             // Get number of cases
 
-        for (auto funcCase : node.cases) {     // Build cases
+        for (auto &funcCase : Node.Cases) {     // Build cases
             funcCase->accept(*this);
         }
 
-        function += ".";
-        function += funcName;
-        function += "funcend:\n";
+        Func += ".";
+        Func += FuncName;
+        Func += "funcend:\n";
 
-        if (funcName.compare("main") == 0) {    // If the current function is main, we want to terminate the program when done
-            function += "movl $0, %ebx\n";
-            function += "movl $1, %eax\n";
-            function += "int $0x80\n";
+        if (FuncName.compare("main") == 0) {    // If the current function is main, we want to terminate the program when done
+            Func += "movl $0, %ebx\n";
+            Func += "movl $1, %eax\n";
+            Func += "int $0x80\n";
         } else {                                // Otherwise return to calling function
-            function += "movl %ebp, %esp\n";
-            function += "popl %ebp\n";
-            function += "leave\n";
-            function += "ret\n";
+            Func += "movl %ebp, %esp\n";
+            Func += "popl %ebp\n";
+            Func += "leave\n";
+            Func += "ret\n";
         }
 
-        funcVector.push_back(function);         // adds function to vector with completed functions
+        FuncVector.push_back(Func);         // adds function to vector with completed functions
 
-        function.clear();                       // Prepare string variable for next function
+        Func.clear();                       // Prepare string variable for next function
     }
 
-    void GasCodeGenerator::visit(Case &node) {
-        caseCount++;
+    void GasCodeGenerator::visit(Case &Node) {
+        CaseCount++;
 
         int argc = 0;
-        for (auto c : node.patterns) {
+        for (auto &c : Node.Patterns) {
             c->accept(*this);
-            cout << "PATTERN IN THIS SCOPE => " << helper.typeName << "    " << helper.typeValue << endl;
+            cout << "PATTERN IN THIS SCOPE => " << Hpr.TypeName << "    " << Hpr.TypeValue << endl;
 
-            if (helper.typeName.compare("Id") == 0) {
+            if (Hpr.TypeName.compare("Id") == 0) {
                 int mempos = argc*4+8;
                 string var = "";
                 var += "movl ";
                 var += to_string(mempos);
                 var += ", %eax\n";
-                varmap[helper.typeValue] = var;
+                VarMap[Hpr.TypeValue] = var;
             }
-            helper = {};
+            Hpr = {};
             argc++;
         }
 
-        if (cases == caseCount) {   // Default case
-            function += ".";
-            function += funcName;
-            function += "casedefault:\n";
-            node.expr->accept(*this);
+        if (Cases == CaseCount) {   // Default case
+            Func += ".";
+            Func += FuncName;
+            Func += "casedefault:\n";
+            Node.Expr->accept(*this);
         } else {                    // Other cases
-            function += ".";
-            function += funcName;
-            function += "case";
-            function += to_string(caseCount);
-            function += ":\n";
+            Func += ".";
+            Func += FuncName;
+            Func += "case";
+            Func += to_string(CaseCount);
+            Func += ":\n";
 
             int argNum = 0;                         // first argument have index 0
-            for (auto c : node.patterns) {
+            for (auto &c : Node.Patterns) {
                 c->accept(*this);                    // Gets the pattern, and puts it in "helper"
 
                 cout << "Working on pattern" << endl;
 
-                if (helper.typeName.compare("Int") == 0) {     // Case where pattern is an Int
+                if (Hpr.TypeName.compare("Int") == 0) {     // Case where pattern is an Int
                     // Compare input argument with pattern
-                    function += "cmpl $";
-                    function += helper.typeValue;
-                    function += ", ";
+                    Func += "cmpl $";
+                    Func += Hpr.TypeValue;
+                    Func += ", ";
                     int mempos = argNum*4+8;            // Stack starts at 8, each arg with 4 space
-                    function += to_string(mempos);
-                    function += "(%ebp)\n";
+                    Func += to_string(mempos);
+                    Func += "(%ebp)\n";
 
                     argNum++;                           // Prepare for next argument
 
                     // If not different move on
-                    function += "jne .";
-                    function += funcName;
-                    function += "case";
-                    if (caseCount + 1 == cases) {       // Last case is called default
-                        function += "default";
+                    Func += "jne .";
+                    Func += FuncName;
+                    Func += "case";
+                    if (CaseCount + 1 == Cases) {       // Last case is called default
+                        Func += "default";
                     } else {
-                        function += to_string(caseCount + 1);
+                        Func += to_string(CaseCount + 1);
                     }
-                    function += "\n";
+                    Func += "\n";
                     continue;
                 }
                 // repeat for all possebilities
             }
-            node.expr->accept(*this);
+            Node.Expr->accept(*this);
 
-            helper = {};
+            Hpr = {};
         }
 
         cout << "CaseNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(Or &node) {
+    void GasCodeGenerator::visit(Or &Node) {
         cout << "OrNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(And &node) {
+    void GasCodeGenerator::visit(And &Node) {
         cout << "AndNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(Equal &node) {
+    void GasCodeGenerator::visit(Equal &Node) {
         cout << "EqualNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(NotEqual &node) {
+    void GasCodeGenerator::visit(NotEqual &Node) {
         cout << "NotEqualNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(Lesser &node) {
+    void GasCodeGenerator::visit(Lesser &Node) {
         cout << "LesserNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(Greater &node) {
+    void GasCodeGenerator::visit(Greater &Node) {
         cout << "GreaterNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(LesserEq &node) {
+    void GasCodeGenerator::visit(LesserEq &Node) {
         cout << "LesserEqNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(GreaterEq &node) {
+    void GasCodeGenerator::visit(GreaterEq &Node) {
         cout << "GreaterEqNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(Add &node) {
+    void GasCodeGenerator::visit(Add &Node) {
         cout << "ADD" << endl;
 
-        node.left->accept(*this);
+        Node.Left->accept(*this);
 
-        function += "pushl %eax\n";
-        node.right->accept(*this);
+        Func += "pushl %eax\n";
+        Node.Right->accept(*this);
 
-        function += "popl %ebx\n";
-        function += "addl %ebx, %eax\n";
+        Func += "popl %ebx\n";
+        Func += "addl %ebx, %eax\n";
         cout << "AddNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(Sub &node) {
+    void GasCodeGenerator::visit(Sub &Node) {
         cout << "SubNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(Mul &node) {
+    void GasCodeGenerator::visit(Mul &Node) {
         cout << "MulNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(Div &node) {
+    void GasCodeGenerator::visit(Div &Node) {
         cout << "DivNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(Mod &node) {
+    void GasCodeGenerator::visit(Mod &Node) {
         cout << "ModNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(ListAdd &node) {
+    void GasCodeGenerator::visit(ListAdd &Node) {
         cout << "ListAddNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(Par &node) {
+    void GasCodeGenerator::visit(Par &Node) {
         cout << "ParNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(Not &node) {
+    void GasCodeGenerator::visit(Not &Node) {
         cout << "NotNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(Int &node) {
-        function += "movl $";
-        function += to_string(node.value);
-        function += ", %eax\n";
+    void GasCodeGenerator::visit(Int &Node) {
+        Func += "movl $";
+        Func += to_string(Node.Val);
+        Func += ", %eax\n";
 
-        helper.typeName = "Int";
-        helper.typeValue = to_string(node.value);
+        Hpr.TypeName = "Int";
+        Hpr.TypeValue = to_string(Node.Val);
 
 
-        cout << "Got integer => " << to_string(node.value) << endl;
+        cout << "Got integer => " << to_string(Node.Val) << endl;
     }
 
-    void GasCodeGenerator::visit(Float &node) {
+    void GasCodeGenerator::visit(Float &Node) {
         cout << "FloatNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(Bool &node) {
+    void GasCodeGenerator::visit(Bool &Node) {
         cout << "BoolNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(Char &node) {
+    void GasCodeGenerator::visit(Char &Node) {
         cout << "CharNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(String &node) {
+    void GasCodeGenerator::visit(String &Node) {
         cout << "StringNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(ListPattern &node) {
+    void GasCodeGenerator::visit(ListPattern &Node) {
         cout << "ListPatternNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(TuplePattern &node) {
+    void GasCodeGenerator::visit(TuplePattern &Node) {
         cout << "TuplePatternNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(ListSplit &node) {
+    void GasCodeGenerator::visit(ListSplit &Node) {
         cout << "ListSplitNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(List &node) {
+    void GasCodeGenerator::visit(List &Node) {
         cout << "ListNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(Tuple &node) {
+    void GasCodeGenerator::visit(Tuple &Node) {
         cout << "TupleNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(Id &node) {
-        helper.typeName = "Id";
-        helper.typeValue = funcName + node.id;
-        cout << "Got ID => " << node.id << endl;
+    void GasCodeGenerator::visit(Id &Node) {
+        Hpr.TypeName = "Id";
+        Hpr.TypeValue = FuncName + Node.Val;
+        cout << "Got ID => " << Node.Val << endl;
     }
 
-    void GasCodeGenerator::visit(Call &node) {
+    void GasCodeGenerator::visit(Call &Node) {
 
         // TODO: Find way pu push arguments to stack.
         vector<string> params;
-        for (auto arg : node.exprs) {
+        for (auto &arg : Node.Args) {
             arg->accept(*this);
 
-            if(helper.typeName.compare("Int") == 0) {
-                function += "pushl %eax\n";
-            } else if (helper.typeName.compare("Id") == 0) {
+            if(Hpr.TypeName.compare("Int") == 0) {
+                Func += "pushl %eax\n";
+            } else if (Hpr.TypeName.compare("Id") == 0) {
 
             }
         }
 
-        node.callee->accept(*this); // function to call;
-        function += "call ";
-        function += helper.typeValue;
-        function += "\n";
+        Node.Callee->accept(*this); // function to call;
+        Func += "call ";
+        Func += Hpr.TypeValue;
+        Func += "\n";
 
-        helper = {};
+        Hpr = {};
 
         cout << "CallNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(Type &node) {
+    void GasCodeGenerator::visit(Type &Node) {
         cout << "TypeNotImplemented" << endl;
     }
 
-    string GasCodeGenerator::get_type(Type *) {
+    string GasCodeGenerator::getType(Type * Ty) {
         return "GasCodeGenerator";
     }
 
@@ -326,12 +302,12 @@ namespace codegen {
         source += ".string \"%d\\n\"\n";        // Allow printing of numbers in printf
 
         source += ".text\n";
-        for (auto f : funcGlobl) {
+        for (auto &f : FuncGlobl) {
             source += f;
             source += "\n";
         }
 
-        for (auto f : funcVector) {
+        for (auto &f : FuncVector) {
             source += f;
         }
         return source;
