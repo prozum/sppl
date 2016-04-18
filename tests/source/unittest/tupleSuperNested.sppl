@@ -1,5 +1,5 @@
-def main : [String]->(Char,(Char,(Char,(Char,(Char,(Char,(Char,(Char,(Char,(Char,(Char,Char)))))))))))
+def main : [String]->(CharPattern,(CharPattern,(CharPattern,(CharPattern,(CharPattern,(CharPattern,(CharPattern,(CharPattern,(CharPattern,(CharPattern,(CharPattern,CharPattern)))))))))))
 | s = func()
 
-def func : (Char,(Char,(Char,(Char,(Char,(Char,(Char,(Char,(Char,(Char,(Char,Char)))))))))))
+def func : (CharPattern,(CharPattern,(CharPattern,(CharPattern,(CharPattern,(CharPattern,(CharPattern,(CharPattern,(CharPattern,(CharPattern,(CharPattern,CharPattern)))))))))))
 |  = ('h',('e',('l',('l',('o',(' ',('w',('o',('r',('l',('d','!')))))))))))

@@ -20,8 +20,8 @@ namespace optimizer {
             auto Expr = Case->Expr.get();
 
             if (typeid(*Expr) == typeid(Call) &&
-                typeid(static_cast<Call*>(Expr)->Callee) == typeid(Id) &&
-                (static_cast<Id*>(static_cast<Call*>(Expr)->Callee.get()))->Val == Node.Id) {
+                typeid(static_cast<Call*>(Expr)->Callee) == typeid(IdPattern) &&
+                (static_cast<IdPattern*>(static_cast<Call*>(Expr)->Callee.get()))->Val == Node.Id) {
                 Case->TailRec = true;
             }
 
@@ -132,28 +132,28 @@ namespace optimizer {
         Node.Right->accept(*this);
     }
 
-    void GeneralOptimizer::visit(Int &Node) {
+    void GeneralOptimizer::visit(IntPattern &Node) {
     }
 
-    void GeneralOptimizer::visit(Float &Node) {
+    void GeneralOptimizer::visit(FloatPattern &Node) {
     }
 
     void GeneralOptimizer::visit(Bool &Node) {
     }
 
-    void GeneralOptimizer::visit(Char &Node) {
+    void GeneralOptimizer::visit(CharPattern &Node) {
     }
 
     void GeneralOptimizer::visit(String &Node) {
     }
 
-    void GeneralOptimizer::visit(List &Node) {
+    void GeneralOptimizer::visit(ListExpression &Node) {
         for (auto &Element : Node.Elements) {
             Element->accept(*this);
         }
     }
 
-    void GeneralOptimizer::visit(Id &Node) {
+    void GeneralOptimizer::visit(IdPattern &Node) {
     }
 
     void GeneralOptimizer::visit(Call &Node) {
@@ -167,7 +167,7 @@ namespace optimizer {
     void GeneralOptimizer::visit(Type &Node) {
     }
 
-    void GeneralOptimizer::visit(Tuple &Node) {
+    void GeneralOptimizer::visit(TupleExpression &Node) {
         for (auto &Element : Node.Elements) {
             Element->accept(*this);
         }

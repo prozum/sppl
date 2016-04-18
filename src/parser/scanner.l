@@ -52,24 +52,28 @@ using namespace std;
     return token::DEF;
 }
 
-"Int" {
-    return token::INTTYPE;
+"type" {
+    return token::TYPE;
 }
 
-"Bool"	{
-    return token::BOOLTYPE;
+"Int" {
+    return token::INTTYPE;
 }
 
 "Float"	{
     return token::FLOATTYPE;
 }
 
-"String" {
-    return token::STRINGTYPE;
-}
-
 "Char"	{
     return token::CHARTYPE;
+}
+
+"Include" {
+    return token::INCLUDE;
+}
+
+"to" {
+    return token::TO;
 }
 
 [0-9]+ {
@@ -95,12 +99,7 @@ using namespace std;
     return token::STRINGLITERAL;
 }
 
-"True"|"False" {
-    yylval->boolean = string(yytext) == "True";
-    return token::BOOLLITERAL;
-}
-
-[a-zA-Z_][a-zA-Z0-9_]* {
+[a-zA-Z][a-zA-Z0-9_]* {
     yylval->str = new string(yytext);
     return token::ID;
 }
@@ -124,9 +123,23 @@ using namespace std;
 "||" {
     return token::OR;
 }
+
+"_" {
+    return token::WILD;
+}
+
+"++" {
+    return token::CONCAT;
+}
+
+"|>" {
+    return token::PROCON;
+}
+
 "<=" {
     return token::LESSEREQUAL;
 }
+
 ">=" {
     return token::GREATEREQUAL;
 }

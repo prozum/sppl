@@ -57,13 +57,13 @@ namespace codegen {
         void visit(common::Function &Node);
         void visit(common::Case &Node);
 
-        void visit(common::Int &Node);
-        void visit(common::Float &Node);
+        void visit(common::IntPattern &Node);
+        void visit(common::FloatPattern &Node);
         void visit(common::Bool &Node);
-        void visit(common::Char &Node);
+        void visit(common::CharPattern &Node);
         void visit(common::String &Node);
-    	void visit(common::Tuple &Node);
-    	void visit(common::List &Node);
+    	void visit(common::TupleExpression &Node);
+    	void visit(common::ListExpression &Node);
 
         void visit(common::Add &Node);
         void visit(common::Sub &Node);
@@ -78,7 +78,7 @@ namespace codegen {
     	void visit(common::LesserEq &Node);
     	void visit(common::GreaterEq &Node);
 
-    	void visit(common::Id &Node);
+    	void visit(common::IdPattern &Node);
         void visit(common::Call &Node);
     	void visit(common::Par &Node);
 

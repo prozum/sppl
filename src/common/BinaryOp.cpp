@@ -1,4 +1,5 @@
 #include "BinaryOp.h"
+#include "Expressions.h"
 #include "Visitor.h"
 
 namespace common {
@@ -17,6 +18,8 @@ namespace common {
     void Greater::accept(Visitor &V) { V.visit(*this); }
     void LesserEq::accept(Visitor &V) { V.visit(*this); }
     void GreaterEq::accept(Visitor &V) { V.visit(*this); }
+    void ProducerConsumer::accept(Visitor &V) { V.visit(*this); }
+    void Concat::accept(Visitor &V) { V.visit(*this); }
 
     BinaryOp::BinaryOp(unique_ptr<Expression> Left,
                    unique_ptr<Expression> Right,
@@ -95,6 +98,16 @@ namespace common {
                          Location Loc) :
             BinaryOp(move(Left), move(Right), Loc) { }
 
+    ProducerConsumer::ProducerConsumer(unique_ptr<Expression> Left,
+                                           unique_ptr<Expression> Right,
+                                           Location Loc) :
+            BinaryOp(move(Left), move(Right), Loc) { }
+
+    Concat::Concat(unique_ptr<Expression> Left,
+                   unique_ptr<Expression> Right,
+                   Location Loc) :
+            BinaryOp(move(Left), move(Right), Loc) { }
+
     string Or::str() {
         return Left->str() + " || " + Right->str();
     }
@@ -149,6 +162,14 @@ namespace common {
 
     string ListAdd::str() {
         return Left->str() + " : " + Right->str();
+    }
+
+    string ProducerConsumer::str() {
+        return Left->str() + " |> " + Right->str();
+    }
+
+    string Concat::str() {
+        return Left->str() + " ++ " + Right->str();
     }
 
 }

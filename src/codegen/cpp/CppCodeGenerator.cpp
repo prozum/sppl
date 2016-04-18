@@ -499,7 +499,7 @@ namespace codegen
         }
     }
 
-    void CCodeGenerator::visit(Int &Node)
+    void CCodeGenerator::visit(IntPattern &Node)
     {
         // If pattern, then generate an expression for matching on this pattern
         if (IdCtx == IdContext::PATTERN) {
@@ -517,7 +517,7 @@ namespace codegen
         }
     }
 
-    void CCodeGenerator::visit(Float &Node)
+    void CCodeGenerator::visit(FloatPattern &Node)
     {
         // If pattern, then generate an expression for matching on this pattern
         if (IdCtx == IdContext::PATTERN) {
@@ -554,7 +554,7 @@ namespace codegen
         }
     }
 
-    void CCodeGenerator::visit(Char &Node)
+    void CCodeGenerator::visit(CharPattern &Node)
     {
         // If pattern, then generate an expression for matching on this pattern
         if (IdCtx == IdContext::PATTERN) {
@@ -593,7 +593,7 @@ namespace codegen
         }
     }
 
-    void CCodeGenerator::visit(List &Node)
+    void CCodeGenerator::visit(ListExpression &Node)
     {
         string Name = getList(Node.Ty);
 
@@ -608,7 +608,7 @@ namespace codegen
         ExprStack.top() << ")";
     }
 
-    void CCodeGenerator::visit(Tuple &Node)
+    void CCodeGenerator::visit(TupleExpression &Node)
     {
         string Name = getTuple(Node.Ty);
 
@@ -623,7 +623,7 @@ namespace codegen
         ExprStack.top() << ")";
     }
 
-    void CCodeGenerator::visit(Id &Node)
+    void CCodeGenerator::visit(IdPattern &Node)
     {
         stringstream Assign;
         string Name = "";

@@ -1,5 +1,5 @@
-def main : [String]->([Char],[Char])
+def main : [String]->([CharPattern],[CharPattern])
 | s = func()
 
-def func : ([Char],[Char])
+def func : ([CharPattern],[CharPattern])
 |  = (['c'],['h'])

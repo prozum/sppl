@@ -33,17 +33,17 @@ namespace semantics {
         virtual void visit(ListAdd &Node);
         virtual void visit(Par &Node);
         virtual void visit(Not &Node);
-        virtual void visit(Int &Node);
-        virtual void visit(Float &Node);
+        virtual void visit(IntPattern &Node);
+        virtual void visit(FloatPattern &Node);
         virtual void visit(Bool &Node);
-        virtual void visit(Char &Node);
+        virtual void visit(CharPattern &Node);
         virtual void visit(String &Node);
         virtual void visit(ListPattern &Node);
         virtual void visit(TuplePattern &Node);
         virtual void visit(ListSplit &Node);
-        virtual void visit(List &Node);
-        virtual void visit(Tuple &Node);
-        virtual void visit(Id &Node);
+        virtual void visit(ListExpression &Node);
+        virtual void visit(TupleExpression &Node);
+        virtual void visit(IdPattern &Node);
         virtual void visit(Call &Node);
 
     private:

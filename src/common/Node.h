@@ -15,12 +15,14 @@ namespace common {
 	// Forward declarations
 	class Node;
 	class Expression;
+	class Declaration;
 	class BinaryOp;
 	class UnaryOp;
 	class Type;
 	class Pattern;
 	class Program;
 	class Function;
+	class ADT;
 	class Case;
 	class Or;
 	class And;
@@ -38,17 +40,22 @@ namespace common {
 	class ListAdd;
 	class Par;
 	class Not;
-	class Int;
-	class Float;
-	class Bool;
-	class Char;
-	class String;
+	class Negative;
+	class ProducerConsumer;
+	class Concat;
+	class IntPattern;
+	class FloatPattern;
+	class CharPattern;
 	class ListPattern;
 	class TuplePattern;
 	class ListSplit;
-	class List;
-	class Tuple;
-	class Id;
+	class WildPattern;
+	class IntExpression;
+	class FloatExpression;
+	class CharExpression;
+	class ListExpression;
+	class TupleExpression;
+	class IdPattern;
 	class Call;
 	class Visitor;
 	class Scope;
@@ -71,7 +78,7 @@ namespace common {
 
 	class Program : public Node {
 	public:
-		vector<unique_ptr<Function>> Funcs;
+		vector<unique_ptr<Declaration>> Funcs;
 
 		Program(vector<unique_ptr<Function>> Funcs, Location Loc);
 		Program(unique_ptr<Expression> AnonFunc, Location Loc);
@@ -80,17 +87,18 @@ namespace common {
 		string str();
 	};
 
-	class Expression : public Node {
-	public:
-		Expression(Location Loc);
-		Expression(Type Ty, Location Loc);
-
-		virtual void accept(Visitor &V) = 0;
-	};
-
 	/* Declaration */
 
-	class Function : public Node {
+	class Declaration : public Node {
+	public:
+		Declaration(Location Loc);
+		Declaration(Type Ty, Location Loc);
+
+		virtual void accept(Visitor &V) = 0;
+		virtual string str() = 0;
+	};
+
+	class Function : public Declaration {
 	public:
 		string Id;
 		Type Signature;
@@ -105,46 +113,22 @@ namespace common {
 		string str();
 	};
 
+	// TODO Implement ADT
+	class ADT : public Declaration {
+		ADT(Location Loc) : Declaration(Loc) { }
+
+		virtual void accept(Visitor &V);
+		string str();
+	};
+
 	class Case : public Node {
 	public:
 		unique_ptr<Expression> Expr;
+		unique_ptr<Expression> When;
 		vector<unique_ptr<Pattern>> Patterns;
 		bool TailRec = false;
 
-		Case(unique_ptr<Expression> Expr, vector<unique_ptr<Pattern>> Patterns, Location Loc);
-
-		virtual void accept(Visitor &V);
-		string str();
-	};
-
-	class Call : public Expression {
-	public:
-		unique_ptr<Expression> Callee;
-		vector<unique_ptr<Expression>> Args;
-
-		Call(unique_ptr<Expression> Callee, vector<unique_ptr<Expression>> Args, Location Loc);
-
-		virtual void accept(Visitor &V);
-		string str();
-	};
-
-	/* Other Expressions */
-
-	class List : public Expression {
-	public:
-		vector<unique_ptr<Expression>> Elements;
-
-		List(vector<unique_ptr<Expression>> Elements, Location Loc);
-
-		virtual void accept(Visitor &V);
-		string str();
-	};
-
-	class Tuple : public Expression {
-	public:
-		vector<unique_ptr<Expression>> Elements;
-
-		Tuple(vector<unique_ptr<Expression>> Elements, Location Loc);
+		Case(unique_ptr<Expression> Expr, unique_ptr<Expression> When, vector<unique_ptr<Pattern>> Patterns, Location Loc);
 
 		virtual void accept(Visitor &V);
 		string str();

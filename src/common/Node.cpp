@@ -1,5 +1,5 @@
 #include "Node.h"
-
+#include "Expressions.h"
 #include "Visitor.h"
 
 using namespace std;
@@ -10,22 +10,11 @@ namespace common {
     void Function::accept(Visitor &V) { V.visit(*this); }
     void Case::accept(Visitor &V) { V.visit(*this); }
 
-    void List::accept(Visitor &V) { V.visit(*this); }
-    void Tuple::accept(Visitor &V) { V.visit(*this); }
-    void Call::accept(Visitor &V) { V.visit(*this); }
-
     Node::Node(Location Loc) :
             Ty(TypeId::UNKNOWN), Loc(Loc) { }
 
     Node::Node(Type Ty, Location Loc) :
             Ty(Ty), Loc(Loc) { }
-
-    Expression::Expression(Location Loc) :
-            Node(Loc) { }
-
-    Expression::Expression(Type Ty, Location Loc) :
-            Node(Ty, Loc) { }
-
 
     Program::Program(vector<unique_ptr<Function>> Funcs,
                      Location Loc) :
@@ -39,8 +28,14 @@ namespace common {
         Funcs.push_back(make_unique<Function>(move(AnonFunc)));
     }
 
+    Declaration::Declaration(Location Loc) :
+            Node(Loc) { }
+
+    Declaration::Declaration(Type Ty, Location Loc) :
+            Node(Ty, Loc) { }
+
     Function::Function(unique_ptr<Expression> AnonFunc) :
-            Node(AnonFunc->Loc),
+            Declaration(AnonFunc->Loc),
             Id(ANON_FUNC_NAME),
             Signature(Type(TypeId::UNKNOWN)),
             Anon(true) {
@@ -50,25 +45,18 @@ namespace common {
     Function::Function(string Id,
                        Type Ty,
                        Location Loc) :
-            Node(Ty.Subtypes.front(), Loc),
+            Declaration(Ty.Subtypes.front(), Loc),
             Id(Id),
             Signature(Ty) { }
 
     Case::Case(unique_ptr<Expression> Expr,
+               unique_ptr<Expression> When,
                vector<unique_ptr<Pattern>> Patterns,
                Location Loc) :
             Node(Loc),
             Expr(move(Expr)),
+            When(move(When)),
             Patterns(move(Patterns)) { }
-
-    Call::Call(unique_ptr<Expression> Callee,
-               vector<unique_ptr<Expression>> Args,
-               Location Loc) :
-            Expression(Loc),
-            Callee(move(Callee)),
-            Args(move(Args))
-    {
-    }
 
     string Program::str() {
         string Str;
@@ -93,10 +81,6 @@ namespace common {
 
     string Case::str() {
         return "\t| " + strJoin(Patterns, " ") + " = " + Expr->str();
-    }
-
-    string Call::str() {
-        return Callee->str() + "(" + strJoin(Args, ", ") + ")";
     }
 
     template<class T>

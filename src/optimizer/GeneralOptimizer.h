@@ -31,17 +31,17 @@ namespace optimizer {
         void visit(ListAdd &Node);
         void visit(Par &Node);
         void visit(Not &Node);
-        void visit(Int &Node);
-        void visit(Float &Node);
+        void visit(IntPattern &Node);
+        void visit(FloatPattern &Node);
         void visit(Bool &Node);
-        void visit(Char &Node);
+        void visit(CharPattern &Node);
         void visit(String &Node);
         void visit(ListPattern &Node);
         void visit(TuplePattern &Node);
         void visit(ListSplit &Node);
-        void visit(List &Node);
-        void visit(Tuple &Node);
-        void visit(Id &Node);
+        void visit(ListExpression &Node);
+        void visit(TupleExpression &Node);
+        void visit(IdPattern &Node);
         void visit(Call &Node);
         void visit(Type &Node);
 

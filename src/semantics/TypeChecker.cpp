@@ -183,7 +183,7 @@ namespace semantics
             (Node.Left->Ty.Id == TypeId::FLOAT && Node.Right->Ty.Id == TypeId::FLOAT)) {
             Node.Ty = Type(TypeId::BOOL);
         } else {
-            throw Error::Binary("Operator only operates on Int or Float children",
+            throw Error::Binary("Operator only operates on Int or FloatPattern children",
                                    Node);
         }
     }
@@ -198,7 +198,7 @@ namespace semantics
             (Node.Left->Ty.Id == TypeId::FLOAT && Node.Right->Ty.Id == TypeId::FLOAT)) {
             Node.Ty = Type(TypeId::BOOL);
         } else {
-            throw Error::Binary("Operator only operates on Int or Float children",
+            throw Error::Binary("Operator only operates on Int or FloatPattern children",
                                    Node);
         }
     }
@@ -213,7 +213,7 @@ namespace semantics
             (Node.Left->Ty.Id == TypeId::FLOAT && Node.Right->Ty.Id == TypeId::FLOAT)) {
             Node.Ty = Type(TypeId::BOOL);
         } else {
-            throw Error::Binary("Operator only operates on Int or Float children",
+            throw Error::Binary("Operator only operates on Int or FloatPattern children",
                                    Node);
         }
     }
@@ -228,7 +228,7 @@ namespace semantics
             (Node.Left->Ty.Id == TypeId::FLOAT && Node.Right->Ty.Id == TypeId::FLOAT)) {
             Node.Ty = Node.Left->Ty;
         } else {
-            throw Error::Binary("Operator only operates on Int or Float children",
+            throw Error::Binary("Operator only operates on Int or FloatPattern children",
                                    Node);
         }
     }
@@ -243,7 +243,7 @@ namespace semantics
             (Node.Left->Ty.Id == TypeId::FLOAT && Node.Right->Ty.Id == TypeId::FLOAT)) {
             Node.Ty = Node.Left->Ty;
         } else {
-            throw Error::Binary("Operator only operates on Int or Float children",
+            throw Error::Binary("Operator only operates on Int or FloatPattern children",
                                    Node);
         }
     }
@@ -258,7 +258,7 @@ namespace semantics
             (Node.Left->Ty.Id == TypeId::FLOAT && Node.Right->Ty.Id == TypeId::FLOAT)) {
             Node.Ty = Node.Left->Ty;
         } else {
-            throw Error::Binary("Operator only operates on Int or Float children",
+            throw Error::Binary("Operator only operates on Int or FloatPattern children",
                                    Node);
         }
     }
@@ -273,7 +273,7 @@ namespace semantics
             (Node.Left->Ty.Id == TypeId::FLOAT && Node.Right->Ty.Id == TypeId::FLOAT)) {
             Node.Ty = Node.Left->Ty;
         } else {
-            throw Error::Binary("Operator only operates on Int or Float children",
+            throw Error::Binary("Operator only operates on Int or FloatPattern children",
                                    Node);
         }
     }
@@ -288,7 +288,7 @@ namespace semantics
             (Node.Left->Ty.Id == TypeId::FLOAT && Node.Right->Ty.Id == TypeId::FLOAT)) {
             Node.Ty = Node.Left->Ty;
         } else {
-            throw Error::Binary("Operator only operates on Int or Float children",
+            throw Error::Binary("Operator only operates on Int or FloatPattern children",
                                    Node);
         }
     }
@@ -303,14 +303,14 @@ namespace semantics
             if (Node.Left->Ty == Node.Right->Ty.Subtypes.front()) {
                 Node.Ty = Node.Right->Ty;
             } else {
-                throw Error::Binary("Left type must be same type of right List",
+                throw Error::Binary("Left type must be same type of right ListExpression",
                                        Node);
             }
         } else if (Node.Right->Ty.Id == TypeId::STRING) {
             if (Node.Left->Ty.Id == TypeId::CHAR) {
                 Node.Ty = Node.Right->Ty;
             } else {
-                throw Error::Binary("Left type must be Char when right is String",
+                throw Error::Binary("Left type must be CharPattern when right is String",
                                        Node);
             }
         }  else if (Node.Right->Ty.Id == TypeId::EMPTYLIST) {
@@ -318,7 +318,7 @@ namespace semantics
             Node.Ty.Subtypes.push_back(Node.Left->Ty);
             Node.Right->Ty = Node.Ty;
         } else {
-            throw Error::Binary("Right must be a List",
+            throw Error::Binary("Right must be a ListExpression",
                                    Node);
         }
     }
@@ -346,17 +346,17 @@ namespace semantics
         }
     }
 
-    void TypeChecker::visit(Int &Node) {
+    void TypeChecker::visit(IntPattern &Node) {
 
     }
 
-    void TypeChecker::visit(Float &Node) {
+    void TypeChecker::visit(FloatPattern &Node) {
     }
 
     void TypeChecker::visit(Bool &Node) {
     }
 
-    void TypeChecker::visit(Char &Node) {
+    void TypeChecker::visit(CharPattern &Node) {
     }
 
     void TypeChecker::visit(String &Node) {
@@ -374,7 +374,7 @@ namespace semantics
         } else {
             for (size_t i = 0; i < Node.Patterns.size() - 1; ++i) {
                 if (Node.Patterns[i]->Ty != Node.Patterns[i + 1]->Ty) {
-                    throw Error::Expected("All items in a List must be of the same type",
+                    throw Error::Expected("All items in a ListExpression must be of the same type",
                                              Node.Patterns[i]->str(),
                                              Node.Patterns[i + 1]->str(),
                                              Node.Loc);
@@ -419,8 +419,8 @@ namespace semantics
             if (Node.Left->Ty.Id == TypeId::CHAR) {
                 Node.Ty = Node.Right->Ty;
             } else {
-                throw Error::Expected("Left must be type Char, when right is String",
-                                         "Char",
+                throw Error::Expected("Left must be type CharPattern, when right is String",
+                                         "CharPattern",
                                          Node.Left->Ty.str(),
                                          Node.Loc);
             }
@@ -428,14 +428,14 @@ namespace semantics
             Node.Ty = Type(TypeId::LIST);
             Node.Ty.Subtypes.push_back(Node.Left->Ty);
         } else {
-            throw Error::Expected("Right must be a List",
-                                     "List",
+            throw Error::Expected("Right must be a ListExpression",
+                                     "ListExpression",
                                      Node.Right->Ty.str(),
                                      Node.Loc);
         }
     }
 
-    void TypeChecker::visit(List &Node) {
+    void TypeChecker::visit(ListExpression &Node) {
         // Visit children
         for (auto &Element : Node.Elements) {
             Element->accept(*this);
@@ -447,7 +447,7 @@ namespace semantics
         } else {
             for (size_t i = 0; i < Node.Elements.size() - 1; ++i) {
                 if (Node.Elements[i]->Ty != Node.Elements[i + 1]->Ty) {
-                    throw Error::Expected("All items in a List must be same type",
+                    throw Error::Expected("All items in a ListExpression must be same type",
                                              Node.Elements[i]->str(),
                                              Node.Elements[i + 1]->str(),
                                              Node.Elements[i + 1]->Loc);
@@ -458,7 +458,7 @@ namespace semantics
         }
     }
 
-    void TypeChecker::visit(Tuple &Node) {
+    void TypeChecker::visit(TupleExpression &Node) {
         // Visit children
         for (auto &Element : Node.Elements) {
             Element->accept(*this);
@@ -473,7 +473,7 @@ namespace semantics
     }
 
 
-    void TypeChecker::visit(Id &Node) {
+    void TypeChecker::visit(IdPattern &Node) {
         if (Node.Scp->exists(Node.Val)) {
             Node.Ty = Node.Scp->getType(Node.Val);
         } else {

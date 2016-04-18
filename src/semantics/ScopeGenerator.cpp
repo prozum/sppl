@@ -194,7 +194,7 @@ namespace semantics {
         Node.Right->accept(*this);
     }
 
-    void ScopeGenerator::visit(List &Node) {
+    void ScopeGenerator::visit(ListExpression &Node) {
         // Visit children
         for (auto &Element : Node.Elements) {
             Element->accept(*this);
@@ -202,7 +202,7 @@ namespace semantics {
         // Visit stops here
     }
 
-    void ScopeGenerator::visit(Tuple &Node) {
+    void ScopeGenerator::visit(TupleExpression &Node) {
         // Visit children
         for (auto &Element : Node.Elements) {
             Element->accept(*this);
@@ -210,7 +210,7 @@ namespace semantics {
         // Visit stops here
     }
 
-    void ScopeGenerator::visit(Id &Node) {
+    void ScopeGenerator::visit(IdPattern &Node) {
         Node.Scp = CurScope;
 
         if (Ctx == ScopeContext::PATTERN) {
@@ -231,16 +231,16 @@ namespace semantics {
 
     void ScopeGenerator::visit(Type &Node) { }
 
-    void ScopeGenerator::visit(Int &Node) {
+    void ScopeGenerator::visit(IntPattern &Node) {
     }
 
-    void ScopeGenerator::visit(Float &Node) {
+    void ScopeGenerator::visit(FloatPattern &Node) {
     }
 
     void ScopeGenerator::visit(Bool &Node) {
     }
 
-    void ScopeGenerator::visit(Char &Node) {
+    void ScopeGenerator::visit(CharPattern &Node) {
     }
 
     void ScopeGenerator::visit(String &Node) {

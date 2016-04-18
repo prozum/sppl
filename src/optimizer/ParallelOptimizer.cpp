@@ -125,11 +125,11 @@ namespace optimizer {
 
     }
 
-    void ParallelOptimizer::visit(Int &Node)
+    void ParallelOptimizer::visit(IntPattern &Node)
     {
     }
 
-    void ParallelOptimizer::visit(Float &Node)
+    void ParallelOptimizer::visit(FloatPattern &Node)
     {
     }
 
@@ -137,7 +137,7 @@ namespace optimizer {
     {
     }
 
-    void ParallelOptimizer::visit(Char &Node)
+    void ParallelOptimizer::visit(CharPattern &Node)
     {
     }
 
@@ -145,12 +145,12 @@ namespace optimizer {
     {
     }
 
-    void ParallelOptimizer::visit(List &Node)
+    void ParallelOptimizer::visit(ListExpression &Node)
     {
 
     }
 
-    void ParallelOptimizer::visit(Id &Node)
+    void ParallelOptimizer::visit(IdPattern &Node)
     {
     }
 
@@ -163,7 +163,7 @@ namespace optimizer {
     {
     }
 
-    void ParallelOptimizer::visit(Tuple &Node) {
+    void ParallelOptimizer::visit(TupleExpression &Node) {
 
     }
 }

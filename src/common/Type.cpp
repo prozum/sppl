@@ -62,11 +62,11 @@ namespace common {
             case TypeId::INT:
                 return "Int";
             case TypeId::FLOAT:
-                return "Float";
+                return "FloatPattern";
             case TypeId::BOOL:
                 return "Bool";
             case TypeId::CHAR:
-                return "Char";
+                return "CharPattern";
             case TypeId::STRING:
                 return "String";
             case TypeId::LIST:

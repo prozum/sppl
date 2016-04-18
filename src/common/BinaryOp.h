@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Node.h"
+#include "Expressions.h"
 
 namespace common {
 
@@ -121,6 +122,21 @@ namespace common {
 	class GreaterEq : public BinaryOp {
 	public:
 		GreaterEq(unique_ptr<Expression> Left, unique_ptr<Expression> Right, Location Loc);
+
+		virtual void accept(Visitor &V);
+		string str();
+	};
+
+	class ProducerConsumer : public BinaryOp {
+	public:
+		ProducerConsumer(unique_ptr<Expression> Left, unique_ptr<Expression> Right, Location Loc);
+
+		virtual void accept(Visitor &V);
+		string str();
+	};
+
+	class Concat : public BinaryOp {
+		Concat(unique_ptr<Expression> Left, unique_ptr<Expression> Right, Location Loc);
 
 		virtual void accept(Visitor &V);
 		string str();

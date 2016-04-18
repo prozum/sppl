@@ -32,4 +32,20 @@ namespace common {
 		virtual void accept(Visitor &V);
 		string str();
 	};
+
+	class Negative : public UnaryOp {
+	public:
+
+		Negative(unique_ptr<Expression> Child, Location Loc);
+
+		virtual void accept(Visitor &V);
+		string str();
+	};
+
+	class To : public UnaryOp {
+		To(unique_ptr<Expression> Child, Location Loc);
+
+		virtual void accept(Visitor &V);
+		string str();
+	};
 }

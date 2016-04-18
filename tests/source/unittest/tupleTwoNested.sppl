@@ -1,5 +1,5 @@
-def main : [String]->((Int, Float), (Bool, (Char, String)))
+def main : [String]->((Int, FloatPattern), (Bool, (CharPattern, String)))
 | s = func()
 
-def func : ((Int, Float), (Bool, (Char, String)))
+def func : ((Int, FloatPattern), (Bool, (CharPattern, String)))
 |  = ((1,2.0),(True,('c',"har")))

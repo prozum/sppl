@@ -1,5 +1,5 @@
-def main : [String]->[Float]
+def main : [String]->[FloatPattern]
 | s = func()
 
-def func : [Float]
+def func : [FloatPattern]
 |  = ['c']

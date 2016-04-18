@@ -4,7 +4,7 @@
 
 namespace common {
 
-	class Pattern : public Expression {
+	class Pattern : public Node {
 	public:
 		Pattern(Location Loc);
 		Pattern(Type Ty, Location Loc);
@@ -12,62 +12,42 @@ namespace common {
 		virtual void accept(Visitor &V) = 0;
 	};
 
-	class Id : public Pattern {
+	class IdPattern : public Pattern {
 	public:
 		string Val;
 		Scope* Scp;
 
-		Id(string Val, Location Loc);
+		IdPattern(string Val, Location Loc);
 
 		virtual void accept(Visitor &V);
 		string str();
 	};
 
-	class Int : public Pattern {
+	class IntPattern : public Pattern {
 	public:
 		long Val;
 
-		Int(long Val, Location Loc);
+		IntPattern(long Val, Location Loc);
 
 		virtual void accept(Visitor &V);
 		string str();
 	};
 
-	class Float : public Pattern {
+	class FloatPattern : public Pattern {
 	public:
 		double Val;
 
-		Float(double Val, Location Loc);
+		FloatPattern(double Val, Location Loc);
 
 		virtual void accept(Visitor &V);
 		string str();
 	};
 
-	class Bool : public Pattern {
-	public:
-		bool Val;
-
-		Bool(bool Val, Location Loc);
-
-		virtual void accept(Visitor &V);
-		string str();
-	};
-
-	class Char : public Pattern {
+	class CharPattern : public Pattern {
 	public:
 		char Val;
 
-		Char(char Val, Location Loc);
-
-		virtual void accept(Visitor &V);
-		string str();
-	};
-
-	class String : public Pattern {
-	public:
-		string Val;
-
-		String(string Val, Location Loc);
+		CharPattern(char Val, Location Loc);
 
 		virtual void accept(Visitor &V);
 		string str();
@@ -88,6 +68,13 @@ namespace common {
 		vector<unique_ptr<Pattern>> Patterns;
 
 		TuplePattern(vector<unique_ptr<Pattern>> Patterns, Location Loc);
+
+		virtual void accept(Visitor &V);
+		string str();
+	};
+
+	class WildPattern : public Pattern {
+		WildPattern(Location Loc);
 
 		virtual void accept(Visitor &V);
 		string str();

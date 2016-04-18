@@ -363,11 +363,11 @@ namespace codegen {
         }
     }
 
-    void LLVMCodeGenerator::visit(common::Float &Node) {
+    void LLVMCodeGenerator::visit(common::FloatPattern &Node) {
         CurVal = ConstantFP::get(getType(Node.Ty), Node.Val);
     }
 
-    void LLVMCodeGenerator::visit(common::Int &Node) {
+    void LLVMCodeGenerator::visit(common::IntPattern &Node) {
         CurVal = ConstantInt::get(getType(Node.Ty), (uint64_t)Node.Val);
     }
 
@@ -375,7 +375,7 @@ namespace codegen {
         CurVal = ConstantInt::get(getType(Node.Ty), (uint64_t)Node.Val);
     }
 
-    void LLVMCodeGenerator::visit(common::Char &Node) {
+    void LLVMCodeGenerator::visit(common::CharPattern &Node) {
         CurVal = ConstantInt::get(getType(Node.Ty), (uint64_t)Node.Val);
     }
 
@@ -397,7 +397,7 @@ namespace codegen {
         CurVal = Builder.CreateCall(Callee, Args, "calltmp");
     }
 
-    void LLVMCodeGenerator::visit(common::Id &Node) {
+    void LLVMCodeGenerator::visit(common::IdPattern &Node) {
         switch (Ctx)
         {
             case PATTERN:
@@ -428,7 +428,7 @@ namespace codegen {
         Node.Child->accept(*this);
     }
 
-    void LLVMCodeGenerator::visit(common::Tuple &Node) {
+    void LLVMCodeGenerator::visit(common::TupleExpression &Node) {
         std::vector<llvm::Constant *> TmpVec;
 
         for (auto &Element : Node.Elements) {
@@ -443,7 +443,7 @@ namespace codegen {
 
     }
 
-    void LLVMCodeGenerator::visit(common::List &Node) {
+    void LLVMCodeGenerator::visit(common::ListExpression &Node) {
         std::vector<llvm::Constant *> TmpVec;
 
         for (auto &Element : Node.Elements) {
