@@ -2,7 +2,7 @@
 
 
 void Test::funcRetInt() { 
-    bool compStatus = compileChecker("funcRetInt.sppl");
+    bool compStatus = compileChecker("func/funcRetInt.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "2");
@@ -11,7 +11,7 @@ void Test::funcRetInt() {
 }
 
 void Test::funcRetFloat() { 
-    bool compStatus = compileChecker("funcRetFloat.sppl");
+    bool compStatus = compileChecker("func/funcRetFloat.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "2.000000");
@@ -20,7 +20,7 @@ void Test::funcRetFloat() {
 }
 
 void Test::funcRetBool() { 
-    bool compStatus = compileChecker("funcRetBool.sppl");
+    bool compStatus = compileChecker("func/funcRetBool.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "True");
@@ -29,7 +29,7 @@ void Test::funcRetBool() {
 }
 
 void Test::funcRetChar() { 
-    bool compStatus = compileChecker("funcRetChar.sppl");
+    bool compStatus = compileChecker("func/funcRetChar.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "'c'");
@@ -38,7 +38,7 @@ void Test::funcRetChar() {
 }
 
 void Test::funcRetString() { 
-    bool compStatus = compileChecker("funcRetString.sppl");
+    bool compStatus = compileChecker("func/funcRetString.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "\"string\"");
@@ -47,7 +47,7 @@ void Test::funcRetString() {
 }
 
 void Test::funcIntRetInt() { 
-    bool compStatus = compileChecker("funcIntRetInt.sppl");
+    bool compStatus = compileChecker("func/funcIntRetInt.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "2");
@@ -56,7 +56,7 @@ void Test::funcIntRetInt() {
 }
 
 void Test::funcFloatRetFloat() { 
-    bool compStatus = compileChecker("funcFloatRetFloat.sppl");
+    bool compStatus = compileChecker("func/funcFloatRetFloat.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "2.000000");
@@ -65,7 +65,7 @@ void Test::funcFloatRetFloat() {
 }
 
 void Test::funcBoolRetBool() { 
-    bool compStatus = compileChecker("funcBoolRetBool.sppl");
+    bool compStatus = compileChecker("func/funcBoolRetBool.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "True");
@@ -74,7 +74,7 @@ void Test::funcBoolRetBool() {
 }
 
 void Test::funcCharRetChar() { 
-    bool compStatus = compileChecker("funcCharRetChar.sppl");
+    bool compStatus = compileChecker("func/funcCharRetChar.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "'c'");
@@ -83,7 +83,7 @@ void Test::funcCharRetChar() {
 }
 
 void Test::funcStringRetString() { 
-    bool compStatus = compileChecker("funcStringRetString.sppl");
+    bool compStatus = compileChecker("func/funcStringRetString.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "\"string\"");
@@ -92,7 +92,7 @@ void Test::funcStringRetString() {
 }
 
 void Test::funcIntIntRetInt() { 
-    bool compStatus = compileChecker("funcIntIntRetInt.sppl");
+    bool compStatus = compileChecker("func/funcIntIntRetInt.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "4");
@@ -101,7 +101,7 @@ void Test::funcIntIntRetInt() {
 }
 
 void Test::funcFloatFloatRetFloat() { 
-    bool compStatus = compileChecker("funcFloatFloatRetFloat.sppl");
+    bool compStatus = compileChecker("func/funcFloatFloatRetFloat.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "4.000000");
@@ -110,7 +110,7 @@ void Test::funcFloatFloatRetFloat() {
 }
 
 void Test::funcBoolBoolRetBool() { 
-    bool compStatus = compileChecker("funcBoolBoolRetBool.sppl");
+    bool compStatus = compileChecker("func/funcBoolBoolRetBool.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "True");
@@ -119,7 +119,7 @@ void Test::funcBoolBoolRetBool() {
 }
 
 void Test::funcCharCharRetChar() { 
-    bool compStatus = compileChecker("funcCharCharRetChar.sppl");
+    bool compStatus = compileChecker("func/funcCharCharRetChar.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "'c'");
@@ -128,7 +128,7 @@ void Test::funcCharCharRetChar() {
 }
 
 void Test::funcStringStringRetString() { 
-    bool compStatus = compileChecker("funcStringStringRetString.sppl");
+    bool compStatus = compileChecker("func/funcStringStringRetString.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "\"string\"");
@@ -137,7 +137,7 @@ void Test::funcStringStringRetString() {
 }
 
 void Test::funcListIntRetListInt() { 
-    bool compStatus = compileChecker("funcListIntRetListInt.sppl");
+    bool compStatus = compileChecker("func/funcListIntRetListInt.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "[1]");
@@ -146,7 +146,7 @@ void Test::funcListIntRetListInt() {
 }
 
 void Test::funcListFloatRetListFloat() { 
-    bool compStatus = compileChecker("funcListFloatRetListFloat.sppl");
+    bool compStatus = compileChecker("func/funcListFloatRetListFloat.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "[1.000000]");
@@ -155,7 +155,7 @@ void Test::funcListFloatRetListFloat() {
 }
 
 void Test::funcListBoolRetListBool() { 
-    bool compStatus = compileChecker("funcListBoolRetListBool.sppl");
+    bool compStatus = compileChecker("func/funcListBoolRetListBool.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "[True]");
@@ -164,7 +164,7 @@ void Test::funcListBoolRetListBool() {
 }
 
 void Test::funcListCharRetListChar() { 
-    bool compStatus = compileChecker("funcListCharRetListChar.sppl");
+    bool compStatus = compileChecker("func/funcListCharRetListChar.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "['c']");
@@ -173,7 +173,7 @@ void Test::funcListCharRetListChar() {
 }
 
 void Test::funcListStringRetListString() { 
-    bool compStatus = compileChecker("funcListStringRetListString.sppl");
+    bool compStatus = compileChecker("func/funcListStringRetListString.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "[\"string\"]");
@@ -182,7 +182,7 @@ void Test::funcListStringRetListString() {
 }
 
 void Test::funcTupleIntIntRetTupleIntInt() { 
-    bool compStatus = compileChecker("funcTupleIntIntRetTupleIntInt.sppl");
+    bool compStatus = compileChecker("func/funcTupleIntIntRetTupleIntInt.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "(2, 2)");
@@ -191,7 +191,7 @@ void Test::funcTupleIntIntRetTupleIntInt() {
 }
 
 void Test::funcTupleFloatFloatRetTupleFloatFloat() { 
-    bool compStatus = compileChecker("funcTupleFloatFloatRetTupleFloatFloat.sppl");
+    bool compStatus = compileChecker("func/funcTupleFloatFloatRetTupleFloatFloat.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "(2.000000, 2.000000)");
@@ -200,7 +200,7 @@ void Test::funcTupleFloatFloatRetTupleFloatFloat() {
 }
 
 void Test::funcTupleBoolBoolRetTupleBoolBool() { 
-    bool compStatus = compileChecker("funcTupleBoolBoolRetTupleBoolBool.sppl");
+    bool compStatus = compileChecker("func/funcTupleBoolBoolRetTupleBoolBool.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "(True, False)");
@@ -209,7 +209,7 @@ void Test::funcTupleBoolBoolRetTupleBoolBool() {
 }
 
 void Test::funcTupleCharCharRetTupleCharChar() { 
-    bool compStatus = compileChecker("funcTupleCharCharRetTupleCharChar.sppl");
+    bool compStatus = compileChecker("func/funcTupleCharCharRetTupleCharChar.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "('c', 'h')");
@@ -218,7 +218,7 @@ void Test::funcTupleCharCharRetTupleCharChar() {
 }
 
 void Test::funcTupleStringStringRetTupleStringString() { 
-    bool compStatus = compileChecker("funcTupleStringStringRetTupleStringString.sppl");
+    bool compStatus = compileChecker("func/funcTupleStringStringRetTupleStringString.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "(\"string\", \"string\")");
@@ -227,7 +227,7 @@ void Test::funcTupleStringStringRetTupleStringString() {
 }
 
 void Test::funcIntToIntRetInt() { 
-    bool compStatus = compileChecker("funcIntToIntRetInt.sppl");
+    bool compStatus = compileChecker("func/funcIntToIntRetInt.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "2");
@@ -236,7 +236,7 @@ void Test::funcIntToIntRetInt() {
 }
 
 void Test::funcFloatToFloatRetFloat() { 
-    bool compStatus = compileChecker("funcFloatToFloatRetFloat.sppl");
+    bool compStatus = compileChecker("func/funcFloatToFloatRetFloat.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "2.000000");
@@ -245,7 +245,7 @@ void Test::funcFloatToFloatRetFloat() {
 }
 
 void Test::funcBoolToBoolRetBool() { 
-    bool compStatus = compileChecker("funcBoolToBoolRetBool.sppl");
+    bool compStatus = compileChecker("func/funcBoolToBoolRetBool.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "True");
@@ -254,7 +254,7 @@ void Test::funcBoolToBoolRetBool() {
 }
 
 void Test::funcCharToCharRetChar() { 
-    bool compStatus = compileChecker("funcCharToCharRetChar.sppl");
+    bool compStatus = compileChecker("func/funcCharToCharRetChar.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "'c'");
@@ -263,7 +263,7 @@ void Test::funcCharToCharRetChar() {
 }
 
 void Test::funcStringToStringRetString() { 
-    bool compStatus = compileChecker("funcStringToStringRetString.sppl");
+    bool compStatus = compileChecker("func/funcStringToStringRetString.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "\"string\"");
@@ -272,7 +272,7 @@ void Test::funcStringToStringRetString() {
 }
 
 void Test::funcListIntToListIntRetListInt() { 
-    bool compStatus = compileChecker("funcListIntToListIntRetListInt.sppl");
+    bool compStatus = compileChecker("func/funcListIntToListIntRetListInt.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "[1]");
@@ -281,7 +281,7 @@ void Test::funcListIntToListIntRetListInt() {
 }
 
 void Test::funcTupleIntIntToTupleIntIntRetInt() { 
-    bool compStatus = compileChecker("funcTupleIntIntToTupleIntIntRetInt.sppl");
+    bool compStatus = compileChecker("func/funcTupleIntIntToTupleIntIntRetInt.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "(1, 2)");
@@ -290,7 +290,7 @@ void Test::funcTupleIntIntToTupleIntIntRetInt() {
 }
 
 void Test::funcIntToIntRetToIntRetToInt() { 
-    bool compStatus = compileChecker("funcIntToIntRetToIntRetToInt.sppl");
+    bool compStatus = compileChecker("func/funcIntToIntRetToIntRetToInt.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "2");

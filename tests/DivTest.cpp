@@ -2,7 +2,7 @@
 
 
 void Test::divIntPosPos() { 
-    bool compStatus = compileChecker("divIntPosPos.sppl");
+    bool compStatus = compileChecker("div/divIntPosPos.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "1");
@@ -11,7 +11,7 @@ void Test::divIntPosPos() {
 }
 
 void Test::divIntZeroZero() { 
-    bool compStatus = compileChecker("divIntZeroZero.sppl");
+    bool compStatus = compileChecker("div/divIntZeroZero.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "0");
@@ -20,7 +20,7 @@ void Test::divIntZeroZero() {
 }
 
 void Test::divIntPosNeg() { 
-    bool compStatus = compileChecker("divIntPosNeg.sppl");
+    bool compStatus = compileChecker("div/divIntPosNeg.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "-1");
@@ -29,7 +29,7 @@ void Test::divIntPosNeg() {
 }
 
 void Test::divIntNegPos() { 
-    bool compStatus = compileChecker("divIntNegPos.sppl");
+    bool compStatus = compileChecker("div/divIntNegPos.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "-1");
@@ -38,7 +38,7 @@ void Test::divIntNegPos() {
 }
 
 void Test::divIntNegNeg() { 
-    bool compStatus = compileChecker("divIntNegNeg.sppl");
+    bool compStatus = compileChecker("div/divIntNegNeg.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "1");
@@ -47,7 +47,7 @@ void Test::divIntNegNeg() {
 }
 
 void Test::divFloatPosPos() { 
-    bool compStatus = compileChecker("divFloatPosPos.sppl");
+    bool compStatus = compileChecker("div/divFloatPosPos.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "1.000000");
@@ -56,7 +56,7 @@ void Test::divFloatPosPos() {
 }
 
 void Test::divFloatZeroZero() { 
-    bool compStatus = compileChecker("divFloatZeroZero.sppl");
+    bool compStatus = compileChecker("div/divFloatZeroZero.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "0.000000");
@@ -65,7 +65,7 @@ void Test::divFloatZeroZero() {
 }
 
 void Test::divFloatPosNeg() { 
-    bool compStatus = compileChecker("divFloatPosNeg.sppl");
+    bool compStatus = compileChecker("div/divFloatPosNeg.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "-1.000000");
@@ -74,7 +74,7 @@ void Test::divFloatPosNeg() {
 }
 
 void Test::divFloatNegPos() { 
-    bool compStatus = compileChecker("divFloatNegPos.sppl");
+    bool compStatus = compileChecker("div/divFloatNegPos.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "-1.000000");
@@ -83,7 +83,7 @@ void Test::divFloatNegPos() {
 }
 
 void Test::divFloatNegNeg() { 
-    bool compStatus = compileChecker("divFloatNegNeg.sppl");
+    bool compStatus = compileChecker("div/divFloatNegNeg.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "1.000000");
@@ -92,7 +92,7 @@ void Test::divFloatNegNeg() {
 }
 
 void Test::divBoolTrueTrue() { 
-    bool compStatus = compileChecker("divBoolTrueTrue.sppl");
+    bool compStatus = compileChecker("div/divBoolTrueTrue.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -101,7 +101,7 @@ void Test::divBoolTrueTrue() {
 }
 
 void Test::divBoolTrueFalse() { 
-    bool compStatus = compileChecker("divBoolTrueFalse.sppl");
+    bool compStatus = compileChecker("div/divBoolTrueFalse.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -110,7 +110,7 @@ void Test::divBoolTrueFalse() {
 }
 
 void Test::divBoolFalseTrue() { 
-    bool compStatus = compileChecker("divBoolFalseTrue.sppl");
+    bool compStatus = compileChecker("div/divBoolFalseTrue.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -119,7 +119,7 @@ void Test::divBoolFalseTrue() {
 }
 
 void Test::divBoolFalseFalse() { 
-    bool compStatus = compileChecker("divBoolFalseFalse.sppl");
+    bool compStatus = compileChecker("div/divBoolFalseFalse.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -128,7 +128,7 @@ void Test::divBoolFalseFalse() {
 }
 
 void Test::divCharStrStr() { 
-    bool compStatus = compileChecker("divCharStrStr.sppl");
+    bool compStatus = compileChecker("div/divCharStrStr.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -137,7 +137,7 @@ void Test::divCharStrStr() {
 }
 
 void Test::divCharStrCha() { 
-    bool compStatus = compileChecker("divCharStrCha.sppl");
+    bool compStatus = compileChecker("div/divCharStrCha.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -146,7 +146,7 @@ void Test::divCharStrCha() {
 }
 
 void Test::divCharChaStr() { 
-    bool compStatus = compileChecker("divCharChaStr.sppl");
+    bool compStatus = compileChecker("div/divCharChaStr.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -155,7 +155,7 @@ void Test::divCharChaStr() {
 }
 
 void Test::divCharChaCha() { 
-    bool compStatus = compileChecker("divCharChaCha.sppl");
+    bool compStatus = compileChecker("div/divCharChaCha.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -164,7 +164,7 @@ void Test::divCharChaCha() {
 }
 
 void Test::divMixFloatInt() { 
-    bool compStatus = compileChecker("divMixFloatInt.sppl");
+    bool compStatus = compileChecker("div/divMixFloatInt.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -173,7 +173,7 @@ void Test::divMixFloatInt() {
 }
 
 void Test::divMixIntFloat() { 
-    bool compStatus = compileChecker("divMixIntFloat.sppl");
+    bool compStatus = compileChecker("div/divMixIntFloat.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");

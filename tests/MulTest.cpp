@@ -2,7 +2,7 @@
 
 
 void Test::mulIntPosPos() { 
-    bool compStatus = compileChecker("mulIntPosPos.sppl");
+    bool compStatus = compileChecker("mul/mulIntPosPos.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "4");
@@ -11,7 +11,7 @@ void Test::mulIntPosPos() {
 }
 
 void Test::mulIntZeroZero() { 
-    bool compStatus = compileChecker("mulIntZeroZero.sppl");
+    bool compStatus = compileChecker("mul/mulIntZeroZero.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "0");
@@ -20,7 +20,7 @@ void Test::mulIntZeroZero() {
 }
 
 void Test::mulIntPosNeg() { 
-    bool compStatus = compileChecker("mulIntPosNeg.sppl");
+    bool compStatus = compileChecker("mul/mulIntPosNeg.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "-4");
@@ -29,7 +29,7 @@ void Test::mulIntPosNeg() {
 }
 
 void Test::mulIntNegPos() { 
-    bool compStatus = compileChecker("mulIntNegPos.sppl");
+    bool compStatus = compileChecker("mul/mulIntNegPos.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "-4");
@@ -38,7 +38,7 @@ void Test::mulIntNegPos() {
 }
 
 void Test::mulIntNegNeg() { 
-    bool compStatus = compileChecker("mulIntNegNeg.sppl");
+    bool compStatus = compileChecker("mul/mulIntNegNeg.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "4");
@@ -47,7 +47,7 @@ void Test::mulIntNegNeg() {
 }
 
 void Test::mulFloatPosPos() { 
-    bool compStatus = compileChecker("mulFloatPosPos.sppl");
+    bool compStatus = compileChecker("mul/mulFloatPosPos.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "4.000000");
@@ -56,7 +56,7 @@ void Test::mulFloatPosPos() {
 }
 
 void Test::mulFloatZeroZero() { 
-    bool compStatus = compileChecker("mulFloatZeroZero.sppl");
+    bool compStatus = compileChecker("mul/mulFloatZeroZero.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "0.000000");
@@ -65,7 +65,7 @@ void Test::mulFloatZeroZero() {
 }
 
 void Test::mulFloatPosNeg() { 
-    bool compStatus = compileChecker("mulFloatPosNeg.sppl");
+    bool compStatus = compileChecker("mul/mulFloatPosNeg.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "-4.000000");
@@ -74,7 +74,7 @@ void Test::mulFloatPosNeg() {
 }
 
 void Test::mulFloatNegPos() { 
-    bool compStatus = compileChecker("mulFloatNegPos.sppl");
+    bool compStatus = compileChecker("mul/mulFloatNegPos.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "-4.000000");
@@ -83,7 +83,7 @@ void Test::mulFloatNegPos() {
 }
 
 void Test::mulFloatNegNeg() { 
-    bool compStatus = compileChecker("mulFloatNegNeg.sppl");
+    bool compStatus = compileChecker("mul/mulFloatNegNeg.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "4.000000");
@@ -92,7 +92,7 @@ void Test::mulFloatNegNeg() {
 }
 
 void Test::mulBoolTrueTrue() { 
-    bool compStatus = compileChecker("mulBoolTrueTrue.sppl");
+    bool compStatus = compileChecker("mul/mulBoolTrueTrue.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -101,7 +101,7 @@ void Test::mulBoolTrueTrue() {
 }
 
 void Test::mulBoolTrueFalse() { 
-    bool compStatus = compileChecker("mulBoolTrueFalse.sppl");
+    bool compStatus = compileChecker("mul/mulBoolTrueFalse.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -110,7 +110,7 @@ void Test::mulBoolTrueFalse() {
 }
 
 void Test::mulBoolFalseTrue() { 
-    bool compStatus = compileChecker("mulBoolFalseTrue.sppl");
+    bool compStatus = compileChecker("mul/mulBoolFalseTrue.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -119,7 +119,7 @@ void Test::mulBoolFalseTrue() {
 }
 
 void Test::mulBoolFalseFalse() { 
-    bool compStatus = compileChecker("mulBoolFalseFalse.sppl");
+    bool compStatus = compileChecker("mul/mulBoolFalseFalse.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -128,7 +128,7 @@ void Test::mulBoolFalseFalse() {
 }
 
 void Test::mulCharStrStr() { 
-    bool compStatus = compileChecker("mulCharStrStr.sppl");
+    bool compStatus = compileChecker("mul/mulCharStrStr.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -137,7 +137,7 @@ void Test::mulCharStrStr() {
 }
 
 void Test::mulCharStrCha() { 
-    bool compStatus = compileChecker("mulCharStrCha.sppl");
+    bool compStatus = compileChecker("mul/mulCharStrCha.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -146,7 +146,7 @@ void Test::mulCharStrCha() {
 }
 
 void Test::mulCharChaStr() { 
-    bool compStatus = compileChecker("mulCharChaStr.sppl");
+    bool compStatus = compileChecker("mul/mulCharChaStr.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -155,7 +155,7 @@ void Test::mulCharChaStr() {
 }
 
 void Test::mulCharChaCha() { 
-    bool compStatus = compileChecker("mulCharChaCha.sppl");
+    bool compStatus = compileChecker("mul/mulCharChaCha.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -164,7 +164,7 @@ void Test::mulCharChaCha() {
 }
 
 void Test::mulMixFloatInt() { 
-    bool compStatus = compileChecker("mulMixFloatInt.sppl");
+    bool compStatus = compileChecker("mul/mulMixFloatInt.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -173,7 +173,7 @@ void Test::mulMixFloatInt() {
 }
 
 void Test::mulMixIntFloat() { 
-    bool compStatus = compileChecker("mulMixIntFloat.sppl");
+    bool compStatus = compileChecker("mul/mulMixIntFloat.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");

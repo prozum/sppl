@@ -2,7 +2,7 @@
 
 
 void Test::sigLengthZeroInt() { 
-    bool compStatus = compileChecker("sigLengthZeroInt.sppl");
+    bool compStatus = compileChecker("sig/sigLengthZeroInt.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "2");
@@ -11,7 +11,7 @@ void Test::sigLengthZeroInt() {
 }
 
 void Test::sigLengthOneInt() { 
-    bool compStatus = compileChecker("sigLengthOneInt.sppl");
+    bool compStatus = compileChecker("sig/sigLengthOneInt.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "2");
@@ -20,7 +20,7 @@ void Test::sigLengthOneInt() {
 }
 
 void Test::sigLengthTwoInt() { 
-    bool compStatus = compileChecker("sigLengthTwoInt.sppl");
+    bool compStatus = compileChecker("sig/sigLengthTwoInt.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "2");
@@ -29,7 +29,7 @@ void Test::sigLengthTwoInt() {
 }
 
 void Test::sigLengthThreeInt() { 
-    bool compStatus = compileChecker("sigLengthThreeInt.sppl");
+    bool compStatus = compileChecker("sig/sigLengthThreeInt.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "2");
@@ -38,7 +38,7 @@ void Test::sigLengthThreeInt() {
 }
 
 void Test::sigLengthFourInt() { 
-    bool compStatus = compileChecker("sigLengthFourInt.sppl");
+    bool compStatus = compileChecker("sig/sigLengthFourInt.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "2");
@@ -47,7 +47,7 @@ void Test::sigLengthFourInt() {
 }
 
 void Test::sigLengthFiveInt() { 
-    bool compStatus = compileChecker("sigLengthFiveInt.sppl");
+    bool compStatus = compileChecker("sig/sigLengthFiveInt.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "2");
@@ -56,7 +56,7 @@ void Test::sigLengthFiveInt() {
 }
 
 void Test::sigLengthSixInt() { 
-    bool compStatus = compileChecker("sigLengthSixInt.sppl");
+    bool compStatus = compileChecker("sig/sigLengthSixInt.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "2");
@@ -65,7 +65,7 @@ void Test::sigLengthSixInt() {
 }
 
 void Test::sigLengthSevenInt() { 
-    bool compStatus = compileChecker("sigLengthSevenInt.sppl");
+    bool compStatus = compileChecker("sig/sigLengthSevenInt.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "2");
@@ -74,7 +74,7 @@ void Test::sigLengthSevenInt() {
 }
 
 void Test::sigLengthEightInt() { 
-    bool compStatus = compileChecker("sigLengthEightInt.sppl");
+    bool compStatus = compileChecker("sig/sigLengthEightInt.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "2");
@@ -83,7 +83,7 @@ void Test::sigLengthEightInt() {
 }
 
 void Test::sigLengthNineInt() { 
-    bool compStatus = compileChecker("sigLengthNineInt.sppl");
+    bool compStatus = compileChecker("sig/sigLengthNineInt.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "2");
@@ -92,7 +92,7 @@ void Test::sigLengthNineInt() {
 }
 
 void Test::sigLengthTenInt() { 
-    bool compStatus = compileChecker("sigLengthTenInt.sppl");
+    bool compStatus = compileChecker("sig/sigLengthTenInt.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "2");

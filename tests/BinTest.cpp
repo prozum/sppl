@@ -2,7 +2,7 @@
 
 
 void Test::binEqualTrueTrue() { 
-    bool compStatus = compileChecker("binEqualTrueTrue.sppl");
+    bool compStatus = compileChecker("bin/binEqualTrueTrue.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "True");
@@ -11,7 +11,7 @@ void Test::binEqualTrueTrue() {
 }
 
 void Test::binEqualTrueFalse() { 
-    bool compStatus = compileChecker("binEqualTrueFalse.sppl");
+    bool compStatus = compileChecker("bin/binEqualTrueFalse.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "False");
@@ -20,7 +20,7 @@ void Test::binEqualTrueFalse() {
 }
 
 void Test::binEqualFalseTrue() { 
-    bool compStatus = compileChecker("binEqualFalseTrue.sppl");
+    bool compStatus = compileChecker("bin/binEqualFalseTrue.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "False");
@@ -29,7 +29,7 @@ void Test::binEqualFalseTrue() {
 }
 
 void Test::binEqualFalseFalse() { 
-    bool compStatus = compileChecker("binEqualFalseFalse.sppl");
+    bool compStatus = compileChecker("bin/binEqualFalseFalse.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "True");
@@ -38,7 +38,7 @@ void Test::binEqualFalseFalse() {
 }
 
 void Test::binNotEqualTrueTrue() { 
-    bool compStatus = compileChecker("binNotEqualTrueTrue.sppl");
+    bool compStatus = compileChecker("bin/binNotEqualTrueTrue.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "False");
@@ -47,7 +47,7 @@ void Test::binNotEqualTrueTrue() {
 }
 
 void Test::binNotEqualTrueFalse() { 
-    bool compStatus = compileChecker("binNotEqualTrueFalse.sppl");
+    bool compStatus = compileChecker("bin/binNotEqualTrueFalse.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "True");
@@ -56,7 +56,7 @@ void Test::binNotEqualTrueFalse() {
 }
 
 void Test::binNotEqualFalseTrue() { 
-    bool compStatus = compileChecker("binNotEqualFalseTrue.sppl");
+    bool compStatus = compileChecker("bin/binNotEqualFalseTrue.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "True");
@@ -65,7 +65,7 @@ void Test::binNotEqualFalseTrue() {
 }
 
 void Test::binNotEqualFalseFalse() { 
-    bool compStatus = compileChecker("binNotEqualFalseFalse.sppl");
+    bool compStatus = compileChecker("bin/binNotEqualFalseFalse.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "False");
@@ -74,7 +74,7 @@ void Test::binNotEqualFalseFalse() {
 }
 
 void Test::binAndTrueTrue() { 
-    bool compStatus = compileChecker("binAndTrueTrue.sppl");
+    bool compStatus = compileChecker("bin/binAndTrueTrue.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "True");
@@ -83,7 +83,7 @@ void Test::binAndTrueTrue() {
 }
 
 void Test::binAndTrueFalse() { 
-    bool compStatus = compileChecker("binAndTrueFalse.sppl");
+    bool compStatus = compileChecker("bin/binAndTrueFalse.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "False");
@@ -92,7 +92,7 @@ void Test::binAndTrueFalse() {
 }
 
 void Test::binAndFalseTrue() { 
-    bool compStatus = compileChecker("binAndFalseTrue.sppl");
+    bool compStatus = compileChecker("bin/binAndFalseTrue.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "False");
@@ -101,7 +101,7 @@ void Test::binAndFalseTrue() {
 }
 
 void Test::binAndFalseFalse() { 
-    bool compStatus = compileChecker("binAndFalseFalse.sppl");
+    bool compStatus = compileChecker("bin/binAndFalseFalse.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "False");
@@ -110,7 +110,7 @@ void Test::binAndFalseFalse() {
 }
 
 void Test::binOrTrueTrue() { 
-    bool compStatus = compileChecker("binOrTrueTrue.sppl");
+    bool compStatus = compileChecker("bin/binOrTrueTrue.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "True");
@@ -119,7 +119,7 @@ void Test::binOrTrueTrue() {
 }
 
 void Test::binOrTrueFalse() { 
-    bool compStatus = compileChecker("binOrTrueFalse.sppl");
+    bool compStatus = compileChecker("bin/binOrTrueFalse.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "True");
@@ -128,7 +128,7 @@ void Test::binOrTrueFalse() {
 }
 
 void Test::binOrFalseTrue() { 
-    bool compStatus = compileChecker("binOrFalseTrue.sppl");
+    bool compStatus = compileChecker("bin/binOrFalseTrue.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "True");
@@ -137,7 +137,7 @@ void Test::binOrFalseTrue() {
 }
 
 void Test::binOrFalseFalse() { 
-    bool compStatus = compileChecker("binOrFalseFalse.sppl");
+    bool compStatus = compileChecker("bin/binOrFalseFalse.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "False");
@@ -146,7 +146,7 @@ void Test::binOrFalseFalse() {
 }
 
 void Test::binGrEqTrueTrue() { 
-    bool compStatus = compileChecker("binGrEqTrueTrue.sppl");
+    bool compStatus = compileChecker("bin/binGrEqTrueTrue.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -155,7 +155,7 @@ void Test::binGrEqTrueTrue() {
 }
 
 void Test::binGrEqTrueFalse() { 
-    bool compStatus = compileChecker("binGrEqTrueFalse.sppl");
+    bool compStatus = compileChecker("bin/binGrEqTrueFalse.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -164,7 +164,7 @@ void Test::binGrEqTrueFalse() {
 }
 
 void Test::binGrEqFalseTrue() { 
-    bool compStatus = compileChecker("binGrEqFalseTrue.sppl");
+    bool compStatus = compileChecker("bin/binGrEqFalseTrue.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -173,7 +173,7 @@ void Test::binGrEqFalseTrue() {
 }
 
 void Test::binGrEqFalseFalse() { 
-    bool compStatus = compileChecker("binGrEqFalseFalse.sppl");
+    bool compStatus = compileChecker("bin/binGrEqFalseFalse.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -182,7 +182,7 @@ void Test::binGrEqFalseFalse() {
 }
 
 void Test::binLeEqTrueTrue() { 
-    bool compStatus = compileChecker("binLeEqTrueTrue.sppl");
+    bool compStatus = compileChecker("bin/binLeEqTrueTrue.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -191,7 +191,7 @@ void Test::binLeEqTrueTrue() {
 }
 
 void Test::binLeEqTrueFalse() { 
-    bool compStatus = compileChecker("binLeEqTrueFalse.sppl");
+    bool compStatus = compileChecker("bin/binLeEqTrueFalse.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -200,7 +200,7 @@ void Test::binLeEqTrueFalse() {
 }
 
 void Test::binLeEqFalseTrue() { 
-    bool compStatus = compileChecker("binLeEqFalseTrue.sppl");
+    bool compStatus = compileChecker("bin/binLeEqFalseTrue.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -209,7 +209,7 @@ void Test::binLeEqFalseTrue() {
 }
 
 void Test::binLeEqFalseFalse() { 
-    bool compStatus = compileChecker("binLeEqFalseFalse.sppl");
+    bool compStatus = compileChecker("bin/binLeEqFalseFalse.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -218,7 +218,7 @@ void Test::binLeEqFalseFalse() {
 }
 
 void Test::binGreatTrueTrue() { 
-    bool compStatus = compileChecker("binGreatTrueTrue.sppl");
+    bool compStatus = compileChecker("bin/binGreatTrueTrue.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -227,7 +227,7 @@ void Test::binGreatTrueTrue() {
 }
 
 void Test::binGreatTrueFalse() { 
-    bool compStatus = compileChecker("binGreatTrueFalse.sppl");
+    bool compStatus = compileChecker("bin/binGreatTrueFalse.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -236,7 +236,7 @@ void Test::binGreatTrueFalse() {
 }
 
 void Test::binGreatFalseTrue() { 
-    bool compStatus = compileChecker("binGreatFalseTrue.sppl");
+    bool compStatus = compileChecker("bin/binGreatFalseTrue.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -245,7 +245,7 @@ void Test::binGreatFalseTrue() {
 }
 
 void Test::binGreatFalseFalse() { 
-    bool compStatus = compileChecker("binGreatFalseFalse.sppl");
+    bool compStatus = compileChecker("bin/binGreatFalseFalse.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -254,7 +254,7 @@ void Test::binGreatFalseFalse() {
 }
 
 void Test::binLessTrueTrue() { 
-    bool compStatus = compileChecker("binLessTrueTrue.sppl");
+    bool compStatus = compileChecker("bin/binLessTrueTrue.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -263,7 +263,7 @@ void Test::binLessTrueTrue() {
 }
 
 void Test::binLessTrueFalse() { 
-    bool compStatus = compileChecker("binLessTrueFalse.sppl");
+    bool compStatus = compileChecker("bin/binLessTrueFalse.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -272,7 +272,7 @@ void Test::binLessTrueFalse() {
 }
 
 void Test::binLessFalseTrue() { 
-    bool compStatus = compileChecker("binLessFalseTrue.sppl");
+    bool compStatus = compileChecker("bin/binLessFalseTrue.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -281,7 +281,7 @@ void Test::binLessFalseTrue() {
 }
 
 void Test::binLessFalseFalse() { 
-    bool compStatus = compileChecker("binLessFalseFalse.sppl");
+    bool compStatus = compileChecker("bin/binLessFalseFalse.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -289,3 +289,148 @@ void Test::binLessFalseFalse() {
     }
 }
 
+// VALUES
+
+void Test::binEqualIntInt() {
+    bool compStatus = compileChecker("bin/binEqualIntInt.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
+        bool execStatus = executeChecker("", "True");
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
+    }
+}
+
+void Test::binNotEqualIntInt() {
+    bool compStatus = compileChecker("bin/binNotEqualIntInt.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
+        bool execStatus = executeChecker("", "False");
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
+    }
+}
+
+void Test::binAndIntInt() {
+    bool compStatus = compileChecker("bin/binAndIntInt.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
+    if (compStatus == true) {
+        bool execStatus = executeChecker("", "");
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
+    }
+}
+
+void Test::binOrIntInt() {
+    bool compStatus = compileChecker("bin/binOrIntInt.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
+    if (compStatus == true) {
+        bool execStatus = executeChecker("", "");
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
+    }
+}
+
+void Test::binGrEqIntInt() {
+    bool compStatus = compileChecker("bin/binGrEqIntInt.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
+        bool execStatus = executeChecker("", "True");
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
+    }
+}
+
+void Test::binLeEqIntInt() {
+    bool compStatus = compileChecker("bin/binLeEqIntInt.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
+        bool execStatus = executeChecker("", "True");
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
+    }
+}
+
+void Test::binGreatIntInt() {
+    bool compStatus = compileChecker("bin/binGreatIntInt.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
+        bool execStatus = executeChecker("", "False");
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
+    }
+}
+
+void Test::binLessIntInt() {
+    bool compStatus = compileChecker("bin/binLessIntInt.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
+        bool execStatus = executeChecker("", "False");
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
+    }
+}
+
+void Test::binEqualFloatFloat() {
+    bool compStatus = compileChecker("bin/binEqualFloatFloat.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
+        bool execStatus = executeChecker("", "True");
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
+    }
+}
+
+void Test::binNotEqualFloatFloat() {
+    bool compStatus = compileChecker("bin/binNotEqualFloatFloat.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
+        bool execStatus = executeChecker("", "False");
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
+    }
+}
+
+void Test::binAndFloatFloat() {
+    bool compStatus = compileChecker("bin/binAndFloatFloat.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
+    if (compStatus == true) {
+        bool execStatus = executeChecker("", "");
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
+    }
+}
+
+void Test::binOrFloatFloat() {
+    bool compStatus = compileChecker("bin/binOrFloatFloat.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
+    if (compStatus == true) {
+        bool execStatus = executeChecker("", "");
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
+    }
+}
+
+void Test::binGrEqFloatFloat() {
+    bool compStatus = compileChecker("bin/binGrEqFloatFloat.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
+        bool execStatus = executeChecker("", "True");
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
+    }
+}
+
+void Test::binLeEqFloatFloat() {
+    bool compStatus = compileChecker("bin/binLeEqFloatFloat.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
+        bool execStatus = executeChecker("", "True");
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
+    }
+}
+
+void Test::binGreatFloatFloat() {
+    bool compStatus = compileChecker("bin/binGreatFloatFloat.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
+        bool execStatus = executeChecker("", "False");
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
+    }
+}
+
+void Test::binLessFloatFloat() {
+    bool compStatus = compileChecker("bin/binLessFloatFloat.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
+        bool execStatus = executeChecker("", "False");
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
+    }
+}
