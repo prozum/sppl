@@ -43,6 +43,7 @@ namespace common {
 	class Negative;
 	class ProducerConsumer;
 	class Concat;
+	class LambdaFunction;
 	class IntPattern;
 	class FloatPattern;
 	class CharPattern;
@@ -78,9 +79,9 @@ namespace common {
 
 	class Program : public Node {
 	public:
-		vector<unique_ptr<Declaration>> Funcs;
+		vector<unique_ptr<Declaration>> Decls;
 
-		Program(vector<unique_ptr<Function>> Funcs, Location Loc);
+		Program(vector<unique_ptr<Declaration>> Decls, Location Loc);
 		Program(unique_ptr<Expression> AnonFunc, Location Loc);
 
 		virtual void accept(Visitor &V);

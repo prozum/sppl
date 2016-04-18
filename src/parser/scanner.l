@@ -104,8 +104,16 @@ using namespace std;
     return token::ID;
 }
 
+"\\" {
+    return token::BACKSLASH;
+}
+
 "->" {
     return token::ARROR;
+}
+
+"=>" {
+    return token::LAMBARROR;
 }
 
 "==" {

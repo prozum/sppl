@@ -9,7 +9,7 @@ namespace codegen {
               Module(std::make_unique<llvm::Module>("SpplModule", getGlobalContext())) {}
 
     void LLVMCodeGenerator::visit(common::Program &node) {
-        for (auto &func : node.Funcs) {
+        for (auto &func : node.Decls) {
             func->accept(*this);
         }
 

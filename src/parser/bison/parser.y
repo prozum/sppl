@@ -46,7 +46,7 @@ using namespace std;
 
 %token END 0 "end of stream"
 %token EOL "end of line"
-%token DEF TYPE INCLUDE TO WILD CONCAT PROCON INTTYPE BOOLTYPE FLOATTYPE STRINGTYPE CHARTYPE ARROR EQUAL NOTEQUAL AND OR LESSEREQUAL GREATEREQUAL LESSER GREATER MUL DIV MOD ADD SUB ASSIGN SQSTART SQEND PARSTART PAREND EXMARK COMMA PIPE ARROW COLON
+%token DEF TYPE BACKSLASH INCLUDE TO WILD CONCAT PROCON INTTYPE BOOLTYPE FLOATTYPE STRINGTYPE CHARTYPE LAMBARROR ARROR EQUAL NOTEQUAL AND OR LESSEREQUAL GREATEREQUAL LESSER GREATER MUL DIV MOD ADD SUB ASSIGN SQSTART SQEND PARSTART PAREND EXMARK COMMA PIPE ARROW COLON
 %token <long_int> INTLITERAL
 %token <chr> CHARLITERAL
 %token <boolean> BOOLLITERAL
@@ -59,6 +59,8 @@ using namespace std;
 %left LESSER GREATER GREATEREQUAL LESSEREQUAL
 %left ADD SUB
 %left MUL DIV MOD
+%left PROCON
+%left CONCAT
 %right COLON
 %left TO
 %precedence EXMARK
@@ -157,20 +159,25 @@ expr:	expr OR expr                                        { $$ = new Or(unique_p
 	|	expr MUL expr                                       { $$ = new Mul(unique_ptr<Expression>($1), unique_ptr<Expression>($3), @2); }
 	|	expr DIV expr                                       { $$ = new Div(unique_ptr<Expression>($1), unique_ptr<Expression>($3), @2); }
 	|	expr MOD expr                                       { $$ = new Mod(unique_ptr<Expression>($1), unique_ptr<Expression>($3), @2); }
+	|   expr PROCON expr                                    { $$ = new ProducerConsumer(unique_ptr<Expression>($1), unique_ptr<Expression>($3), @2); }
+	|   expr CONCAT expr                                    { $$ = new Concat(unique_ptr<Expression>($1), unique_ptr<Expression>($3), @2); }
 	|	expr COLON expr                                     { $$ = new ListAdd(unique_ptr<Expression>($1), unique_ptr<Expression>($3), @2); }
 	|   expr TO type                                        { $$ = new To(unique_ptr<Expression>($1), @1); }
 	|	ID                                                  { $$ = new Id(* $1, @1); }
 	|	literal                                             { $$ = $1; }
-	|	struct_inst                                         { $$ = $1; }
+	|	SQSTART exprs_comma SQEND                           { $$ = new ListExpression(move(* $2), @1); delete $2; }
+	|   PARSTART exprs_comma_ne COMMA expr PAREND           { $2->push_back(unique_ptr<Expression>($4)); $$ = new TupleExpression(move(* $2), @1); delete $2; }
 	|	PARSTART expr PAREND                                { $$ = new Par(unique_ptr<Expression>($2), @1); }
 	|	expr PARSTART exprs_comma PAREND                    { $$ = new Call(unique_ptr<Expression>($1), move(* $3), @2); delete $3; }
 	|	EXMARK expr                                         { $$ = new Not(unique_ptr<Expression>($2), @1); }
-struct_inst:	SQSTART exprs_comma SQEND                   { $$ = new ListExpression(move(* $2), @1); delete $2; }
-	|	PARSTART exprs_comma_ne COMMA expr PAREND           { $2->push_back(unique_ptr<Expression>($4)); $$ = new TupleExpression(move(* $2), @1); delete $2; }
+    |	SUB expr                                            { $$ = new Negative(unique_ptr<Expression>($2), @1); }
+    |   BACKSLASH ids LAMBARROW expr                        { $$ = new LambdaFunction(unique_ptr<Expression>($4), move(* $2), @1); delete $2; }
+ids:    ids ID                                              { $$->push_back(unique_ptr<IdPattern>(new IdPattern($2, @1))); }
+    |                                                       { $$ = new vector<unique_ptr<IdPattern>>(); }
 exprs_comma:    exprs_comma_ne                              { $$ = $1; }
 	|	                                                    { $$ = new vector<unique_ptr<Expression>>(); }
 exprs_comma_ne: exprs_comma_ne COMMA expr                   { $$ = $1; $$->push_back(unique_ptr<Expression>($3)); }
-	|	expr                                                { $$ = new vector<unique_ptr<Expression>>(); $$->push_back(unique_ptr<Expression>($1)); }
+	|	        expr                                        { $$ = new vector<unique_ptr<Expression>>(); $$->push_back(unique_ptr<Expression>($1)); }
 
 %%
 

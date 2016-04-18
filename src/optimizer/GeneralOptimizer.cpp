@@ -10,7 +10,7 @@ using namespace common;
 namespace optimizer {
 
     void GeneralOptimizer::visit(Program &Node) {
-        for (auto &Func : Node.Funcs){
+        for (auto &Func : Node.Decls){
             Func->accept(*this);
         }
     }

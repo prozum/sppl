@@ -10,7 +10,7 @@ namespace optimizer {
 
     void ParallelOptimizer::visit(Program &Node)
     {
-        for (auto &Func : Node.Funcs){
+        for (auto &Func : Node.Decls){
             Func->accept(*this);
         }
     }

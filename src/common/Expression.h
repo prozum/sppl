@@ -9,6 +9,7 @@ namespace common {
         Expression(Type Ty, Location Loc);
 
         virtual void accept(Visitor &V) = 0;
+        virtual string str() = 0;
     };
 
     class IdExpression : public Expression {
@@ -80,6 +81,17 @@ namespace common {
         vector<unique_ptr<Expression>> Args;
 
         Call(unique_ptr<Expression> Callee, vector<unique_ptr<Expression>> Args, Location Loc);
+
+        virtual void accept(Visitor &V);
+        string str();
+    };
+
+    class LambdaFunction : public Expression {
+    public:
+        unique_ptr<Expression> Expr;
+        vector<unique_ptr<IdPattern>> Args;
+
+        LambdaFunction(unique_ptr<Expression> Expr, vector<unique_ptr<IdPattern>> Args, Location Loc);
 
         virtual void accept(Visitor &V);
         string str();

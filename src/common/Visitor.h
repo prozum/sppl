@@ -37,6 +37,7 @@ namespace common {
 		virtual void visit(Par &Node) { throw runtime_error( "Not implemented"); }
 		virtual void visit(Not &Node) { throw runtime_error( "Not implemented"); }
 		virtual void visit(Negative &Node) { throw runtime_error( "Not implemented"); }
+		virtual void visit(LambdaFunction &Node) { throw runtime_error( "Not implemented"); }
 		virtual void visit(IdPattern &Node) { throw runtime_error( "Not implemented"); }
 		virtual void visit(IntPattern &Node) { throw runtime_error( "Not implemented"); }
 		virtual void visit(FloatPattern &Node) { throw runtime_error( "Not implemented"); }
@@ -45,6 +46,7 @@ namespace common {
 		virtual void visit(TuplePattern &Node) { throw runtime_error( "Not implemented"); }
 		virtual void visit(ListSplit &Node) { throw runtime_error( "Not implemented"); }
 		virtual void visit(WildPattern &Node) { throw runtime_error( "Not implemented"); }
+		virtual void visit(IdExpression &Node) { throw runtime_error( "Not implemented"); }
 		virtual void visit(IntExpression &Node) { throw runtime_error( "Not implemented"); }
 		virtual void visit(FloatExpression &Node) { throw runtime_error( "Not implemented"); }
 		virtual void visit(CharExpression &Node) { throw runtime_error( "Not implemented"); }

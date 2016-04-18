@@ -35,9 +35,7 @@ namespace semantics {
         virtual void visit(Not &Node);
         virtual void visit(IntPattern &Node);
         virtual void visit(FloatPattern &Node);
-        virtual void visit(Bool &Node);
         virtual void visit(CharPattern &Node);
-        virtual void visit(String &Node);
         virtual void visit(ListPattern &Node);
         virtual void visit(TuplePattern &Node);
         virtual void visit(ListSplit &Node);

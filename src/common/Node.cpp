@@ -1,5 +1,5 @@
 #include "Node.h"
-#include "Expressions.h"
+#include "Expression.h"
 #include "Visitor.h"
 
 using namespace std;
@@ -16,16 +16,16 @@ namespace common {
     Node::Node(Type Ty, Location Loc) :
             Ty(Ty), Loc(Loc) { }
 
-    Program::Program(vector<unique_ptr<Function>> Funcs,
+    Program::Program(vector<unique_ptr<Declaration>> Decls,
                      Location Loc) :
             Node(Loc),
-            Funcs(move(Funcs)) { }
+            Decls(move(Decls)) { }
 
     Program::Program(unique_ptr<Expression> AnonFunc,
                      Location Loc) :
                      Node(Loc) {
 
-        Funcs.push_back(make_unique<Function>(move(AnonFunc)));
+        Decls.push_back(make_unique<Function>(move(AnonFunc)));
     }
 
     Declaration::Declaration(Location Loc) :
@@ -39,7 +39,7 @@ namespace common {
             Id(ANON_FUNC_NAME),
             Signature(Type(TypeId::UNKNOWN)),
             Anon(true) {
-        Cases.push_back(make_unique<Case>(move(AnonFunc), vector<unique_ptr<Pattern>>(), AnonFunc->Loc));
+        //Cases.push_back(make_unique<Case>(move(AnonFunc), vector<unique_ptr<Pattern>>(), AnonFunc->Loc));
     }
 
     Function::Function(string Id,
@@ -60,7 +60,7 @@ namespace common {
 
     string Program::str() {
         string Str;
-        for (auto &Func : Funcs) {
+        for (auto &Func : Decls) {
             Str += Func->str();
         }
 

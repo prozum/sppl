@@ -150,7 +150,7 @@ namespace jit {
         if (!Driver.accept(Generator)) {
             return;
         }
-        auto FuncNode = Driver.Prog->Funcs[0].get();
+        auto FuncNode = Driver.Prog->Decls[0].get();
         auto FuncIR = Generator.Module->getFunction(FuncNode->Id);
         PassMgr->run(* FuncIR);
 

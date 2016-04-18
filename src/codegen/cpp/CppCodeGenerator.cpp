@@ -26,7 +26,7 @@ namespace codegen
         generateStd();
 
         // Find the main function
-        for (auto &Func : Node.Funcs)
+        for (auto &Func : Node.Decls)
             if (Func->Id == "main")
                 Main = Func.get();
 
@@ -52,7 +52,7 @@ namespace codegen
                    "} \n"
                    " \n";
 
-        for (auto &Func : Node.Funcs) {
+        for (auto &Func : Node.Decls) {
             Func->accept(*this);
             *Output << endl;
             outputBuffer();
@@ -652,7 +652,7 @@ namespace codegen
         } else {
             bool IsDeclared = false;
 
-            for (auto &Func : Prog->Funcs) {
+            for (auto &Func : Prog->Decls) {
                 if (Func->Id == Node.Val) {
                     IsDeclared = true;
                     break;

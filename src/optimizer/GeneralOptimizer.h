@@ -33,9 +33,7 @@ namespace optimizer {
         void visit(Not &Node);
         void visit(IntPattern &Node);
         void visit(FloatPattern &Node);
-        void visit(Bool &Node);
         void visit(CharPattern &Node);
-        void visit(String &Node);
         void visit(ListPattern &Node);
         void visit(TuplePattern &Node);
         void visit(ListSplit &Node);

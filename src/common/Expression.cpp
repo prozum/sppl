@@ -2,7 +2,7 @@
 // Created by hejsil on 4/18/16.
 //
 
-#include "Expressions.h"
+#include "Expression.h"
 #include "Visitor.h"
 
 
@@ -53,6 +53,13 @@ namespace common {
             Callee(move(Callee)),
             Args(move(Args)) { }
 
+    LambdaFunction::LambdaFunction(unique_ptr<Expression> Expr,
+                                   vector<unique_ptr<IdPattern>> Args,
+                                   Location Loc) :
+            Expression(Loc),
+            Expr(move(Expr)),
+            Args(move(Args)) { }
+
     void IdExpression::accept(Visitor &V) { V.visit(*this); }
     void IntExpression::accept(Visitor &V) { V.visit(*this); }
     void FloatExpression::accept(Visitor &V) { V.visit(*this); }
@@ -60,6 +67,7 @@ namespace common {
     void ListExpression::accept(Visitor &V) { V.visit(*this); }
     void TupleExpression::accept(Visitor &V) { V.visit(*this); }
     void Call::accept(Visitor &V) { V.visit(*this); }
+    void LambdaFunction::accept(Visitor &V) { V.visit(*this); }
 
     string IdExpression::str() {
         return Val;
@@ -87,6 +95,10 @@ namespace common {
 
     string Call::str() {
         return Callee->str() + "(" + strJoin(Args, ", ") + ")";
+    }
+
+    string LambdaFunction::str() {
+        return "\n" + strJoin(Args, " ") + " => " + Expr->str();
     }
 
 }

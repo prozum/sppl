@@ -63,12 +63,8 @@ namespace common {
                 return "Int";
             case TypeId::FLOAT:
                 return "FloatPattern";
-            case TypeId::BOOL:
-                return "Bool";
             case TypeId::CHAR:
                 return "CharPattern";
-            case TypeId::STRING:
-                return "String";
             case TypeId::LIST:
                 return "[" + Subtypes[0].str() + "]";
             case TypeId::TUPLE:

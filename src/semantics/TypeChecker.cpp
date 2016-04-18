@@ -12,7 +12,7 @@ namespace semantics
         auto StrList = Type(TypeId::LIST, vector<Type>({ Type(TypeId::STRING) }));
 
         // Visit children
-        for (auto &Func : Node.Funcs) {
+        for (auto &Func : Node.Decls) {
             Func->accept(*this);
 
             try {

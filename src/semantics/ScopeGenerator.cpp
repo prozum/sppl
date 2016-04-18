@@ -8,7 +8,7 @@ namespace semantics {
 
     void ScopeGenerator::visit(Program &Node) {
         // Visit children
-        for (auto &Func : Node.Funcs) {
+        for (auto &Func : Node.Decls) {
             Func->accept(*this);
         }
         // Visit stops here

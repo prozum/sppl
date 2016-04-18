@@ -2,7 +2,8 @@
 
 namespace compiler {
     Compiler::Compiler() :
-            scope_generator(semantics::ScopeGenerator(&Global)) {
+            //scope_generator(semantics::ScopeGenerator(&Global))
+    {
 
     }
 
@@ -31,7 +32,7 @@ namespace compiler {
                 break;
 #endif
             case Backend::PPRINTER:
-                generator = make_unique<codegen::Printer>(*this);
+                //generator = make_unique<codegen::Printer>(*this);
                 break;
             default:
                 throw runtime_error("Not a valid backend!");
@@ -43,6 +44,7 @@ namespace compiler {
         if (!parseFiles())
             return 1;
 
+        /*
         if (!accept(scope_generator))
             return 2;
 
@@ -54,6 +56,7 @@ namespace compiler {
 
         if (!accept(*generator))
             return 5;
+        */
 
         return 0;
     }
