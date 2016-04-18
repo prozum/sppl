@@ -599,10 +599,10 @@ namespace codegen
 
         // Create list
         ExprStack.top() << GGenerated << GCreate << Name << "(" << Node.Elements.size();
-        for (size_t i = Node.Elements.size() - 1; i >= 0; i--) {
+        for (size_t i = Node.Elements.size(); i > 0; --i) {
             ExprStack.top() << ", ";
 
-            Node.Elements[i]->accept(*this);
+            Node.Elements[i-1]->accept(*this);
         }
 
         ExprStack.top() << ")";
