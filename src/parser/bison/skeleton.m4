@@ -144,7 +144,7 @@ m4_define([b4_parser_class_name],
 b4_bison_locations_if([# Backward compatibility.
    m4_define([b4_location_constructors])
    m4_include(b4_pkgdatadir/[location.cc])])
-m4_include(bison/stack.h)
+m4_include(bison/stack.m4)
 b4_variant_if([m4_include(b4_pkgdatadir/[variant.hh])])
 
 # b4_shared_declarations
