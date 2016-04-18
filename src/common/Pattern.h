@@ -87,7 +87,7 @@ namespace common {
 	public:
 		vector<unique_ptr<Pattern>> Patterns;
 
-		TuplePattern(vector<unique_ptr<Pattern>> Patterns, Location loc);
+		TuplePattern(vector<unique_ptr<Pattern>> Patterns, Location Loc);
 
 		virtual void accept(Visitor &V);
 		string str();
@@ -98,7 +98,7 @@ namespace common {
 		unique_ptr<Pattern> Left;
 		unique_ptr<Pattern> Right;
 
-		ListSplit(unique_ptr<Pattern>, unique_ptr<Pattern> Patterns, Location loc);
+		ListSplit(unique_ptr<Pattern>, unique_ptr<Pattern> Patterns, Location Loc);
 
 		virtual void accept(Visitor &V);
 		string str();

@@ -91,12 +91,12 @@ namespace parser {
         try {
             Prog->accept(V);
         }
-        catch (Error err) {
-            V.Errors.push_back(err);
+        catch (Error Err) {
+            V.Errors.push_back(Err);
         }
 
-        for (auto &error : V.Errors) {
-            showError(error);
+        for (auto &Err : V.Errors) {
+            showError(Err);
         }
 
         return !V.hasError();

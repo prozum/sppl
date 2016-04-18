@@ -18,19 +18,19 @@ namespace jit {
     }
 
     SpplJit::ModuleHandleT SpplJit::addModule(std::unique_ptr<llvm::Module> M) {
-        auto resolver = createLambdaResolver(
+        auto Resolver = createLambdaResolver(
                 [&](const std::string &Name) {
                     if (auto Sym = findMangledSymbol(Name))
                         return RuntimeDyld::SymbolInfo(Sym.getAddress(), Sym.getFlags());
                     return RuntimeDyld::SymbolInfo(nullptr);
                 },
                 [](const std::string &S) { return nullptr; });
-        auto handler = CompileLayer.addModuleSet(singletonSet(std::move(M)),
+        auto Handler = CompileLayer.addModuleSet(singletonSet(std::move(M)),
                                                  std::make_unique<SectionMemoryManager>(),
-                                                 std::move(resolver));
+                                                 std::move(Resolver));
 
-        ModuleHandles.push_back(handler);
-        return handler;
+        ModuleHandles.push_back(Handler);
+        return Handler;
     }
 
     void SpplJit::removeModule(ModuleHandleT Handler) {
@@ -44,23 +44,23 @@ namespace jit {
 
 
     JITSymbol SpplJit::findMangledSymbol(const std::string &Name) {
-        for (auto handler : make_range(ModuleHandles.rbegin(), ModuleHandles.rend()))
-            if (auto Sym = CompileLayer.findSymbolIn(handler, Name, true))
+        for (auto Handler : make_range(ModuleHandles.rbegin(), ModuleHandles.rend()))
+            if (auto Sym = CompileLayer.findSymbolIn(Handler, Name, true))
                 return Sym;
 
-        if (auto sym_addr = RTDyldMemoryManager::getSymbolAddressInProcess(Name))
-            return JITSymbol(sym_addr, JITSymbolFlags::Exported);
+        if (auto SymAddr = RTDyldMemoryManager::getSymbolAddressInProcess(Name))
+            return JITSymbol(SymAddr, JITSymbolFlags::Exported);
 
         return nullptr;
     }
 
     std::string SpplJit::mangle(const std::string &Name) {
-        std::string mangled_name;
+        std::string MangledName;
         {
-            raw_string_ostream MangledNameStream(mangled_name);
+            raw_string_ostream MangledNameStream(MangledName);
             Mangler::getNameWithPrefix(MangledNameStream, Name, Layout);
         }
-        return mangled_name;
+        return MangledName;
     }
 
     void SpplJit::createModule() {
@@ -81,7 +81,7 @@ namespace jit {
 
 
     string SpplJit::getOutput(intptr_t data, common::Type Type) {
-        string out;
+        string Out;
 
         switch (Type.Id) {
             case common::TypeId::INT:
@@ -90,10 +90,10 @@ namespace jit {
                 // WTF is double type a pointer
                 return to_string(*(double *) data);
             case common::TypeId::STRING:
-                out += "\"";
-                out += (char *) data;
-                out += "\"";
-                return out;
+                Out += "\"";
+                Out += (char *) data;
+                Out += "\"";
+                return Out;
             case common::TypeId::TUPLE:
                 return getOutputTuple(data, Type.Subtypes);
             case common::TypeId::SIGNATURE:
@@ -104,33 +104,33 @@ namespace jit {
     }
 
     string SpplJit::getOutputTuple(intptr_t addr, vector<common::Type> Subtypes) {
-        string out("(");
-        for (size_t i = 0; i < Subtypes.size(); i++) {
+        string Out("(");
+        for (size_t i = 0; i < Subtypes.size(); ++i) {
             switch (Subtypes[i].Id) {
                 case common::TypeId::INT:
-                    out += getOutput(*(int64_t *) addr, Subtypes[i]);
+                    Out += getOutput(*(int64_t *) addr, Subtypes[i]);
                     addr += sizeof(int64_t);
                     break;
                 case common::TypeId::FLOAT:
-                    out += getOutput(addr, Subtypes[i]);
+                    Out += getOutput(addr, Subtypes[i]);
                     addr += sizeof(double);
                     break;
                 case common::TypeId::STRING:
-                    out += getOutput(*(intptr_t *) addr, Subtypes[i]);
+                    Out += getOutput(*(intptr_t *) addr, Subtypes[i]);
                     addr += sizeof(intptr_t *);
                     break;
                 case common::TypeId::TUPLE:
-                    out += getOutputTuple(*(intptr_t *) addr, Subtypes[i].Subtypes);
+                    Out += getOutputTuple(*(intptr_t *) addr, Subtypes[i].Subtypes);
                     addr += sizeof(intptr_t *);
                     break;
                 default:
                     throw runtime_error("Cannot convert to C data: " + Subtypes[i].str());
             }
             if (i + 1 != Subtypes.size())
-                out += ", ";
+                Out += ", ";
         }
 
-        return  out + ")";
+        return  Out + ")";
     }
 
 
@@ -155,7 +155,7 @@ namespace jit {
         PassMgr->run(* FuncIR);
 
         // Store function in seperate module
-        moduleHandler = addModule(std::move(Generator.Module));
+        ModuleHandler = addModule(std::move(Generator.Module));
         createModule();
 
         // Only run anonymous functions
@@ -164,11 +164,11 @@ namespace jit {
             auto FuncJIT = (size_t (*)()) Func.getAddress();
 
             assert(FuncJIT != NULL);
-            string output = getOutput(FuncJIT(), FuncNode->Ty);
-            cout << output << "\t\ttype: " << FuncNode->Ty.str() << endl;
+            string Output = getOutput(FuncJIT(), FuncNode->Ty);
+            cout << Output << "\t\ttype: " << FuncNode->Ty.str() << endl;
 
             // Remove module
-            removeModule(moduleHandler);
+            removeModule(ModuleHandler);
         }
 
     }

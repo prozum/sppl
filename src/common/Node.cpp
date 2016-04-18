@@ -71,55 +71,43 @@ namespace common {
     }
 
     string Program::str() {
-        string str;
-        for (auto &func : Funcs) {
-            str += func->str();
+        string Str;
+        for (auto &Func : Funcs) {
+            Str += Func->str();
         }
 
-        return str;
+        return Str;
     }
 
     string Function::str() {
-        string str("def " + Id + " : ");
+        string Str("def " + Id + " : ");
 
-        for (auto &type : Signature.Subtypes) {
-            str += type.str();
-            if (type != Signature.Subtypes.back())
-                str += " -> ";
+        Str += Signature.str() + "\n";
+
+        for (auto &Case : Cases) {
+            Str += Case->str() + "\n";
         }
 
-        str += '\n';
-
-        for (auto &cse : Cases) {
-            str += cse->str() + "\n";
-        }
-
-        return str + "\n";
+        return Str + "\n";
     }
 
     string Case::str() {
-        string str("\t| ");
-
-        for (auto &pattern : Patterns) {
-            str += pattern->str();
-            if (pattern != Patterns.back())
-                str += ' ';
-        }
-
-        return str + " = " + Expr->str();
+        return "\t| " + strJoin(Patterns, " ") + " = " + Expr->str();
     }
 
     string Call::str() {
-        string str(Callee->str() + "(");
-
-        for (auto &expr : Args) {
-            str += expr->str();
-            if (expr != Args.back())
-                str += ", ";
-        }
-
-        return str + ")";
+        return Callee->str() + "(" + strJoin(Args, ", ") + ")";
     }
 
+    template<class T>
+	string strJoin(T &List, const std::string JoinStr) {
+		string Str("(");
+		for (size_t i = 0; i < List.size(); ++i) {
+			Str += List[i]->str();
+			if (i + 1 != List.size())
+				Str += JoinStr;
+		}
 
+		return Str + ")";
+	}
 }

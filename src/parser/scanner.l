@@ -28,7 +28,7 @@ using namespace std;
 
 %{
     if (NewSource) {
-        yylloc->sources(Drv.Src);
+        yylloc->sources(Drv.Source);
         NewSource = false;
     }
     yylloc->step();

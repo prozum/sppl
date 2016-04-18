@@ -149,6 +149,10 @@ namespace common {
 		virtual void accept(Visitor &V);
 		string str();
 	};
+
+
+	template<class T>
+	string strJoin(T &List, const std::string JoinStr);
 }
 
 

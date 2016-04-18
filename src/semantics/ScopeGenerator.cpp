@@ -8,8 +8,8 @@ namespace semantics {
 
     void ScopeGenerator::visit(Program &Node) {
         // Visit children
-        for (auto &func: Node.Funcs) {
-            func->accept(*this);
+        for (auto &Func : Node.Funcs) {
+            Func->accept(*this);
         }
         // Visit stops here
     }
@@ -22,8 +22,8 @@ namespace semantics {
             CurScope->Decls.insert({Node.Id, Node.Signature});
 
             // Visit children
-            for (auto &cse: Node.Cases) {
-                cse->accept(*this);
+            for (auto &Case : Node.Cases) {
+                Case->accept(*this);
             }
             // Visit stops here
         } else {
@@ -33,14 +33,14 @@ namespace semantics {
 
 
     void ScopeGenerator::visit(Case &Node) {
-        auto case_scope = new Scope(CurScope);
-        CurScope->Children.push_back(unique_ptr<Scope>(case_scope));
-        CurScope = case_scope;
+        auto CaseScope = new Scope(CurScope);
+        CurScope->Children.push_back(unique_ptr<Scope>(CaseScope));
+        CurScope = CaseScope;
 
         // Visit children
         Ctx = ScopeContext::PATTERN;
 
-        for (size_t i = 0; i < Node.Patterns.size(); i++) {
+        for (size_t i = 0; i < Node.Patterns.size(); ++i) {
             Node.Patterns[i]->Ty = CurFunc->Signature[i];
             Node.Patterns[i]->accept(*this);
         }
@@ -173,7 +173,7 @@ namespace semantics {
     void ScopeGenerator::visit(TuplePattern &Node) {
         if (Node.Ty.Id == TypeId::TUPLE) {
             if (Node.Patterns.size() == Node.Ty.Subtypes.size()) {
-                for (size_t i = 0; i < Node.Patterns.size(); i++) {
+                for (size_t i = 0; i < Node.Patterns.size(); ++i) {
                     Node.Patterns[i]->Ty = Node.Ty.Subtypes[i];
                     Node.Patterns[i]->accept(*this);
                 }
@@ -196,16 +196,16 @@ namespace semantics {
 
     void ScopeGenerator::visit(List &Node) {
         // Visit children
-        for (auto &expr: Node.Elements) {
-            expr->accept(*this);
+        for (auto &Element : Node.Elements) {
+            Element->accept(*this);
         }
         // Visit stops here
     }
 
     void ScopeGenerator::visit(Tuple &Node) {
         // Visit children
-        for (auto &expr: Node.Elements) {
-            expr->accept(*this);
+        for (auto &Element : Node.Elements) {
+            Element->accept(*this);
         }
         // Visit stops here
     }
@@ -223,8 +223,8 @@ namespace semantics {
     void ScopeGenerator::visit(Call &Node) {
         // Visit children
         Node.Callee->accept(*this);
-        for (auto &expr: Node.Args) {
-            expr->accept(*this);
+        for (auto &Arg : Node.Args) {
+            Arg->accept(*this);
         }
         // Visit stops here
     }

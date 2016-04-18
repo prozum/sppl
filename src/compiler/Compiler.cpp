@@ -6,9 +6,9 @@ namespace compiler {
 
     }
 
-    void Compiler::set_backend(Backend backend)
+    void Compiler::set_backend(Backend B)
     {
-        switch (backend)
+        switch (B)
         {
 #ifdef CCPP
             case Backend::CPP:
@@ -34,7 +34,7 @@ namespace compiler {
                 generator = make_unique<codegen::Printer>(*this);
                 break;
             default:
-                throw runtime_error("Not a valid backend");
+                throw runtime_error("Not a valid backend!");
         }
     }
 

@@ -49,14 +49,14 @@ namespace common {
             Patterns(move(Patterns)) { }
 
     TuplePattern::TuplePattern(vector<unique_ptr<Pattern>> Patterns,
-                               Location loc) :
-            Pattern(loc),
+                               Location Loc) :
+            Pattern(Loc),
             Patterns(move(Patterns)) { }
 
     ListSplit::ListSplit(unique_ptr<Pattern> left,
                          unique_ptr<Pattern> Patterns,
-                         Location loc) :
-            Pattern(loc),
+                         Location Loc) :
+            Pattern(Loc),
             Left(move(left)),
             Right(move(Patterns)) { }
 
@@ -76,27 +76,11 @@ namespace common {
             Val(Val) { }
 
     string List::str() {
-        string str("[");
-
-        for (size_t i = 0; i < Elements.size(); i++) {
-            str += Elements[i]->str();
-            if (i + 1 != Elements.size())
-                str += ", ";
-        }
-
-        return str + "]";
+        return "[" + strJoin(Elements, ", ") + "]";
     }
 
     string Tuple::str() {
-        string str("(");
-
-        for (size_t i = 0; i < Elements.size(); i++) {
-            str += Elements[i]->str();
-            if (i + 1 != Elements.size())
-                str += ", ";
-        }
-
-        return str + ")";
+        return "(" + strJoin(Elements, ", ") + ")";
     }
 
     string Id::str() {
@@ -108,12 +92,12 @@ namespace common {
     }
 
     string Float::str() {
-        string res = to_string(Val);
+        string Res = to_string(Val);
 
-        if (res.find('.') == res.npos)
-            res += ".0";
+        if (Res.find('.') == Res.npos)
+            Res += ".0";
 
-        return res;
+        return Res;
     }
 
     string Bool::str() {
@@ -121,11 +105,7 @@ namespace common {
     }
 
     string Char::str() {
-        string res = "\'";
-        res += Val;
-        res += "\'";
-
-        return res;
+        return "\'" + to_string(Val) + "\'";
     }
 
     string String::str() {
@@ -133,27 +113,11 @@ namespace common {
     }
 
     string ListPattern::str() {
-        string str("[");
-
-        for (size_t i = 0; i < Patterns.size(); i++) {
-            str += Patterns[i]->str();
-            if (i + 1 != Patterns.size())
-                str += ", ";
-        }
-
-        return str + "]";
+        return "[" + strJoin(Patterns, ", ") + "]";
     }
 
     string TuplePattern::str() {
-        string str("(");
-
-        for (size_t i = 0; i < Patterns.size(); i++) {
-            str += Patterns[i]->str();
-            if (i + 1 != Patterns.size())
-                str += ", ";
-        }
-
-        return str + ")";
+        return "(" + strJoin(Patterns, ", ") + ")";
     }
 
     string ListSplit::str() {
