@@ -1,0 +1,5 @@
+def main : [String]->[Bool]
+| n = func1([True])
+
+def func1 : [Bool]->[Bool]
+| n = n

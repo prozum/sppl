@@ -1,313 +1,282 @@
 #include "Test.h"
 
 
-void Test::tupleEmpty() {
-    std::shared_ptr<std::stringstream> source = buildSimple("()", "", "()", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
-    if(compStatus) {
+void Test::tupleEmpty() { 
+    bool compStatus = compileChecker("tuple/tupleEmpty.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::tupleEmptyInt() {
-    std::shared_ptr<std::stringstream> source = buildSimple("(Int)", "", "()", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
-    if(compStatus) {
+void Test::tupleEmptyInt() { 
+    bool compStatus = compileChecker("tuple/tupleEmptyInt.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::tupleEmptyFloat() {
-    std::shared_ptr<std::stringstream> source = buildSimple("(Float)", "", "()", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
-    if(compStatus) {
+void Test::tupleEmptyFloat() { 
+    bool compStatus = compileChecker("tuple/tupleEmptyFloat.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::tupleEmptyBool() {
-    std::shared_ptr<std::stringstream> source = buildSimple("(Bool)", "", "()", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
-    if(compStatus) {
+void Test::tupleEmptyBool() { 
+    bool compStatus = compileChecker("tuple/tupleEmptyBool.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::tupleEmptyChar() {
-    std::shared_ptr<std::stringstream> source = buildSimple("(Char)", "", "()", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
-    if(compStatus) {
+void Test::tupleEmptyChar() { 
+    bool compStatus = compileChecker("tuple/tupleEmptyChar.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::tupleEmptyString() {
-    std::shared_ptr<std::stringstream> source = buildSimple("(String)", "", "()", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
-    if(compStatus) {
+void Test::tupleEmptyString() { 
+    bool compStatus = compileChecker("tuple/tupleEmptyString.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::tupleOneInt() {
-    std::shared_ptr<std::stringstream> source = buildSimple("(Int)", "", "(2)", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
-    if(compStatus) {
+void Test::tupleOneInt() { 
+    bool compStatus = compileChecker("tuple/tupleOneInt.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::tupleOneFloat() {
-    std::shared_ptr<std::stringstream> source = buildSimple("(Float)", "", "(2.0)", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
-    if(compStatus) {
+void Test::tupleOneFloat() { 
+    bool compStatus = compileChecker("tuple/tupleOneFloat.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::tupleOneBool() {
-    std::shared_ptr<std::stringstream> source = buildSimple("(Bool)", "", "(True)", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
-    if(compStatus) {
+void Test::tupleOneBool() { 
+    bool compStatus = compileChecker("tuple/tupleOneBool.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::tupleOneChar() {
-    std::shared_ptr<std::stringstream> source = buildSimple("(Char)", "", "('c')", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
-    if(compStatus) {
+void Test::tupleOneChar() { 
+    bool compStatus = compileChecker("tuple/tupleOneChar.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::tupleOneString() {
-    std::shared_ptr<std::stringstream> source = buildSimple("(String)", "", "(\"string\")", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
-    if(compStatus) {
+void Test::tupleOneString() { 
+    bool compStatus = compileChecker("tuple/tupleOneString.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::tupleTwoInt() {
-    std::shared_ptr<std::stringstream> source = buildSimple("(Int,Int)", "", "(2,2)", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
-    if(compStatus) {
+void Test::tupleTwoInt() { 
+    bool compStatus = compileChecker("tuple/tupleTwoInt.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "(2, 2)");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::tupleTwoFloat() {
-    std::shared_ptr<std::stringstream> source = buildSimple("(Float,Float)", "", "(2.0,2.0)", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
-    if(compStatus) {
+void Test::tupleTwoFloat() { 
+    bool compStatus = compileChecker("tuple/tupleTwoFloat.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "(2.000000, 2.000000)");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::tupleTwoBool() {
-    std::shared_ptr<std::stringstream> source = buildSimple("(Bool,Bool)", "", "(True,False)", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
-    if(compStatus) {
+void Test::tupleTwoBool() { 
+    bool compStatus = compileChecker("tuple/tupleTwoBool.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "(True, False)");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::tupleTwoChar() {
-    std::shared_ptr<std::stringstream> source = buildSimple("(Char, Char)", "", "('c','h')", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
-    if(compStatus) {
+void Test::tupleTwoChar() { 
+    bool compStatus = compileChecker("tuple/tupleTwoChar.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "('c', 'h')");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::tupleTwoString() {
-    std::shared_ptr<std::stringstream> source = buildSimple("(String, String)", "", "(\"string\",\"string\")", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
-    if(compStatus) {
+void Test::tupleTwoString() { 
+    bool compStatus = compileChecker("tuple/tupleTwoString.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "(\"string\", \"string\")");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::tupleThreeInt() {
-    std::shared_ptr<std::stringstream> source = buildSimple("(Int,Int, Int)", "", "(2,2,2)", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
-    if(compStatus) {
+void Test::tupleThreeInt() { 
+    bool compStatus = compileChecker("tuple/tupleThreeInt.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "(2, 2, 2)");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::tupleThreeFloat() {
-    std::shared_ptr<std::stringstream> source = buildSimple("(Float,Float, Float)", "", "(2.0,2.0,2.0)", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
-    if(compStatus) {
+void Test::tupleThreeFloat() { 
+    bool compStatus = compileChecker("tuple/tupleThreeFloat.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "(2.000000, 2.000000, 2.000000)");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::tupleThreeBool() {
-    std::shared_ptr<std::stringstream> source = buildSimple("(Bool,Bool, Bool)", "", "(True, False, True)", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
-    if(compStatus) {
+void Test::tupleThreeBool() { 
+    bool compStatus = compileChecker("tuple/tupleThreeBool.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "(True, False, True)");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::tupleThreeChar() {
-    std::shared_ptr<std::stringstream> source = buildSimple("(Char, Char, Char)", "", "('c','h','a')", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
-    if(compStatus) {
+void Test::tupleThreeChar() { 
+    bool compStatus = compileChecker("tuple/tupleThreeChar.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "('c', 'h', 'a')");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::tupleThreeString() {
-    std::shared_ptr<std::stringstream> source = buildSimple("(String, String, String)", "", "(\"string\",\"string\",\"string\")", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
-    if(compStatus) {
+void Test::tupleThreeString() { 
+    bool compStatus = compileChecker("tuple/tupleThreeString.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "(\"string\", \"string\", \"string\")");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::tupleMixed() {
-    std::shared_ptr<std::stringstream> source = buildSimple("(Int, Float, Bool, Char, Char, Char, Char, String)", "", "(2,2.0,True,'c','h','a','r',\"string\")", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
-    if(compStatus) {
+void Test::tupleMixed() { 
+    bool compStatus = compileChecker("tuple/tupleMixed.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "(2, 2.000000, True, 'c', 'h', 'a', 'r', \"string\")");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::tupleListInt() {
-    std::shared_ptr<std::stringstream> source = buildSimple("([Int],[Int])", "", "([2],[2])", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
-    if(compStatus) {
+void Test::tupleListInt() { 
+    bool compStatus = compileChecker("tuple/tupleListInt.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "([2], [2])");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::tupleListFloat() {
-    std::shared_ptr<std::stringstream> source = buildSimple("([Float],[Float])", "", "([2.0],[2.0])", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
-    if(compStatus) {
+void Test::tupleListFloat() { 
+    bool compStatus = compileChecker("tuple/tupleListFloat.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "([2.000000], [2.000000])");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::tupleListBool() {
-    std::shared_ptr<std::stringstream> source = buildSimple("([Bool],[Bool])", "", "([True],[False])", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
-    if(compStatus) {
+void Test::tupleListBool() { 
+    bool compStatus = compileChecker("tuple/tupleListBool.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "([True], [False])");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::tupleListChar() {
-    std::shared_ptr<std::stringstream> source = buildSimple("([Char],[Char])", "", "(['c'],['h'])", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
-    if(compStatus) {
+void Test::tupleListChar() { 
+    bool compStatus = compileChecker("tuple/tupleListChar.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "(['c'], ['h'])");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::tupleListString() {
-    std::shared_ptr<std::stringstream> source = buildSimple("([String],[String])", "", "([\"string\"],[\"string\"])", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
-    if(compStatus) {
+void Test::tupleListString() { 
+    bool compStatus = compileChecker("tuple/tupleListString.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "([\"string\"], [\"string\"])");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::tupleNested() {
-    std::shared_ptr<std::stringstream> source = buildSimple("((Int, Int), (Int,Int))", "", "((1,2),(3,4))", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
-    if(compStatus) {
+void Test::tupleNested() { 
+    bool compStatus = compileChecker("tuple/tupleNested.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "((1, 2), (3, 4))");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::tupleTwoNested() {
-    std::shared_ptr<std::stringstream> source = buildSimple("((Int, Float), (Bool, (Char, String)))", "", "((1,2.0),(True,('c',\"har\")))", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
-    if(compStatus) {
+void Test::tupleTwoNested() { 
+    bool compStatus = compileChecker("tuple/tupleTwoNested.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "((1, 2.000000), (True, ('c', \"har\")))");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::tupleSuperNested() {
-    std::shared_ptr<std::stringstream> source = buildSimple("(Char,(Char,(Char,(Char,(Char,(Char,(Char,(Char,(Char,(Char,(Char,Char)))))))))))", "", "('h',('e',('l',('l',('o',(' ',('w',('o',('r',('l',('d','!')))))))))))", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
-    if(compStatus) {
+void Test::tupleSuperNested() { 
+    bool compStatus = compileChecker("tuple/tupleSuperNested.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "('h', ('e', ('l', ('l', ('o', (' ', ('w', ('o', ('r', ('l', ('d', '!')))))))))))");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::tupleWrongType() {
-    std::shared_ptr<std::stringstream> source = buildSimple("(Int,Float,Bool,Char,String)", "", "(1.2,True,'c',\"string\",1)", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
-    if(compStatus) {
+void Test::tupleWrongType() { 
+    bool compStatus = compileChecker("tuple/tupleWrongType.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 

@@ -1,0 +1,8 @@
+def main : [String]->String
+| n = func1(func2)
+
+def func1 : (String->String)->String
+| f = f("string")
+
+def func2 : String->String
+| n = n

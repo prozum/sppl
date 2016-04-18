@@ -1,408 +1,300 @@
 #include "Test.h"
 
 
-void Test::funcRetInt () {
-    std::shared_ptr<std::stringstream> source = buildFunc("Int",
-        "Int", "", "2", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
-    if(compStatus) {
+void Test::funcRetInt() { 
+    bool compStatus = compileChecker("func/funcRetInt.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "2");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-
-void Test::funcRetFloat () {
-    std::shared_ptr<std::stringstream> source = buildFunc("Float",
-        "Float", "", "2.0", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
-    if(compStatus) {
+void Test::funcRetFloat() { 
+    bool compStatus = compileChecker("func/funcRetFloat.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "2.000000");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-
-void Test::funcRetBool () {
-    std::shared_ptr<std::stringstream> source = buildFunc("Bool",
-        "Bool", "", "True", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
-    if(compStatus) {
+void Test::funcRetBool() { 
+    bool compStatus = compileChecker("func/funcRetBool.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "True");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-
-void Test::funcRetChar () {
-    std::shared_ptr<std::stringstream> source = buildFunc("Char",
-        "Char", "", "'c'", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
-    if(compStatus) {
+void Test::funcRetChar() { 
+    bool compStatus = compileChecker("func/funcRetChar.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "'c'");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-
-void Test::funcRetString () {
-    std::shared_ptr<std::stringstream> source = buildFunc("String",
-        "String", "", "\"string\"", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
-    if(compStatus) {
+void Test::funcRetString() { 
+    bool compStatus = compileChecker("func/funcRetString.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "\"string\"");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-
-void Test::funcIntRetInt () {
-    std::shared_ptr<std::stringstream> source = buildFunc("Int",
-        "Int->Int", "n", "n", "2");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
-    if(compStatus) {
+void Test::funcIntRetInt() { 
+    bool compStatus = compileChecker("func/funcIntRetInt.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "2");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-
-void Test::funcFloatRetFloat () {
-    std::shared_ptr<std::stringstream> source = buildFunc("Float",
-        "Float->Float", "n", "n", "2.0");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
-    if(compStatus) {
+void Test::funcFloatRetFloat() { 
+    bool compStatus = compileChecker("func/funcFloatRetFloat.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "2.000000");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-
-void Test::funcBoolRetBool () {
-    std::shared_ptr<std::stringstream> source = buildFunc("Bool",
-        "Bool->Bool", "n", "n", "True");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
-    if(compStatus) {
+void Test::funcBoolRetBool() { 
+    bool compStatus = compileChecker("func/funcBoolRetBool.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "True");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-
-void Test::funcCharRetChar () {
-    std::shared_ptr<std::stringstream> source = buildFunc("Char",
-        "Char->Char", "n", "n", "'c'");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
-    if(compStatus) {
+void Test::funcCharRetChar() { 
+    bool compStatus = compileChecker("func/funcCharRetChar.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "'c'");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-
-void Test::funcStringRetString () {
-    std::shared_ptr<std::stringstream> source = buildFunc("String",
-        "String->String", "n", "n", "\"string\"");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
-    if(compStatus) {
+void Test::funcStringRetString() { 
+    bool compStatus = compileChecker("func/funcStringRetString.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "\"string\"");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-
-void Test::funcIntIntRetInt () {
-    std::shared_ptr<std::stringstream> source = buildFunc("Int",
-        "Int->Int->Int", "m n", "m+n", "2,2");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
-    if(compStatus) {
+void Test::funcIntIntRetInt() { 
+    bool compStatus = compileChecker("func/funcIntIntRetInt.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "4");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-
-void Test::funcFloatFloatRetFloat () {
-    std::shared_ptr<std::stringstream> source = buildFunc("Float",
-        "Float->Float->Float", "m n", "m+n", "2.0,2.0");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
-    if(compStatus) {
+void Test::funcFloatFloatRetFloat() { 
+    bool compStatus = compileChecker("func/funcFloatFloatRetFloat.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "4.000000");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-
-void Test::funcBoolBoolRetBool () {
-    std::shared_ptr<std::stringstream> source = buildFunc("Bool",
-        "Bool->Bool->Bool", "m n", "m||n", "True,False");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
-    if(compStatus) {
+void Test::funcBoolBoolRetBool() { 
+    bool compStatus = compileChecker("func/funcBoolBoolRetBool.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "True");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-
-void Test::funcCharCharRetChar () {
-    std::shared_ptr<std::stringstream> source = buildFunc("Char",
-        "Char->Char->Char", "m n", "'c'", "'c','h'");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
-    if(compStatus) {
+void Test::funcCharCharRetChar() { 
+    bool compStatus = compileChecker("func/funcCharCharRetChar.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "'c'");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-
-void Test::funcStringStringRetString () {
-    std::shared_ptr<std::stringstream> source = buildFunc("String",
-        "String->String->String", "m n", "\"string\"", "\"string\", \"string\"");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
-    if(compStatus) {
+void Test::funcStringStringRetString() { 
+    bool compStatus = compileChecker("func/funcStringStringRetString.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "\"string\"");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-
-void Test::funcListIntRetListInt () {
-    std::shared_ptr<std::stringstream> source = buildFunc("[Int]",
-        "[Int]->[Int]", "n", "n", "[1]");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
-    if(compStatus) {
+void Test::funcListIntRetListInt() { 
+    bool compStatus = compileChecker("func/funcListIntRetListInt.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "[1]");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-
-void Test::funcListFloatRetListFloat () {
-    std::shared_ptr<std::stringstream> source = buildFunc("[Float]",
-        "[Float]->[Float]", "n", "n", "[1.0]");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
-    if(compStatus) {
+void Test::funcListFloatRetListFloat() { 
+    bool compStatus = compileChecker("func/funcListFloatRetListFloat.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "[1.000000]");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-
-void Test::funcListBoolRetListBool () {
-    std::shared_ptr<std::stringstream> source = buildFunc("[Bool]",
-        "[Bool]->[Bool]", "n", "n", "[True]");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
-    if(compStatus) {
+void Test::funcListBoolRetListBool() { 
+    bool compStatus = compileChecker("func/funcListBoolRetListBool.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "[True]");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-
-void Test::funcListCharRetListChar () {
-    std::shared_ptr<std::stringstream> source = buildFunc("[Char]",
-        "[Char]->[Char]", "n", "n", "['c']");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
-    if(compStatus) {
+void Test::funcListCharRetListChar() { 
+    bool compStatus = compileChecker("func/funcListCharRetListChar.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "['c']");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-
-void Test::funcListStringRetListString () {
-    std::shared_ptr<std::stringstream> source = buildFunc("[String]",
-        "[String]->[String]", "n", "n", "[\"string\"]");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
-    if(compStatus) {
+void Test::funcListStringRetListString() { 
+    bool compStatus = compileChecker("func/funcListStringRetListString.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "[\"string\"]");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-
-void Test::funcTupleIntIntRetTupleIntInt () {
-    std::shared_ptr<std::stringstream> source = buildFunc("(Int,Int)",
-        "(Int,Int)->(Int,Int)", "n", "n", "(2,2)");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
-    if(compStatus) {
+void Test::funcTupleIntIntRetTupleIntInt() { 
+    bool compStatus = compileChecker("func/funcTupleIntIntRetTupleIntInt.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "(2, 2)");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-
-void Test::funcTupleFloatFloatRetTupleFloatFloat () {
-    std::shared_ptr<std::stringstream> source = buildFunc("(Float,Float)",
-        "(Float,Float)->(Float,Float)", "n", "n", "(2.0,2.0)");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
-    if(compStatus) {
+void Test::funcTupleFloatFloatRetTupleFloatFloat() { 
+    bool compStatus = compileChecker("func/funcTupleFloatFloatRetTupleFloatFloat.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "(2.000000, 2.000000)");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-
-void Test::funcTupleBoolBoolRetTupleBoolBool () {
-    std::shared_ptr<std::stringstream> source = buildFunc("(Bool,Bool)",
-        "(Bool,Bool)->(Bool,Bool)", "n", "n", "(True,False)");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
-    if(compStatus) {
+void Test::funcTupleBoolBoolRetTupleBoolBool() { 
+    bool compStatus = compileChecker("func/funcTupleBoolBoolRetTupleBoolBool.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "(True, False)");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-
-void Test::funcTupleCharCharRetTupleCharChar () {
-    std::shared_ptr<std::stringstream> source = buildFunc("(Char,Char)",
-        "(Char,Char)->(Char,Char)", "n", "n", "('c','h')");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
-    if(compStatus) {
+void Test::funcTupleCharCharRetTupleCharChar() { 
+    bool compStatus = compileChecker("func/funcTupleCharCharRetTupleCharChar.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "('c', 'h')");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-
-void Test::funcTupleStringStringRetTupleStringString () {
-    std::shared_ptr<std::stringstream> source = buildFunc("(String,String)",
-        "(String,String)->(String,String)", "n", "n", "(\"string\",\"string\")");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
-    if(compStatus) {
+void Test::funcTupleStringStringRetTupleStringString() { 
+    bool compStatus = compileChecker("func/funcTupleStringStringRetTupleStringString.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "(\"string\", \"string\")");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-
-void Test::funcIntToIntRetInt () {
-    std::shared_ptr<std::stringstream> source = buildFunc("Int",
-        "(Int->Int)->Int", "f", "f(2)", "func2",
-        "Int->Int", "n", "n");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
-    if(compStatus) {
+void Test::funcIntToIntRetInt() { 
+    bool compStatus = compileChecker("func/funcIntToIntRetInt.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "2");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-
-void Test::funcFloatToFloatRetFloat () {
-    std::shared_ptr<std::stringstream> source = buildFunc("Float",
-        "(Float->Float)->Float", "f", "f(2.0)", "func2",
-        "Float->Float", "n", "n");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
-    if(compStatus) {
+void Test::funcFloatToFloatRetFloat() { 
+    bool compStatus = compileChecker("func/funcFloatToFloatRetFloat.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "2.000000");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-
-void Test::funcBoolToBoolRetBool () {
-    std::shared_ptr<std::stringstream> source = buildFunc("Bool",
-        "(Bool->Bool)->Bool", "f", "f(True)", "func2",
-        "Bool->Bool", "n", "n");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
-    if(compStatus) {
+void Test::funcBoolToBoolRetBool() { 
+    bool compStatus = compileChecker("func/funcBoolToBoolRetBool.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "True");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-
-void Test::funcCharToCharRetChar () {
-    std::shared_ptr<std::stringstream> source = buildFunc("Char",
-        "(Char->Char)->Char", "f", "f('c')", "func2",
-        "Char->Char", "n", "n");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
-    if(compStatus) {
+void Test::funcCharToCharRetChar() { 
+    bool compStatus = compileChecker("func/funcCharToCharRetChar.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "'c'");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-
-void Test::funcStringToStringRetString () {
-    std::shared_ptr<std::stringstream> source = buildFunc("String",
-        "(String->String)->String", "f", "f(\"string\")", "func2",
-        "String->String", "n", "n");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
-    if(compStatus) {
+void Test::funcStringToStringRetString() { 
+    bool compStatus = compileChecker("func/funcStringToStringRetString.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "\"string\"");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-
-void Test::funcListIntToListIntRetListInt () {
-    std::shared_ptr<std::stringstream> source = buildFunc("[Int]",
-        "([Int]->[Int])->[Int]", "f", "f([1])", "func2",
-        "[Int]->[Int]", "n", "n");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
-    if(compStatus) {
+void Test::funcListIntToListIntRetListInt() { 
+    bool compStatus = compileChecker("func/funcListIntToListIntRetListInt.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "[1]");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-
-void Test::funcTupleIntIntToTupleIntIntRetInt () {
-    std::shared_ptr<std::stringstream> source = buildFunc("(Int,Int)",
-        "((Int,Int)->(Int,Int))->(Int,Int)", "f", "f((1,2))", "func2",
-        "(Int,Int)->(Int,Int)", "n", "n");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
-    if(compStatus) {
+void Test::funcTupleIntIntToTupleIntIntRetInt() { 
+    bool compStatus = compileChecker("func/funcTupleIntIntToTupleIntIntRetInt.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "(1, 2)");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-
-void Test::funcIntToIntRetToIntRetToInt () {
-    std::shared_ptr<std::stringstream> source = buildFunc("Int",
-        "((Int->Int)->Int)->Int", "f", "f(func3)", "func2",
-        "(Int->Int)->Int", "f", "f(2)",
-        "Int->Int", "n", "n");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
-    if(compStatus) {
+void Test::funcIntToIntRetToIntRetToInt() { 
+    bool compStatus = compileChecker("func/funcIntToIntRetToIntRetToInt.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "2");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
-
 

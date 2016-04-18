@@ -1,0 +1,6 @@
+def main : [String]->String
+| s = func("string")
+
+def func : String->String
+| String = "string"
+| arg0  = "string"

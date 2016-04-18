@@ -1,0 +1,5 @@
+def main : [String]->(Char,(Char,(Char,(Char,(Char,(Char,(Char,(Char,(Char,(Char,(Char,Char)))))))))))
+| s = func()
+
+def func : (Char,(Char,(Char,(Char,(Char,(Char,(Char,(Char,(Char,(Char,(Char,Char)))))))))))
+|  = ('h',('e',('l',('l',('o',(' ',('w',('o',('r',('l',('d','!')))))))))))

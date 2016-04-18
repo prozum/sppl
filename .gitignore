@@ -35,7 +35,5 @@ CMakeLists.txt.user
 # Ignore flex/bison generated files
 Parser.cpp
 Parser.h
+stack.h
 Scanner.cpp
-location.hh
-stack.hh
-position.hh

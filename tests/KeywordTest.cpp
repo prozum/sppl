@@ -1,83 +1,75 @@
 #include "Test.h"
 
 
-void Test::keywordInt() {
-    std::shared_ptr<std::stringstream> source = buildSimple("Int->Int", "Int", "2", "2");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
-    if(compStatus) {
+void Test::keywordInt() { 
+    bool compStatus = compileChecker("keyword/keywordInt.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::keywordFloat() {
-    std::shared_ptr<std::stringstream> source = buildSimple("Float->Float", "Float", "2.0", "2.0");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
-    if(compStatus) {
+void Test::keywordFloat() { 
+    bool compStatus = compileChecker("keyword/keywordFloat.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::keywordBool() {
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool->Bool", "Bool", "True", "True");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
-    if(compStatus) {
+void Test::keywordBool() { 
+    bool compStatus = compileChecker("keyword/keywordBool.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::keywordChar() {
-    std::shared_ptr<std::stringstream> source = buildSimple("Char->Char", "Char", "'c'", "'c'");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
-    if(compStatus) {
+void Test::keywordChar() { 
+    bool compStatus = compileChecker("keyword/keywordChar.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::keywordString() {
-    std::shared_ptr<std::stringstream> source = buildSimple("String->String", "String", "\"string\"", "\"string\"");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
-    if(compStatus) {
+void Test::keywordString() { 
+    bool compStatus = compileChecker("keyword/keywordString.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::keywordDef() {
-    std::shared_ptr<std::stringstream> source = buildSimple("Int->Int", "def", "2", "2");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
-    if(compStatus) {
+void Test::keywordDef() { 
+    bool compStatus = compileChecker("keyword/keywordDef.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::keywordMain() {
-    std::shared_ptr<std::stringstream> source = buildSimple("Int->Int", "main", "2", "2");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
-    if(compStatus) {
+void Test::keywordMain() { 
+    bool compStatus = compileChecker("keyword/keywordMain.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::comment() {
-    std::shared_ptr<std::stringstream> source = buildSimple("Int", "", "2 # This is a comment", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
-    if(compStatus) {
+void Test::comment() { 
+    bool compStatus = compileChecker("comment.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "2");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 

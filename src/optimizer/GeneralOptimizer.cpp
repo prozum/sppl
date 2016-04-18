@@ -20,8 +20,8 @@ namespace optimizer {
             auto Expr = Case->Expr.get();
 
             if (typeid(*Expr) == typeid(Call) &&
-                typeid(*((Call*)Expr)->Callee) == typeid(Id) &&
-                ((Id*)((Call*)Expr)->Callee.get())->Val == Node.Id) {
+                typeid(static_cast<Call*>(Expr)->Callee) == typeid(Id) &&
+                (static_cast<Id*>(static_cast<Call*>(Expr)->Callee.get()))->Val == Node.Id) {
                 Case->TailRec = true;
             }
 

@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <dirent.h>
 #include "Test.h"
 
 void Test::setUp() {
@@ -21,27 +22,28 @@ void Test::tearDown() {
     // Final test cleanup
 }
 
-bool Test::compileChecker(shared_ptr<std::stringstream> source) {
+bool Test::compileChecker(std::string name) {
     int compStatus;
-    std::stringstream out;
-    std::stringstream hout;
 
-    std::ofstream in("test.sppl");
-    in << source->str();
-    in.close();
+    ifstream f(name);
+    if (f.bad()) {
+        f.close();
+        CPPUNIT_ASSERT_MESSAGE("File \"" + name + "\" not found!", false);
+    } else {
+        f.close();
+    }
 
     try {
         compiler::Compiler compiler;
 
         std::vector<string> in;
-        in.push_back("test.sppl");
-        compiler.out = &out;
-        compiler.hout = &hout;
+        in.push_back(name);
 
-        compiler.set_inputs(in);
-        // compiler.parse_file(/*file*/);
+        compiler.setOutput("out.c");
+        compiler.setHeaderOutput("test.h");     // TODO: Use better name when fixed
+        compiler.setInputs(in);
 
-        compiler.set_backend(backend);
+        compiler.setBackend(backend);
         compStatus = compiler.compile();
     }
     catch (...) {
@@ -52,30 +54,11 @@ bool Test::compileChecker(shared_ptr<std::stringstream> source) {
     if (compStatus != 0) {
         return false;
     } else {
-
-#ifdef CCPP
-        // Create new files for test
-        std::ofstream outC("out.c");
-        std::ofstream outH("test.h");
-
-        // And add generated code to output
-        outC << out.str();
-        outH << hout.str();
-
-        outC.close();
-        outH.close();
-#elif CLLVM
-        std::ofstream outIr("out.ir");
-        outIr << out.str();
-        outIr.close();
-#endif
-        // Return true because success
         return true;
     }
 }
 
 bool Test::executeChecker(std::string args, std::string expectedOutput) {
-    return true; // TODO: DON'T DO THIS!!!
 
 #ifdef CCPP
     return executeCPP(args, expectedOutput);
@@ -94,125 +77,6 @@ bool Test::checkIfFileExists(string file) {
         f.close();
         return true;
     }
-}
-
-std::string Test::buildCase(std::string pattern, std::string body) {
-    shared_ptr<std::stringstream> source = make_shared<std::stringstream>();
-    *source << "| " << pattern << " = " << body << endl;
-    return source->str();
-}
-
-shared_ptr<std::stringstream> Test::buildSimple(std::string signature,
-                                                std::string pattern,
-                                                std::string body,
-                                                std::string args) {
-    shared_ptr<std::stringstream> source = make_shared<std::stringstream>();
-
-    int pos = signature.find_last_of("->");
-    string ret = "";
-
-    if (pos != -1) {
-        ret = signature.substr(pos+1, signature.length() - 1);
-    } else {
-        ret = signature;
-    }
-
-    *source
-    << "def main : [String]->" << ret << endl
-    << "| s = func(" << args << ")" << endl
-    << endl
-    << "def func : " << signature << endl
-    << "| " << pattern << " = " << body << endl;
-
-    int count = 0;
-    for (int pos = 0; pos < signature.length(); ++pos) {
-        if (signature[pos] == '-') {
-            pos++;
-            if (signature[pos] == '>') {
-                count++;
-            }
-        }
-    }
-
-    if (count > 0) {
-        *source << "| ";
-        for (int i = 0; i < count; ++i) {
-            *source << "arg" << i << " ";
-        }
-
-        *source << " = " << body << endl;
-    }
-
-    return source;
-}
-
-shared_ptr<std::stringstream> Test::buildFunc(std::string retType,
-                                              std::string func1Sig, std::string func1Pat, std::string func1Body, std::string func1Arg) {
-    shared_ptr<std::stringstream> source = make_shared<std::stringstream>();
-    *source
-    << "def main : [String]->" << retType << endl
-    << "| n = func1(" << func1Arg << ")" << endl
-    << endl
-    << "def func1 : " << func1Sig << endl
-    << buildCase(func1Pat, func1Body);
-    return source;
-}
-
-shared_ptr<std::stringstream> Test::buildFunc(std::string retType,
-                                              std::string func1Sig, std::string func1Pat, std::string func1Body, std::string func1Arg,
-                                              std::string func2Sig, std::string func2Pat, std::string func2Body) {
-    shared_ptr<std::stringstream> source = make_shared<std::stringstream>();
-    *source
-    << "def main : [String]->" << retType << endl
-    << "| n = func1(" << func1Arg << ")" << endl
-    << endl
-    << "def func1 : " << func1Sig << endl
-    << buildCase(func1Pat, func1Body)
-    << endl
-    << "def func2 : " << func2Sig << endl
-    << buildCase(func2Pat, func2Body);
-    return source;
-}
-
-shared_ptr<std::stringstream> Test::buildFunc(std::string retType,
-                                              std::string func1Sig, std::string func1Pat, std::string func1Body, std::string func1Arg,
-                                              std::string func2Sig, std::string func2Pat, std::string func2Body,
-                                              std::string func3Sig, std::string func3Pat, std::string func3Body) {
-    shared_ptr<std::stringstream> source = make_shared<std::stringstream>();
-    *source
-    << "def main : [String]->" << retType << endl
-    << "| n = func1(" << func1Arg << ")" << endl
-    << endl
-    << "def func1 : " << func1Sig << endl
-    << buildCase(func1Pat, func1Body)
-    << endl
-    << "def func2 : " << func2Sig << endl
-    << buildCase(func2Pat, func2Body)
-    << endl
-    << "def func3 : " << func3Sig << endl
-    << buildCase(func3Pat, func3Body);
-    return source;
-}
-
-shared_ptr<std::stringstream> Test::buildMultiCase(string signature,
-                                                   std::string ret,
-                                                   std::vector<string> pattern,
-                                                   std::string cas,
-                                                   std::string compArg) {
-    shared_ptr<std::stringstream> source = make_shared<std::stringstream>();
-
-    *source
-    << "def main : [String]->" << ret << endl
-    << "| n = func(" << compArg << ")" << endl
-                                          << endl
-
-    << "def func : " << signature << "->" << ret << endl;
-
-    for(auto p : pattern) {
-        *source << buildCase(p, cas);
-    }
-
-    return source;
 }
 
 bool Test::executeCPP(std::string args, std::string expectedOutput) {
@@ -280,5 +144,5 @@ bool Test::executeLLVM(std::string args, std::string expectedOutput) {
         CPPUNIT_ASSERT_MESSAGE("file out.ir not found", false);
     }
 
-
+    return false;
 }
