@@ -6,4 +6,4 @@ target_link_libraries(tests compiler ${CPPUNIT_LIBRARIES})
 target_include_directories(tests PUBLIC ${CPPUNIT_INCLUDE_DIRS})
 target_compile_options(tests PUBLIC ${CPPUNIT_CFLAGS_OTHER})
 
-add_custom_command(TARGET tests POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/tests/source/cppunit $<TARGET_FILE_DIR:tests>)
+add_custom_command(TARGET tests POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/tests/source/unittest $<TARGET_FILE_DIR:tests>)
