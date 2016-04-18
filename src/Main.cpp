@@ -91,7 +91,7 @@ int main(int argc, char *argv[])
     compiler.setOutput(output);
     compiler.setHeaderOutput(header_output);
     compiler.setInputs(inputs);
-    compiler.set_backend(backend);
+    compiler.setBackend(backend);
 
     return compiler.compile();
 }

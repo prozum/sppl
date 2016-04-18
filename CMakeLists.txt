@@ -7,6 +7,7 @@ set(CMAKE_CXX_COMPILER_FORCED TRUE)
 project(sppl)
 
 option(DEBUG "Debug mode" ON)
+option(STATIC "Compile with static libs" OFF)
 option(CCPP "C++ Compiler" OFF)
 option(CHASKELL "Haskell Compiler" OFF)
 option(CGNUASM "GNU Assembly Compiler" OFF)
@@ -17,14 +18,17 @@ option(JIT "LLVM JIT Compiler" OFF)
 option(TESTS "Tests" OFF)
 
 # Enable C++14 and use of static libraries
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -static")
-set(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "")
-set(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
+if(STATIC)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static")
+endif()
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
     message("Compiling with LLVM/Clang")
     # Fix compilation with Clang
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -fPIE")
+    set(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "")
+    set(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "")
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     message("Compiling with GNU/GCC")
 else()

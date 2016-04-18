@@ -35,7 +35,7 @@ bool Test::compileChecker(std::string name) {
         compiler.setHeaderOutput("test.h");     // TODO: Use better name when fixed
         compiler.setInputs(in);
 
-        compiler.set_backend(backend);
+        compiler.setBackend(backend);
         compStatus = compiler.compile();
     }
     catch (...) {

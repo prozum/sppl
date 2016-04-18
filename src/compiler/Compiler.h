@@ -46,14 +46,14 @@ namespace compiler {
     public:
         Compiler();
 
-        unique_ptr<CodeGenerator> generator;
-        semantics::ScopeGenerator scope_generator;
-        semantics::TypeChecker type_checker;
-        optimizer::GeneralOptimizer optimizer;
+        unique_ptr<CodeGenerator> CodeGen;
+        semantics::ScopeGenerator ScopeGen;
+        semantics::TypeChecker TypeChecker;
+        optimizer::GeneralOptimizer Optimizer;
 
         int compile();
 
-        void set_backend(Backend B);
+        void setBackend(Backend B);
     };
 
 }
