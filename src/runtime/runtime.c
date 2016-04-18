@@ -13,11 +13,11 @@ void add_task(task_t *task) {
 
 int check_subtasks_done(task_t *task) {
 
-    printf("checking subtasks\n");
+    //printf("checking subtasks\n");
 
     for (uint32_t i = 0; i < task->sub_task_len; ++i) {
 
-        if (task->state != DONE) {
+        if (task->sub_tasks[i]->state != DONE) {
             return 0;
         }
     }
@@ -25,7 +25,7 @@ int check_subtasks_done(task_t *task) {
     return 1;
 }
 
-void yield(task_t *task) {
+void yield_waiting(task_t *task) {
     task->state = WAITING;
 
     queue_head *head = malloc(sizeof(queue_head));
@@ -34,9 +34,11 @@ void yield(task_t *task) {
 
     task->context = malloc(sizeof(ucontext_t));
 
-    printf("entered yield - %lu\n", task->scheduler_id);
+    printf("scheduler id in yield: %lu\n", task->scheduler_id);
 
     swapcontext(task->context, runtime.scheduler_pool[task->scheduler_id].context);
+
+    //swapcontext(task->context, task->context);
 }
 
 //runtime entry point
@@ -81,22 +83,22 @@ void start_scheduler(void *sched_ptr) {
 
         curr = queue_get(runtime.queue);
 
-        printf("inside run_scheduler do-while\n");
-
         if (curr != NULL) {
 
             curr_task = (task_t *)(curr->item);
             curr_task->scheduler_id = scheduler->id;
+
+            //printf("sched id: %lu", curr_task->scheduler_id);
+
             set_active_worker(scheduler->id, WORKING);
-            if ((curr_task->state == WAITING) && check_subtasks_done(curr_task)) {
-                scheduler->curr_task = curr_task;
+            if (curr_task->state == WAITING && check_subtasks_done(curr_task)) {
+                //scheduler->curr_task = curr_task;
                 swapcontext(scheduler->context, curr_task->context);
             } else if (curr_task->state == NEW) {
-                printf("inside run_scheduler NEW\n");
-                scheduler->curr_task = curr_task;
-                scheduler->curr_task->state = ACTIVE;
-                curr_task->f(curr_task->args);
-                scheduler->curr_task->state = DONE;
+                //scheduler->curr_task = curr_task;
+                curr_task->state = ACTIVE;
+                curr_task->f(curr_task);
+                curr_task->state = DONE;
             } else {
                 queue_add(curr, runtime.queue);
             }
