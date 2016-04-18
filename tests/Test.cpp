@@ -24,19 +24,16 @@ void Test::tearDown() {
 
 bool Test::compileChecker(std::string name) {
     int compStatus;
-    std::ofstream out("out.c");
-    std::ofstream hout("test.h");
 
     try {
         compiler::Compiler compiler;
 
         std::vector<string> in;
         in.push_back(name);
-        compiler.out = &out;
-        compiler.hout = &hout;
 
-        compiler.set_inputs(in);
-        // compiler.parse_file(/*file*/);
+        compiler.setOutput("out.c");
+        compiler.setHeaderOutput("test.h");     // TODO: Use better name when fixed
+        compiler.setInputs(in);
 
         compiler.set_backend(backend);
         compStatus = compiler.compile();
@@ -45,9 +42,6 @@ bool Test::compileChecker(std::string name) {
         CPPUNIT_ASSERT_MESSAGE("Exception Thrown In Compiler", false);
         return false;
     }
-
-    out.close();
-    hout.close();
 
     if (compStatus != 0) {
         return false;
