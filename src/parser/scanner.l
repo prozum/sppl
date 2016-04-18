@@ -96,7 +96,7 @@ using namespace std;
 }
 
 "True"|"False" {
-    yylval->boolean = (string(yytext) == "True") ? true : false;
+    yylval->boolean = string(yytext) == "True";
     return token::BOOLLITERAL;
 }
 

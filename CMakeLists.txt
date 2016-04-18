@@ -21,8 +21,15 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -static")
 set(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "")
 set(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "")
 
-# Fix compilation with clang
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -fPIE")
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+    message("Compiling with LLVM/Clang")
+    # Fix compilation with Clang
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -fPIE")
+elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+    message("Compiling with GNU/GCC")
+else()
+    message("Compiling with ${CMAKE_CXX_COMPILER_ID}")
+endif()
 
 if(DEBUG)
     set(CMAKE_BUILD_TYPE Debug)
@@ -31,6 +38,7 @@ else()
     set(CMAKE_BUILD_TYPE Release)
 endif()
 
+# Set C/C++ defines from CMake options
 if (CCPP)
     add_definitions(-DCCPP)
 endif()
