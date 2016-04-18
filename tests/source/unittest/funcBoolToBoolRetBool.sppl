@@ -1,0 +1,8 @@
+def main : [String]->Bool
+| n = func1(func2)
+
+def func1 : (Bool->Bool)->Bool
+| f = f(True)
+
+def func2 : Bool->Bool
+| n = n

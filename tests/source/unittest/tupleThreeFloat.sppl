@@ -1,0 +1,5 @@
+def main : [String]->(Float,Float, Float)
+| s = func()
+
+def func : (Float,Float, Float)
+|  = (2.0,2.0,2.0)

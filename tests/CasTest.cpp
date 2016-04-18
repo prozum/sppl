@@ -1,178 +1,93 @@
 #include "Test.h"
 
 
-void Test::casCountOneInt() {
-    std::vector<std::string> pattern;
-    pattern.push_back("0");
-    pattern.push_back("n");
-    std::shared_ptr<std::stringstream> source = buildMultiCase("Int", "Int", pattern, "2", "1");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
-    if(compStatus == true) {
+void Test::casCountOneInt() { 
+    bool compStatus = compileChecker("casCountOneInt.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "2");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::casCountTwoInt() {
-    std::vector<std::string> pattern;
-    pattern.push_back("0");
-    pattern.push_back("1");
-    pattern.push_back("n");
-    std::shared_ptr<std::stringstream> source = buildMultiCase("Int", "Int", pattern, "2", "1");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
-    if(compStatus == true) {
+void Test::casCountTwoInt() { 
+    bool compStatus = compileChecker("casCountTwoInt.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "2");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::casCountThreeInt() {
-    std::vector<std::string> pattern;
-    pattern.push_back("0");
-    pattern.push_back("1");
-    pattern.push_back("2");
-    pattern.push_back("n");
-    std::shared_ptr<std::stringstream> source = buildMultiCase("Int", "Int", pattern, "2", "1");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
-    if(compStatus == true) {
+void Test::casCountThreeInt() { 
+    bool compStatus = compileChecker("casCountThreeInt.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "2");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::casCountFourInt() {
-    std::vector<std::string> pattern;
-    pattern.push_back("0");
-    pattern.push_back("1");
-    pattern.push_back("2");
-    pattern.push_back("3");
-    pattern.push_back("n");
-    std::shared_ptr<std::stringstream> source = buildMultiCase("Int", "Int", pattern, "2", "1");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
-    if(compStatus == true) {
+void Test::casCountFourInt() { 
+    bool compStatus = compileChecker("casCountFourInt.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "2");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::casCountFiveInt() {
-    std::vector<std::string> pattern;
-    pattern.push_back("0");
-    pattern.push_back("1");
-    pattern.push_back("2");
-    pattern.push_back("3");
-    pattern.push_back("4");
-    pattern.push_back("n");
-    std::shared_ptr<std::stringstream> source = buildMultiCase("Int", "Int", pattern, "2", "1");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
-    if(compStatus == true) {
+void Test::casCountFiveInt() { 
+    bool compStatus = compileChecker("casCountFiveInt.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "2");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::casCountSixInt() {
-    std::vector<std::string> pattern;
-    pattern.push_back("0");
-    pattern.push_back("1");
-    pattern.push_back("2");
-    pattern.push_back("3");
-    pattern.push_back("4");
-    pattern.push_back("5");
-    pattern.push_back("n");
-    std::shared_ptr<std::stringstream> source = buildMultiCase("Int", "Int", pattern, "2", "1");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
-    if(compStatus == true) {
+void Test::casCountSixInt() { 
+    bool compStatus = compileChecker("casCountSixInt.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "2");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::casCountSevenInt() {
-    std::vector<std::string> pattern;
-    pattern.push_back("0");
-    pattern.push_back("1");
-    pattern.push_back("2");
-    pattern.push_back("3");
-    pattern.push_back("4");
-    pattern.push_back("5");
-    pattern.push_back("6");
-    pattern.push_back("n");
-    std::shared_ptr<std::stringstream> source = buildMultiCase("Int", "Int", pattern, "2", "1");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
-    if(compStatus == true) {
+void Test::casCountSevenInt() { 
+    bool compStatus = compileChecker("casCountSevenInt.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "2");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::casCountEightInt() {
-    std::vector<std::string> pattern;
-    pattern.push_back("0");
-    pattern.push_back("1");
-    pattern.push_back("2");
-    pattern.push_back("3");
-    pattern.push_back("4");
-    pattern.push_back("5");
-    pattern.push_back("6");
-    pattern.push_back("7");
-    pattern.push_back("n");
-    std::shared_ptr<std::stringstream> source = buildMultiCase("Int", "Int", pattern, "2", "1");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
-    if(compStatus == true) {
+void Test::casCountEightInt() { 
+    bool compStatus = compileChecker("casCountEightInt.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "2");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::casCountNineInt() {
-    std::vector<std::string> pattern;
-    pattern.push_back("0");
-    pattern.push_back("1");
-    pattern.push_back("2");
-    pattern.push_back("3");
-    pattern.push_back("4");
-    pattern.push_back("5");
-    pattern.push_back("6");
-    pattern.push_back("7");
-    pattern.push_back("8");
-    pattern.push_back("n");
-    std::shared_ptr<std::stringstream> source = buildMultiCase("Int", "Int", pattern, "2", "1");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
-    if(compStatus == true) {
+void Test::casCountNineInt() { 
+    bool compStatus = compileChecker("casCountNineInt.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "2");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::casCountTenInt() {
-    std::vector<std::string> pattern;
-    pattern.push_back("0");
-    pattern.push_back("1");
-    pattern.push_back("2");
-    pattern.push_back("3");
-    pattern.push_back("4");
-    pattern.push_back("5");
-    pattern.push_back("6");
-    pattern.push_back("7");
-    pattern.push_back("8");
-    pattern.push_back("9");
-    pattern.push_back("n");
-    std::shared_ptr<std::stringstream> source = buildMultiCase("Int", "Int", pattern, "2", "1");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
-    if(compStatus == true) {
+void Test::casCountTenInt() { 
+    bool compStatus = compileChecker("casCountTenInt.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "2");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 

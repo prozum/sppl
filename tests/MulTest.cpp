@@ -2,202 +2,182 @@
 
 
 void Test::mulIntPosPos() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Int", "","2*2", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
+    bool compStatus = compileChecker("mulIntPosPos.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "4");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
 void Test::mulIntZeroZero() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Int", "","0*0", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
+    bool compStatus = compileChecker("mulIntZeroZero.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "0");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
 void Test::mulIntPosNeg() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Int", "","2*-2", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
+    bool compStatus = compileChecker("mulIntPosNeg.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "-4");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
 void Test::mulIntNegPos() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Int", "","-2*2", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
+    bool compStatus = compileChecker("mulIntNegPos.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "-4");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
 void Test::mulIntNegNeg() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Int", "","-2*-2", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
+    bool compStatus = compileChecker("mulIntNegNeg.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "4");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
 void Test::mulFloatPosPos() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Float", "","2.0*2.0", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
+    bool compStatus = compileChecker("mulFloatPosPos.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "4.000000");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
 void Test::mulFloatZeroZero() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Float", "","0.0*0.0", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
+    bool compStatus = compileChecker("mulFloatZeroZero.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "0.000000");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
 void Test::mulFloatPosNeg() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Float", "","2.0*-2.0", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
+    bool compStatus = compileChecker("mulFloatPosNeg.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "-4.000000");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
 void Test::mulFloatNegPos() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Float", "","-2.0*2.0", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
+    bool compStatus = compileChecker("mulFloatNegPos.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "-4.000000");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
 void Test::mulFloatNegNeg() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Float", "","-2.0*-2.0", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
+    bool compStatus = compileChecker("mulFloatNegNeg.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "4.000000");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
 void Test::mulBoolTrueTrue() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","True*True", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
+    bool compStatus = compileChecker("mulBoolTrueTrue.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
 void Test::mulBoolTrueFalse() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","True*False", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
+    bool compStatus = compileChecker("mulBoolTrueFalse.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
 void Test::mulBoolFalseTrue() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","False*True", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
+    bool compStatus = compileChecker("mulBoolFalseTrue.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
 void Test::mulBoolFalseFalse() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","False*False", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
+    bool compStatus = compileChecker("mulBoolFalseFalse.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
 void Test::mulCharStrStr() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("String", "","\"string\"*\"string\"", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
+    bool compStatus = compileChecker("mulCharStrStr.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
 void Test::mulCharStrCha() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("String", "","\"string\"*'c'", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
+    bool compStatus = compileChecker("mulCharStrCha.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
 void Test::mulCharChaStr() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Char", "","'c'*\"string\"", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
+    bool compStatus = compileChecker("mulCharChaStr.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
 void Test::mulCharChaCha() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Char", "","'c'*'c'", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
+    bool compStatus = compileChecker("mulCharChaCha.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
 void Test::mulMixFloatInt() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Float", "","2-0*2", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
+    bool compStatus = compileChecker("mulMixFloatInt.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
 void Test::mulMixIntFloat() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Int", "","2*2.0", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
+    bool compStatus = compileChecker("mulMixIntFloat.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 

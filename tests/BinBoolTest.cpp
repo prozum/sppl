@@ -2,322 +2,290 @@
 
 
 void Test::binEqualTrueTrue() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","True==True", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
+    bool compStatus = compileChecker("binEqualTrueTrue.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "True");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
 void Test::binEqualTrueFalse() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","True==False", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
+    bool compStatus = compileChecker("binEqualTrueFalse.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "False");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
 void Test::binEqualFalseTrue() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","False==True", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
+    bool compStatus = compileChecker("binEqualFalseTrue.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "False");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
 void Test::binEqualFalseFalse() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","False==False", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
+    bool compStatus = compileChecker("binEqualFalseFalse.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "True");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
 void Test::binNotEqualTrueTrue() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","True!=True", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
+    bool compStatus = compileChecker("binNotEqualTrueTrue.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "False");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
 void Test::binNotEqualTrueFalse() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","True!=False", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
+    bool compStatus = compileChecker("binNotEqualTrueFalse.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "True");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
 void Test::binNotEqualFalseTrue() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","False!=True", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
+    bool compStatus = compileChecker("binNotEqualFalseTrue.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "True");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
 void Test::binNotEqualFalseFalse() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","False!=False", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
+    bool compStatus = compileChecker("binNotEqualFalseFalse.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "False");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
 void Test::binAndTrueTrue() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","True&&True", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
+    bool compStatus = compileChecker("binAndTrueTrue.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "True");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
 void Test::binAndTrueFalse() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","True&&False", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
+    bool compStatus = compileChecker("binAndTrueFalse.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "False");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
 void Test::binAndFalseTrue() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","False&&True", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
+    bool compStatus = compileChecker("binAndFalseTrue.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "False");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
 void Test::binAndFalseFalse() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","False&&False", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
+    bool compStatus = compileChecker("binAndFalseFalse.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "False");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
 void Test::binOrTrueTrue() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","True||True", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
+    bool compStatus = compileChecker("binOrTrueTrue.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "True");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
 void Test::binOrTrueFalse() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","True||False", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
+    bool compStatus = compileChecker("binOrTrueFalse.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "True");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
 void Test::binOrFalseTrue() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","False||True", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
+    bool compStatus = compileChecker("binOrFalseTrue.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "True");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
 void Test::binOrFalseFalse() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","False||False", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
+    bool compStatus = compileChecker("binOrFalseFalse.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "False");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
 void Test::binGrEqTrueTrue() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","True>=True", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
+    bool compStatus = compileChecker("binGrEqTrueTrue.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
 void Test::binGrEqTrueFalse() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","True>=False", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
+    bool compStatus = compileChecker("binGrEqTrueFalse.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
 void Test::binGrEqFalseTrue() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","False>=True", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
+    bool compStatus = compileChecker("binGrEqFalseTrue.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
 void Test::binGrEqFalseFalse() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","False>=False", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
+    bool compStatus = compileChecker("binGrEqFalseFalse.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
 void Test::binLeEqTrueTrue() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","True<=True", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
+    bool compStatus = compileChecker("binLeEqTrueTrue.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
 void Test::binLeEqTrueFalse() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","True<=False", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
+    bool compStatus = compileChecker("binLeEqTrueFalse.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
 void Test::binLeEqFalseTrue() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","False<=True", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
+    bool compStatus = compileChecker("binLeEqFalseTrue.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
 void Test::binLeEqFalseFalse() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","False<=False", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
+    bool compStatus = compileChecker("binLeEqFalseFalse.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
 void Test::binGreatTrueTrue() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","True>True", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
+    bool compStatus = compileChecker("binGreatTrueTrue.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
 void Test::binGreatTrueFalse() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","True>False", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
+    bool compStatus = compileChecker("binGreatTrueFalse.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
 void Test::binGreatFalseTrue() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","False>True", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
+    bool compStatus = compileChecker("binGreatFalseTrue.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
 void Test::binGreatFalseFalse() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","False>False", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
+    bool compStatus = compileChecker("binGreatFalseFalse.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
 void Test::binLessTrueTrue() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","True<True", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
+    bool compStatus = compileChecker("binLessTrueTrue.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
 void Test::binLessTrueFalse() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","True<False", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
+    bool compStatus = compileChecker("binLessTrueFalse.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
 void Test::binLessFalseTrue() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","False<True", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
+    bool compStatus = compileChecker("binLessFalseTrue.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
 void Test::binLessFalseFalse() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","False<False", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
+    bool compStatus = compileChecker("binLessFalseFalse.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 

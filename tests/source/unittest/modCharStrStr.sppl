@@ -1,0 +1,5 @@
+def main : [String]->String
+| s = func()
+
+def func : String
+|  = "string"%"string"

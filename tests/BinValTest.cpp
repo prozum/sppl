@@ -2,162 +2,146 @@
 
 
 void Test::binEqualIntInt() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","2==2", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
+    bool compStatus = compileChecker("binEqualIntInt.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "True");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
 void Test::binNotEqualIntInt() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","2!=2", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
+    bool compStatus = compileChecker("binNotEqualIntInt.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "False");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
 void Test::binAndIntInt() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","2&&2", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
+    bool compStatus = compileChecker("binAndIntInt.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
 void Test::binOrIntInt() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","2||2", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
+    bool compStatus = compileChecker("binOrIntInt.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
 void Test::binGrEqIntInt() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","2>=2", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
+    bool compStatus = compileChecker("binGrEqIntInt.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "True");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
 void Test::binLeEqIntInt() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","2<=2", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
+    bool compStatus = compileChecker("binLeEqIntInt.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "True");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
 void Test::binGreatIntInt() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","2>2", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
+    bool compStatus = compileChecker("binGreatIntInt.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "False");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
 void Test::binLessIntInt() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","2<2", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
+    bool compStatus = compileChecker("binLessIntInt.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "False");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
 void Test::binEqualFloatFloat() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","2.0==2.0", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
+    bool compStatus = compileChecker("binEqualFloatFloat.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "True");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
 void Test::binNotEqualFloatFloat() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","2.0!=2.0", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
+    bool compStatus = compileChecker("binNotEqualFloatFloat.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "False");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
 void Test::binAndFloatFloat() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","2.0&&2.0", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
+    bool compStatus = compileChecker("binAndFloatFloat.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
 void Test::binOrFloatFloat() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","2.0||2.0", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
+    bool compStatus = compileChecker("binOrFloatFloat.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
 void Test::binGrEqFloatFloat() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","2.0>=2.0", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
+    bool compStatus = compileChecker("binGrEqFloatFloat.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "True");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
 void Test::binLeEqFloatFloat() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","2.0<=2.0", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
+    bool compStatus = compileChecker("binLeEqFloatFloat.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "True");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
 void Test::binGreatFloatFloat() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","2.0>2.0", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
+    bool compStatus = compileChecker("binGreatFloatFloat.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "False");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
 void Test::binLessFloatFloat() { 
-    std::shared_ptr<std::stringstream> source = buildSimple("Bool", "","2.0<2.0", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
+    bool compStatus = compileChecker("binLessFloatFloat.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "False");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 

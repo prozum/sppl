@@ -1,463 +1,417 @@
 #include "Test.h"
 
 
-void Test::listCasEmpty() {
-    std::shared_ptr<std::stringstream> source = buildSimple("[Int]->Int", "[]", "2", "[]");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
-    if(compStatus) {
+void Test::listCasEmpty() { 
+    bool compStatus = compileChecker("listCasEmpty.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "2");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::listAppendEmpty() {
-    std::shared_ptr<std::stringstream> source = buildSimple("[Int]", "", "1:[]", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
-    if(compStatus) {
+void Test::listAppendEmpty() { 
+    bool compStatus = compileChecker("listAppendEmpty.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "[1]");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::listInt() {
-    std::shared_ptr<std::stringstream> source = buildSimple("[Int]", "", "[2]", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
-    if(compStatus) {
+void Test::listInt() { 
+    bool compStatus = compileChecker("listInt.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "[2]");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::listFloat() {
-    std::shared_ptr<std::stringstream> source = buildSimple("[Float]", "", "[2.0]", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
-    if(compStatus) {
+void Test::listFloat() { 
+    bool compStatus = compileChecker("listFloat.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "[2.000000]");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::listBool() {
-    std::shared_ptr<std::stringstream> source = buildSimple("[Bool]", "", "[True]", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
-    if(compStatus) {
+void Test::listBool() { 
+    bool compStatus = compileChecker("listBool.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "[True]");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::listChar() {
-    std::shared_ptr<std::stringstream> source = buildSimple("[Char]", "", "['c']", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
-    if(compStatus) {
+void Test::listChar() { 
+    bool compStatus = compileChecker("listChar.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "['c']");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::listString() {
-    std::shared_ptr<std::stringstream> source = buildSimple("[String]", "", "[\"string\"]", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
-    if(compStatus) {
+void Test::listString() { 
+    bool compStatus = compileChecker("listString.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "[\"string\"]");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::listListInt() {
-    std::shared_ptr<std::stringstream> source = buildSimple("[[Int]]", "", "[[2]]", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
-    if(compStatus) {
+void Test::listListInt() { 
+    bool compStatus = compileChecker("listListInt.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "[[2]]");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::listListFloat() {
-    std::shared_ptr<std::stringstream> source = buildSimple("[[Float]]", "", "[[2.0]]", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
-    if(compStatus) {
+void Test::listListFloat() { 
+    bool compStatus = compileChecker("listListFloat.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "[[2.000000]]");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::listListBool() {
-    std::shared_ptr<std::stringstream> source = buildSimple("[[Bool]]", "", "[[True]]", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
-    if(compStatus) {
+void Test::listListBool() { 
+    bool compStatus = compileChecker("listListBool.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "[[True]]");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::listListChar() {
-    std::shared_ptr<std::stringstream> source = buildSimple("[[Char]]", "", "[['c']]", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
-    if(compStatus) {
+void Test::listListChar() { 
+    bool compStatus = compileChecker("listListChar.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "[['c']]");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::listListString() {
-    std::shared_ptr<std::stringstream> source = buildSimple("[[String]]", "", "[[\"string\"]]", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
-    if(compStatus) {
+void Test::listListString() { 
+    bool compStatus = compileChecker("listListString.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "[[\"string\"]]");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::listListListInt() {
-    std::shared_ptr<std::stringstream> source = buildSimple("[[[Int]]]", "", "[[[2]]]", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
-    if(compStatus) {
+void Test::listListListInt() { 
+    bool compStatus = compileChecker("listListListInt.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "[[[2]]]");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::listAppendInt() {
-    std::shared_ptr<std::stringstream> source = buildSimple("[Int]", "", "1:[2,3]", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
-    if(compStatus) {
+void Test::listAppendInt() { 
+    bool compStatus = compileChecker("listAppendInt.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "[1, 2, 3]");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::listAppendFloat() {
-    std::shared_ptr<std::stringstream> source = buildSimple("[Float]", "", "1.0:[2.0,3.0]", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
-    if(compStatus) {
+void Test::listAppendFloat() { 
+    bool compStatus = compileChecker("listAppendFloat.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "[1.000000, 2.000000, 3.000000]");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::listAppendBool() {
-    std::shared_ptr<std::stringstream> source = buildSimple("[Bool]", "", "True:[False,True]", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
-    if(compStatus) {
+void Test::listAppendBool() { 
+    bool compStatus = compileChecker("listAppendBool.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "[True, False, True]");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::listAppendChar() {
-    std::shared_ptr<std::stringstream> source = buildSimple("[Char]", "", "'c':['h','a','r']", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
-    if(compStatus) {
+void Test::listAppendChar() { 
+    bool compStatus = compileChecker("listAppendChar.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "['c', 'h', 'a', 'r']");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::listAppendString() {
-    std::shared_ptr<std::stringstream> source = buildSimple("[String]", "", "\"string\":[\"string\",\"string\"]", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
-    if(compStatus) {
+void Test::listAppendString() { 
+    bool compStatus = compileChecker("listAppendString.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "[\"string\", \"string\", \"string\"]");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::listLongInt() {
-    std::shared_ptr<std::stringstream> source = buildSimple("[Int]", "", "[0,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0]", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
-    if(compStatus) {
+void Test::listLongInt() { 
+    bool compStatus = compileChecker("listLongInt.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0]");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::listFloatInInt() {
-    std::shared_ptr<std::stringstream> source = buildSimple("[Int]", "", "[2.0]", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
-    if(compStatus) {
+void Test::listFloatInInt() { 
+    bool compStatus = compileChecker("listFloatInInt.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::listBoolInInt() {
-    std::shared_ptr<std::stringstream> source = buildSimple("[Int]", "", "[True]", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
-    if(compStatus) {
+void Test::listBoolInInt() { 
+    bool compStatus = compileChecker("listBoolInInt.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::listCharInInt() {
-    std::shared_ptr<std::stringstream> source = buildSimple("[Int]", "", "['c']", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
-    if(compStatus) {
+void Test::listCharInInt() { 
+    bool compStatus = compileChecker("listCharInInt.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::listStringInInt() {
-    std::shared_ptr<std::stringstream> source = buildSimple("[Int]", "", "[\"string\"]", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
-    if(compStatus) {
+void Test::listStringInInt() { 
+    bool compStatus = compileChecker("listStringInInt.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::listIntInFloat() {
-    std::shared_ptr<std::stringstream> source = buildSimple("[Float]", "", "[2]", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
-    if(compStatus) {
+void Test::listIntInFloat() { 
+    bool compStatus = compileChecker("listIntInFloat.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::listBoolInFloat() {
-    std::shared_ptr<std::stringstream> source = buildSimple("[Float]", "", "[True]", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
-    if(compStatus) {
+void Test::listBoolInFloat() { 
+    bool compStatus = compileChecker("listBoolInFloat.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::listCharInFloat() {
-    std::shared_ptr<std::stringstream> source = buildSimple("[Float]", "", "['c']", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
-    if(compStatus) {
+void Test::listCharInFloat() { 
+    bool compStatus = compileChecker("listCharInFloat.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::listStringInFloat() {
-    std::shared_ptr<std::stringstream> source = buildSimple("[Float]", "", "[\"string\"]", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
-    if(compStatus) {
+void Test::listStringInFloat() { 
+    bool compStatus = compileChecker("listStringInFloat.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::listIntInBool() {
-    std::shared_ptr<std::stringstream> source = buildSimple("[Bool]", "", "[2]", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
-    if(compStatus) {
+void Test::listIntInBool() { 
+    bool compStatus = compileChecker("listIntInBool.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::listFloatInBool() {
-    std::shared_ptr<std::stringstream> source = buildSimple("[Bool]", "", "[2.0]", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
-    if(compStatus) {
+void Test::listFloatInBool() { 
+    bool compStatus = compileChecker("listFloatInBool.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::listCharInBool() {
-    std::shared_ptr<std::stringstream> source = buildSimple("[Bool]", "", "['c']", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
-    if(compStatus) {
+void Test::listCharInBool() { 
+    bool compStatus = compileChecker("listCharInBool.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::listStringInBool() {
-    std::shared_ptr<std::stringstream> source = buildSimple("[Bool]", "", "[\"string\"]", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
-    if(compStatus) {
+void Test::listStringInBool() { 
+    bool compStatus = compileChecker("listStringInBool.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::listIntInChar() {
-    std::shared_ptr<std::stringstream> source = buildSimple("[Char]", "", "[2]", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
-    if(compStatus) {
+void Test::listIntInChar() { 
+    bool compStatus = compileChecker("listIntInChar.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::listFloatInChar() {
-    std::shared_ptr<std::stringstream> source = buildSimple("[Char]", "", "[2.0]", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
-    if(compStatus) {
+void Test::listFloatInChar() { 
+    bool compStatus = compileChecker("listFloatInChar.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::listBoolInChar() {
-    std::shared_ptr<std::stringstream> source = buildSimple("[Char]", "", "[True]", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
-    if(compStatus) {
+void Test::listBoolInChar() { 
+    bool compStatus = compileChecker("listBoolInChar.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::listStringInChar() {
-    std::shared_ptr<std::stringstream> source = buildSimple("[Char]", "", "[\"True\"]", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
-    if(compStatus) {
+void Test::listStringInChar() { 
+    bool compStatus = compileChecker("listStringInChar.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::listIntInString() {
-    std::shared_ptr<std::stringstream> source = buildSimple("[String]", "", "[2]", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
-    if(compStatus) {
+void Test::listIntInString() { 
+    bool compStatus = compileChecker("listIntInString.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::listFloatInString() {
-    std::shared_ptr<std::stringstream> source = buildSimple("[String]", "", "[2.0]", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
-    if(compStatus) {
+void Test::listFloatInString() { 
+    bool compStatus = compileChecker("listFloatInString.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::listBoolInString() {
-    std::shared_ptr<std::stringstream> source = buildSimple("[String]", "", "[True]", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
-    if(compStatus) {
+void Test::listBoolInString() { 
+    bool compStatus = compileChecker("listBoolInString.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::listCharInString() {
-    std::shared_ptr<std::stringstream> source = buildSimple("[String]", "", "['c']", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
-    if(compStatus) {
+void Test::listCharInString() { 
+    bool compStatus = compileChecker("listCharInString.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::listMixTypes() {
-    std::shared_ptr<std::stringstream> source = buildSimple("[Int]", "", "[2,2.0,False,'c',\"string\"]", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == false);
-    if(compStatus) {
+void Test::listMixTypes() { 
+    bool compStatus = compileChecker("listMixTypes.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::listNestedDifLengthInt() {
-    std::shared_ptr<std::stringstream> source = buildSimple("[[Int]]", "", "[[1,2,3],[1,2,3,4,5,6,7,8,9,0]]", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
-    if(compStatus) {
+void Test::listNestedDifLengthInt() { 
+    bool compStatus = compileChecker("listNestedDifLengthInt.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "[[1, 2, 3], [1, 2, 3, 4, 5, 6, 7, 8, 9, 0]]");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::listTupleInt() {
-    std::shared_ptr<std::stringstream> source = buildSimple("[(Int, Int)]", "", "[(1,2),(3,4),(5,6)]", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
-    if(compStatus) {
+void Test::listTupleInt() { 
+    bool compStatus = compileChecker("listTupleInt.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "[(1, 2), (3, 4), (5, 6)]");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::listTupleFloat() {
-    std::shared_ptr<std::stringstream> source = buildSimple("[(Float, Float)]", "", "[(1.0,2.0),(3.0,4.0),(5.0,6.0)]", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
-    if(compStatus) {
+void Test::listTupleFloat() { 
+    bool compStatus = compileChecker("listTupleFloat.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "[(1.000000, 2.000000), (3.000000, 4.000000), (5.000000, 6.000000)]");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::listTupleBool() {
-    std::shared_ptr<std::stringstream> source = buildSimple("[(Bool, Bool)]", "", "[(True,False),(False,True),(False,False)]", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
-    if(compStatus) {
+void Test::listTupleBool() { 
+    bool compStatus = compileChecker("listTupleBool.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "[(True, False), (False, True), (False, False)]");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::listTupleChar() {
-    std::shared_ptr<std::stringstream> source = buildSimple("[(Char, Char)]", "", "[('c','h'),('a','r'),('c','h')]", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
-    if(compStatus) {
+void Test::listTupleChar() { 
+    bool compStatus = compileChecker("listTupleChar.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "[('c', 'h'), ('a', 'r'), ('c', 'h')]");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 
-void Test::listTupleString() {
-    std::shared_ptr<std::stringstream> source = buildSimple("[(String, String)]", "", "[(\"string\",\"string\"),(\"string\",\"string\"),(\"string\",\"string\")]", "");
-    bool compStatus = compileChecker(source);
-    CPPUNIT_ASSERT_MESSAGE("Compilation failed", compStatus == true);
-    if(compStatus) {
+void Test::listTupleString() { 
+    bool compStatus = compileChecker("listTupleString.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
+    if (compStatus == true) {
         bool execStatus = executeChecker("", "[(\"string\", \"string\"), (\"string\", \"string\"), (\"string\", \"string\")]");
-        CPPUNIT_ASSERT_MESSAGE("Execution failed", execStatus);
+        CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
     }
 }
 

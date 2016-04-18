@@ -1,0 +1,6 @@
+def main : [String]->Int
+| n = func(1)
+
+def func : Int->Int
+| 0 = 2
+| n = 2

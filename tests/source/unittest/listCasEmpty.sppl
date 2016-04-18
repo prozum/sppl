@@ -1,0 +1,6 @@
+def main : [String]->Int
+| s = func([])
+
+def func : [Int]->Int
+| [] = 2
+| arg0  = 2
