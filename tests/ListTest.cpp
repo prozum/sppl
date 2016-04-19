@@ -2,7 +2,7 @@
 
 
 void Test::listCasEmpty() { 
-    bool compStatus = compileChecker("listCasEmpty.sppl");
+    bool compStatus = compileChecker("list/listCasEmpty.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "2");
@@ -11,7 +11,7 @@ void Test::listCasEmpty() {
 }
 
 void Test::listAppendEmpty() { 
-    bool compStatus = compileChecker("listAppendEmpty.sppl");
+    bool compStatus = compileChecker("list/listAppendEmpty.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "[1]");
@@ -20,7 +20,7 @@ void Test::listAppendEmpty() {
 }
 
 void Test::listInt() { 
-    bool compStatus = compileChecker("listInt.sppl");
+    bool compStatus = compileChecker("list/listInt.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "[2]");
@@ -29,7 +29,7 @@ void Test::listInt() {
 }
 
 void Test::listFloat() { 
-    bool compStatus = compileChecker("listFloat.sppl");
+    bool compStatus = compileChecker("list/listFloat.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "[2.000000]");
@@ -38,7 +38,7 @@ void Test::listFloat() {
 }
 
 void Test::listBool() { 
-    bool compStatus = compileChecker("listBool.sppl");
+    bool compStatus = compileChecker("list/listBool.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "[True]");
@@ -47,7 +47,7 @@ void Test::listBool() {
 }
 
 void Test::listChar() { 
-    bool compStatus = compileChecker("listChar.sppl");
+    bool compStatus = compileChecker("list/listChar.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "['c']");
@@ -56,7 +56,7 @@ void Test::listChar() {
 }
 
 void Test::listString() { 
-    bool compStatus = compileChecker("listString.sppl");
+    bool compStatus = compileChecker("list/listString.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "[\"string\"]");
@@ -65,7 +65,7 @@ void Test::listString() {
 }
 
 void Test::listListInt() { 
-    bool compStatus = compileChecker("listListInt.sppl");
+    bool compStatus = compileChecker("list/listListInt.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "[[2]]");
@@ -74,7 +74,7 @@ void Test::listListInt() {
 }
 
 void Test::listListFloat() { 
-    bool compStatus = compileChecker("listListFloat.sppl");
+    bool compStatus = compileChecker("list/listListFloat.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "[[2.000000]]");
@@ -83,7 +83,7 @@ void Test::listListFloat() {
 }
 
 void Test::listListBool() { 
-    bool compStatus = compileChecker("listListBool.sppl");
+    bool compStatus = compileChecker("list/listListBool.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "[[True]]");
@@ -92,7 +92,7 @@ void Test::listListBool() {
 }
 
 void Test::listListChar() { 
-    bool compStatus = compileChecker("listListChar.sppl");
+    bool compStatus = compileChecker("list/listListChar.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "[['c']]");
@@ -101,7 +101,7 @@ void Test::listListChar() {
 }
 
 void Test::listListString() { 
-    bool compStatus = compileChecker("listListString.sppl");
+    bool compStatus = compileChecker("list/listListString.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "[[\"string\"]]");
@@ -110,7 +110,7 @@ void Test::listListString() {
 }
 
 void Test::listListListInt() { 
-    bool compStatus = compileChecker("listListListInt.sppl");
+    bool compStatus = compileChecker("list/listListListInt.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "[[[2]]]");
@@ -119,7 +119,7 @@ void Test::listListListInt() {
 }
 
 void Test::listAppendInt() { 
-    bool compStatus = compileChecker("listAppendInt.sppl");
+    bool compStatus = compileChecker("list/listAppendInt.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "[1, 2, 3]");
@@ -128,7 +128,7 @@ void Test::listAppendInt() {
 }
 
 void Test::listAppendFloat() { 
-    bool compStatus = compileChecker("listAppendFloat.sppl");
+    bool compStatus = compileChecker("list/listAppendFloat.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "[1.000000, 2.000000, 3.000000]");
@@ -137,7 +137,7 @@ void Test::listAppendFloat() {
 }
 
 void Test::listAppendBool() { 
-    bool compStatus = compileChecker("listAppendBool.sppl");
+    bool compStatus = compileChecker("list/listAppendBool.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "[True, False, True]");
@@ -146,7 +146,7 @@ void Test::listAppendBool() {
 }
 
 void Test::listAppendChar() { 
-    bool compStatus = compileChecker("listAppendChar.sppl");
+    bool compStatus = compileChecker("list/listAppendChar.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "['c', 'h', 'a', 'r']");
@@ -155,7 +155,7 @@ void Test::listAppendChar() {
 }
 
 void Test::listAppendString() { 
-    bool compStatus = compileChecker("listAppendString.sppl");
+    bool compStatus = compileChecker("list/listAppendString.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "[\"string\", \"string\", \"string\"]");
@@ -164,7 +164,7 @@ void Test::listAppendString() {
 }
 
 void Test::listLongInt() { 
-    bool compStatus = compileChecker("listLongInt.sppl");
+    bool compStatus = compileChecker("list/listLongInt.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0]");
@@ -173,7 +173,7 @@ void Test::listLongInt() {
 }
 
 void Test::listFloatInInt() { 
-    bool compStatus = compileChecker("listFloatInInt.sppl");
+    bool compStatus = compileChecker("list/listFloatInInt.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -182,7 +182,7 @@ void Test::listFloatInInt() {
 }
 
 void Test::listBoolInInt() { 
-    bool compStatus = compileChecker("listBoolInInt.sppl");
+    bool compStatus = compileChecker("list/listBoolInInt.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -191,7 +191,7 @@ void Test::listBoolInInt() {
 }
 
 void Test::listCharInInt() { 
-    bool compStatus = compileChecker("listCharInInt.sppl");
+    bool compStatus = compileChecker("list/listCharInInt.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -200,7 +200,7 @@ void Test::listCharInInt() {
 }
 
 void Test::listStringInInt() { 
-    bool compStatus = compileChecker("listStringInInt.sppl");
+    bool compStatus = compileChecker("list/listStringInInt.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -209,7 +209,7 @@ void Test::listStringInInt() {
 }
 
 void Test::listIntInFloat() { 
-    bool compStatus = compileChecker("listIntInFloat.sppl");
+    bool compStatus = compileChecker("list/listIntInFloat.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -218,7 +218,7 @@ void Test::listIntInFloat() {
 }
 
 void Test::listBoolInFloat() { 
-    bool compStatus = compileChecker("listBoolInFloat.sppl");
+    bool compStatus = compileChecker("list/listBoolInFloat.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -227,7 +227,7 @@ void Test::listBoolInFloat() {
 }
 
 void Test::listCharInFloat() { 
-    bool compStatus = compileChecker("listCharInFloat.sppl");
+    bool compStatus = compileChecker("list/listCharInFloat.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -236,7 +236,7 @@ void Test::listCharInFloat() {
 }
 
 void Test::listStringInFloat() { 
-    bool compStatus = compileChecker("listStringInFloat.sppl");
+    bool compStatus = compileChecker("list/listStringInFloat.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -245,7 +245,7 @@ void Test::listStringInFloat() {
 }
 
 void Test::listIntInBool() { 
-    bool compStatus = compileChecker("listIntInBool.sppl");
+    bool compStatus = compileChecker("list/listIntInBool.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -254,7 +254,7 @@ void Test::listIntInBool() {
 }
 
 void Test::listFloatInBool() { 
-    bool compStatus = compileChecker("listFloatInBool.sppl");
+    bool compStatus = compileChecker("list/listFloatInBool.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -263,7 +263,7 @@ void Test::listFloatInBool() {
 }
 
 void Test::listCharInBool() { 
-    bool compStatus = compileChecker("listCharInBool.sppl");
+    bool compStatus = compileChecker("list/listCharInBool.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -272,7 +272,7 @@ void Test::listCharInBool() {
 }
 
 void Test::listStringInBool() { 
-    bool compStatus = compileChecker("listStringInBool.sppl");
+    bool compStatus = compileChecker("list/listStringInBool.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -281,7 +281,7 @@ void Test::listStringInBool() {
 }
 
 void Test::listIntInChar() { 
-    bool compStatus = compileChecker("listIntInChar.sppl");
+    bool compStatus = compileChecker("list/listIntInChar.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -290,7 +290,7 @@ void Test::listIntInChar() {
 }
 
 void Test::listFloatInChar() { 
-    bool compStatus = compileChecker("listFloatInChar.sppl");
+    bool compStatus = compileChecker("list/listFloatInChar.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -299,7 +299,7 @@ void Test::listFloatInChar() {
 }
 
 void Test::listBoolInChar() { 
-    bool compStatus = compileChecker("listBoolInChar.sppl");
+    bool compStatus = compileChecker("list/listBoolInChar.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -308,7 +308,7 @@ void Test::listBoolInChar() {
 }
 
 void Test::listStringInChar() { 
-    bool compStatus = compileChecker("listStringInChar.sppl");
+    bool compStatus = compileChecker("list/listStringInChar.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -317,7 +317,7 @@ void Test::listStringInChar() {
 }
 
 void Test::listIntInString() { 
-    bool compStatus = compileChecker("listIntInString.sppl");
+    bool compStatus = compileChecker("list/listIntInString.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -326,7 +326,7 @@ void Test::listIntInString() {
 }
 
 void Test::listFloatInString() { 
-    bool compStatus = compileChecker("listFloatInString.sppl");
+    bool compStatus = compileChecker("list/listFloatInString.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -335,7 +335,7 @@ void Test::listFloatInString() {
 }
 
 void Test::listBoolInString() { 
-    bool compStatus = compileChecker("listBoolInString.sppl");
+    bool compStatus = compileChecker("list/listBoolInString.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -344,7 +344,7 @@ void Test::listBoolInString() {
 }
 
 void Test::listCharInString() { 
-    bool compStatus = compileChecker("listCharInString.sppl");
+    bool compStatus = compileChecker("list/listCharInString.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -353,7 +353,7 @@ void Test::listCharInString() {
 }
 
 void Test::listMixTypes() { 
-    bool compStatus = compileChecker("listMixTypes.sppl");
+    bool compStatus = compileChecker("list/listMixTypes.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -362,7 +362,7 @@ void Test::listMixTypes() {
 }
 
 void Test::listNestedDifLengthInt() { 
-    bool compStatus = compileChecker("listNestedDifLengthInt.sppl");
+    bool compStatus = compileChecker("list/listNestedDifLengthInt.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "[[1, 2, 3], [1, 2, 3, 4, 5, 6, 7, 8, 9, 0]]");
@@ -371,7 +371,7 @@ void Test::listNestedDifLengthInt() {
 }
 
 void Test::listTupleInt() { 
-    bool compStatus = compileChecker("listTupleInt.sppl");
+    bool compStatus = compileChecker("list/listTupleInt.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "[(1, 2), (3, 4), (5, 6)]");
@@ -380,7 +380,7 @@ void Test::listTupleInt() {
 }
 
 void Test::listTupleFloat() { 
-    bool compStatus = compileChecker("listTupleFloat.sppl");
+    bool compStatus = compileChecker("list/listTupleFloat.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "[(1.000000, 2.000000), (3.000000, 4.000000), (5.000000, 6.000000)]");
@@ -389,7 +389,7 @@ void Test::listTupleFloat() {
 }
 
 void Test::listTupleBool() { 
-    bool compStatus = compileChecker("listTupleBool.sppl");
+    bool compStatus = compileChecker("list/listTupleBool.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "[(True, False), (False, True), (False, False)]");
@@ -398,7 +398,7 @@ void Test::listTupleBool() {
 }
 
 void Test::listTupleChar() { 
-    bool compStatus = compileChecker("listTupleChar.sppl");
+    bool compStatus = compileChecker("list/listTupleChar.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "[('c', 'h'), ('a', 'r'), ('c', 'h')]");
@@ -407,7 +407,7 @@ void Test::listTupleChar() {
 }
 
 void Test::listTupleString() { 
-    bool compStatus = compileChecker("listTupleString.sppl");
+    bool compStatus = compileChecker("list/listTupleString.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "[(\"string\", \"string\"), (\"string\", \"string\"), (\"string\", \"string\")]");

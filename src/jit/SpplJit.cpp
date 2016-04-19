@@ -164,8 +164,8 @@ namespace jit {
             auto FuncJIT = (size_t (*)()) Func.getAddress();
 
             assert(FuncJIT != NULL);
-            string Output = getOutput(FuncJIT(), FuncNode->Ty);
-            cout << Output << "\t\ttype: " << FuncNode->Ty.str() << endl;
+            string Output = getOutput(FuncJIT(), FuncNode->RetTy);
+            cout << Output << "\t\ttype: " << FuncNode->RetTy.str() << endl;
 
             // Remove module
             removeModule(ModuleHandler);

@@ -41,7 +41,7 @@ namespace semantics {
         Ctx = ScopeContext::PATTERN;
 
         for (size_t i = 0; i < Node.Patterns.size(); ++i) {
-            Node.Patterns[i]->Ty = CurFunc->Signature[i];
+            Node.Patterns[i]->RetTy = CurFunc->Signature[i];
             Node.Patterns[i]->accept(*this);
         }
 
@@ -162,19 +162,19 @@ namespace semantics {
     }
 
     void ScopeGenerator::visit(ListPattern &Node) {
-        if (Node.Ty.Id == TypeId::LIST) {
+        if (Node.RetTy.Id == TypeId::LIST) {
             for (size_t i = 0; i < Node.Patterns.size(); ++i) {
-                Node.Patterns[i]->Ty = Node.Ty.Subtypes[i];
+                Node.Patterns[i]->RetTy = Node.RetTy.Subtypes[i];
                 Node.Patterns[i]->accept(*this);
             }
         }
     }
 
     void ScopeGenerator::visit(TuplePattern &Node) {
-        if (Node.Ty.Id == TypeId::TUPLE) {
-            if (Node.Patterns.size() == Node.Ty.Subtypes.size()) {
+        if (Node.RetTy.Id == TypeId::TUPLE) {
+            if (Node.Patterns.size() == Node.RetTy.Subtypes.size()) {
                 for (size_t i = 0; i < Node.Patterns.size(); ++i) {
-                    Node.Patterns[i]->Ty = Node.Ty.Subtypes[i];
+                    Node.Patterns[i]->RetTy = Node.RetTy.Subtypes[i];
                     Node.Patterns[i]->accept(*this);
                 }
             }
@@ -182,9 +182,9 @@ namespace semantics {
     }
 
     void ScopeGenerator::visit(ListSplit &Node) {
-        if (Node.Ty.Id == TypeId::LIST) {
-            Node.Left->Ty = Node.Ty.Subtypes.front();
-            Node.Right->Ty = Node.Ty;
+        if (Node.RetTy.Id == TypeId::LIST) {
+            Node.Left->RetTy = Node.RetTy.Subtypes.front();
+            Node.Right->RetTy = Node.RetTy;
         }
 
         Node.Left->accept(*this);
@@ -212,7 +212,7 @@ namespace semantics {
 
         if (Ctx == ScopeContext::PATTERN) {
             if (!CurScope->exists(Node.Val)) {
-                CurScope->Decls.insert({Node.Val, Node.Ty});
+                CurScope->Decls.insert({Node.Val, Node.RetTy});
             }
         }
     }

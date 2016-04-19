@@ -9,18 +9,25 @@
 %parse-param { class Driver &Drv }
 %error-verbose
 
+// Parser.h
 %code requires {
 #include "Common.h"
+
+#include <string>
+#include <vector>
 
 using namespace common;
 using namespace std;
 
 }
 
+// Parser.cpp
 %{
-#include <string>
-#include <vector>
+#include "Driver.h"
 
+// Connect bison parser to flex scanner
+#undef yylex
+#define yylex Drv.Snr.lex
 %}
 
 %union {
@@ -49,16 +56,52 @@ using namespace std;
     vector<unique_ptr<Product>> *       ProdVec;
 }
 
-
-
-%token END 0 "end of stream"
-%token EOL "end of line"
-%token DEF WHEN TYPE BACKSLASH INCLUDE TO WILD CONCAT PROCON INTTYPE BOOLTYPE FLOATTYPE STRINGTYPE CHARTYPE LAMBARROW ARROR EQUAL NOTEQUAL AND OR LESSEREQUAL GREATEREQUAL LESSER GREATER MUL DIV MOD ADD SUB ASSIGN SQSTART SQEND PARSTART PAREND EXMARK COMMA PIPE ARROW COLON
-%token <LongInt> INTLITERAL
-%token <Chr> CHARLITERAL
-%token <Boolean> BOOLLITERAL
-%token <LongDouble> FLOATLITERAL
-%token <Str> ID STRINGLITERAL
+%token END 0 "End"
+%token EOL "End of line"
+%token DEF "def"
+%token TYPE "type"
+%token BACKSLASH "\\"
+%token INCLUDE "include"
+%token WHEN "when"
+%token TYPE "type"
+%token TO "to"
+%token WILD "_"
+%token CONCAT "++"
+%token PROCON "|>"
+%token INTTYPE "Int Type"
+%token BOOLTYPE "Bool Type"
+%token FLOATTYPE "Float Type"
+%token STRINGTYPE "String Type"
+%token CHARTYPE "Char Type"
+%token LAMBARROW "=>"
+%token ARROR "->"
+%token EQUAL "=="
+%token NOTEQUAL "!="
+%token AND "&&"
+%token OR "||"
+%token LESSEREQUAL "<="
+%token GREATEREQUAL ">="
+%token LESSER "<"
+%token GREATER ">"
+%token MUL "*"
+%token DIV "/"
+%token MOD "%"
+%token ADD "+"
+%token SUB "-"
+%token ASSIGN "="
+%token SQSTART "["
+%token SQEND "]"
+%token PARSTART "("
+%token PAREND ")"
+%token EXMARK "!"
+%token COMMA ","
+%token PIPE "|"
+%token COLON ":"
+%token <LongInt> INTLITERAL "Int"
+%token <Chr> CHARLITERAL "Char"
+%token <Boolean> BOOLLITERAL "Bool"
+%token <LongDouble> FLOATLITERAL "Float"
+%token <Str> ID STRINGLITERAL "String"
 
 %left OR
 %left AND
@@ -88,19 +131,7 @@ using namespace std;
 %type <ExprVec> exprs_comma exprs_comma_ne
 %type <ProdVec> sum
 
-%{
-
-#include "Driver.h"
-#include "Scanner.h"
-
-// Connect bison parser to flex scanner
-#undef yylex
-#define yylex Drv.Snr.lex
-
-
-%}
-
-
+// Start at program
 %start program
 
 %%

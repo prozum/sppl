@@ -226,7 +226,7 @@ namespace codegen {
         Node.Right->accept(*this);
         auto right = CurVal;
 
-        if ( Node.Left->Ty.Id == common::TypeId::FLOAT && Node.Right->Ty.Id == common::TypeId::FLOAT) {
+        if ( Node.Left->RetTy.Id == common::TypeId::FLOAT && Node.Right->RetTy.Id == common::TypeId::FLOAT) {
             CurVal = Builder.CreateFAdd(left, right, "addtmp");
         } else {
             CurVal = Builder.CreateAdd(left, right, "addtmp");
@@ -239,7 +239,7 @@ namespace codegen {
         Node.Right->accept(*this);
         auto right = CurVal;
 
-        if ( Node.Left->Ty.Id == common::TypeId::FLOAT && Node.Right->Ty.Id == common::TypeId::FLOAT) {
+        if ( Node.Left->RetTy.Id == common::TypeId::FLOAT && Node.Right->RetTy.Id == common::TypeId::FLOAT) {
             CurVal = Builder.CreateFSub(left, right, "subtmp");
         } else {
             CurVal = Builder.CreateSub(left, right, "subtmp");
@@ -252,7 +252,7 @@ namespace codegen {
         Node.Right->accept(*this);
         auto right = CurVal;
 
-        if ( Node.Left->Ty.Id == common::TypeId::FLOAT && Node.Right->Ty.Id == common::TypeId::FLOAT) {
+        if ( Node.Left->RetTy.Id == common::TypeId::FLOAT && Node.Right->RetTy.Id == common::TypeId::FLOAT) {
             CurVal = Builder.CreateFMul(left, right, "multmp");
         } else {
             CurVal = Builder.CreateMul(left, right, "multmp");
@@ -265,7 +265,7 @@ namespace codegen {
         Node.Right->accept(*this);
         auto right = CurVal;
 
-        if ( Node.Left->Ty.Id == common::TypeId::FLOAT && Node.Right->Ty.Id == common::TypeId::FLOAT) {
+        if ( Node.Left->RetTy.Id == common::TypeId::FLOAT && Node.Right->RetTy.Id == common::TypeId::FLOAT) {
             CurVal = Builder.CreateFDiv(left, right, "divtmp");
         } else {
             CurVal = Builder.CreateSDiv(left, right, "divtmp");
@@ -278,7 +278,7 @@ namespace codegen {
         Node.Right->accept(*this);
         auto right = CurVal;
 
-        if ( Node.Left->Ty.Id == common::TypeId::FLOAT && Node.Right->Ty.Id == common::TypeId::FLOAT) {
+        if ( Node.Left->RetTy.Id == common::TypeId::FLOAT && Node.Right->RetTy.Id == common::TypeId::FLOAT) {
             CurVal = Builder.CreateFRem(left, right, "modtmp");
         } else {
             CurVal = Builder.CreateSRem(left, right, "modtmp");
@@ -291,7 +291,7 @@ namespace codegen {
         Node.Right->accept(*this);
         auto right = CurVal;
 
-        if ( Node.Left->Ty.Id == common::TypeId::FLOAT && Node.Right->Ty.Id == common::TypeId::FLOAT) {
+        if ( Node.Left->RetTy.Id == common::TypeId::FLOAT && Node.Right->RetTy.Id == common::TypeId::FLOAT) {
             CurVal = Builder.CreateFCmpOEQ(left, right, "eqtmp");
         } else {
             CurVal = Builder.CreateICmpEQ(left, right, "eqtmp");
@@ -304,7 +304,7 @@ namespace codegen {
         Node.Right->accept(*this);
         auto right = CurVal;
 
-        if ( Node.Left->Ty.Id == common::TypeId::FLOAT && Node.Right->Ty.Id == common::TypeId::FLOAT) {
+        if ( Node.Left->RetTy.Id == common::TypeId::FLOAT && Node.Right->RetTy.Id == common::TypeId::FLOAT) {
             CurVal = Builder.CreateFCmpONE(left, right, "neqtmp");
         } else {
             CurVal = Builder.CreateICmpNE(left, right, "neqtmp");
@@ -317,7 +317,7 @@ namespace codegen {
         Node.Right->accept(*this);
         auto right = CurVal;
 
-        if ( Node.Left->Ty.Id == common::TypeId::FLOAT && Node.Right->Ty.Id == common::TypeId::FLOAT) {
+        if ( Node.Left->RetTy.Id == common::TypeId::FLOAT && Node.Right->RetTy.Id == common::TypeId::FLOAT) {
             CurVal = Builder.CreateFCmpOLT(left, right, "lttmp");
         } else {
             CurVal = Builder.CreateICmpSLT(left, right, "lttmp");
@@ -330,7 +330,7 @@ namespace codegen {
         Node.Right->accept(*this);
         auto right = CurVal;
 
-        if ( Node.Left->Ty.Id == common::TypeId::FLOAT && Node.Right->Ty.Id == common::TypeId::FLOAT) {
+        if ( Node.Left->RetTy.Id == common::TypeId::FLOAT && Node.Right->RetTy.Id == common::TypeId::FLOAT) {
             CurVal = Builder.CreateFCmpOGT(left, right, "lttmp");
         } else {
             CurVal = Builder.CreateICmpSGT(left, right, "lttmp");
@@ -343,7 +343,7 @@ namespace codegen {
         Node.Right->accept(*this);
         auto right = CurVal;
 
-        if ( Node.Left->Ty.Id == common::TypeId::FLOAT && Node.Right->Ty.Id == common::TypeId::FLOAT) {
+        if ( Node.Left->RetTy.Id == common::TypeId::FLOAT && Node.Right->RetTy.Id == common::TypeId::FLOAT) {
             CurVal = Builder.CreateFCmpOLE(left, right, "lttmp");
         } else {
             CurVal = Builder.CreateICmpSLE(left, right, "lttmp");
@@ -356,7 +356,7 @@ namespace codegen {
         Node.Right->accept(*this);
         auto right = CurVal;
 
-        if ( Node.Left->Ty.Id == common::TypeId::FLOAT && Node.Right->Ty.Id == common::TypeId::FLOAT) {
+        if ( Node.Left->RetTy.Id == common::TypeId::FLOAT && Node.Right->RetTy.Id == common::TypeId::FLOAT) {
             CurVal = Builder.CreateFCmpOGE(left, right, "lttmp");
         } else {
             CurVal = Builder.CreateICmpSGE(left, right, "lttmp");
@@ -364,11 +364,11 @@ namespace codegen {
     }
 
     void LLVMCodeGenerator::visit(common::FloatPattern &Node) {
-        CurVal = ConstantFP::get(getType(Node.Ty), Node.Val);
+        CurVal = ConstantFP::get(getType(Node.RetTy), Node.Val);
     }
 
     void LLVMCodeGenerator::visit(common::IntPattern &Node) {
-        CurVal = ConstantInt::get(getType(Node.Ty), (uint64_t)Node.Val);
+        CurVal = ConstantInt::get(getType(Node.RetTy), (uint64_t)Node.Val);
     }
 
     void LLVMCodeGenerator::visit(common::Bool &Node) {
@@ -376,7 +376,7 @@ namespace codegen {
     }
 
     void LLVMCodeGenerator::visit(common::CharPattern &Node) {
-        CurVal = ConstantInt::get(getType(Node.Ty), (uint64_t)Node.Val);
+        CurVal = ConstantInt::get(getType(Node.RetTy), (uint64_t)Node.Val);
     }
 
     void LLVMCodeGenerator::visit(common::String &Node) {
@@ -438,7 +438,7 @@ namespace codegen {
 
         ArrayRef<Constant *> TupleVal(TmpVec);
 
-        auto ConstVal = ConstantStruct::get(getTupleType(Node.Ty), TupleVal);
+        auto ConstVal = ConstantStruct::get(getTupleType(Node.RetTy), TupleVal);
         CurVal = new GlobalVariable(*Module.get(), ConstVal->getType(), true, GlobalVariable::ExternalLinkage, ConstVal);
 
     }
@@ -453,7 +453,7 @@ namespace codegen {
 
         ArrayRef<Constant *> ListData(TmpVec);
 
-        auto ListType = ArrayType::get(getType(Node.Ty), Node.Elements.size());
+        auto ListType = ArrayType::get(getType(Node.RetTy), Node.Elements.size());
         auto ConstVal = ConstantArray::get(ListType, ListData);
 
         CurVal = new GlobalVariable(*Module.get(), ConstVal->getType(), true, GlobalVariable::ExternalLinkage, ConstVal);
