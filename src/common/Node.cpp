@@ -11,10 +11,10 @@ namespace common {
     void Case::accept(Visitor &V) { V.visit(*this); }
 
     Node::Node(Location Loc) :
-            Ty(TypeId::UNKNOWN), Loc(Loc) { }
+            RetTy(TypeId::UNKNOWN), Loc(Loc) { }
 
     Node::Node(Type Ty, Location Loc) :
-            Ty(Ty), Loc(Loc) { }
+            RetTy(Ty), Loc(Loc) { }
 
     Program::Program(vector<unique_ptr<Declaration>> Decls,
                      Location Loc) :

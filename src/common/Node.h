@@ -64,7 +64,7 @@ namespace common {
 	// Abstract Nodes
 	class Node {
 	public:
-		Type Ty;
+		Type RetTy;
 		Location Loc;
 
 		Node(Location Loc);

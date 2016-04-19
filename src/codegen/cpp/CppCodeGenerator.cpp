@@ -34,7 +34,7 @@ namespace codegen
             throw "No main, help!";
 
         // Get the type of main, so that return type of main is generated
-        getType(Main->Ty);
+        getType(Main->RetTy);
 
         // Generate real main function, that calls the users main
         string StrListName = getList(StringList);
@@ -47,7 +47,7 @@ namespace codegen
                    "        args = " << GGenerated << GAdd << StrListName << "(args, " << GGenerated << GCreate << GString << "(argv[i])); \n"
                    "    } \n"
                    " \n"
-                   "    " << GGenerated << GPrint << GString << "("  << ToStrings[Main->Ty] << "(" << GGlobal << GUser << GMain << ".call(&" << GGlobal << GUser << GMain << ", args))); \n"
+                   "    " << GGenerated << GPrint << GString << "("  << ToStrings[Main->RetTy] << "(" << GGlobal << GUser << GMain << ".call(&" << GGlobal << GUser << GMain << ", args))); \n"
                    "    return 0; \n"
                    "} \n"
                    " \n";
@@ -63,7 +63,7 @@ namespace codegen
     {
         stringstream Func;
         stringstream ArgName;
-        string RetType = getType(Node.Ty);
+        string RetType = getType(Node.RetTy);
         string ArgType;
         string Signature = getEnvironment(Node.Signature);
 
@@ -213,13 +213,13 @@ namespace codegen
 
     void CCodeGenerator::visit(Equal &Node)
     {
-        outputEqual(Node.Ty, *Node.Left.get(), *Node.Right.get());
+        outputEqual(Node.RetTy, *Node.Left.get(), *Node.Right.get());
     }
 
     void CCodeGenerator::visit(NotEqual &Node)
     {
         ExprStack.top() << "(!";
-        outputEqual(Node.Ty, *Node.Left.get(), *Node.Right.get());
+        outputEqual(Node.RetTy, *Node.Left.get(), *Node.Right.get());
         ExprStack.top() << ")";
     }
 
@@ -228,7 +228,7 @@ namespace codegen
 
         switch (Ty.Id) {
             case TypeId::TUPLE:
-                Name = getTuple(Left.Ty);
+                Name = getTuple(Left.RetTy);
 
                 ExprStack.top() << GGenerated << GCompare << Name << "(";
                 Left.accept(*this);
@@ -238,7 +238,7 @@ namespace codegen
                 break;
             case TypeId::LIST:
             case TypeId::STRING:
-                Name = getList(Left.Ty);
+                Name = getList(Left.RetTy);
 
                 ExprStack.top() << GGenerated << GCompare << Name << "(";
                 Left.accept(*this);
@@ -339,7 +339,7 @@ namespace codegen
 
     void CCodeGenerator::visit(ListAdd &Node)
     {
-        string Name = getList(Node.Ty);
+        string Name = getList(Node.RetTy);
 
         // Use pregenerated push function to push thing onto list
         // Look at generate_list(Type &type) for the generation of this function
@@ -370,7 +370,7 @@ namespace codegen
         // Result is needed, so we don't generate something else, while the ListPattern is being generated
         stringstream Res;
         string ValGotten;
-        string TypeName = getList(Node.Ty);
+        string TypeName = getList(Node.RetTy);
 
         // Generate the gotten value from get_value_builder
         for (auto Str : GetValueBuilder) {
@@ -409,7 +409,7 @@ namespace codegen
     {
         // Result is needed, so we don't start generating something in a signature in the header file
         stringstream Res;
-        string TypeName = getTuple(Node.Ty);
+        string TypeName = getTuple(Node.RetTy);
         bool Empty = true;
 
         // Iterate through all items in tuple
@@ -445,7 +445,7 @@ namespace codegen
     void CCodeGenerator::visit(ListSplit &Node)
     {
         stringstream Res;
-        string TypeName = getList(Node.Ty);
+        string TypeName = getList(Node.RetTy);
         bool Empty = true;
 
         // Add "gat_"name"(" and ", offset)" to get_value_builder.
@@ -595,7 +595,7 @@ namespace codegen
 
     void CCodeGenerator::visit(ListExpression &Node)
     {
-        string Name = getList(Node.Ty);
+        string Name = getList(Node.RetTy);
 
         // Create list
         ExprStack.top() << GGenerated << GCreate << Name << "(" << Node.Elements.size();
@@ -610,7 +610,7 @@ namespace codegen
 
     void CCodeGenerator::visit(TupleExpression &Node)
     {
-        string Name = getTuple(Node.Ty);
+        string Name = getTuple(Node.RetTy);
 
         // Create tuple
         ExprStack.top() << GGenerated << GCreate << Name << "(";
@@ -635,11 +635,11 @@ namespace codegen
             }
 
             // Generate an assignment for the id, which should occur after the if-statement
-            Assign << getType(Node.Ty) << " " << GUser << Node.Val << " = ";
+            Assign << getType(Node.RetTy) << " " << GUser << Node.Val << " = ";
 
-            if ((Node.Ty.Id == TypeId::LIST || Node.Ty.Id == TypeId::STRING) &&
+            if ((Node.RetTy.Id == TypeId::LIST || Node.RetTy.Id == TypeId::STRING) &&
                  ListOffsets.back() > 0) {
-                Assign << GGenerated << GAt << getList(Node.Ty) << "(" << Name << ", " << ListOffsets.back() << ");";
+                Assign << GGenerated << GAt << getList(Node.RetTy) << "(" << Name << ", " << ListOffsets.back() << ");";
             } else {
                 Assign << Name << ";";
             }
@@ -670,7 +670,7 @@ namespace codegen
     void CCodeGenerator::visit(Call &Node)
     {
         string Name = GGenerated + GClosure + to_string(EnvCount++);
-        string Assignment = getEnvironment(Node.Callee->Ty) + "* " + Name + " = ";
+        string Assignment = getEnvironment(Node.Callee->RetTy) + "* " + Name + " = ";
 
         ExprStack.push(stringstream());
         // Generate the callee (aka, the function being called)
