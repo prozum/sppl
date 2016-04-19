@@ -159,6 +159,8 @@ namespace codegen {
             return Builder.CreateFCmpONE(Val1, Val2, "cmptmp");
         else if (Val1->getType()->isIntegerTy())
             return Builder.CreateICmpEQ(Val1, Val2, "cmptmp");
+        else if (Val1->getType()->getPointerElementType()->isFunctionTy())
+            return ConstantInt::get(llvm::Type::getInt1Ty(getGlobalContext()), 1);
         else
             throw runtime_error("This should not happen!");
     }
@@ -453,7 +455,7 @@ namespace codegen {
                 if (CurVal)
                     return;
 
-                // Current module
+                // Internal module
                 CurVal = Module->getFunction(Node.Val);
                 if (CurVal)
                     return;
@@ -462,8 +464,7 @@ namespace codegen {
                 if (Drv.Global.Decls.count(Node.Val))
                     CurVal = llvm::Function::Create(getFuncType(Drv.Global.Decls[Node.Val]), llvm::Function::ExternalLinkage, Node.Val, Module.get());
 
-                // TODO ERROR NOT FOUND
-                break;
+                throw runtime_error("This should not happen!");
         }
     }
 
