@@ -14,16 +14,19 @@ namespace common {
         INT,
         FLOAT,
         CHAR,
+		BOOL,
 		LIST,
 		TUPLE,
 		SIGNATURE,
-		EMPTYLIST
+		GENERIC,
+		CUSTOM
 	};
 
 	class Type {
 	public:
 		TypeId Id;
 		vector<Type> Subtypes;
+		string Name;
 		Location Loc;
 
 		Type();
@@ -32,6 +35,7 @@ namespace common {
 		Type(TypeId Id, Location Loc);
 		Type(TypeId Id, std::vector<Type> Subtypes);
 		Type(TypeId Id, std::vector<Type> Subtypes, Location Loc);
+		Type(TypeId Id, std::vector<Type> Subtypes, string Name, Location Loc);
 
 		bool operator==(const Type &Other) const;
 		bool operator!=(const Type &Other) const;

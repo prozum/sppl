@@ -136,6 +136,7 @@ namespace common {
 	};
 
 	class Concat : public BinaryOp {
+	public:
 		Concat(unique_ptr<Expression> Left, unique_ptr<Expression> Right, Location Loc);
 
 		virtual void accept(Visitor &V);

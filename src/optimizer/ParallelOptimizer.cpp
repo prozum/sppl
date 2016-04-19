@@ -133,15 +133,7 @@ namespace optimizer {
     {
     }
 
-    void ParallelOptimizer::visit(Bool &Node)
-    {
-    }
-
     void ParallelOptimizer::visit(CharPattern &Node)
-    {
-    }
-
-    void ParallelOptimizer::visit(String &Node)
     {
     }
 

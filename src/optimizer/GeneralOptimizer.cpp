@@ -21,7 +21,7 @@ namespace optimizer {
 
             if (typeid(*Expr) == typeid(Call) &&
                 typeid(static_cast<Call*>(Expr)->Callee) == typeid(IdPattern) &&
-                (static_cast<IdPattern*>(static_cast<Call*>(Expr)->Callee.get()))->Val == Node.Id) {
+                (static_cast<IdExpression*>(static_cast<Call*>(Expr)->Callee.get()))->Val == Node.Id) {
                 Case->TailRec = true;
             }
 
@@ -138,13 +138,7 @@ namespace optimizer {
     void GeneralOptimizer::visit(FloatPattern &Node) {
     }
 
-    void GeneralOptimizer::visit(Bool &Node) {
-    }
-
     void GeneralOptimizer::visit(CharPattern &Node) {
-    }
-
-    void GeneralOptimizer::visit(String &Node) {
     }
 
     void GeneralOptimizer::visit(ListExpression &Node) {

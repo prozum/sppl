@@ -22,8 +22,10 @@ namespace common {
 	class Pattern;
 	class Program;
 	class Function;
-	class ADT;
+	class AlgebraicDT;
+	class Product;
 	class Case;
+	class LambdaArg;
 	class Or;
 	class And;
 	class Equal;
@@ -47,6 +49,8 @@ namespace common {
 	class IntPattern;
 	class FloatPattern;
 	class CharPattern;
+	class BoolPattern;
+	class StringPattern;
 	class ListPattern;
 	class TuplePattern;
 	class ListSplit;
@@ -54,6 +58,7 @@ namespace common {
 	class IntExpression;
 	class FloatExpression;
 	class CharExpression;
+	class BoolExpression;
 	class ListExpression;
 	class TupleExpression;
 	class IdPattern;
@@ -115,8 +120,24 @@ namespace common {
 	};
 
 	// TODO Implement ADT
-	class ADT : public Declaration {
-		ADT(Location Loc) : Declaration(Loc) { }
+	class AlgebraicDT : public Declaration {
+	public:
+		string Name;
+		vector<Type> TypeConstructor;
+		vector<unique_ptr<Product>> Sum;
+
+		AlgebraicDT(string Name, vector<Type> TypeConstructor, vector<unique_ptr<Product>> Sum, Location Loc);
+
+		virtual void accept(Visitor &V);
+		string str();
+	};
+
+	class Product : public Node {
+	public:
+		string Constructor;
+		vector<Type> Values;
+
+		Product(string Constructor, vector<Type> Values, Location Loc);
 
 		virtual void accept(Visitor &V);
 		string str();
@@ -135,6 +156,15 @@ namespace common {
 		string str();
 	};
 
+	class LambdaArg : public Node {
+	public:
+		string Id;
+
+		LambdaArg(string Id, Location Loc);
+
+		virtual void accept(Visitor &V);
+		string str();
+	};
 
 	template<class T>
 	string strJoin(T &List, const std::string JoinStr);

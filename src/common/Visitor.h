@@ -16,7 +16,10 @@ namespace common {
 
 		virtual void visit(Program &Node) { throw runtime_error( "Not implemented"); }
 		virtual void visit(Function &Node) { throw runtime_error( "Not implemented"); }
+		virtual void visit(AlgebraicDT &Node) { throw runtime_error( "Not implemented"); }
+		virtual void visit(Product &Node) { throw runtime_error( "Not implemented"); }
 		virtual void visit(Case &Node) { throw runtime_error( "Not implemented"); }
+		virtual void visit(LambdaArg &Node) { throw runtime_error( "Not implemented"); }
 		virtual void visit(Or &Node) { throw runtime_error( "Not implemented"); }
 		virtual void visit(And &Node) { throw runtime_error( "Not implemented"); }
 		virtual void visit(Equal &Node) { throw runtime_error( "Not implemented"); }
@@ -42,6 +45,8 @@ namespace common {
 		virtual void visit(IntPattern &Node) { throw runtime_error( "Not implemented"); }
 		virtual void visit(FloatPattern &Node) { throw runtime_error( "Not implemented"); }
 		virtual void visit(CharPattern &Node) { throw runtime_error( "Not implemented"); }
+		virtual void visit(BoolPattern &Node) { throw runtime_error( "Not implemented"); }
+		virtual void visit(StringPattern &Node) { throw runtime_error( "Not implemented"); }
 		virtual void visit(ListPattern &Node) { throw runtime_error( "Not implemented"); }
 		virtual void visit(TuplePattern &Node) { throw runtime_error( "Not implemented"); }
 		virtual void visit(ListSplit &Node) { throw runtime_error( "Not implemented"); }
@@ -50,6 +55,7 @@ namespace common {
 		virtual void visit(IntExpression &Node) { throw runtime_error( "Not implemented"); }
 		virtual void visit(FloatExpression &Node) { throw runtime_error( "Not implemented"); }
 		virtual void visit(CharExpression &Node) { throw runtime_error( "Not implemented"); }
+		virtual void visit(BoolExpression &Node) { throw runtime_error( "Not implemented"); }
 		virtual void visit(ListExpression &Node) { throw runtime_error( "Not implemented"); }
 		virtual void visit(TupleExpression &Node) { throw runtime_error( "Not implemented"); }
 		virtual void visit(Call &Node) { throw runtime_error( "Not implemented"); }

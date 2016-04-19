@@ -185,9 +185,6 @@ namespace semantics {
         if (Node.Ty.Id == TypeId::LIST) {
             Node.Left->Ty = Node.Ty.Subtypes.front();
             Node.Right->Ty = Node.Ty;
-        } else if (Node.Ty.Id == TypeId::STRING){
-            Node.Left->Ty = Type(TypeId::CHAR);
-            Node.Right->Ty = Node.Ty;
         }
 
         Node.Left->accept(*this);
@@ -237,12 +234,6 @@ namespace semantics {
     void ScopeGenerator::visit(FloatPattern &Node) {
     }
 
-    void ScopeGenerator::visit(Bool &Node) {
-    }
-
     void ScopeGenerator::visit(CharPattern &Node) {
-    }
-
-    void ScopeGenerator::visit(String &Node) {
     }
 }

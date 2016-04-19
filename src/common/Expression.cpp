@@ -15,26 +15,31 @@ namespace common {
 
     IdExpression::IdExpression(string Val,
                                Location Loc) :
-            Val(Val),
-            Expression(Loc) { }
+            Expression(Loc),
+            Val(Val) { }
 
 
     IntExpression::IntExpression(long Val,
                                  Location Loc) :
-            Val(Val),
-            Expression(Loc) { }
+            Expression(Loc),
+            Val(Val) { }
 
 
     FloatExpression::FloatExpression(double Val,
                                      Location Loc) :
-            Val(Val),
-            Expression(Loc) { }
+            Expression(Loc),
+            Val(Val) { }
 
 
     CharExpression::CharExpression(char Val,
                                    Location Loc) :
-            Val(Val),
-            Expression(Loc) { }
+            Expression(Loc),
+            Val(Val) { }
+
+    BoolExpression::BoolExpression(bool Val,
+                                   Location Loc) :
+            Expression(Loc),
+            Val(Val) { }
 
     ListExpression::ListExpression(vector<unique_ptr<Expression>> Elements,
                                    Location Loc) :
@@ -54,7 +59,7 @@ namespace common {
             Args(move(Args)) { }
 
     LambdaFunction::LambdaFunction(unique_ptr<Expression> Expr,
-                                   vector<unique_ptr<IdPattern>> Args,
+                                   vector<unique_ptr<LambdaArg>> Args,
                                    Location Loc) :
             Expression(Loc),
             Expr(move(Expr)),
@@ -64,6 +69,7 @@ namespace common {
     void IntExpression::accept(Visitor &V) { V.visit(*this); }
     void FloatExpression::accept(Visitor &V) { V.visit(*this); }
     void CharExpression::accept(Visitor &V) { V.visit(*this); }
+    void BoolExpression::accept(Visitor &V) { V.visit(*this); }
     void ListExpression::accept(Visitor &V) { V.visit(*this); }
     void TupleExpression::accept(Visitor &V) { V.visit(*this); }
     void Call::accept(Visitor &V) { V.visit(*this); }
@@ -82,23 +88,67 @@ namespace common {
     }
 
     string CharExpression::str() {
-        return to_string(Val);
+        return string("\'") + Val + "\'";
+    }
+
+    string BoolExpression::str() {
+        return (Val) ? "True" : "False";
     }
 
     string ListExpression::str() {
-        return "[" + strJoin(Elements, ", ") + "]";
+        // TODO fix strJoin problems. I give up for now
+        string Str("[");
+
+        for (auto &Element : Elements) {
+            Str += Element->str();
+
+            if (Element != Elements.back())
+                Str += ", ";
+        }
+
+        return Str + "]";
     }
 
     string TupleExpression::str() {
-        return "(" + strJoin(Elements, ", ") + ")";
+        // TODO fix strJoin problems. I give up for now
+        string Str("(");
+
+        for (auto &Element : Elements) {
+            Str += Element->str();
+
+            if (Element != Elements.back())
+                Str += ", ";
+        }
+
+        return Str + ")";
     }
 
     string Call::str() {
-        return Callee->str() + "(" + strJoin(Args, ", ") + ")";
+        // TODO fix strJoin problems. I give up for now
+        string Str(Callee->str() + "(");
+
+        for (auto &Arg : Args) {
+            Str += Arg->str();
+
+            if (Arg != Args.back())
+                Str += ", ";
+        }
+
+        return Str + ")";
     }
 
     string LambdaFunction::str() {
-        return "\n" + strJoin(Args, " ") + " => " + Expr->str();
+        // TODO fix strJoin problems. I give up for now
+        string Str("\\");
+
+        for (auto &Arg : Args) {
+            Str += Arg->str();
+
+            if (Arg != Args.back())
+                Str += " ";
+        }
+
+        return Str + " => " + Expr->str();
     }
 
 }

@@ -5,6 +5,8 @@ namespace common {
     void IntPattern::accept(Visitor &V) { V.visit(*this); }
     void FloatPattern::accept(Visitor &V) { V.visit(*this); }
     void CharPattern::accept(Visitor &V) { V.visit(*this); }
+    void BoolPattern::accept(Visitor &V) { V.visit(*this); }
+    void StringPattern::accept(Visitor &V) { V.visit(*this); }
     void IdPattern::accept(Visitor &V) { V.visit(*this); }
     void ListPattern::accept(Visitor &V) { V.visit(*this); }
     void TuplePattern::accept(Visitor &V) { V.visit(*this); }
@@ -29,6 +31,16 @@ namespace common {
 
     CharPattern::CharPattern(char Val,
                              Location Loc) :
+            Pattern(Type(TypeId::CHAR), Loc),
+            Val(Val) { }
+
+    BoolPattern::BoolPattern(bool Val,
+                             Location Loc) :
+            Pattern(Type(TypeId::CHAR), Loc),
+            Val(Val) { }
+
+    StringPattern::StringPattern(string Val,
+                                 Location Loc) :
             Pattern(Type(TypeId::CHAR), Loc),
             Val(Val) { }
 
@@ -75,7 +87,15 @@ namespace common {
     }
 
     string CharPattern::str() {
-        return "\'" + to_string(Val) + "\'";
+        return string("\'") + Val + "\'";
+    }
+
+    string BoolPattern::str() {
+        return (Val) ? "True" : "Flase";
+    }
+
+    string StringPattern::str() {
+        return "\"" + Val + "\"";
     }
 
     string ListPattern::str() {

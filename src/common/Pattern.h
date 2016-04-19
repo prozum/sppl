@@ -3,7 +3,6 @@
 #include "Node.h"
 
 namespace common {
-
 	class Pattern : public Node {
 	public:
 		Pattern(Location Loc);
@@ -48,6 +47,26 @@ namespace common {
 		char Val;
 
 		CharPattern(char Val, Location Loc);
+
+		virtual void accept(Visitor &V);
+		string str();
+	};
+
+	class BoolPattern : public Pattern {
+	public:
+		bool Val;
+
+		BoolPattern(bool Val, Location Loc);
+
+		virtual void accept(Visitor &V);
+		string str();
+	};
+
+	class StringPattern : public Pattern {
+	public:
+		string Val;
+
+		StringPattern(string Val, Location Loc);
 
 		virtual void accept(Visitor &V);
 		string str();

@@ -24,34 +24,41 @@ using namespace std;
 %}
 
 %union {
-    char chr;
-    long long_int;
-    long double long_double;
-    bool boolean;
+    char                                Chr;
+    long                                LongInt;
+    long double                         LongDouble;
+    bool                                Boolean;
 
-    Type *          type;
-    Function *      func;
-    Case *          cse;
-    Pattern *       pattern;
-    Expression *    expr;
-    string *        str;
+    string *                            Str;
 
-    vector<unique_ptr<Function>> *      func_vec;
-    vector<unique_ptr<Case>> *          cse_vec;
-    vector<unique_ptr<Pattern>> *       pattern_vec;
-    vector<unique_ptr<Expression>> *    expr_vec;
+    Declaration *                       Decl;
+    Function *                          Func;
+    AlgebraicDT *                       ADT;
+    Product *                           Prod;
+    Type *                              Ty;
+    Case *                              Cse;
+    Pattern *                           Pat;
+    Expression *                        Expr;
+
+    vector<unique_ptr<Declaration>> *   DeclVec;
+    vector<Type> *                      TypeVec;
+    vector<unique_ptr<Case>> *          CaseVec;
+    vector<unique_ptr<Pattern>> *       PatternVec;
+    vector<unique_ptr<LambdaArg>> *     ArgVec;
+    vector<unique_ptr<Expression>> *    ExprVec;
+    vector<unique_ptr<Product>> *       ProdVec;
 }
 
 
 
 %token END 0 "end of stream"
 %token EOL "end of line"
-%token DEF TYPE BACKSLASH INCLUDE TO WILD CONCAT PROCON INTTYPE BOOLTYPE FLOATTYPE STRINGTYPE CHARTYPE LAMBARROR ARROR EQUAL NOTEQUAL AND OR LESSEREQUAL GREATEREQUAL LESSER GREATER MUL DIV MOD ADD SUB ASSIGN SQSTART SQEND PARSTART PAREND EXMARK COMMA PIPE ARROW COLON
-%token <long_int> INTLITERAL
-%token <chr> CHARLITERAL
-%token <boolean> BOOLLITERAL
-%token <long_double> FLOATLITERAL
-%token <str> ID STRINGLITERAL
+%token DEF WHEN TYPE BACKSLASH INCLUDE TO WILD CONCAT PROCON INTTYPE BOOLTYPE FLOATTYPE STRINGTYPE CHARTYPE LAMBARROW ARROR EQUAL NOTEQUAL AND OR LESSEREQUAL GREATEREQUAL LESSER GREATER MUL DIV MOD ADD SUB ASSIGN SQSTART SQEND PARSTART PAREND EXMARK COMMA PIPE ARROW COLON
+%token <LongInt> INTLITERAL
+%token <Chr> CHARLITERAL
+%token <Boolean> BOOLLITERAL
+%token <LongDouble> FLOATLITERAL
+%token <Str> ID STRINGLITERAL
 
 %left OR
 %left AND
@@ -65,15 +72,21 @@ using namespace std;
 %left TO
 %precedence EXMARK
 
-%type <func> func decl
-%type <func_vec> funcs_ne
-%type <cse> case
-%type <cse_vec> cases_ne
-%type <pattern> pattern literal
-%type <pattern_vec> patterns patterns_comma_ne patterns_comma
-%type <expr> expr struct_inst
-%type <expr_vec> exprs_comma exprs_comma_ne
-%type <type> type signature types_comma_ne
+%type <DeclVec> decls
+%type <Decl> decl
+%type <Func> func
+%type <ADT> adt
+%type <Prod> product
+%type <TypeVec> generics types
+%type <Ty> signature type tupletype generic
+%type <Cse> case
+%type <CaseVec> cases_ne
+%type <PatternVec> patterns patterns_comma patterns_comma_ne
+%type <Pat> pattern
+%type <Expr> expr literal
+%type <ArgVec> args
+%type <ExprVec> exprs_comma exprs_comma_ne
+%type <ProdVec> sum
 
 %{
 
@@ -92,52 +105,54 @@ using namespace std;
 
 %%
 
-program:	includes decls                                  { Drv.Prog = make_unique<Program>(move(* $1), @1); delete $1; }
+program:	includes decls                                  { Drv.Prog = make_unique<Program>(move(* $2), @1); delete $2; }
     |       expr                                            { Drv.Prog = make_unique<Program>(unique_ptr<Expression>($1), @1); }
 includes: includes include                                  { /* TODO Functionality for include! */ }
     |                                                       { /* TODO Functionality for include! */ }
 include:    INCLUDE STRINGLITERAL                           { /* TODO Functionality for include! */ }
-decls:      decls decl                                      { $$ = $1; $$->push_back(unique_ptr<Expression>($2); }
-    |                                                       { $$ = new vector<unique_ptr<Declaration>>() }
+decls:      decls decl                                      { $$ = $1; $$->push_back(unique_ptr<Declaration>($2)); }
+    |                                                       { $$ = new vector<unique_ptr<Declaration>>(); }
 decl:       func                                            { $$ = $1; }
-    |       adt                                             { $$ = $1 }
+    |       adt                                             { $$ = $1; }
 func:		DEF ID COLON signature cases_ne                 { $$ = new Function(* $2, * $4, @1); $$->Cases = move(* $5); delete $2; }
-adt:        TYPE ID types ASSIGN options                    { /* TODO Implement ADT */ }
-types:      types type                                      { /* TODO Implement the types, for ADT */ }
-    |                                                       { /* TODO Implement the types, for ADT */ }
-sum:        sum PIPE product                                { /* TODO Implement sum for ADT */ }
-    |       product                                         { /* TODO Implement sum for ADT */ }
-product:    product value                                   { /* TODO Implement product for ADT */ }
-    |       value                                           { /* TODO Implement product for ADT */ }
-value:      ID                                              { /* TODO Implement value for ADT */ }
-    |       type                                            { /* TODO Implement value for ADT */ }
+adt:        TYPE ID generics ASSIGN sum                     { $$ = new AlgebraicDT(* $2, move(* $3), move(* $5), @1); delete $2; }
+sum:        sum PIPE product                                { $$ = $1; $$->push_back(unique_ptr<Product>($3)); }
+    |       product                                         { $$ = new vector<unique_ptr<Product>>(); $$->push_back(unique_ptr<Product>($1)); }
+product:    ID types                                        { $$ = new Product(* $1, * $2, @1); delete $1; delete $2; }
+types:      types type                                      { $$ = $1; $$->push_back(* $2); delete $2; }
+    |                                                       { $$ = new vector<Type>(); }
+generics:   generics generic                                { $$ = $1; $$->push_back(* $2); delete $2; }
+    |                                                       { $$ = new vector<Type>(); }
 signature:	signature ARROR type                            { $$ = $1; $$->Subtypes.push_back(* $3); }
 	|       type                                            { $$ = new Type(TypeId::SIGNATURE, @1); $$->Subtypes.push_back(* $1); }
 type:	    INTTYPE                                         { $$ = new Type(TypeId::INT, @1); }
 	|	    FLOATTYPE                                       { $$ = new Type(TypeId::FLOAT, @1); }
 	|	    CHARTYPE                                        { $$ = new Type(TypeId::CHAR, @1); }
-	|	    SQSTART type SQEND                              { $$ = new Type(TypeId::LIST, @2); $$->Subtypes.push_back(* $2); }
+	|	    BOOLTYPE                                        { $$ = new Type(TypeId::BOOL, @1); }
+	|	    SQSTART type SQEND                              { $$ = new Type(TypeId::LIST, @1); $$->Subtypes.push_back(* $2); }
 	|	    PARSTART signature PAREND                       { $$ = $2; }
-	|	    PARSTART tupletypes COMMA type PAREND           { $$ = new Type(TypeId::TUPLE, $2->Subtypes, @2); $$->Subtypes.push_back(* $4); }
-	|       LESSER ID GREATER                               { /* TODO Functionality for generics */ }
-tupletypes: types_comma_ne COMMA type                       { $$ = $1; $$->Subtypes.push_back(* $3); }
-	|	    type                                            { $$ = new Type(); $$->Subtypes.push_back(* $1); }
+	|	    PARSTART tupletype COMMA type PAREND            { $$ = $2; $$->Loc = @1; $$->Subtypes.push_back(* $4); }
+    |       generic                                         { $$ = $1; }
+	|       ID                                              { $$ = new Type(TypeId::CUSTOM, @1); $$->Name = * $1; delete $1; }
+generic:    LESSER ID GREATER                               { $$ = new Type(TypeId::GENERIC, @1); $$->Name = * $2; delete $2; }
+tupletype:  tupletype COMMA type                            { $$ = $1; $$->Subtypes.push_back(* $3); }
+	|	    type                                            { $$ = new Type(TypeId::TUPLE); $$->Subtypes.push_back(* $1); }
 cases_ne:	cases_ne case                                   { $$ = $1; $$->push_back(unique_ptr<Case>($2)); }
 	|       case                                            { $$ = new vector<unique_ptr<Case>>(); $$->push_back(unique_ptr<Case>($1)); }
-case: 		PIPE patterns ASSIGN expr                       { $$ = new Case(unique_ptr<Expression>($4), nullptr, move(* $2), @2); delete $2; }
-    |		PIPE patterns WHEN expr ASSIGN expr             { $$ = new Case(unique_ptr<Expression>($6), unique_ptr<Expression>($4), move(* $2), @2); delete $2; }
+case: 		PIPE patterns ASSIGN expr                       { $$ = new Case(unique_ptr<Expression>($4), nullptr, move(* $2), @1); delete $2; }
+    |		PIPE patterns WHEN expr ASSIGN expr             { $$ = new Case(unique_ptr<Expression>($6), unique_ptr<Expression>($4), move(* $2), @1); delete $2; }
 patterns:	patterns pattern                                { $$ = $1; $$->push_back(unique_ptr<Pattern>($2)); }
 	|                                                       { $$ = new vector<unique_ptr<Pattern>>(); }
 pattern:    INTLITERAL                                      { $$ = new IntPattern($1, @1); }
-    |	    SUB INTLITERAL                                  { $$ = new IntPattern(- $2, @2); }
-    |	    FLOATLITERAL                                    { $$ = new FloatPattern($2, @2); }
-    |	    SUB FLOATLITERAL                                { $$ = new FloatPattern(- $2, @2); }
+    |	    SUB INTLITERAL                                  { $$ = new IntPattern(- $2, @1); }
+    |	    FLOATLITERAL                                    { $$ = new FloatPattern($1, @1); }
+    |	    SUB FLOATLITERAL                                { $$ = new FloatPattern(- $2, @1); }
 	|	    CHARLITERAL                                     { $$ = new CharPattern($1, @1); }
-	|	    STRINGLITERAL                                   { /* TODO STRINGLITERALS should have a pattern */  }
-	| 	    ID                                              { $$ = new Id(* $1, @1); }
-	| 	    PARSTART pattern COLON pattern PAREND           { $$ = new ListSplit(unique_ptr<Pattern>($2), unique_ptr<Pattern>($4), @2);  }
-	| 	    PARSTART patterns_comma_ne COMMA pattern PAREND { $2->push_back(unique_ptr<Pattern>($4)); $$ = new TuplePattern(move(* $2), @2); delete $2; }
-    |       SQSTART patterns_comma SQEND                    { $$ = new ListPattern(move(* $2), @2); delete $2; }
+	|	    STRINGLITERAL                                   { $$ = new StringPattern(* $1, @1); delete $1; }
+	| 	    ID                                              { $$ = new IdPattern(* $1, @1); }
+	| 	    PARSTART pattern COLON pattern PAREND           { $$ = new ListSplit(unique_ptr<Pattern>($2), unique_ptr<Pattern>($4), @1);  }
+	| 	    PARSTART patterns_comma_ne COMMA pattern PAREND { $2->push_back(unique_ptr<Pattern>($4)); $$ = new TuplePattern(move(* $2), @1); delete $2; }
+    |       SQSTART patterns_comma SQEND                    { $$ = new ListPattern(move(* $2), @1); delete $2; }
 patterns_comma:    patterns_comma_ne                        { $$ = $1; }
 	|	                                                    { $$ = new vector<unique_ptr<Pattern>>(); }
 patterns_comma_ne:  patterns_comma_ne COMMA pattern         { $$ = $1; $$->push_back(unique_ptr<Pattern>($3)); }
@@ -145,35 +160,35 @@ patterns_comma_ne:  patterns_comma_ne COMMA pattern         { $$ = $1; $$->push_
 literal:	INTLITERAL                                      { $$ = new IntExpression($1, @1); }
 	|	FLOATLITERAL                                        { $$ = new FloatExpression($1, @1); }
 	|	CHARLITERAL                                         { $$ = new CharExpression($1, @1); }
-	|	STRINGLITERAL                                       { /* TODO STRINGLITERALS should become char lists $$ = new String(* $1, @1); */  }
-expr:	expr OR expr                                        { $$ = new Or(unique_ptr<Expression>($1), unique_ptr<Expression>($3), @2); }
-	|	expr AND expr                                       { $$ = new And(unique_ptr<Expression>($1), unique_ptr<Expression>($3), @2); }
-	|	expr EQUAL expr                                     { $$ = new Equal(unique_ptr<Expression>($1), unique_ptr<Expression>($3), @2); }
-	|	expr NOTEQUAL expr                                  { $$ = new NotEqual(unique_ptr<Expression>($1), unique_ptr<Expression>($3), @2); }
-	|	expr LESSER expr                                    { $$ = new Lesser(unique_ptr<Expression>($1), unique_ptr<Expression>($3), @2); }
-	|	expr GREATER expr                                   { $$ = new Greater(unique_ptr<Expression>($1), unique_ptr<Expression>($3), @2); }
-	|	expr LESSEREQUAL expr                               { $$ = new LesserEq(unique_ptr<Expression>($1), unique_ptr<Expression>($3), @2); }
-	|	expr GREATEREQUAL expr                              { $$ = new GreaterEq(unique_ptr<Expression>($1), unique_ptr<Expression>($3), @2); }
-	|	expr ADD expr                                       { $$ = new Add(unique_ptr<Expression>($1), unique_ptr<Expression>($3), @2); }
-	|	expr SUB expr                                       { $$ = new Sub(unique_ptr<Expression>($1), unique_ptr<Expression>($3), @2); }
-	|	expr MUL expr                                       { $$ = new Mul(unique_ptr<Expression>($1), unique_ptr<Expression>($3), @2); }
-	|	expr DIV expr                                       { $$ = new Div(unique_ptr<Expression>($1), unique_ptr<Expression>($3), @2); }
-	|	expr MOD expr                                       { $$ = new Mod(unique_ptr<Expression>($1), unique_ptr<Expression>($3), @2); }
-	|   expr PROCON expr                                    { $$ = new ProducerConsumer(unique_ptr<Expression>($1), unique_ptr<Expression>($3), @2); }
-	|   expr CONCAT expr                                    { $$ = new Concat(unique_ptr<Expression>($1), unique_ptr<Expression>($3), @2); }
-	|	expr COLON expr                                     { $$ = new ListAdd(unique_ptr<Expression>($1), unique_ptr<Expression>($3), @2); }
+	|	STRINGLITERAL                                       { auto res = new ListExpression(vector<unique_ptr<Expression>>(), @1); for (auto Chr : * $1) res->Elements.push_back(make_unique<CharExpression>(Chr, @1)); delete $1; $$ = res; }
+expr:	expr OR expr                                        { $$ = new Or(unique_ptr<Expression>($1), unique_ptr<Expression>($3), @1); }
+	|	expr AND expr                                       { $$ = new And(unique_ptr<Expression>($1), unique_ptr<Expression>($3), @1); }
+	|	expr EQUAL expr                                     { $$ = new Equal(unique_ptr<Expression>($1), unique_ptr<Expression>($3), @1); }
+	|	expr NOTEQUAL expr                                  { $$ = new NotEqual(unique_ptr<Expression>($1), unique_ptr<Expression>($3), @1); }
+	|	expr LESSER expr                                    { $$ = new Lesser(unique_ptr<Expression>($1), unique_ptr<Expression>($3), @1); }
+	|	expr GREATER expr                                   { $$ = new Greater(unique_ptr<Expression>($1), unique_ptr<Expression>($3), @1); }
+	|	expr LESSEREQUAL expr                               { $$ = new LesserEq(unique_ptr<Expression>($1), unique_ptr<Expression>($3), @1); }
+	|	expr GREATEREQUAL expr                              { $$ = new GreaterEq(unique_ptr<Expression>($1), unique_ptr<Expression>($3), @1); }
+	|	expr ADD expr                                       { $$ = new Add(unique_ptr<Expression>($1), unique_ptr<Expression>($3), @1); }
+	|	expr SUB expr                                       { $$ = new Sub(unique_ptr<Expression>($1), unique_ptr<Expression>($3), @1); }
+	|	expr MUL expr                                       { $$ = new Mul(unique_ptr<Expression>($1), unique_ptr<Expression>($3), @1); }
+	|	expr DIV expr                                       { $$ = new Div(unique_ptr<Expression>($1), unique_ptr<Expression>($3), @1); }
+	|	expr MOD expr                                       { $$ = new Mod(unique_ptr<Expression>($1), unique_ptr<Expression>($3), @1); }
+	|   expr PROCON expr                                    { $$ = new ProducerConsumer(unique_ptr<Expression>($1), unique_ptr<Expression>($3), @1); }
+	|   expr CONCAT expr                                    { $$ = new Concat(unique_ptr<Expression>($1), unique_ptr<Expression>($3), @1); }
+	|	expr COLON expr                                     { $$ = new ListAdd(unique_ptr<Expression>($1), unique_ptr<Expression>($3), @1); }
 	|   expr TO type                                        { $$ = new To(unique_ptr<Expression>($1), @1); }
-	|	ID                                                  { $$ = new Id(* $1, @1); }
+	|	ID                                                  { $$ = new IdExpression(* $1, @1); }
 	|	literal                                             { $$ = $1; }
 	|	SQSTART exprs_comma SQEND                           { $$ = new ListExpression(move(* $2), @1); delete $2; }
 	|   PARSTART exprs_comma_ne COMMA expr PAREND           { $2->push_back(unique_ptr<Expression>($4)); $$ = new TupleExpression(move(* $2), @1); delete $2; }
 	|	PARSTART expr PAREND                                { $$ = new Par(unique_ptr<Expression>($2), @1); }
-	|	expr PARSTART exprs_comma PAREND                    { $$ = new Call(unique_ptr<Expression>($1), move(* $3), @2); delete $3; }
+	|	expr PARSTART exprs_comma PAREND                    { $$ = new Call(unique_ptr<Expression>($1), move(* $3), @1); delete $3; }
 	|	EXMARK expr                                         { $$ = new Not(unique_ptr<Expression>($2), @1); }
     |	SUB expr                                            { $$ = new Negative(unique_ptr<Expression>($2), @1); }
-    |   BACKSLASH ids LAMBARROW expr                        { $$ = new LambdaFunction(unique_ptr<Expression>($4), move(* $2), @1); delete $2; }
-ids:    ids ID                                              { $$->push_back(unique_ptr<IdPattern>(new IdPattern($2, @1))); }
-    |                                                       { $$ = new vector<unique_ptr<IdPattern>>(); }
+    |   BACKSLASH args LAMBARROW expr                       { $$ = new LambdaFunction(unique_ptr<Expression>($4), move(* $2), @1); delete $2; }
+args:    args ID                                            { $$ = $1; $$->push_back(unique_ptr<LambdaArg>(new LambdaArg(* $2, @1))); }
+    |                                                       { $$ = new vector<unique_ptr<LambdaArg>>();  }
 exprs_comma:    exprs_comma_ne                              { $$ = $1; }
 	|	                                                    { $$ = new vector<unique_ptr<Expression>>(); }
 exprs_comma_ne: exprs_comma_ne COMMA expr                   { $$ = $1; $$->push_back(unique_ptr<Expression>($3)); }

@@ -68,7 +68,11 @@ using namespace std;
     return token::CHARTYPE;
 }
 
-"Include" {
+"Bool"	{
+    return token::BOOLTYPE;
+}
+
+"include" {
     return token::INCLUDE;
 }
 
@@ -76,31 +80,35 @@ using namespace std;
     return token::TO;
 }
 
+"when" {
+    return token::WHEN;
+}
+
 [0-9]+ {
-    yylval->long_int = atol(yytext);
+    yylval->LongInt = atol(yytext);
     return token::INTLITERAL;
 }
 
 [0-9]+"."[0-9]+ {
-    yylval->long_double = atof(yytext);
+    yylval->LongDouble = atof(yytext);
     return token::FLOATLITERAL;
 }
 
 "'"[^']"'" {
 
-    yylval->chr = yytext[1];
+    yylval->Chr = yytext[1];
     return token::CHARLITERAL;
 }
 
 "\""[^"]*"\"" {
-    yylval->str = new string(yytext);
-    yylval->str->pop_back();
-    yylval->str->erase(0, 1);
+    yylval->Str = new string(yytext);
+    yylval->Str->pop_back();
+    yylval->Str->erase(0, 1);
     return token::STRINGLITERAL;
 }
 
 [a-zA-Z][a-zA-Z0-9_]* {
-    yylval->str = new string(yytext);
+    yylval->Str = new string(yytext);
     return token::ID;
 }
 
@@ -113,7 +121,7 @@ using namespace std;
 }
 
 "=>" {
-    return token::LAMBARROR;
+    return token::LAMBARROW;
 }
 
 "==" {

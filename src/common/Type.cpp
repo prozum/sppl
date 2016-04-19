@@ -28,6 +28,15 @@ namespace common {
                 Subtypes(Subtypes),
                 Loc(Loc) { }
 
+    Type::Type(TypeId Id,
+               vector<Type> Subtypes,
+               string Name,
+               Location Loc) :
+            Id(Id),
+            Subtypes(Subtypes),
+            Name(Name),
+            Loc(Loc) { }
+
     bool Type::operator==(const Type &Other) const {
         if (Id != Other.Id)
             return false;
@@ -62,17 +71,21 @@ namespace common {
             case TypeId::INT:
                 return "Int";
             case TypeId::FLOAT:
-                return "FloatPattern";
+                return "Float";
             case TypeId::CHAR:
-                return "CharPattern";
+                return "Char";
+            case TypeId::BOOL:
+                return "Bool";
             case TypeId::LIST:
                 return "[" + Subtypes[0].str() + "]";
             case TypeId::TUPLE:
                 return strJoin(", ");
             case TypeId::SIGNATURE:
                 return strJoin(" -> ");
-            case TypeId::EMPTYLIST:
-                return "[]";
+            case TypeId::CUSTOM:
+                return Name;
+            case TypeId::GENERIC:
+                return "<" + Name + ">";
             default:
                 throw runtime_error("This should not happen!");
         }

@@ -9,7 +9,6 @@ namespace common {
         Expression(Type Ty, Location Loc);
 
         virtual void accept(Visitor &V) = 0;
-        virtual string str() = 0;
     };
 
     class IdExpression : public Expression {
@@ -53,6 +52,16 @@ namespace common {
         string str();
     };
 
+    class BoolExpression : public Expression {
+    public:
+        bool Val;
+
+        BoolExpression(bool Val, Location Loc);
+
+        virtual void accept(Visitor &V);
+        string str();
+    };
+
     /* Other Expressions */
 
     class ListExpression : public Expression {
@@ -89,9 +98,9 @@ namespace common {
     class LambdaFunction : public Expression {
     public:
         unique_ptr<Expression> Expr;
-        vector<unique_ptr<IdPattern>> Args;
+        vector<unique_ptr<LambdaArg>> Args;
 
-        LambdaFunction(unique_ptr<Expression> Expr, vector<unique_ptr<IdPattern>> Args, Location Loc);
+        LambdaFunction(unique_ptr<Expression> Expr, vector<unique_ptr<LambdaArg>> Args, Location Loc);
 
         virtual void accept(Visitor &V);
         string str();

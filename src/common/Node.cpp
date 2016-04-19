@@ -9,6 +9,9 @@ namespace common {
     void Program::accept(Visitor &V) { V.visit(*this); }
     void Function::accept(Visitor &V) { V.visit(*this); }
     void Case::accept(Visitor &V) { V.visit(*this); }
+    void LambdaArg::accept(Visitor &V) { V.visit(*this); }
+    void AlgebraicDT::accept(Visitor &V) { V.visit(*this); }
+    void Product::accept(Visitor &V) { V.visit(*this); }
 
     Node::Node(Location Loc) :
             Ty(TypeId::UNKNOWN), Loc(Loc) { }
@@ -39,7 +42,7 @@ namespace common {
             Id(ANON_FUNC_NAME),
             Signature(Type(TypeId::UNKNOWN)),
             Anon(true) {
-        //Cases.push_back(make_unique<Case>(move(AnonFunc), vector<unique_ptr<Pattern>>(), AnonFunc->Loc));
+        Cases.push_back(make_unique<Case>(move(AnonFunc), nullptr, vector<unique_ptr<Pattern>>(), AnonFunc->Loc));
     }
 
     Function::Function(string Id,
@@ -58,6 +61,25 @@ namespace common {
             When(move(When)),
             Patterns(move(Patterns)) { }
 
+    LambdaArg::LambdaArg(string Id,
+                         Location Loc) :
+            Node(Loc),
+            Id(Id) { }
+
+    AlgebraicDT::AlgebraicDT(string Name, vector<Type> TypeConstructor, vector<unique_ptr<Product>> Sum,
+                             Location Loc) :
+            Declaration(Loc),
+            Name(Name),
+            TypeConstructor(TypeConstructor),
+            Sum(move(Sum)) { }
+
+    Product::Product(string Constructor,
+                     vector<Type> Values,
+                     Location Loc) :
+            Node(Loc),
+            Constructor(Constructor),
+            Values(Values) { }
+
     string Program::str() {
         string Str;
         for (auto &Func : Decls) {
@@ -70,28 +92,62 @@ namespace common {
     string Function::str() {
         string Str("def " + Id + " : ");
 
-        Str += Signature.str() + "\n";
+        for (size_t I = 0; I < Signature.Subtypes.size(); I++) {
+            Str += Signature.Subtypes[I].str();
+
+            if (I != Signature.Subtypes.size() - 1)
+                Str += " -> ";
+        }
+
+        Str += "\n";
 
         for (auto &Case : Cases) {
             Str += Case->str() + "\n";
         }
 
-        return Str + "\n";
+        return Str + "\n\n";
     }
 
     string Case::str() {
-        return "\t| " + strJoin(Patterns, " ") + " = " + Expr->str();
+        if (When)
+            return "\t| " + strJoin(Patterns, " ") + " when " + When->str() + " = " + Expr->str();
+        else
+            return "\t| " + strJoin(Patterns, " ") + " = " + Expr->str();
+    }
+
+    string LambdaArg::str() {
+        return Id;
+    }
+
+    string AlgebraicDT::str() {
+        string Str("type " + Name);
+
+        for (auto Type : TypeConstructor) {
+            Str += " " + Type.str();
+        }
+
+        return Str + " = " + strJoin(Sum, " | ") + "\n\n";
+    }
+
+    string Product::str() {
+        string Str(Constructor);
+
+        for (auto Value : Values) {
+            Str += " " + Value.str();
+        }
+
+        return Str;
     }
 
     template<class T>
-	string strJoin(T &List, const std::string JoinStr) {
-		string Str("(");
-		for (size_t i = 0; i < List.size(); ++i) {
-			Str += List[i]->str();
-			if (i + 1 != List.size())
-				Str += JoinStr;
-		}
+    string strJoin(T &List, const std::string JoinStr) {
+        string Str;
+        for (size_t i = 0; i < List.size(); ++i) {
+            Str += List[i]->str();
+            if (i + 1 != List.size())
+                Str += JoinStr;
+        }
 
-		return Str + ")";
-	}
+        return Str;
+    }
 }

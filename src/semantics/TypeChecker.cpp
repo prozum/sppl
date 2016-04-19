@@ -9,6 +9,7 @@ namespace semantics
     TypeChecker::TypeChecker() { }
 
     void TypeChecker::visit(Program &Node) {
+        /*
         auto StrList = Type(TypeId::LIST, vector<Type>({ Type(TypeId::STRING) }));
 
         // Visit children
@@ -36,6 +37,7 @@ namespace semantics
 
         }
         // Visit stops here
+         */
     }
 
     void TypeChecker::visit(Function &Node) {
@@ -78,11 +80,6 @@ namespace semantics
         }
 
         for (size_t i = 0; i < Node.Patterns.size(); ++i) {
-            if (Node.Patterns[i]->Ty.Id == TypeId::EMPTYLIST &&
-                    CurFunc->Signature.Subtypes[i].Id == TypeId::LIST) {
-                Node.Patterns[i]->Ty = CurFunc->Signature.Subtypes[i];
-            }
-
             if (Node.Patterns[i]->Ty != CurFunc->Signature.Subtypes[i]) {
                 throw Error::Expected("Wrong pattern type",
                                          CurFunc->Signature.Subtypes[i].str(),
@@ -91,10 +88,7 @@ namespace semantics
             }
         }
 
-        if (Node.Expr->Ty.Id == TypeId::EMPTYLIST &&
-                CurFunc->Signature.Subtypes.back().Id == TypeId::LIST)
-            Node.Expr->Ty = CurFunc->Signature.Subtypes.back();
-        else if (CurFunc->Signature.Subtypes.back() != Node.Expr->Ty) {
+        if (CurFunc->Signature.Subtypes.back() != Node.Expr->Ty) {
             throw Error::Expected("Wrong return type",
                                      CurFunc->Ty.str(),
                                      Node.Expr->Ty.str(),
@@ -103,6 +97,7 @@ namespace semantics
     }
 
     void TypeChecker::visit(Or &Node) {
+        /*
         // Visit children
         Node.Left->accept(*this);
         Node.Right->accept(*this);
@@ -114,6 +109,7 @@ namespace semantics
             throw Error::Binary("Operator only operates on Bool typed children",
                                    Node);
         }
+        */
     }
 
     void TypeChecker::visit(And &Node) {
@@ -306,17 +302,6 @@ namespace semantics
                 throw Error::Binary("Left type must be same type of right ListExpression",
                                        Node);
             }
-        } else if (Node.Right->Ty.Id == TypeId::STRING) {
-            if (Node.Left->Ty.Id == TypeId::CHAR) {
-                Node.Ty = Node.Right->Ty;
-            } else {
-                throw Error::Binary("Left type must be CharPattern when right is String",
-                                       Node);
-            }
-        }  else if (Node.Right->Ty.Id == TypeId::EMPTYLIST) {
-            Node.Ty = Type(TypeId::LIST);
-            Node.Ty.Subtypes.push_back(Node.Left->Ty);
-            Node.Right->Ty = Node.Ty;
         } else {
             throw Error::Binary("Right must be a ListExpression",
                                    Node);
@@ -353,13 +338,10 @@ namespace semantics
     void TypeChecker::visit(FloatPattern &Node) {
     }
 
-    void TypeChecker::visit(Bool &Node) {
+    void TypeChecker::visit(BoolPattern &Node) {
     }
 
     void TypeChecker::visit(CharPattern &Node) {
-    }
-
-    void TypeChecker::visit(String &Node) {
     }
 
     void TypeChecker::visit(ListPattern &Node) {
@@ -369,21 +351,17 @@ namespace semantics
         }
         // Visit stops here
 
-        if (Node.Patterns.size() == 0) {
-            Node.Ty = Type(TypeId::EMPTYLIST);
-        } else {
-            for (size_t i = 0; i < Node.Patterns.size() - 1; ++i) {
-                if (Node.Patterns[i]->Ty != Node.Patterns[i + 1]->Ty) {
-                    throw Error::Expected("All items in a ListExpression must be of the same type",
-                                             Node.Patterns[i]->str(),
-                                             Node.Patterns[i + 1]->str(),
-                                             Node.Loc);
-                }
+        for (size_t i = 0; i < Node.Patterns.size() - 1; ++i) {
+            if (Node.Patterns[i]->Ty != Node.Patterns[i + 1]->Ty) {
+                throw Error::Expected("All items in a ListExpression must be of the same type",
+                                         Node.Patterns[i]->str(),
+                                         Node.Patterns[i + 1]->str(),
+                                         Node.Loc);
             }
-
-            Node.Ty = Type(TypeId::LIST);
-            Node.Ty.Subtypes.push_back(Node.Patterns[0]->Ty);
         }
+
+        Node.Ty = Type(TypeId::LIST);
+        Node.Ty.Subtypes.push_back(Node.Patterns[0]->Ty);
     }
 
     void TypeChecker::visit(TuplePattern &Node) {
@@ -415,18 +393,6 @@ namespace semantics
                                          Node.Left->Ty.str(),
                                          Node.Loc);
             }
-        } else if (Node.Right->Ty.Id == TypeId::STRING) {
-            if (Node.Left->Ty.Id == TypeId::CHAR) {
-                Node.Ty = Node.Right->Ty;
-            } else {
-                throw Error::Expected("Left must be type CharPattern, when right is String",
-                                         "CharPattern",
-                                         Node.Left->Ty.str(),
-                                         Node.Loc);
-            }
-        } else if (Node.Right->Ty.Id == TypeId::EMPTYLIST) {
-            Node.Ty = Type(TypeId::LIST);
-            Node.Ty.Subtypes.push_back(Node.Left->Ty);
         } else {
             throw Error::Expected("Right must be a ListExpression",
                                      "ListExpression",
@@ -442,20 +408,16 @@ namespace semantics
         }
         // Visit stops here
 
-        if (Node.Elements.size() == 0) {
-            Node.Ty = Type(TypeId::EMPTYLIST);
-        } else {
-            for (size_t i = 0; i < Node.Elements.size() - 1; ++i) {
-                if (Node.Elements[i]->Ty != Node.Elements[i + 1]->Ty) {
-                    throw Error::Expected("All items in a ListExpression must be same type",
-                                             Node.Elements[i]->str(),
-                                             Node.Elements[i + 1]->str(),
-                                             Node.Elements[i + 1]->Loc);
-                }
+        for (size_t i = 0; i < Node.Elements.size() - 1; ++i) {
+            if (Node.Elements[i]->Ty != Node.Elements[i + 1]->Ty) {
+                throw Error::Expected("All items in a ListExpression must be same type",
+                                         Node.Elements[i]->str(),
+                                         Node.Elements[i + 1]->str(),
+                                         Node.Elements[i + 1]->Loc);
             }
-            Node.Ty = Type(TypeId::LIST);
-            Node.Ty.Subtypes.push_back(Node.Elements[0]->Ty);
         }
+        Node.Ty = Type(TypeId::LIST);
+        Node.Ty.Subtypes.push_back(Node.Elements[0]->Ty);
     }
 
     void TypeChecker::visit(TupleExpression &Node) {
@@ -506,10 +468,7 @@ namespace semantics
         }
 
         for (size_t i = 0; i < Node.Args.size(); ++i) {
-            if (Node.Args[i]->Ty.Id == TypeId::EMPTYLIST &&
-                    Node.Callee->Ty.Subtypes[i].Id == TypeId::LIST)
-                Node.Args[i]->Ty = Node.Callee->Ty.Subtypes[i];
-            else if (Node.Args[i]->Ty != Node.Callee->Ty.Subtypes[i]) {
+            if (Node.Args[i]->Ty != Node.Callee->Ty.Subtypes[i]) {
                 throw Error::Expected("Function was called with an invalid argument",
                                          Node.Callee->Ty.Subtypes[i].str(),
                                          Node.Args[i]->Ty.str(),

@@ -42,6 +42,7 @@ namespace common {
 	};
 
 	class To : public UnaryOp {
+	public:
 		To(unique_ptr<Expression> Child, Location Loc);
 
 		virtual void accept(Visitor &V);

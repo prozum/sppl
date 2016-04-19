@@ -2,9 +2,9 @@
 
 #include "Driver.h"
 #include "CodeGenerator.h"
-//#include "TypeChecker.h"
-//#include "ScopeGenerator.h"
-//#include "GeneralOptimizer.h"
+#include "TypeChecker.h"
+#include "ScopeGenerator.h"
+#include "GeneralOptimizer.h"
 
 #include <iostream>
 #include <memory>
@@ -47,9 +47,9 @@ namespace compiler {
         Compiler();
 
         unique_ptr<CodeGenerator> generator;
-        //semantics::ScopeGenerator scope_generator;
-        //semantics::TypeChecker type_checker;
-        //optimizer::GeneralOptimizer optimizer;
+        semantics::ScopeGenerator scope_generator;
+        semantics::TypeChecker type_checker;
+        optimizer::GeneralOptimizer optimizer;
 
         int compile();
 
