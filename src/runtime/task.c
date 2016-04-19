@@ -1,0 +1,338 @@
+/* Copyright (c) 2005 Russ Cox, MIT; see COPYRIGHT */
+
+#include "taskimpl.h"
+#include "runtime.h"
+#include <fcntl.h>
+#include <stdio.h>
+
+/*
+Context	    taskschedcontext;
+Tasklist	taskrunqueue;
+*/
+
+
+
+static char *argv0;
+static	void		contextswitch(Context *from, Context *to);
+
+
+static void
+taskstart(uint y, uint x)
+{
+	Task *t;
+	ulong z;
+
+	z = x<<16;	/* hide undefined 32-bit shift from 32-bit compilers */
+	z <<= 16;
+	z |= y;
+	t = (Task*)z;
+
+//print("taskstart %p\n", t);
+	t->startfn(t->startarg);
+//print("taskexits %p\n", t);
+	taskexit(0);
+//print("not reacehd\n");
+}
+
+static int taskidgen;
+
+static Task*
+taskalloc(void (*fn)(void*), void *arg, uint stack)
+{
+	Task *t;
+	sigset_t zero;
+	uint x, y;
+	ulong z;
+
+	/* allocate the task and stack together */
+	t = malloc(sizeof *t+stack);
+	if(t == nil){
+		fprint(2, "taskalloc malloc: %r\n");
+		abort();
+	}
+	memset(t, 0, sizeof *t);
+	t->stk = (uchar*)(t+1);
+	t->stksize = stack;
+	t->startfn = fn;
+	t->startarg = arg;
+
+	/* do a reasonable initialization */
+	memset(&t->context.uc, 0, sizeof t->context.uc);
+	sigemptyset(&zero);
+	sigprocmask(SIG_BLOCK, &zero, &t->context.uc.uc_sigmask);
+
+	/* must initialize with current context */
+	if(getcontext(&t->context.uc) < 0){
+		fprint(2, "getcontext: %r\n");
+		abort();
+	}
+
+	/* call makecontext to do the real work. */
+	/* leave a few words open on both ends */
+	t->context.uc.uc_stack.ss_sp = t->stk+8;
+	t->context.uc.uc_stack.ss_size = t->stksize-64;
+#if defined(__sun__) && !defined(__MAKECONTEXT_V2_SOURCE)		/* sigh */
+#warning "doing sun thing"
+	/* can avoid this with __MAKECONTEXT_V2_SOURCE but only on SunOS 5.9 */
+	t->context.uc.uc_stack.ss_sp = 
+		(char*)t->context.uc.uc_stack.ss_sp
+		+t->context.uc.uc_stack.ss_size;
+#endif
+	/*
+	 * All this magic is because you have to pass makecontext a
+	 * function that takes some number of word-sized variables,
+	 * and on 64-bit machines pointers are bigger than words.
+	 */
+//print("make %p\n", t);
+	z = (ulong)t;
+	y = z;
+	z >>= 16;	/* hide undefined 32-bit shift from 32-bit compilers */
+	x = z>>16;
+	makecontext(&t->context.uc, (void(*)())taskstart, 2, y, x);
+
+	return t;
+}
+
+void
+taskcreate(void (*fn)(void*), void *arg, uint stack)
+{
+	Task *t;
+
+	t = taskalloc(fn, arg, stack);
+
+	taskready(t);
+}
+
+void
+taskswitch(Task *t)
+{
+	needstack(t, 0);
+	contextswitch(&t->context, &taskschedcontext);
+}
+
+void
+taskready(Task *t)
+{
+	t->ready = 1;
+
+    queue_head *new = malloc(sizeof(queue_head));
+    new->item = (void *)t;
+    queue_add(new, runtime.queue);
+}
+
+void
+taskyield(Task *t)
+{
+	taskready(t);
+	taskswitch(t);
+}
+
+int
+anyready(void)
+{
+	return taskrunqueue.head != nil;
+}
+
+void
+taskexitall(int val)
+{
+	exit(val);
+}
+
+void
+taskexit(Task *t)
+{
+	//taskexitval = val;
+	t->exiting = 1;
+	taskswitch(t);
+}
+
+static void
+contextswitch(Context *from, Context *to)
+{
+	if(swapcontext(&from->uc, &to->uc) < 0){
+		fprint(2, "swapcontext failed: %r\n");
+		assert(0);
+	}
+}
+
+void
+taskscheduler(void)
+{
+	int i;
+	Task *t;
+
+	//taskdebug("scheduler enter");
+	do{
+		contextswitch(&taskschedcontext, &t->context);
+	} while (1);
+
+    pthread_exit(NULL);
+}
+
+void**
+taskdata(Task *t)
+{
+	return t->udata;
+}
+
+/*
+ * debugging
+ */
+void
+taskname(Task *t, char *fmt, ...)
+{
+	va_list arg;
+
+	va_start(arg, fmt);
+	vsnprint(t->name, sizeof t->name, fmt, arg);
+	va_end(arg);
+}
+
+char*
+taskgetname(Task *t)
+{
+	return t->name;
+}
+
+/*
+void
+taskstate(char *fmt, ...)
+{
+	va_list arg;
+	Task *t;
+
+	t = taskrunning;
+	va_start(arg, fmt);
+	vsnprint(t->state, sizeof t->name, fmt, arg);
+	va_end(arg);
+}
+ */
+
+/*
+char*
+taskgetstate(void)
+{
+	return taskrunning->state;
+}
+ */
+
+
+void
+needstack(Task *t, int n)
+{
+	if((char*)&t <= (char*)t->stk
+	|| (char*)&t - (char*)t->stk < 256+n){
+		fprint(2, "task stack overflow: &t=%p tstk=%p n=%d\n", &t, t->stk, 256+n);
+		abort();
+	}
+}
+
+/*
+static void
+taskinfo(int s)
+{
+	int i;
+	Task *t;
+	char *extra;
+
+	fprint(2, "task list:\n");
+	for(i=0; i<nalltask; i++){
+		t = alltask[i];
+		if(t == taskrunning)
+			extra = " (running)";
+		else if(t->ready)
+			extra = " (ready)";
+		else
+			extra = "";
+		fprint(2, "%6d%c %-20s %s%s\n", 
+			t->id, t->system ? 's' : ' ', 
+			t->name, t->state, extra);
+	}
+}
+ */
+
+/*
+ * startup
+ */
+
+static int taskargc;
+static char **taskargv;
+int mainstacksize;
+
+/*
+static void
+taskmainstart(void *v)
+{
+	taskname("taskmain");
+	taskmain(taskargc, taskargv);
+}
+ */
+
+int
+main(int argc, char **argv)
+{
+    /*
+	struct sigaction sa, osa;
+
+	memset(&sa, 0, sizeof sa);
+	//sa.sa_handler = taskinfo;
+	sa.sa_flags = SA_RESTART;
+	sigaction(SIGQUIT, &sa, &osa);
+
+#ifdef SIGINFO
+	sigaction(SIGINFO, &sa, &osa);
+#endif
+
+	argv0 = argv[0];
+	taskargc = argc;
+	taskargv = argv;
+
+	if(mainstacksize == 0)
+		mainstacksize = 256*1024;
+	taskcreate(taskmainstart, nil, mainstacksize);
+	taskscheduler();
+	fprint(2, "taskscheduler returned in main!\n");
+	abort();
+    */
+	return 0;
+}
+
+/*
+ * hooray for linked lists
+ */
+void
+addtask(Tasklist *l, Task *t)
+{
+	if(l->tail){
+		l->tail->next = t;
+		t->prev = l->tail;
+	}else{
+		l->head = t;
+		t->prev = nil;
+	}
+	l->tail = t;
+	t->next = nil;
+}
+
+void
+deltask(Tasklist *l, Task *t)
+{
+	if(t->prev)
+		t->prev->next = t->next;
+	else
+		l->head = t->next;
+	if(t->next)
+		t->next->prev = t->prev;
+	else
+		l->tail = t->prev;
+}
+
+/*
+unsigned int
+taskid(void)
+{
+	return taskrunning->id;
+}
+*/
+
