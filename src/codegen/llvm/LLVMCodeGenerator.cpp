@@ -227,10 +227,10 @@ namespace codegen {
         auto Right = CurVal;
 
         if (Node.Left->Ty.Id == common::TypeId::FLOAT) {
-            assert(Node.Right->Ty.Id == common::TypeId::FLOAT)
+            assert(Node.Right->Ty.Id == common::TypeId::FLOAT);
             CurVal = Builder.CreateFAdd(Left, Right, "addtmp");
         } else {
-            assert(Node.Left->Ty.Id == common::TypeId::INT && Node.Right->Ty.Id == common::TypeId::INT)
+            assert(Node.Left->Ty.Id == common::TypeId::INT && Node.Right->Ty.Id == common::TypeId::INT);
             CurVal = Builder.CreateAdd(Left, Right, "addtmp");
         }
     }
@@ -242,10 +242,10 @@ namespace codegen {
         auto Right = CurVal;
 
         if ( Node.Left->Ty.Id == common::TypeId::FLOAT && Node.Right->Ty.Id == common::TypeId::FLOAT) {
-            assert(Node.Right->Ty.Id == common::TypeId::FLOAT)
+            assert(Node.Right->Ty.Id == common::TypeId::FLOAT);
             CurVal = Builder.CreateFSub(Left, Right, "subtmp");
         } else {
-            assert(Node.Left->Ty.Id == common::TypeId::INT && Node.Right->Ty.Id == common::TypeId::INT)
+            assert(Node.Left->Ty.Id == common::TypeId::INT && Node.Right->Ty.Id == common::TypeId::INT);
             CurVal = Builder.CreateSub(Left, Right, "subtmp");
         }
     }
@@ -257,10 +257,10 @@ namespace codegen {
         auto Right = CurVal;
 
         if (Node.Left->Ty.Id == common::TypeId::FLOAT) {
-            assert(Node.Right->Ty.Id == common::TypeId::FLOAT)
+            assert(Node.Right->Ty.Id == common::TypeId::FLOAT);
             CurVal = Builder.CreateFMul(Left, Right, "multmp");
         } else {
-            assert(Node.Left->Ty.Id == common::TypeId::INT && Node.Right->Ty.Id == common::TypeId::INT)
+            assert(Node.Left->Ty.Id == common::TypeId::INT && Node.Right->Ty.Id == common::TypeId::INT);
             CurVal = Builder.CreateMul(Left, Right, "multmp");
         }
     }
@@ -272,10 +272,10 @@ namespace codegen {
         auto Right = CurVal;
 
         if (Node.Left->Ty.Id == common::TypeId::FLOAT) {
-            assert(Node.Right->Ty.Id == common::TypeId::FLOAT)
+            assert(Node.Right->Ty.Id == common::TypeId::FLOAT);
             CurVal = Builder.CreateFDiv(Left, Right, "divtmp");
         } else {
-            assert(Node.Left->Ty.Id == common::TypeId::INT && Node.Right->Ty.Id == common::TypeId::INT)
+            assert(Node.Left->Ty.Id == common::TypeId::INT && Node.Right->Ty.Id == common::TypeId::INT);
             CurVal = Builder.CreateSDiv(Left, Right, "divtmp");
         }
     }
@@ -287,10 +287,10 @@ namespace codegen {
         auto right = CurVal;
 
         if (Node.Left->Ty.Id == common::TypeId::FLOAT) {
-            assert(Node.Right->Ty.Id == common::TypeId::FLOAT)
+            assert(Node.Right->Ty.Id == common::TypeId::FLOAT);
             CurVal = Builder.CreateFRem(left, right, "modtmp");
         } else {
-            assert(Node.Left->Ty.Id == common::TypeId::INT && Node.Right->Ty.Id == common::TypeId::INT)
+            assert(Node.Left->Ty.Id == common::TypeId::INT && Node.Right->Ty.Id == common::TypeId::INT);
             CurVal = Builder.CreateSRem(left, right, "modtmp");
         }
     }
@@ -324,10 +324,10 @@ namespace codegen {
         auto Right = CurVal;
 
         if (Node.Left->Ty.Id == common::TypeId::FLOAT) {
-            assert(Node.Right->Ty.Id == common::TypeId::FLOAT)
+            assert(Node.Right->Ty.Id == common::TypeId::FLOAT);
             CurVal = Builder.CreateFCmpOEQ(Left, Right, "eqtmp");
         } else {
-            assert(Node.Left->Ty.Id == common::TypeId::INT && Node.Right->Ty.Id == common::TypeId::INT)
+            assert(Node.Left->Ty.Id == common::TypeId::INT && Node.Right->Ty.Id == common::TypeId::INT);
             CurVal = Builder.CreateICmpEQ(Left, Right, "eqtmp");
         }
     }
@@ -339,10 +339,10 @@ namespace codegen {
         auto Right = CurVal;
 
         if ( Node.Left->Ty.Id == common::TypeId::FLOAT) {
-            assert(Node.Right->Ty.Id == common::TypeId::FLOAT)
+            assert(Node.Right->Ty.Id == common::TypeId::FLOAT);
             CurVal = Builder.CreateFCmpONE(Left, Right, "neqtmp");
         } else {
-            assert(Node.Left->Ty.Id == common::TypeId::INT && Node.Right->Ty.Id == common::TypeId::INT)
+            assert(Node.Left->Ty.Id == common::TypeId::INT && Node.Right->Ty.Id == common::TypeId::INT);
             CurVal = Builder.CreateICmpNE(Left, Right, "neqtmp");
         }
     }
@@ -354,10 +354,10 @@ namespace codegen {
         auto Right = CurVal;
 
         if ( Node.Left->Ty.Id == common::TypeId::FLOAT) {
-            assert(Node.Right->Ty.Id == common::TypeId::FLOAT)
+            assert(Node.Right->Ty.Id == common::TypeId::FLOAT);
             CurVal = Builder.CreateFCmpOLT(Left, Right, "lttmp");
         } else {
-            assert(Node.Left->Ty.Id == common::TypeId::INT && Node.Right->Ty.Id == common::TypeId::INT)
+            assert(Node.Left->Ty.Id == common::TypeId::INT && Node.Right->Ty.Id == common::TypeId::INT);
             CurVal = Builder.CreateICmpSLT(Left, Right, "lttmp");
         }
     }
@@ -369,10 +369,10 @@ namespace codegen {
         auto Right = CurVal;
 
         if ( Node.Left->Ty.Id == common::TypeId::FLOAT) {
-            assert(Node.Right->Ty.Id == common::TypeId::FLOAT)
+            assert(Node.Right->Ty.Id == common::TypeId::FLOAT);
             CurVal = Builder.CreateFCmpOGT(Left, Right, "lttmp");
         } else {
-            assert(Node.Left->Ty.Id == common::TypeId::INT && Node.Right->Ty.Id == common::TypeId::INT)
+            assert(Node.Left->Ty.Id == common::TypeId::INT && Node.Right->Ty.Id == common::TypeId::INT);
             CurVal = Builder.CreateICmpSGT(Left, Right, "lttmp");
         }
     }
@@ -384,10 +384,10 @@ namespace codegen {
         auto Right = CurVal;
 
         if ( Node.Left->Ty.Id == common::TypeId::FLOAT) {
-            assert(Node.Right->Ty.Id == common::TypeId::FLOAT)
+            assert(Node.Right->Ty.Id == common::TypeId::FLOAT);
             CurVal = Builder.CreateFCmpOLE(Left, Right, "lttmp");
         } else {
-            assert(Node.Left->Ty.Id == common::TypeId::INT && Node.Right->Ty.Id == common::TypeId::INT)
+            assert(Node.Left->Ty.Id == common::TypeId::INT && Node.Right->Ty.Id == common::TypeId::INT);
             CurVal = Builder.CreateICmpSLE(Left, Right, "lttmp");
         }
     }
@@ -399,10 +399,10 @@ namespace codegen {
         auto Right = CurVal;
 
         if ( Node.Left->Ty.Id == common::TypeId::FLOAT) {
-            assert(Node.Right->Ty.Id == common::TypeId::FLOAT)
+            assert(Node.Right->Ty.Id == common::TypeId::FLOAT);
             CurVal = Builder.CreateFCmpOGE(Left, Right, "lttmp");
         } else {
-            assert(Node.Left->Ty.Id == common::TypeId::INT && Node.Right->Ty.Id == common::TypeId::INT)
+            assert(Node.Left->Ty.Id == common::TypeId::INT && Node.Right->Ty.Id == common::TypeId::INT);
             CurVal = Builder.CreateICmpSGE(Left, Right, "lttmp");
         }
     }
