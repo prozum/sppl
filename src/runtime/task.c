@@ -1,20 +1,8 @@
-/* Copyright (c) 2005 Russ Cox, MIT; see COPYRIGHT */
-
-#include "taskimpl.h"
-#include "runtime.h"
-#include <fcntl.h>
-#include <stdio.h>
-
-/*
-Context	    taskschedcontext;
-Tasklist	taskrunqueue;
-*/
-
-
+#include "defs.h"
+#include "task.h"
 
 static char *argv0;
 static	void		contextswitch(Context *from, Context *to);
-
 
 static void
 taskstart(uint y, uint x)
@@ -27,14 +15,9 @@ taskstart(uint y, uint x)
 	z |= y;
 	t = (Task*)z;
 
-//print("taskstart %p\n", t);
 	t->startfn(t->startarg);
-//print("taskexits %p\n", t);
-	taskexit(0);
-//print("not reacehd\n");
+	taskexit(t,);
 }
-
-static int taskidgen;
 
 static Task*
 taskalloc(void (*fn)(void*), void *arg, uint stack)
@@ -46,10 +29,7 @@ taskalloc(void (*fn)(void*), void *arg, uint stack)
 
 	/* allocate the task and stack together */
 	t = malloc(sizeof *t+stack);
-	if(t == nil){
-		fprint(2, "taskalloc malloc: %r\n");
-		abort();
-	}
+
 	memset(t, 0, sizeof *t);
 	t->stk = (uchar*)(t+1);
 	t->stksize = stack;
@@ -71,13 +51,7 @@ taskalloc(void (*fn)(void*), void *arg, uint stack)
 	/* leave a few words open on both ends */
 	t->context.uc.uc_stack.ss_sp = t->stk+8;
 	t->context.uc.uc_stack.ss_size = t->stksize-64;
-#if defined(__sun__) && !defined(__MAKECONTEXT_V2_SOURCE)		/* sigh */
-#warning "doing sun thing"
-	/* can avoid this with __MAKECONTEXT_V2_SOURCE but only on SunOS 5.9 */
-	t->context.uc.uc_stack.ss_sp = 
-		(char*)t->context.uc.uc_stack.ss_sp
-		+t->context.uc.uc_stack.ss_size;
-#endif
+
 	/*
 	 * All this magic is because you have to pass makecontext a
 	 * function that takes some number of word-sized variables,
@@ -94,30 +68,24 @@ taskalloc(void (*fn)(void*), void *arg, uint stack)
 }
 
 void
-taskcreate(void (*fn)(void*), void *arg, uint stack)
+taskcreate(void (*fn)(void*), void *arg, uint stack, queue_root *queue)
 {
 	Task *t;
 
 	t = taskalloc(fn, arg, stack);
 
-	taskready(t);
-}
-
-void
-taskswitch(Task *t)
-{
-	needstack(t, 0);
-	contextswitch(&t->context, &taskschedcontext);
-}
-
-void
-taskready(Task *t)
-{
 	t->ready = 1;
 
-    queue_head *new = malloc(sizeof(queue_head));
-    new->item = (void *)t;
-    queue_add(new, runtime.queue);
+	queue_head *new = malloc(sizeof(queue_head));
+	new->item = (void *)t;
+	queue_add(new, queue);
+}
+
+void
+taskswitch(Task *t, Context *context)
+{
+    needstack(t, 0);
+	contextswitch(&t->context, context);
 }
 
 void
@@ -134,17 +102,10 @@ anyready(void)
 }
 
 void
-taskexitall(int val)
+taskexit(Task *t, Context *context)
 {
-	exit(val);
-}
-
-void
-taskexit(Task *t)
-{
-	//taskexitval = val;
 	t->exiting = 1;
-	taskswitch(t);
+	taskswitch(t, context);
 }
 
 static void
@@ -195,29 +156,6 @@ taskgetname(Task *t)
 	return t->name;
 }
 
-/*
-void
-taskstate(char *fmt, ...)
-{
-	va_list arg;
-	Task *t;
-
-	t = taskrunning;
-	va_start(arg, fmt);
-	vsnprint(t->state, sizeof t->name, fmt, arg);
-	va_end(arg);
-}
- */
-
-/*
-char*
-taskgetstate(void)
-{
-	return taskrunning->state;
-}
- */
-
-
 void
 needstack(Task *t, int n)
 {
@@ -227,30 +165,6 @@ needstack(Task *t, int n)
 		abort();
 	}
 }
-
-/*
-static void
-taskinfo(int s)
-{
-	int i;
-	Task *t;
-	char *extra;
-
-	fprint(2, "task list:\n");
-	for(i=0; i<nalltask; i++){
-		t = alltask[i];
-		if(t == taskrunning)
-			extra = " (running)";
-		else if(t->ready)
-			extra = " (ready)";
-		else
-			extra = "";
-		fprint(2, "%6d%c %-20s %s%s\n", 
-			t->id, t->system ? 's' : ' ', 
-			t->name, t->state, extra);
-	}
-}
- */
 
 /*
  * startup

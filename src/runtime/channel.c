@@ -1,6 +1,8 @@
 /* Copyright (c) 2005 Russ Cox, MIT; see COPYRIGHT */
 
-#include "taskimpl.h"
+//#include "taskimpl.h"
+
+#include "channel.h"
 
 Channel*
 chancreate(int elemsize, int bufsize)

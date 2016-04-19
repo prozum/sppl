@@ -1,7 +1,4 @@
-/* Copyright (c) 2004 Russ Cox.  See COPYRIGHT. */
-
-#include "taskimpl.h"
-#include <stdio.h>	/* for strerror! */
+#include "print.h"
 
 /*
  * Stripped down print library.  Plan 9 interface, new code.
