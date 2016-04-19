@@ -5,8 +5,8 @@
 %initial-action {
     @$.begin.Src = @$.end.Src = Drv.Source;
 }
-%debug
 %parse-param { class Driver &Drv }
+%debug
 %error-verbose
 
 // Parser.h
@@ -18,7 +18,6 @@
 
 using namespace common;
 using namespace std;
-
 }
 
 // Parser.cpp
@@ -27,7 +26,7 @@ using namespace std;
 
 // Connect bison parser to flex scanner
 #undef yylex
-#define yylex Drv.Snr.lex
+#define yylex Drv.Scr.lex
 %}
 
 %union {

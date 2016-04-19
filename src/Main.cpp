@@ -46,31 +46,31 @@ int main(int argc, char *argv[])
             return 0;
         }
 #ifdef CCPP
-        else if (strcmp(argv[i],"--cpp") == 0)
+        else if (strcmp(argv[i], "--cpp") == 0)
             backend = Backend::CPP;
 #endif
 #ifdef CGNUASM
-        else if (strcmp(argv[i],"--gnuasm") == 0)
+        else if (strcmp(argv[i], "--gnuasm") == 0)
             backend = Backend::GNUASM;
 #endif
 #ifdef CHASKELL
-        else if (strcmp(argv[i],"--haskell") == 0)
+        else if (strcmp(argv[i], "--haskell") == 0)
             backend = Backend::GNUASM;
 #endif
 #ifdef CLLVM
-        else if (strcmp(argv[i],"--llvm") == 0)
+        else if (strcmp(argv[i], "--llvm") == 0)
             backend = Backend::LLVM;
 #endif
-        else if (strcmp(argv[i],"--pprinter") == 0)
+        else if (strcmp(argv[i], "--pprinter") == 0)
             backend = Backend::PPRINTER;
-        else if (strcmp(argv[i],"--output") == 0 || strcmp(argv[i],"-o") == 0)
+        else if (strcmp(argv[i], "--output") == 0 || strcmp(argv[i], "-o") == 0)
             if (i < argc - 1)
                 output = argv[++i];
             else {
                 cerr << "No output file specified" << endl;
                 return 2;
             }
-        else if (strcmp(argv[i],"--header-output") == 0 || strcmp(argv[i],"-ho") == 0)
+        else if (strcmp(argv[i], "--header-output") == 0 || strcmp(argv[i], "-ho") == 0)
             if (i < argc - 1)
                 header_output = argv[++i];
             else {
@@ -90,8 +90,7 @@ int main(int argc, char *argv[])
     Compiler compiler;
     compiler.setOutput(output);
     compiler.setHeaderOutput(header_output);
-    compiler.setInputs(inputs);
     compiler.setBackend(backend);
 
-    return compiler.compile();
+    return compiler.compile(inputs);
 }
