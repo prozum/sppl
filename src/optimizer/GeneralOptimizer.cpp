@@ -19,9 +19,9 @@ namespace optimizer {
         for (auto &Case : Node.Cases) {
             auto Expr = Case->Expr.get();
 
-            if (typeid(*Expr) == typeid(Call) &&
-                typeid(static_cast<Call*>(Expr)->Callee) == typeid(IdPattern) &&
-                (static_cast<IdExpression*>(static_cast<Call*>(Expr)->Callee.get()))->Val == Node.Id) {
+            if (typeid(*Expr) == typeid(CallExpr) &&
+                typeid(static_cast<CallExpr*>(Expr)->Callee) == typeid(IdPattern) &&
+                (static_cast<IdExpr*>(static_cast<CallExpr*>(Expr)->Callee.get()))->Val == Node.Id) {
                 Case->TailRec = true;
             }
 
@@ -107,7 +107,7 @@ namespace optimizer {
         Node.Right->accept(*this);
     }
 
-    void GeneralOptimizer::visit(Par &Node) {
+    void GeneralOptimizer::visit(ParExpr &Node) {
         Node.Child->accept(*this);
     }
 
@@ -141,7 +141,7 @@ namespace optimizer {
     void GeneralOptimizer::visit(CharPattern &Node) {
     }
 
-    void GeneralOptimizer::visit(ListExpression &Node) {
+    void GeneralOptimizer::visit(ListExpr &Node) {
         for (auto &Element : Node.Elements) {
             Element->accept(*this);
         }
@@ -150,7 +150,7 @@ namespace optimizer {
     void GeneralOptimizer::visit(IdPattern &Node) {
     }
 
-    void GeneralOptimizer::visit(Call &Node) {
+    void GeneralOptimizer::visit(CallExpr &Node) {
         Node.Callee->accept(*this);
 
         for (auto &Arg : Node.Args) {
@@ -161,7 +161,7 @@ namespace optimizer {
     void GeneralOptimizer::visit(Type &Node) {
     }
 
-    void GeneralOptimizer::visit(TupleExpression &Node) {
+    void GeneralOptimizer::visit(TupleExpr &Node) {
         for (auto &Element : Node.Elements) {
             Element->accept(*this);
         }

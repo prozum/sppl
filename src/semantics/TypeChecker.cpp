@@ -9,39 +9,32 @@ namespace semantics
     TypeChecker::TypeChecker() { }
 
     void TypeChecker::visit(Program &Node) {
-        /*
-        auto StrList = Type(TypeId::LIST, vector<Type>({ Type(TypeId::STRING) }));
 
         // Visit children
-        for (auto &Func : Node.Decls) {
-            Func->accept(*this);
-
-            try {
-                if (Func->Id == "main") {
-                    if (Func->Signature.Subtypes.front() != StrList) {
-                        throw Error::Expected("Declaration of \"main\" had wrong input type",
-                                              StrList.str(),
-                                              Func->Signature.Subtypes.front().str(),
-                                              Func->Loc);
-                    } else if (Func->Signature.Subtypes.size() != 2) {
-                        throw Error::Expected("Function \"main\" had wrong number of input",
-                                              "2",
-                                              to_string(Func->Signature.Subtypes.size()),
-                                              Func->Loc);
-                    }
-                }
-            }
-            catch (Error err) {
-                Errors.push_back(err);
-            }
-
+        for (auto &Decl : Node.Decls) {
+            Decl->accept(*this);
         }
         // Visit stops here
-         */
     }
 
     void TypeChecker::visit(Function &Node) {
         CurFunc = &Node;
+
+        auto StrList = Type(TypeId::LIST, vector<Type>({ Type(TypeId::CHAR) }));
+
+        if (Node.Id == "main") {
+            if (Node.Signature.Subtypes.front() != StrList) {
+                addError(Error::Expected("Declaration of \"main\" had wrong input type",
+                         StrList.str(),
+                         Node.Signature.Subtypes.front().str(),
+                         Node.Loc));
+            } else if (Node.Signature.Subtypes.size() != 2) {
+                addError(Error::Expected("Function \"main\" had wrong number of input",
+                         "2",
+                         to_string(Node.Signature.Subtypes.size()),
+                         Node.Loc));
+            }
+        }
 
         // Visit children
         for (auto &Case : Node.Cases) {
@@ -53,10 +46,6 @@ namespace semantics
             }
         }
         // Visit stops here
-
-        // Set return type
-        if (!hasError())
-            Node.RetTy = Node.Signature.Subtypes.back();
     }
 
     void TypeChecker::visit(Case &Node) {
@@ -80,44 +69,35 @@ namespace semantics
         }
 
         for (size_t i = 0; i < Node.Patterns.size(); ++i) {
-            if (Node.Patterns[i]->RetTy.Id == TypeId::EMPTYLIST &&
-                    CurFunc->Signature.Subtypes[i].Id == TypeId::LIST) {
-                Node.Patterns[i]->RetTy = CurFunc->Signature.Subtypes[i];
-            }
-
             if (Node.Patterns[i]->RetTy != CurFunc->Signature.Subtypes[i]) {
                 throw Error::Expected("Wrong pattern type",
-                                         CurFunc->Signature.Subtypes[i].str(),
-                                         Node.Patterns[i]->RetTy.str(),
-                                         Node.Patterns[i]->Loc);
+                                      CurFunc->Signature.Subtypes[i].str(),
+                                      Node.Patterns[i]->RetTy.str(),
+                                      Node.Patterns[i]->Loc);
             }
         }
 
-        if (Node.Expr->RetTy.Id == TypeId::EMPTYLIST &&
-                CurFunc->Signature.Subtypes.back().Id == TypeId::LIST)
-            Node.Expr->RetTy = CurFunc->Signature.Subtypes.back();
-        else if (CurFunc->Signature.Subtypes.back() != Node.Expr->RetTy) {
+        if (CurFunc->Signature.Subtypes.back() != Node.Expr->RetTy) {
             throw Error::Expected("Wrong return type",
-                                     CurFunc->RetTy.str(),
-                                     Node.Expr->RetTy.str(),
-                                     Node.Loc);
+                                  CurFunc->Signature.Subtypes.back().str(),
+                                  Node.Expr->RetTy.str(),
+                                  Node.Loc);
         }
     }
 
     void TypeChecker::visit(Or &Node) {
-        /*
         // Visit children
         Node.Left->accept(*this);
         Node.Right->accept(*this);
         // Visit stops here
 
-        if (Node.Left->RetTy.Id == TypeId::BOOL && Node.Right->RetTy.Id == TypeId::BOOL) {
-            Node.RetTy = Node.Left->RetTy;
-        } else {
+        if (Node.Left->RetTy.Id != TypeId::BOOL ||
+            Node.Left->RetTy.Id != Node.Right->RetTy.Id) {
             throw Error::Binary("Operator only operates on Bool typed children",
-                                   Node);
+                                Node);
         }
-        */
+
+        Node.RetTy = Node.Left->RetTy;
     }
 
     void TypeChecker::visit(And &Node) {
@@ -126,12 +106,13 @@ namespace semantics
         Node.Right->accept(*this);
         // Visit stops here
 
-        if (Node.Left->RetTy == TypeId::BOOL && Node.Right->RetTy == TypeId::BOOL) {
-            Node.RetTy = Node.Left->RetTy;
-        } else {
+        if (Node.Left->RetTy.Id != TypeId::BOOL ||
+            Node.Left->RetTy.Id != Node.Right->RetTy.Id) {
             throw Error::Binary("Operator only operates on Bool typed children",
-                                   Node);
+                                Node);
         }
+
+        Node.RetTy = Node.Left->RetTy;
     }
 
     void TypeChecker::visit(Equal &Node) {
@@ -140,12 +121,13 @@ namespace semantics
         Node.Right->accept(*this);
         // Visit stops here
 
-        if (Node.Left->RetTy == Node.Right->RetTy) {
-            Node.RetTy = Type(TypeId::BOOL);
-        } else {
-            throw Error::Binary("Operator only operates on children of the same type",
-                                   Node);
+        if ((Node.Left->RetTy.Id != TypeId::INT && Node.Left->RetTy.Id != TypeId::FLOAT) ||
+            Node.Left->RetTy.Id != Node.Right->RetTy.Id) {
+            throw Error::Binary("Operator only operates on Int or FloatPattern children",
+                                Node);
         }
+
+        Node.RetTy = Node.Left->RetTy;
     }
 
     void TypeChecker::visit(NotEqual &Node) {
@@ -154,12 +136,13 @@ namespace semantics
         Node.Right->accept(*this);
         // Visit stops here
 
-        if (Node.Left->RetTy == Node.Right->RetTy) {
-            Node.RetTy = Type(TypeId::BOOL);
-        } else {
-            throw Error::Binary("Operator only operates on children of the same type",
-                                   Node);
+        if ((Node.Left->RetTy.Id != TypeId::INT && Node.Left->RetTy.Id != TypeId::FLOAT) ||
+            Node.Left->RetTy.Id != Node.Right->RetTy.Id) {
+            throw Error::Binary("Operator only operates on Int or FloatPattern children",
+                                Node);
         }
+
+        Node.RetTy = Node.Left->RetTy;
     }
 
     void TypeChecker::visit(Lesser &Node) {
@@ -168,13 +151,13 @@ namespace semantics
         Node.Right->accept(*this);
         // Visit stops here
 
-        if ((Node.Left->RetTy.Id == TypeId::INT && Node.Right->RetTy.Id == TypeId::INT) ||
-            (Node.Left->RetTy.Id == TypeId::FLOAT && Node.Right->RetTy.Id == TypeId::FLOAT)) {
-            Node.RetTy = Type(TypeId::BOOL);
-        } else {
-            throw Error::Binary("Operator only operates on children of the same type",
-                                   Node);
+        if ((Node.Left->RetTy.Id != TypeId::INT && Node.Left->RetTy.Id != TypeId::FLOAT) ||
+            Node.Left->RetTy.Id != Node.Right->RetTy.Id) {
+            throw Error::Binary("Operator only operates on Int or FloatPattern children",
+                                Node);
         }
+
+        Node.RetTy = Node.Left->RetTy;
     }
 
     void TypeChecker::visit(Greater &Node) {
@@ -183,13 +166,13 @@ namespace semantics
         Node.Right->accept(*this);
         // Visit stops here
 
-        if ((Node.Left->RetTy.Id == TypeId::INT && Node.Right->RetTy.Id == TypeId::INT) ||
-            (Node.Left->RetTy.Id == TypeId::FLOAT && Node.Right->RetTy.Id == TypeId::FLOAT)) {
-            Node.RetTy = Type(TypeId::BOOL);
-        } else {
+        if ((Node.Left->RetTy.Id != TypeId::INT && Node.Left->RetTy.Id != TypeId::FLOAT) ||
+            Node.Left->RetTy.Id != Node.Right->RetTy.Id) {
             throw Error::Binary("Operator only operates on Int or FloatPattern children",
-                                   Node);
+                                Node);
         }
+
+        Node.RetTy = Node.Left->RetTy;
     }
 
     void TypeChecker::visit(LesserEq &Node) {
@@ -198,13 +181,13 @@ namespace semantics
         Node.Right->accept(*this);
         // Visit stops here
 
-        if ((Node.Left->RetTy.Id == TypeId::INT && Node.Right->RetTy.Id == TypeId::INT) ||
-            (Node.Left->RetTy.Id == TypeId::FLOAT && Node.Right->RetTy.Id == TypeId::FLOAT)) {
-            Node.RetTy = Type(TypeId::BOOL);
-        } else {
+        if ((Node.Left->RetTy.Id != TypeId::INT && Node.Left->RetTy.Id != TypeId::FLOAT) ||
+            Node.Left->RetTy.Id != Node.Right->RetTy.Id) {
             throw Error::Binary("Operator only operates on Int or FloatPattern children",
-                                   Node);
+                                Node);
         }
+
+        Node.RetTy = Node.Left->RetTy;
     }
 
     void TypeChecker::visit(GreaterEq &Node) {
@@ -213,13 +196,13 @@ namespace semantics
         Node.Right->accept(*this);
         // Visit stops here
 
-        if ((Node.Left->RetTy.Id == TypeId::INT && Node.Right->RetTy.Id == TypeId::INT) ||
-            (Node.Left->RetTy.Id == TypeId::FLOAT && Node.Right->RetTy.Id == TypeId::FLOAT)) {
-            Node.RetTy = Type(TypeId::BOOL);
-        } else {
+        if ((Node.Left->RetTy.Id != TypeId::INT && Node.Left->RetTy.Id != TypeId::FLOAT) ||
+            Node.Left->RetTy.Id != Node.Right->RetTy.Id) {
             throw Error::Binary("Operator only operates on Int or FloatPattern children",
-                                   Node);
+                                Node);
         }
+
+        Node.RetTy = Node.Left->RetTy;
     }
 
     void TypeChecker::visit(Add &Node) {
@@ -228,13 +211,13 @@ namespace semantics
         Node.Right->accept(*this);
         // Visit stops here
 
-        if ((Node.Left->RetTy.Id == TypeId::INT && Node.Right->RetTy.Id == TypeId::INT) ||
-            (Node.Left->RetTy.Id == TypeId::FLOAT && Node.Right->RetTy.Id == TypeId::FLOAT)) {
-            Node.RetTy = Node.Left->RetTy;
-        } else {
+        if ((Node.Left->RetTy.Id != TypeId::INT && Node.Left->RetTy.Id != TypeId::FLOAT) ||
+            Node.Left->RetTy.Id != Node.Right->RetTy.Id) {
             throw Error::Binary("Operator only operates on Int or FloatPattern children",
-                                   Node);
+                                Node);
         }
+
+        Node.RetTy = Node.Left->RetTy;
     }
 
     void TypeChecker::visit(Sub &Node) {
@@ -243,13 +226,13 @@ namespace semantics
         Node.Right->accept(*this);
         // Visit stops here
 
-        if ((Node.Left->RetTy.Id == TypeId::INT && Node.Right->RetTy.Id == TypeId::INT) ||
-            (Node.Left->RetTy.Id == TypeId::FLOAT && Node.Right->RetTy.Id == TypeId::FLOAT)) {
-            Node.RetTy = Node.Left->RetTy;
-        } else {
+        if ((Node.Left->RetTy.Id != TypeId::INT && Node.Left->RetTy.Id != TypeId::FLOAT) ||
+            Node.Left->RetTy.Id != Node.Right->RetTy.Id) {
             throw Error::Binary("Operator only operates on Int or FloatPattern children",
-                                   Node);
+                                Node);
         }
+
+        Node.RetTy = Node.Left->RetTy;
     }
 
     void TypeChecker::visit(Mul &Node) {
@@ -258,13 +241,13 @@ namespace semantics
         Node.Right->accept(*this);
         // Visit stops here
 
-        if ((Node.Left->RetTy.Id == TypeId::INT && Node.Right->RetTy.Id == TypeId::INT) ||
-            (Node.Left->RetTy.Id == TypeId::FLOAT && Node.Right->RetTy.Id == TypeId::FLOAT)) {
-            Node.RetTy = Node.Left->RetTy;
-        } else {
+        if ((Node.Left->RetTy.Id != TypeId::INT && Node.Left->RetTy.Id != TypeId::FLOAT) ||
+            Node.Left->RetTy.Id != Node.Right->RetTy.Id) {
             throw Error::Binary("Operator only operates on Int or FloatPattern children",
-                                   Node);
+                                Node);
         }
+
+        Node.RetTy = Node.Left->RetTy;
     }
 
     void TypeChecker::visit(Div &Node) {
@@ -273,13 +256,13 @@ namespace semantics
         Node.Right->accept(*this);
         // Visit stops here
 
-        if ((Node.Left->RetTy.Id == TypeId::INT && Node.Right->RetTy.Id == TypeId::INT) ||
-            (Node.Left->RetTy.Id == TypeId::FLOAT && Node.Right->RetTy.Id == TypeId::FLOAT)) {
-            Node.RetTy = Node.Left->RetTy;
-        } else {
+        if ((Node.Left->RetTy.Id != TypeId::INT && Node.Left->RetTy.Id != TypeId::FLOAT) ||
+            Node.Left->RetTy.Id != Node.Right->RetTy.Id) {
             throw Error::Binary("Operator only operates on Int or FloatPattern children",
-                                   Node);
+                                Node);
         }
+
+        Node.RetTy = Node.Left->RetTy;
     }
 
     void TypeChecker::visit(Mod &Node) {
@@ -288,13 +271,13 @@ namespace semantics
         Node.Right->accept(*this);
         // Visit stops here
 
-        if ((Node.Left->RetTy.Id == TypeId::INT && Node.Right->RetTy.Id == TypeId::INT) ||
-            (Node.Left->RetTy.Id == TypeId::FLOAT && Node.Right->RetTy.Id == TypeId::FLOAT)) {
-            Node.RetTy = Node.Left->RetTy;
-        } else {
+        if ((Node.Left->RetTy.Id != TypeId::INT && Node.Left->RetTy.Id != TypeId::FLOAT) ||
+            Node.Left->RetTy.Id != Node.Right->RetTy.Id) {
             throw Error::Binary("Operator only operates on Int or FloatPattern children",
-                                   Node);
+                                Node);
         }
+
+        Node.RetTy = Node.Left->RetTy;
     }
 
     void TypeChecker::visit(ListAdd &Node) {
@@ -303,31 +286,20 @@ namespace semantics
         Node.Right->accept(*this);
         // Visit stops here
 
-        if (Node.Right->RetTy.Id == TypeId::LIST) {
-            if (Node.Left->RetTy == Node.Right->RetTy.Subtypes.front()) {
-                Node.RetTy = Node.Right->RetTy;
-            } else {
-                throw Error::Binary("Left type must be same type of right ListExpression",
-                                       Node);
-            }
-        } else if (Node.Right->RetTy.Id == TypeId::STRING) {
-            if (Node.Left->RetTy.Id == TypeId::CHAR) {
-                Node.RetTy = Node.Right->RetTy;
-            } else {
-                throw Error::Binary("Left type must be CharPattern when right is String",
-                                       Node);
-            }
-        }  else if (Node.Right->RetTy.Id == TypeId::EMPTYLIST) {
-            Node.RetTy = Type(TypeId::LIST);
-            Node.RetTy.Subtypes.push_back(Node.Left->RetTy);
-            Node.Right->RetTy = Node.RetTy;
-        } else {
+        if (Node.Right->RetTy.Id != TypeId::LIST) {
             throw Error::Binary("Right must be a ListExpression",
-                                   Node);
+                                Node);
         }
+
+        if (Node.Left->RetTy != Node.Right->RetTy.Subtypes.front()) {
+            throw Error::Binary("Left type must be same type of right ListExpression",
+                                Node);
+        }
+
+        Node.RetTy = Node.Right->RetTy;
     }
 
-    void TypeChecker::visit(Par &Node) {
+    void TypeChecker::visit(ParExpr &Node) {
         // Visit children
         Node.Child->accept(*this);
         // Visit stops here
@@ -342,12 +314,12 @@ namespace semantics
         Node.Child->accept(*this);
         // Visit stops here
 
-        if (Node.Child->RetTy.Id == TypeId::BOOL) {
-            Node.RetTy = Node.Child->RetTy;
-        } else {
+        if (Node.Child->RetTy.Id != TypeId::BOOL) {
             throw Error::Unary("Operator only operates on Bool typed children",
-                                  Node);
+                               Node);
         }
+
+        Node.RetTy = Node.Child->RetTy;
     }
 
     void TypeChecker::visit(IntPattern &Node) {
@@ -370,16 +342,12 @@ namespace semantics
         }
         // Visit stops here
 
-        if (Node.Patterns.size() == 0) {
-            Node.RetTy = Type(TypeId::EMPTYLIST);
-        } else {
-            for (size_t i = 0; i < Node.Patterns.size() - 1; ++i) {
-                if (Node.Patterns[i]->RetTy != Node.Patterns[i + 1]->RetTy) {
-                    throw Error::Expected("All items in a ListExpression must be of the same type",
-                                             Node.Patterns[i]->str(),
-                                             Node.Patterns[i + 1]->str(),
-                                             Node.Loc);
-                }
+        for (size_t i = 0; i < Node.Patterns.size() - 1; ++i) {
+            if (Node.Patterns[i]->RetTy != Node.Patterns[i + 1]->RetTy) {
+                throw Error::Expected("All items in a ListExpression must be of the same type",
+                                      Node.Patterns[i]->str(),
+                                      Node.Patterns[i + 1]->str(),
+                                      Node.Loc);
             }
 
             Node.RetTy = Type(TypeId::LIST);
@@ -407,59 +375,44 @@ namespace semantics
         Node.Right->accept(*this);
         // Visit stops here
 
-        if (Node.Right->RetTy.Id == TypeId::LIST) {
-            if (Node.Left->RetTy == Node.Right->RetTy.Subtypes.front()) {
-                Node.RetTy = Node.Right->RetTy;
-            } else {
-                throw Error::Expected("Left must be the same type as the right Lists children",
-                                         Node.Right->RetTy.Subtypes[0].str(),
-                                         Node.Left->RetTy.str(),
-                                         Node.Loc);
-            }
-        } else if (Node.Right->RetTy.Id == TypeId::STRING) {
-            if (Node.Left->RetTy.Id == TypeId::CHAR) {
-                Node.RetTy = Node.Right->RetTy;
-            } else {
-                throw Error::Expected("Left must be type CharPattern, when right is String",
-                                         "CharPattern",
-                                         Node.Left->RetTy.str(),
-                                         Node.Loc);
-            }
-        } else if (Node.Right->RetTy.Id == TypeId::EMPTYLIST) {
-            Node.RetTy = Type(TypeId::LIST);
-            Node.RetTy.Subtypes.push_back(Node.Left->RetTy);
-        } else {
+        if (Node.Right->RetTy.Id != TypeId::LIST) {
             throw Error::Expected("Right must be a ListExpression",
-                                     "ListExpression",
-                                     Node.Right->RetTy.str(),
+                                  "ListExpression",
+                                  Node.Right->RetTy.str(),
+                                  Node.Loc);
+        }
+
+        if (Node.Left->RetTy != Node.Right->RetTy.Subtypes.front()) {
+            throw Error::Expected("Left must be the same type as the right Lists children",
+                                     Node.Right->RetTy.Subtypes[0].str(),
+                                     Node.Left->RetTy.str(),
                                      Node.Loc);
         }
+
+        Node.RetTy = Node.Right->RetTy;
     }
 
-    void TypeChecker::visit(ListExpression &Node) {
+    void TypeChecker::visit(ListExpr &Node) {
         // Visit children
         for (auto &Element : Node.Elements) {
             Element->accept(*this);
         }
         // Visit stops here
 
-        if (Node.Elements.size() == 0) {
-            Node.RetTy = Type(TypeId::EMPTYLIST);
-        } else {
-            for (size_t i = 0; i < Node.Elements.size() - 1; ++i) {
-                if (Node.Elements[i]->RetTy != Node.Elements[i + 1]->RetTy) {
-                    throw Error::Expected("All items in a ListExpression must be same type",
-                                             Node.Elements[i]->str(),
-                                             Node.Elements[i + 1]->str(),
-                                             Node.Elements[i + 1]->Loc);
-                }
+        for (size_t i = 0; i < Node.Elements.size() - 1; ++i) {
+            if (Node.Elements[i]->RetTy != Node.Elements[i + 1]->RetTy) {
+                throw Error::Expected("All items in a ListExpression must be same type",
+                                         Node.Elements[i]->str(),
+                                         Node.Elements[i + 1]->str(),
+                                         Node.Elements[i + 1]->Loc);
             }
-            Node.RetTy = Type(TypeId::LIST);
-            Node.RetTy.Subtypes.push_back(Node.Elements[0]->RetTy);
         }
+
+        Node.RetTy = Type(TypeId::LIST);
+        Node.RetTy.Subtypes.push_back(Node.Elements[0]->RetTy);
     }
 
-    void TypeChecker::visit(TupleExpression &Node) {
+    void TypeChecker::visit(TupleExpr &Node) {
         // Visit children
         for (auto &Element : Node.Elements) {
             Element->accept(*this);
@@ -473,17 +426,30 @@ namespace semantics
         }
     }
 
+    void TypeChecker::visit(IntExpr &Node) { }
+    void TypeChecker::visit(FloatExpr &Node) { }
+    void TypeChecker::visit(CharExpr &Node) { }
+
 
     void TypeChecker::visit(IdPattern &Node) {
-        if (Node.Scp->exists(Node.Val)) {
-            Node.RetTy = Node.Scp->getType(Node.Val);
-        } else {
+        if (!Node.Scp->exists(Node.Val)) {
             throw Error(Node.Val + ": Id does not exist in the current scope",
-                           Node.Loc);
+                        Node.Loc);
         }
+
+        Node.RetTy = Node.Scp->getType(Node.Val);
     }
 
-    void TypeChecker::visit(Call &Node) {
+    void TypeChecker::visit(IdExpr &Node) {
+        if (!Node.Scp->exists(Node.Val)) {
+            throw Error(Node.Val + ": Id does not exist in the current scope",
+                        Node.Loc);
+        }
+
+        Node.RetTy = Node.Scp->getType(Node.Val);
+    }
+
+    void TypeChecker::visit(CallExpr &Node) {
 
         // Visit children
         Node.Callee->accept(*this);
@@ -507,10 +473,7 @@ namespace semantics
         }
 
         for (size_t i = 0; i < Node.Args.size(); ++i) {
-            if (Node.Args[i]->RetTy.Id == TypeId::EMPTYLIST &&
-                    Node.Callee->RetTy.Subtypes[i].Id == TypeId::LIST)
-                Node.Args[i]->RetTy = Node.Callee->RetTy.Subtypes[i];
-            else if (Node.Args[i]->RetTy != Node.Callee->RetTy.Subtypes[i]) {
+            if (Node.Args[i]->RetTy != Node.Callee->RetTy.Subtypes[i]) {
                 throw Error::Expected("Function was called with an invalid argument",
                                          Node.Callee->RetTy.Subtypes[i].str(),
                                          Node.Args[i]->RetTy.str(),

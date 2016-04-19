@@ -14,7 +14,7 @@ namespace codegen
             Output(Drv.Out),
             Header(Drv.HOut),
             ListOffsets(vector<int>({ 0 })),
-            StringList(Type(TypeId::LIST, vector<Type>({ Type(TypeId::STRING) }))),
+            StringList(Type(TypeId::LIST, vector<Type>({ Type(TypeId::CHAR) }))),
             RealString(Type(TypeId::LIST, vector<Type>({ Type(TypeId::CHAR) }))) { }
 
     void CCodeGenerator::visit(Program &Node)

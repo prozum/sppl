@@ -14,10 +14,7 @@ namespace common {
     void Product::accept(Visitor &V) { V.visit(*this); }
 
     Node::Node(Location Loc) :
-            RetTy(TypeId::UNKNOWN), Loc(Loc) { }
-
-    Node::Node(Type Ty, Location Loc) :
-            RetTy(Ty), Loc(Loc) { }
+            Loc(Loc) { }
 
     Program::Program(vector<unique_ptr<Declaration>> Decls,
                      Location Loc) :
@@ -35,7 +32,7 @@ namespace common {
             Node(Loc) { }
 
     Declaration::Declaration(Type Ty, Location Loc) :
-            Node(Ty, Loc) { }
+            Node(Loc) { }
 
     Function::Function(unique_ptr<Expression> AnonFunc) :
             Declaration(AnonFunc->Loc),

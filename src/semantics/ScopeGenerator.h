@@ -39,16 +39,20 @@ namespace semantics {
         void visit(IntPattern &Node);
         void visit(FloatPattern &Node);
         void visit(CharPattern &Node);
-        void visit(Par &Node);
+        void visit(ParExpr &Node);
         void visit(Not &Node);
         void visit(ListPattern &Node);
         void visit(TuplePattern &Node);
         void visit(ListSplit &Node);
-        void visit(ListExpression &Node);
-        void visit(TupleExpression &Node);
+        void visit(ListExpr &Node);
+        void visit(TupleExpr &Node);
         void visit(IdPattern &Node);
-        void visit(Call &Node);
+        void visit(CallExpr &Node);
         void visit(Type &Node);
+        void visit(IdExpr &Node);
+        void visit(IntExpr &Node);
+        void visit(FloatExpr &Node);
+        void visit(CharExpr &Node);
 
     private:
         Scope *CurScope;

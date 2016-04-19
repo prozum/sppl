@@ -57,13 +57,11 @@ namespace codegen {
         void visit(common::Function &Node);
         void visit(common::Case &Node);
 
+		void visit(common::IdPattern &Node);
         void visit(common::IntPattern &Node);
         void visit(common::FloatPattern &Node);
-        void visit(common::Bool &Node);
+        void visit(common::BoolPattern &Node);
         void visit(common::CharPattern &Node);
-        void visit(common::String &Node);
-    	void visit(common::TupleExpression &Node);
-    	void visit(common::ListExpression &Node);
 
         void visit(common::Add &Node);
         void visit(common::Sub &Node);
@@ -78,9 +76,15 @@ namespace codegen {
     	void visit(common::LesserEq &Node);
     	void visit(common::GreaterEq &Node);
 
-    	void visit(common::IdPattern &Node);
-        void visit(common::Call &Node);
-    	void visit(common::Par &Node);
+		void visit(common::IdExpr &Node);
+        void visit(common::IntExpr &Node);
+        void visit(common::FloatExpr &Node);
+        void visit(common::BoolExpr &Node);
+        void visit(common::CharExpr &Node);
+    	void visit(common::TupleExpr &Node);
+    	void visit(common::ListExpr &Node);
+        void visit(common::CallExpr &Node);
+    	void visit(common::ParExpr &Node);
 
         llvm::Type *getType(common::Type Ty, bool Ptr = false);
     	llvm::StructType *getTupleType(common::Type Ty);

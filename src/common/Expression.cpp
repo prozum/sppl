@@ -1,57 +1,47 @@
-//
-// Created by hejsil on 4/18/16.
-//
-
 #include "Expression.h"
 #include "Visitor.h"
 
 
 namespace common {
     Expression::Expression(Location Loc) :
-            Node(Loc) { }
+            Node(Loc),
+            RetTy(TypeId::UNKNOWN) { }
 
     Expression::Expression(Type Ty, Location Loc) :
-            Node(Ty, Loc) { }
+            Node(Loc),
+            RetTy(Ty) { }
 
-    IdExpression::IdExpression(string Val,
-                               Location Loc) :
+    IdExpr::IdExpr(string Val, Location Loc) :
             Expression(Loc),
             Val(Val) { }
 
-
-    IntExpression::IntExpression(long Val,
-                                 Location Loc) :
-            Expression(Loc),
+    IntExpr::IntExpr(long Val, Location Loc) :
+            Expression(Type(TypeId::INT), Loc),
             Val(Val) { }
 
-
-    FloatExpression::FloatExpression(double Val,
-                                     Location Loc) :
-            Expression(Loc),
+    FloatExpr::FloatExpr(double Val, Location Loc) :
+            Expression(Type(TypeId::FLOAT), Loc),
             Val(Val) { }
 
-
-    CharExpression::CharExpression(char Val,
-                                   Location Loc) :
-            Expression(Loc),
+    CharExpr::CharExpr(char Val, Location Loc) :
+            Expression(Type(TypeId::CHAR), Loc),
             Val(Val) { }
 
-    BoolExpression::BoolExpression(bool Val,
-                                   Location Loc) :
-            Expression(Loc),
+    BoolExpr::BoolExpr(bool Val, Location Loc) :
+            Expression(Type(TypeId::BOOL), Loc),
             Val(Val) { }
 
-    ListExpression::ListExpression(vector<unique_ptr<Expression>> Elements,
+    ListExpr::ListExpr(vector<unique_ptr<Expression>> Elements,
                                    Location Loc) :
             Expression(Type(TypeId::LIST), Loc),
             Elements(move(Elements)) { }
 
-    TupleExpression::TupleExpression(vector<unique_ptr<Expression>> Elements,
+    TupleExpr::TupleExpr(vector<unique_ptr<Expression>> Elements,
                                      Location Loc) :
             Expression(Type(TypeId::TUPLE), Loc),
             Elements(move(Elements)) { }
 
-    Call::Call(unique_ptr<Expression> Callee,
+    CallExpr::CallExpr(unique_ptr<Expression> Callee,
                vector<unique_ptr<Expression>> Args,
                Location Loc) :
             Expression(Loc),
@@ -65,37 +55,37 @@ namespace common {
             Expr(move(Expr)),
             Args(move(Args)) { }
 
-    void IdExpression::accept(Visitor &V) { V.visit(*this); }
-    void IntExpression::accept(Visitor &V) { V.visit(*this); }
-    void FloatExpression::accept(Visitor &V) { V.visit(*this); }
-    void CharExpression::accept(Visitor &V) { V.visit(*this); }
-    void BoolExpression::accept(Visitor &V) { V.visit(*this); }
-    void ListExpression::accept(Visitor &V) { V.visit(*this); }
-    void TupleExpression::accept(Visitor &V) { V.visit(*this); }
-    void Call::accept(Visitor &V) { V.visit(*this); }
+    void IdExpr::accept(Visitor &V) { V.visit(*this); }
+    void IntExpr::accept(Visitor &V) { V.visit(*this); }
+    void FloatExpr::accept(Visitor &V) { V.visit(*this); }
+    void CharExpr::accept(Visitor &V) { V.visit(*this); }
+    void BoolExpr::accept(Visitor &V) { V.visit(*this); }
+    void ListExpr::accept(Visitor &V) { V.visit(*this); }
+    void TupleExpr::accept(Visitor &V) { V.visit(*this); }
+    void CallExpr::accept(Visitor &V) { V.visit(*this); }
     void LambdaFunction::accept(Visitor &V) { V.visit(*this); }
 
-    string IdExpression::str() {
+    string IdExpr::str() {
         return Val;
     }
 
-    string IntExpression::str() {
+    string IntExpr::str() {
         return to_string(Val);
     }
 
-    string FloatExpression::str(){
+    string FloatExpr::str(){
         return to_string(Val);
     }
 
-    string CharExpression::str() {
+    string CharExpr::str() {
         return string("\'") + Val + "\'";
     }
 
-    string BoolExpression::str() {
+    string BoolExpr::str() {
         return (Val) ? "True" : "False";
     }
 
-    string ListExpression::str() {
+    string ListExpr::str() {
         // TODO fix strJoin problems. I give up for now
         string Str("[");
 
@@ -109,7 +99,7 @@ namespace common {
         return Str + "]";
     }
 
-    string TupleExpression::str() {
+    string TupleExpr::str() {
         // TODO fix strJoin problems. I give up for now
         string Str("(");
 
@@ -123,7 +113,7 @@ namespace common {
         return Str + ")";
     }
 
-    string Call::str() {
+    string CallExpr::str() {
         // TODO fix strJoin problems. I give up for now
         string Str(Callee->str() + "(");
 

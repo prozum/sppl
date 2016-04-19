@@ -40,7 +40,7 @@ namespace common {
 	class Div;
 	class Mod;
 	class ListAdd;
-	class Par;
+	class ParExpr;
 	class Not;
 	class Negative;
 	class ProducerConsumer;
@@ -55,25 +55,23 @@ namespace common {
 	class TuplePattern;
 	class ListSplit;
 	class WildPattern;
-	class IntExpression;
-	class FloatExpression;
-	class CharExpression;
-	class BoolExpression;
-	class ListExpression;
-	class TupleExpression;
+	class IntExpr;
+	class FloatExpr;
+	class CharExpr;
+	class BoolExpr;
+	class ListExpr;
+	class TupleExpr;
 	class IdPattern;
-	class Call;
+	class CallExpr;
 	class Visitor;
 	class Scope;
 
 	// Abstract Nodes
 	class Node {
 	public:
-		Type RetTy;
 		Location Loc;
 
 		Node(Location Loc);
-		Node(Type Ty, Location Loc);
         Node(const Node&) = delete;
         Node& operator=(const Node&) = delete;
         ~Node() = default;

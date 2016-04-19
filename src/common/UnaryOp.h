@@ -14,10 +14,10 @@ namespace common {
 		virtual void accept(Visitor &V) = 0;
 	};
 
-	class Par : public UnaryOp {
+	class ParExpr : public UnaryOp {
 	public:
 
-		Par(unique_ptr<Expression> Child, Location Loc);
+		ParExpr(unique_ptr<Expression> Child, Location Loc);
 
 		virtual void accept(Visitor &V);
 		string str();

@@ -100,7 +100,7 @@ namespace optimizer {
 
     }
 
-    void ParallelOptimizer::visit(Par &Node)
+    void ParallelOptimizer::visit(ParExpr &Node)
     {
 
     }
@@ -137,7 +137,7 @@ namespace optimizer {
     {
     }
 
-    void ParallelOptimizer::visit(ListExpression &Node)
+    void ParallelOptimizer::visit(ListExpr &Node)
     {
 
     }
@@ -146,7 +146,7 @@ namespace optimizer {
     {
     }
 
-    void ParallelOptimizer::visit(Call &Node)
+    void ParallelOptimizer::visit(CallExpr &Node)
     {
 
     }
@@ -155,7 +155,7 @@ namespace optimizer {
     {
     }
 
-    void ParallelOptimizer::visit(TupleExpression &Node) {
+    void ParallelOptimizer::visit(TupleExpr &Node) {
 
     }
 }

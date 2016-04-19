@@ -7,18 +7,18 @@ namespace compiler {
 
     }
 
-    void Compiler::set_backend(Backend B)
+    void Compiler::setBackend(Backend B)
     {
         switch (B)
         {
 #ifdef CCPP
             case Backend::CPP:
-                generator = make_unique<codegen::CCodeGenerator>(*this);
+                CodeGen = make_unique<codegen::CCodeGenerator>(*this);
                 break;
 #endif
 #ifdef CGNUASM
             case Backend::GNUASM:
-                generator = make_unique<codegen::GasCodeGenerator>(*this);
+                CodeGen = make_unique<codegen::GasCodeGenerator>(*this);
                 break;
 #endif
 #ifdef CHASKELL
@@ -28,7 +28,7 @@ namespace compiler {
 #endif
 #ifdef CLLVM
             case Backend::LLVM:
-                generator = make_unique<codegen::LLVMCodeGenerator>(*this);
+                CodeGen = make_unique<codegen::LLVMCodeGenerator>(*this);
                 break;
 #endif
             case Backend::PPRINTER:
@@ -44,9 +44,6 @@ namespace compiler {
         if (!parseFiles())
             return 1;
 
-        cout << Prog->str() << endl;
-
-        /*
         if (!accept(ScopeGen))
             return 2;
 
@@ -58,7 +55,6 @@ namespace compiler {
 
         if (!accept(*CodeGen))
             return 5;
-         */
 
         return 0;
     }

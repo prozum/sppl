@@ -3,7 +3,7 @@
 
 namespace common {
 
-    void Par::accept(Visitor &V) { V.visit(*this); }
+    void ParExpr::accept(Visitor &V) { V.visit(*this); }
     void Not::accept(Visitor &V) { V.visit(*this); }
     void To::accept(Visitor &V) { V.visit(*this); }
     void Negative::accept(Visitor &V) { V.visit(*this); }
@@ -13,7 +13,7 @@ namespace common {
         Expression(Loc),
         Child(move(Child)) { }
 
-    Par::Par(unique_ptr<Expression> Child,
+    ParExpr::ParExpr(unique_ptr<Expression> Child,
              Location Loc) :
             UnaryOp(move(Child), Loc) { }
 
@@ -29,7 +29,7 @@ namespace common {
                        Location Loc) :
             UnaryOp(move(Child), Loc) { }
 
-    string Par::str() {
+    string ParExpr::str() {
         return "(" + Child->str() + ")";
     }
 

@@ -29,7 +29,7 @@ namespace optimizer {
         void visit(Div &Node);
         void visit(Mod &Node);
         void visit(ListAdd &Node);
-        void visit(Par &Node);
+        void visit(ParExpr &Node);
         void visit(Not &Node);
         void visit(IntPattern &Node);
         void visit(FloatPattern &Node);
@@ -37,10 +37,10 @@ namespace optimizer {
         void visit(ListPattern &Node);
         void visit(TuplePattern &Node);
         void visit(ListSplit &Node);
-        void visit(ListExpression &Node);
-        void visit(TupleExpression &Node);
+        void visit(ListExpr &Node);
+        void visit(TupleExpr &Node);
         void visit(IdPattern &Node);
-        void visit(Call &Node);
+        void visit(CallExpr &Node);
         void visit(Type &Node);
 
     private:

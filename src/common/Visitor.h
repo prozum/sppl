@@ -37,7 +37,7 @@ namespace common {
 		virtual void visit(ProducerConsumer &Node) { throw runtime_error( "Not implemented"); }
 		virtual void visit(Concat &Node) { throw runtime_error( "Not implemented"); }
 		virtual void visit(To &Node) { throw runtime_error( "Not implemented"); }
-		virtual void visit(Par &Node) { throw runtime_error( "Not implemented"); }
+		virtual void visit(ParExpr &Node) { throw runtime_error( "Not implemented"); }
 		virtual void visit(Not &Node) { throw runtime_error( "Not implemented"); }
 		virtual void visit(Negative &Node) { throw runtime_error( "Not implemented"); }
 		virtual void visit(LambdaFunction &Node) { throw runtime_error( "Not implemented"); }
@@ -51,13 +51,13 @@ namespace common {
 		virtual void visit(TuplePattern &Node) { throw runtime_error( "Not implemented"); }
 		virtual void visit(ListSplit &Node) { throw runtime_error( "Not implemented"); }
 		virtual void visit(WildPattern &Node) { throw runtime_error( "Not implemented"); }
-		virtual void visit(IdExpression &Node) { throw runtime_error( "Not implemented"); }
-		virtual void visit(IntExpression &Node) { throw runtime_error( "Not implemented"); }
-		virtual void visit(FloatExpression &Node) { throw runtime_error( "Not implemented"); }
-		virtual void visit(CharExpression &Node) { throw runtime_error( "Not implemented"); }
-		virtual void visit(BoolExpression &Node) { throw runtime_error( "Not implemented"); }
-		virtual void visit(ListExpression &Node) { throw runtime_error( "Not implemented"); }
-		virtual void visit(TupleExpression &Node) { throw runtime_error( "Not implemented"); }
-		virtual void visit(Call &Node) { throw runtime_error( "Not implemented"); }
+		virtual void visit(IdExpr &Node) { throw runtime_error( "Not implemented"); }
+		virtual void visit(IntExpr &Node) { throw runtime_error( "Not implemented"); }
+		virtual void visit(FloatExpr &Node) { throw runtime_error( "Not implemented"); }
+		virtual void visit(CharExpr &Node) { throw runtime_error( "Not implemented"); }
+		virtual void visit(BoolExpr &Node) { throw runtime_error( "Not implemented"); }
+		virtual void visit(ListExpr &Node) { throw runtime_error( "Not implemented"); }
+		virtual void visit(TupleExpr &Node) { throw runtime_error( "Not implemented"); }
+		virtual void visit(CallExpr &Node) { throw runtime_error( "Not implemented"); }
 	};
 }

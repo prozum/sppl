@@ -63,7 +63,6 @@ using namespace std;
 %token BACKSLASH "\\"
 %token INCLUDE "include"
 %token WHEN "when"
-%token TYPE "type"
 %token TO "to"
 %token WILD "_"
 %token CONCAT "++"
@@ -188,10 +187,10 @@ patterns_comma:    patterns_comma_ne                        { $$ = $1; }
 	|	                                                    { $$ = new vector<unique_ptr<Pattern>>(); }
 patterns_comma_ne:  patterns_comma_ne COMMA pattern         { $$ = $1; $$->push_back(unique_ptr<Pattern>($3)); }
 	|   pattern                                             { $$ = new vector<unique_ptr<Pattern>>(); $$->push_back(unique_ptr<Pattern>($1)); }
-literal:	INTLITERAL                                      { $$ = new IntExpression($1, @1); }
-	|	FLOATLITERAL                                        { $$ = new FloatExpression($1, @1); }
-	|	CHARLITERAL                                         { $$ = new CharExpression($1, @1); }
-	|	STRINGLITERAL                                       { auto res = new ListExpression(vector<unique_ptr<Expression>>(), @1); for (auto Chr : * $1) res->Elements.push_back(make_unique<CharExpression>(Chr, @1)); delete $1; $$ = res; }
+literal:	INTLITERAL                                      { $$ = new IntExpr($1, @1); }
+	|	FLOATLITERAL                                        { $$ = new FloatExpr($1, @1); }
+	|	CHARLITERAL                                         { $$ = new CharExpr($1, @1); }
+	|	STRINGLITERAL                                       { auto res = new ListExpr(vector<unique_ptr<Expression>>(), @1); for (auto Chr : * $1) res->Elements.push_back(make_unique<CharExpr>(Chr, @1)); delete $1; $$ = res; }
 expr:	expr OR expr                                        { $$ = new Or(unique_ptr<Expression>($1), unique_ptr<Expression>($3), @1); }
 	|	expr AND expr                                       { $$ = new And(unique_ptr<Expression>($1), unique_ptr<Expression>($3), @1); }
 	|	expr EQUAL expr                                     { $$ = new Equal(unique_ptr<Expression>($1), unique_ptr<Expression>($3), @1); }
@@ -209,12 +208,12 @@ expr:	expr OR expr                                        { $$ = new Or(unique_p
 	|   expr CONCAT expr                                    { $$ = new Concat(unique_ptr<Expression>($1), unique_ptr<Expression>($3), @1); }
 	|	expr COLON expr                                     { $$ = new ListAdd(unique_ptr<Expression>($1), unique_ptr<Expression>($3), @1); }
 	|   expr TO type                                        { $$ = new To(unique_ptr<Expression>($1), @1); }
-	|	ID                                                  { $$ = new IdExpression(* $1, @1); }
+	|	ID                                                  { $$ = new IdExpr(* $1, @1); }
 	|	literal                                             { $$ = $1; }
-	|	SQSTART exprs_comma SQEND                           { $$ = new ListExpression(move(* $2), @1); delete $2; }
-	|   PARSTART exprs_comma_ne COMMA expr PAREND           { $2->push_back(unique_ptr<Expression>($4)); $$ = new TupleExpression(move(* $2), @1); delete $2; }
-	|	PARSTART expr PAREND                                { $$ = new Par(unique_ptr<Expression>($2), @1); }
-	|	expr PARSTART exprs_comma PAREND                    { $$ = new Call(unique_ptr<Expression>($1), move(* $3), @1); delete $3; }
+	|	SQSTART exprs_comma SQEND                           { $$ = new ListExpr(move(* $2), @1); delete $2; }
+	|   PARSTART exprs_comma_ne COMMA expr PAREND           { $2->push_back(unique_ptr<Expression>($4)); $$ = new TupleExpr(move(* $2), @1); delete $2; }
+	|	PARSTART expr PAREND                                { $$ = new ParExpr(unique_ptr<Expression>($2), @1); }
+	|	expr PARSTART exprs_comma PAREND                    { $$ = new CallExpr(unique_ptr<Expression>($1), move(* $3), @1); delete $3; }
 	|	EXMARK expr                                         { $$ = new Not(unique_ptr<Expression>($2), @1); }
     |	SUB expr                                            { $$ = new Negative(unique_ptr<Expression>($2), @1); }
     |   BACKSLASH args LAMBARROW expr                       { $$ = new LambdaFunction(unique_ptr<Expression>($4), move(* $2), @1); delete $2; }

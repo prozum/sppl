@@ -208,7 +208,7 @@ namespace codegen {
         cout << "NotNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(Int &Node) {
+    void GasCodeGenerator::visit(IntPattern &Node) {
         Func += "movl $";
         Func += Node.str();
         Func += ", %eax\n";
@@ -220,20 +220,16 @@ namespace codegen {
         cout << "Got integer => " << Node.str() << endl;
     }
 
-    void GasCodeGenerator::visit(Float &Node) {
+    void GasCodeGenerator::visit(FloatPattern &Node) {
         cout << "FloatNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(Bool &Node) {
+    void GasCodeGenerator::visit(BoolPattern &Node) {
         cout << "BoolNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(Char &Node) {
+    void GasCodeGenerator::visit(CharPattern &Node) {
         cout << "CharNotImplemented" << endl;
-    }
-
-    void GasCodeGenerator::visit(String &Node) {
-        cout << "StringNotImplemented" << endl;
     }
 
     void GasCodeGenerator::visit(ListPattern &Node) {
@@ -248,15 +244,15 @@ namespace codegen {
         cout << "ListSplitNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(List &Node) {
+    void GasCodeGenerator::visit(ListExpression &Node) {
         cout << "ListNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(Tuple &Node) {
+    void GasCodeGenerator::visit(TupleExpression &Node) {
         cout << "TupleNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(Id &Node) {
+    void GasCodeGenerator::visit(IdPattern &Node) {
         Hpr.TypeName = "Id";
         Hpr.TypeValue = FuncName + Node.Val;
         cout << "Got ID => " << Node.Val << endl;

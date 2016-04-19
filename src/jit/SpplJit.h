@@ -64,9 +64,9 @@ namespace jit {
         std::vector<ModuleHandleT> ModuleHandles;
         ModuleHandleT ModuleHandler;
 
-        parser::Driver Driver;
-        codegen::LLVMCodeGenerator Generator;
-        semantics::ScopeGenerator ScopeGenerator;
+        parser::Driver Drv;
+        codegen::LLVMCodeGenerator CodeGen;
+        semantics::ScopeGenerator ScopeGen;
         semantics::TypeChecker TypeChecker;
 
 

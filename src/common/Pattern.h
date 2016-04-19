@@ -5,7 +5,7 @@
 namespace common {
 	class Pattern : public Node {
 	public:
-		Pattern(Location Loc);
+		Type RetTy;
 		Pattern(Type Ty, Location Loc);
 
 		virtual void accept(Visitor &V) = 0;

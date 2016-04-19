@@ -6,15 +6,15 @@ namespace jit {
             Machine(EngineBuilder().selectTarget()),
             Layout(Machine->createDataLayout()),
             CompileLayer(ObjectLayer, SimpleCompiler(*Machine)),
-            Generator(Driver),
-            ScopeGenerator(&Driver.Global)
+            CodeGen(Drv),
+            ScopeGen(&Drv.Global)
     {
         llvm::sys::DynamicLibrary::LoadLibraryPermanently(nullptr);
         createModule();
 
         // Time is short, mortal
-        Driver.setOutput("/dev/null");
-        Driver.setHeaderOutput("/dev/null");
+        Drv.setOutput("/dev/null");
+        Drv.setHeaderOutput("/dev/null");
     }
 
     SpplJit::ModuleHandleT SpplJit::addModule(std::unique_ptr<llvm::Module> M) {
@@ -65,11 +65,11 @@ namespace jit {
 
     void SpplJit::createModule() {
         // Open a new module
-        Generator.Module = llvm::make_unique<llvm::Module>("SpplJit", getGlobalContext());
-        Generator.Module->setDataLayout(Machine->createDataLayout());
+        CodeGen.Module = llvm::make_unique<llvm::Module>("SpplJit", getGlobalContext());
+        CodeGen.Module->setDataLayout(Machine->createDataLayout());
 
         // Create a new pass manager attached to it
-        PassMgr = llvm::make_unique<legacy::FunctionPassManager>(Generator.Module.get());
+        PassMgr = llvm::make_unique<legacy::FunctionPassManager>(CodeGen.Module.get());
 
         // Add optimization passes
         PassMgr->add(createInstructionCombiningPass());
@@ -89,11 +89,12 @@ namespace jit {
             case common::TypeId::FLOAT:
                 // WTF is double type a pointer
                 return to_string(*(double *) data);
-            case common::TypeId::STRING:
+/*            case common::TypeId::STRING:
                 Out += "\"";
                 Out += (char *) data;
                 Out += "\"";
                 return Out;
+*/
             case common::TypeId::TUPLE:
                 return getOutputTuple(data, Type.Subtypes);
             case common::TypeId::SIGNATURE:
@@ -115,10 +116,11 @@ namespace jit {
                     Out += getOutput(addr, Subtypes[i]);
                     addr += sizeof(double);
                     break;
-                case common::TypeId::STRING:
+/*                case common::TypeId::STRING:
                     Out += getOutput(*(intptr_t *) addr, Subtypes[i]);
                     addr += sizeof(intptr_t *);
                     break;
+*/
                 case common::TypeId::TUPLE:
                     Out += getOutputTuple(*(intptr_t *) addr, Subtypes[i].Subtypes);
                     addr += sizeof(intptr_t *);
@@ -135,27 +137,27 @@ namespace jit {
 
 
     void SpplJit::eval(std::string Str) {
-        if (!Driver.parseString(Str))
+        if (!Drv.parseString(Str))
             return;
 
-        if (!Driver.accept(ScopeGenerator)) {
+        if (!Drv.accept(ScopeGen)) {
             return;
         }
 
-        if (!Driver.accept(TypeChecker)) {
+        if (!Drv.accept(TypeChecker)) {
             return;
         }
 
         // Generate ir_func
-        if (!Driver.accept(Generator)) {
+        if (!Drv.accept(CodeGen)) {
             return;
         }
-        auto FuncNode = Driver.Prog->Decls[0].get();
-        auto FuncIR = Generator.Module->getFunction(FuncNode->Id);
+        auto FuncNode = static_cast<common::Function *>(Drv.Prog->Decls[0].get());
+        auto FuncIR = CodeGen.Module->getFunction(FuncNode->Id);
         PassMgr->run(* FuncIR);
 
         // Store function in seperate module
-        ModuleHandler = addModule(std::move(Generator.Module));
+        ModuleHandler = addModule(std::move(CodeGen.Module));
         createModule();
 
         // Only run anonymous functions
@@ -164,8 +166,8 @@ namespace jit {
             auto FuncJIT = (size_t (*)()) Func.getAddress();
 
             assert(FuncJIT != NULL);
-            string Output = getOutput(FuncJIT(), FuncNode->RetTy);
-            cout << Output << "\t\ttype: " << FuncNode->RetTy.str() << endl;
+            string Output = getOutput(FuncJIT(), FuncNode->Signature.Subtypes.back());
+            cout << Output << "\t\ttype: " << FuncNode->Signature.Subtypes.back().str() << endl;
 
             // Remove module
             removeModule(ModuleHandler);

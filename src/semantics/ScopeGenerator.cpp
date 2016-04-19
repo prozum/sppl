@@ -149,7 +149,7 @@ namespace semantics {
         // Visit stops here
     }
 
-    void ScopeGenerator::visit(Par &Node) {
+    void ScopeGenerator::visit(ParExpr &Node) {
         // Visit children
         Node.Child->accept(*this);
         // Visit stops here
@@ -191,7 +191,7 @@ namespace semantics {
         Node.Right->accept(*this);
     }
 
-    void ScopeGenerator::visit(ListExpression &Node) {
+    void ScopeGenerator::visit(ListExpr &Node) {
         // Visit children
         for (auto &Element : Node.Elements) {
             Element->accept(*this);
@@ -199,7 +199,7 @@ namespace semantics {
         // Visit stops here
     }
 
-    void ScopeGenerator::visit(TupleExpression &Node) {
+    void ScopeGenerator::visit(TupleExpr &Node) {
         // Visit children
         for (auto &Element : Node.Elements) {
             Element->accept(*this);
@@ -210,14 +210,15 @@ namespace semantics {
     void ScopeGenerator::visit(IdPattern &Node) {
         Node.Scp = CurScope;
 
-        if (Ctx == ScopeContext::PATTERN) {
-            if (!CurScope->exists(Node.Val)) {
-                CurScope->Decls.insert({Node.Val, Node.RetTy});
-            }
+        if (!CurScope->exists(Node.Val)) {
+            CurScope->Decls.insert({Node.Val, Node.RetTy});
         }
     }
+    void ScopeGenerator::visit(IdExpr &Node) {
+        Node.Scp = CurScope;
+    }
 
-    void ScopeGenerator::visit(Call &Node) {
+    void ScopeGenerator::visit(CallExpr &Node) {
         // Visit children
         Node.Callee->accept(*this);
         for (auto &Arg : Node.Args) {
@@ -227,13 +228,11 @@ namespace semantics {
     }
 
     void ScopeGenerator::visit(Type &Node) { }
+    void ScopeGenerator::visit(IntPattern &Node) { }
+    void ScopeGenerator::visit(FloatPattern &Node) { }
+    void ScopeGenerator::visit(CharPattern &Node) { }
 
-    void ScopeGenerator::visit(IntPattern &Node) {
-    }
-
-    void ScopeGenerator::visit(FloatPattern &Node) {
-    }
-
-    void ScopeGenerator::visit(CharPattern &Node) {
-    }
+    void ScopeGenerator::visit(IntExpr &Node) { }
+    void ScopeGenerator::visit(FloatExpr &Node) { }
+    void ScopeGenerator::visit(CharExpr &Node) { }
 }

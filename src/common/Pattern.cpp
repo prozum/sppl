@@ -13,11 +13,9 @@ namespace common {
     void ListSplit::accept(Visitor &V) { V.visit(*this); }
     void WildPattern::accept(Visitor &V) { V.visit(*this); }
 
-    Pattern::Pattern(Location Loc) :
-            Node(Loc) { }
-
     Pattern::Pattern(Type Ty, Location Loc) :
-            Node(Ty, Loc) { }
+            Node(Loc),
+            RetTy(Ty) { }
 
     IntPattern::IntPattern(long Val,
                            Location Loc) :
@@ -46,28 +44,28 @@ namespace common {
 
     ListPattern::ListPattern(vector<unique_ptr<Pattern>> Patterns,
                              Location Loc) :
-            Pattern(Loc),
+            Pattern(Type(TypeId::LIST), Loc),
             Patterns(move(Patterns)) { }
 
     TuplePattern::TuplePattern(vector<unique_ptr<Pattern>> Patterns,
                                Location Loc) :
-            Pattern(Loc),
+            Pattern(Type(TypeId::TUPLE), Loc),
             Patterns(move(Patterns)) { }
 
     ListSplit::ListSplit(unique_ptr<Pattern> left,
                          unique_ptr<Pattern> Patterns,
                          Location Loc) :
-            Pattern(Loc),
+            Pattern(Type(TypeId::UNKNOWN), Loc),
             Left(move(left)),
             Right(move(Patterns)) { }
 
     IdPattern::IdPattern(string Val,
            Location Loc) :
-            Pattern(Loc),
+            Pattern(Type(TypeId::UNKNOWN), Loc),
             Val(Val) { }
 
     WildPattern::WildPattern(Location Loc) :
-            Pattern(Loc) { }
+            Pattern(Type(TypeId::UNKNOWN), Loc) { }
 
     string IdPattern::str() {
         return Val;
