@@ -20,11 +20,6 @@ using namespace parser;
 
 namespace codegen {
 
-    enum Context {
-        PATTERN,
-        EXPR,
-    };
-
     class LLVMCodeGenerator : public CodeGenerator {
       public:
         LLVMCodeGenerator(parser::Driver &driver);
@@ -40,7 +35,6 @@ namespace codegen {
     	std::unordered_map<common::Type, llvm::StructType *> TupleTypes;
     	std::unordered_map<common::Type, llvm::StructType *> ListTypes;
         std::unordered_map<common::Type, llvm::FunctionType *> FuncTypes;
-    	std::map<std::string, llvm::Function *> Functions;
 
         llvm::Function *CurFunc;
         llvm::Value *CurVal;
@@ -52,7 +46,6 @@ namespace codegen {
         std::vector<llvm::Argument *> Arguments;
         size_t CurCaseId;
         size_t LastCaseId;
-        Context Ctx;
 
         void visit(common::Function &Node);
         void visit(common::Case &Node);

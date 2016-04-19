@@ -33,6 +33,8 @@ void LLVMCodeGenerator::visit(common::IdExpr &Node) {
     // External module
     if (Drv.Global.Decls.count(Node.Val))
         CurVal = llvm::Function::Create(getFuncType(Drv.Global.Decls[Node.Val]), llvm::Function::ExternalLinkage, Node.Val, Module.get());
+    if (CurVal)
+        return;
 
     throw runtime_error("This should not happen");
 }

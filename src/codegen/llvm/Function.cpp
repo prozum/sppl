@@ -48,7 +48,6 @@ void LLVMCodeGenerator::visit(common::Function &Node) {
     Builder.CreateBr(CurPatternBlock);
 
     verifyFunction(*CurFunc);
-    Functions[Node.Id] = move(CurFunc);
 }
 
 Value *LLVMCodeGenerator::compare(Value *Val1, Value *Val2)
@@ -74,7 +73,6 @@ void LLVMCodeGenerator::visit(common::Case &Node) {
 
 
     if (Node.Patterns.size()) {
-        Ctx = PATTERN;
         ContextValues.clear();
         for (size_t i = Node.Patterns.size(); i != 0; --i) {
 
@@ -110,7 +108,6 @@ void LLVMCodeGenerator::visit(common::Case &Node) {
 
     // Generate expression in case block
     Builder.SetInsertPoint(CurCaseBlock);
-    Ctx = EXPR;
     Node.Expr->accept(*this);
 
     // Add return value to phi node

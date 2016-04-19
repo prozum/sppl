@@ -10,11 +10,6 @@ using namespace codegen;
 
 namespace semantics {
 
-    enum class ScopeContext {
-        EXPR,
-        PATTERN
-    };
-
     class ScopeGenerator : public Visitor {
     public:
         ScopeGenerator(Scope* Scp);
@@ -57,6 +52,5 @@ namespace semantics {
     private:
         Scope *CurScope;
         Function *CurFunc;
-        ScopeContext Ctx;
     };
 }

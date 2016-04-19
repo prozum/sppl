@@ -38,14 +38,11 @@ namespace semantics {
         CurScope = CaseScope;
 
         // Visit children
-        Ctx = ScopeContext::PATTERN;
-
         for (size_t i = 0; i < Node.Patterns.size(); ++i) {
             Node.Patterns[i]->RetTy = CurFunc->Signature[i];
             Node.Patterns[i]->accept(*this);
         }
 
-        Ctx = ScopeContext::EXPR;
         Node.Expr->accept(*this);
 
         CurScope = CurScope->Parent;
@@ -214,6 +211,7 @@ namespace semantics {
             CurScope->Decls.insert({Node.Val, Node.RetTy});
         }
     }
+
     void ScopeGenerator::visit(IdExpr &Node) {
         Node.Scp = CurScope;
     }
