@@ -35,14 +35,12 @@ typedef unsigned short ushort;
 typedef unsigned long long uvlong;
 typedef long long vlong;
 
-typedef struct Context Context;
-
 enum
 {
     STACK = 8192
 };
 
-struct Context
+typedef struct Context
 {
     ucontext_t	uc;
-};
+} Context;

@@ -8,8 +8,6 @@ extern	void		makecontext(ucontext_t*, void(*)(), int, ...);
 extern	int		getmcontext(mcontext_t*);
 extern	void		setmcontext(const mcontext_t*);
 
-#include <signal.h>
-
 /*-
  * Copyright (c) 1999 Marcel Moolenaar
  * All rights reserved.

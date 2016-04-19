@@ -1,4 +1,3 @@
-#include "defs.h"
 #include "task.h"
 
 static char *argv0;
@@ -16,7 +15,7 @@ taskstart(uint y, uint x)
 	t = (Task*)z;
 
 	t->startfn(t->startarg);
-	taskexit(t,);
+	taskexit(t);
 }
 
 static Task*
@@ -53,11 +52,10 @@ taskalloc(void (*fn)(void*), void *arg, uint stack)
 	t->context.uc.uc_stack.ss_size = t->stksize-64;
 
 	/*
-	 * All this magic is because you have to pass makecontext a
+	 * All this magic is because you have to pass makecontext
 	 * function that takes some number of word-sized variables,
 	 * and on 64-bit machines pointers are bigger than words.
 	 */
-//print("make %p\n", t);
 	z = (ulong)t;
 	y = z;
 	z >>= 16;	/* hide undefined 32-bit shift from 32-bit compilers */
@@ -82,30 +80,31 @@ taskcreate(void (*fn)(void*), void *arg, uint stack, queue_root *queue)
 }
 
 void
-taskswitch(Task *t, Context *context)
+taskready(Task *t, queue_root *queue)
 {
-    needstack(t, 0);
-	contextswitch(&t->context, context);
+    t->ready = 1;
+    taskadd(t, queue);
 }
 
 void
-taskyield(Task *t)
+taskswitch(Task *t)
 {
-	taskready(t);
+    needstack(t, 0);
+	contextswitch(&t->context, t->scheduler);
+}
+
+void
+taskyield(Task *t, queue_root *queue)
+{
+	taskready(t, queue);
 	taskswitch(t);
 }
 
-int
-anyready(void)
-{
-	return taskrunqueue.head != nil;
-}
-
 void
-taskexit(Task *t, Context *context)
+taskexit(Task *t)
 {
 	t->exiting = 1;
-	taskswitch(t, context);
+	taskswitch(t);
 }
 
 static void
@@ -125,7 +124,7 @@ taskscheduler(void)
 
 	//taskdebug("scheduler enter");
 	do{
-		contextswitch(&taskschedcontext, &t->context);
+		//contextswitch(&taskschedcontext, &t->context);
 	} while (1);
 
     pthread_exit(NULL);
@@ -186,6 +185,7 @@ taskmainstart(void *v)
 int
 main(int argc, char **argv)
 {
+
     /*
 	struct sigaction sa, osa;
 
@@ -206,47 +206,21 @@ main(int argc, char **argv)
 		mainstacksize = 256*1024;
 	taskcreate(taskmainstart, nil, mainstacksize);
 	taskscheduler();
-	fprint(2, "taskscheduler returned in main!\n");
-	abort();
-    */
+
 	return 0;
+     */
 }
 
 /*
  * hooray for linked lists
  */
 void
-addtask(Tasklist *l, Task *t)
+taskadd(Task *t, queue_root *queue)
 {
-	if(l->tail){
-		l->tail->next = t;
-		t->prev = l->tail;
-	}else{
-		l->head = t;
-		t->prev = nil;
-	}
-	l->tail = t;
-	t->next = nil;
+    queue_head *head = malloc(sizeof(queue_head));
+    head->item = (void *)t;
+
+    queue_add(head, queue);
 }
 
-void
-deltask(Tasklist *l, Task *t)
-{
-	if(t->prev)
-		t->prev->next = t->next;
-	else
-		l->head = t->next;
-	if(t->next)
-		t->next->prev = t->prev;
-	else
-		l->tail = t->prev;
-}
-
-/*
-unsigned int
-taskid(void)
-{
-	return taskrunning->id;
-}
-*/
 

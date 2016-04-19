@@ -1,7 +1,5 @@
 /* Copyright (c) 2005-2006 Russ Cox, MIT; see COPYRIGHT */
 
-#include "taskimpl.h"
-
 #if defined(__APPLE__)
 #if defined(__i386__)
 #define NEEDX86MAKECONTEXT

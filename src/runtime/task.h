@@ -1,6 +1,5 @@
 #include "defs.h"
 #include "queue.h"
-#include "print.h"
 
 #if defined(__arm__)
 int getmcontext(mcontext_t*);
@@ -17,6 +16,26 @@ void setmcontext(const mcontext_t*);
 #define	getcontext(u)	getmcontext(&(u)->uc_mcontext)
 #endif
 
+#define print task_print
+#define fprint task_fprint
+#define snprint task_snprint
+#define seprint task_seprint
+#define vprint task_vprint
+#define vfprint task_vfprint
+#define vsnprint task_vsnprint
+#define vseprint task_vseprint
+#define strecpy task_strecpy
+
+int print(char*, ...);
+int fprint(int, char*, ...);
+char *snprint(char*, uint, char*, ...);
+char *seprint(char*, char*, char*, ...);
+int vprint(char*, va_list);
+int vfprint(int, char*, va_list);
+char *vsnprint(char*, uint, char*, va_list);
+char *vseprint(char*, char*, char*, va_list);
+char *strecpy(char*, char*, char*);
+
 typedef struct Task_s
 {
     uint    sched_id;
@@ -27,6 +46,7 @@ typedef struct Task_s
     struct Task	*allnext;
     struct Task	*allprev;
     Context	context;
+    Context *scheduler;
     uvlong	alarmtime;
     uchar	*stk;
     uint	stksize;
@@ -39,11 +59,11 @@ typedef struct Task_s
     void	*udata;
 } Task;
 
-int		anyready(void);
-void	taskcreate(void (*fn)(void*), void *arg, uint stack, queue_root *queue)
-void	taskexit(Task *t, Context *context);
+void	taskcreate(void (*fn)(void*), void *arg, uint stack, queue_root *);
+void	taskadd(Task *t, queue_root *);
+void	taskexit(Task *t);
 void	taskmain(int argc, char *argv[]);
-void	taskyield(Task *t, Context *context);
+void	taskyield(Task *t, queue_root *);
 void**	taskdata(Task *t);
 void	needstack(Task *t, int);
 void	taskname(Task *t, char*, ...);
@@ -53,10 +73,8 @@ char*	taskgetstate(void);
 void	tasksystem(void);
 unsigned int	taskdelay(unsigned int);
 unsigned int	taskid(void);
-void	taskready(Task*);
-void	taskswitch(Task *t, Context *context);
-
-void	addtask(queue_root*, Task*);
+void	taskready(Task*, queue_root *);
+void	taskswitch(Task *t);
 
 /*
 struct Tasklist	//used internally
