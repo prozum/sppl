@@ -2,7 +2,7 @@
 
 
 void Test::modIntPosPos() { 
-    bool compStatus = compileChecker("modIntPosPos.sppl");
+    bool compStatus = compileChecker("mod/modIntPosPos.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "0");
@@ -11,7 +11,7 @@ void Test::modIntPosPos() {
 }
 
 void Test::modIntZeroZero() { 
-    bool compStatus = compileChecker("modIntZeroZero.sppl");
+    bool compStatus = compileChecker("mod/modIntZeroZero.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "0");
@@ -20,7 +20,7 @@ void Test::modIntZeroZero() {
 }
 
 void Test::modIntPosNeg() { 
-    bool compStatus = compileChecker("modIntPosNeg.sppl");
+    bool compStatus = compileChecker("mod/modIntPosNeg.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "0");
@@ -29,7 +29,7 @@ void Test::modIntPosNeg() {
 }
 
 void Test::modIntNegPos() { 
-    bool compStatus = compileChecker("modIntNegPos.sppl");
+    bool compStatus = compileChecker("mod/modIntNegPos.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "0");
@@ -38,7 +38,7 @@ void Test::modIntNegPos() {
 }
 
 void Test::modIntNegNeg() { 
-    bool compStatus = compileChecker("modIntNegNeg.sppl");
+    bool compStatus = compileChecker("mod/modIntNegNeg.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "0");
@@ -47,7 +47,7 @@ void Test::modIntNegNeg() {
 }
 
 void Test::modFloatPosPos() { 
-    bool compStatus = compileChecker("modFloatPosPos.sppl");
+    bool compStatus = compileChecker("mod/modFloatPosPos.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "0.000000");
@@ -56,7 +56,7 @@ void Test::modFloatPosPos() {
 }
 
 void Test::modFloatZeroZero() { 
-    bool compStatus = compileChecker("modFloatZeroZero.sppl");
+    bool compStatus = compileChecker("mod/modFloatZeroZero.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "0.000000");
@@ -65,7 +65,7 @@ void Test::modFloatZeroZero() {
 }
 
 void Test::modFloatPosNeg() { 
-    bool compStatus = compileChecker("modFloatPosNeg.sppl");
+    bool compStatus = compileChecker("mod/modFloatPosNeg.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "0.000000");
@@ -74,7 +74,7 @@ void Test::modFloatPosNeg() {
 }
 
 void Test::modFloatNegPos() { 
-    bool compStatus = compileChecker("modFloatNegPos.sppl");
+    bool compStatus = compileChecker("mod/modFloatNegPos.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "0.000000");
@@ -83,7 +83,7 @@ void Test::modFloatNegPos() {
 }
 
 void Test::modFloatNegNeg() { 
-    bool compStatus = compileChecker("modFloatNegNeg.sppl");
+    bool compStatus = compileChecker("mod/modFloatNegNeg.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "0.000000");
@@ -92,7 +92,7 @@ void Test::modFloatNegNeg() {
 }
 
 void Test::modBoolTrueTrue() { 
-    bool compStatus = compileChecker("modBoolTrueTrue.sppl");
+    bool compStatus = compileChecker("mod/modBoolTrueTrue.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -101,7 +101,7 @@ void Test::modBoolTrueTrue() {
 }
 
 void Test::modBoolTrueFalse() { 
-    bool compStatus = compileChecker("modBoolTrueFalse.sppl");
+    bool compStatus = compileChecker("mod/modBoolTrueFalse.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -110,7 +110,7 @@ void Test::modBoolTrueFalse() {
 }
 
 void Test::modBoolFalseTrue() { 
-    bool compStatus = compileChecker("modBoolFalseTrue.sppl");
+    bool compStatus = compileChecker("mod/modBoolFalseTrue.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -119,7 +119,7 @@ void Test::modBoolFalseTrue() {
 }
 
 void Test::modBoolFalseFalse() { 
-    bool compStatus = compileChecker("modBoolFalseFalse.sppl");
+    bool compStatus = compileChecker("mod/modBoolFalseFalse.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -128,7 +128,7 @@ void Test::modBoolFalseFalse() {
 }
 
 void Test::modCharStrStr() { 
-    bool compStatus = compileChecker("modCharStrStr.sppl");
+    bool compStatus = compileChecker("mod/modCharStrStr.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -137,7 +137,7 @@ void Test::modCharStrStr() {
 }
 
 void Test::modCharStrCha() { 
-    bool compStatus = compileChecker("modCharStrCha.sppl");
+    bool compStatus = compileChecker("mod/modCharStrCha.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -146,7 +146,7 @@ void Test::modCharStrCha() {
 }
 
 void Test::modCharChaStr() { 
-    bool compStatus = compileChecker("modCharChaStr.sppl");
+    bool compStatus = compileChecker("mod/modCharChaStr.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -155,7 +155,7 @@ void Test::modCharChaStr() {
 }
 
 void Test::modCharChaCha() { 
-    bool compStatus = compileChecker("modCharChaCha.sppl");
+    bool compStatus = compileChecker("mod/modCharChaCha.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -164,7 +164,7 @@ void Test::modCharChaCha() {
 }
 
 void Test::modMixFloatInt() { 
-    bool compStatus = compileChecker("modMixFloatInt.sppl");
+    bool compStatus = compileChecker("mod/modMixFloatInt.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -173,7 +173,7 @@ void Test::modMixFloatInt() {
 }
 
 void Test::modMixIntFloat() { 
-    bool compStatus = compileChecker("modMixIntFloat.sppl");
+    bool compStatus = compileChecker("mod/modMixIntFloat.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
