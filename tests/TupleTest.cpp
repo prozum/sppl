@@ -2,7 +2,7 @@
 
 
 void Test::tupleEmpty() { 
-    bool compStatus = compileChecker("tupleEmpty.sppl");
+    bool compStatus = compileChecker("tuple/tupleEmpty.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -11,7 +11,7 @@ void Test::tupleEmpty() {
 }
 
 void Test::tupleEmptyInt() { 
-    bool compStatus = compileChecker("tupleEmptyInt.sppl");
+    bool compStatus = compileChecker("tuple/tupleEmptyInt.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -20,7 +20,7 @@ void Test::tupleEmptyInt() {
 }
 
 void Test::tupleEmptyFloat() { 
-    bool compStatus = compileChecker("tupleEmptyFloat.sppl");
+    bool compStatus = compileChecker("tuple/tupleEmptyFloat.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -29,7 +29,7 @@ void Test::tupleEmptyFloat() {
 }
 
 void Test::tupleEmptyBool() { 
-    bool compStatus = compileChecker("tupleEmptyBool.sppl");
+    bool compStatus = compileChecker("tuple/tupleEmptyBool.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -38,7 +38,7 @@ void Test::tupleEmptyBool() {
 }
 
 void Test::tupleEmptyChar() { 
-    bool compStatus = compileChecker("tupleEmptyChar.sppl");
+    bool compStatus = compileChecker("tuple/tupleEmptyChar.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -47,7 +47,7 @@ void Test::tupleEmptyChar() {
 }
 
 void Test::tupleEmptyString() { 
-    bool compStatus = compileChecker("tupleEmptyString.sppl");
+    bool compStatus = compileChecker("tuple/tupleEmptyString.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -56,7 +56,7 @@ void Test::tupleEmptyString() {
 }
 
 void Test::tupleOneInt() { 
-    bool compStatus = compileChecker("tupleOneInt.sppl");
+    bool compStatus = compileChecker("tuple/tupleOneInt.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -65,7 +65,7 @@ void Test::tupleOneInt() {
 }
 
 void Test::tupleOneFloat() { 
-    bool compStatus = compileChecker("tupleOneFloat.sppl");
+    bool compStatus = compileChecker("tuple/tupleOneFloat.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -74,7 +74,7 @@ void Test::tupleOneFloat() {
 }
 
 void Test::tupleOneBool() { 
-    bool compStatus = compileChecker("tupleOneBool.sppl");
+    bool compStatus = compileChecker("tuple/tupleOneBool.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -83,7 +83,7 @@ void Test::tupleOneBool() {
 }
 
 void Test::tupleOneChar() { 
-    bool compStatus = compileChecker("tupleOneChar.sppl");
+    bool compStatus = compileChecker("tuple/tupleOneChar.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -92,7 +92,7 @@ void Test::tupleOneChar() {
 }
 
 void Test::tupleOneString() { 
-    bool compStatus = compileChecker("tupleOneString.sppl");
+    bool compStatus = compileChecker("tuple/tupleOneString.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -101,7 +101,7 @@ void Test::tupleOneString() {
 }
 
 void Test::tupleTwoInt() { 
-    bool compStatus = compileChecker("tupleTwoInt.sppl");
+    bool compStatus = compileChecker("tuple/tupleTwoInt.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "(2, 2)");
@@ -110,7 +110,7 @@ void Test::tupleTwoInt() {
 }
 
 void Test::tupleTwoFloat() { 
-    bool compStatus = compileChecker("tupleTwoFloat.sppl");
+    bool compStatus = compileChecker("tuple/tupleTwoFloat.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "(2.000000, 2.000000)");
@@ -119,7 +119,7 @@ void Test::tupleTwoFloat() {
 }
 
 void Test::tupleTwoBool() { 
-    bool compStatus = compileChecker("tupleTwoBool.sppl");
+    bool compStatus = compileChecker("tuple/tupleTwoBool.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "(True, False)");
@@ -128,7 +128,7 @@ void Test::tupleTwoBool() {
 }
 
 void Test::tupleTwoChar() { 
-    bool compStatus = compileChecker("tupleTwoChar.sppl");
+    bool compStatus = compileChecker("tuple/tupleTwoChar.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "('c', 'h')");
@@ -137,7 +137,7 @@ void Test::tupleTwoChar() {
 }
 
 void Test::tupleTwoString() { 
-    bool compStatus = compileChecker("tupleTwoString.sppl");
+    bool compStatus = compileChecker("tuple/tupleTwoString.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "(\"string\", \"string\")");
@@ -146,7 +146,7 @@ void Test::tupleTwoString() {
 }
 
 void Test::tupleThreeInt() { 
-    bool compStatus = compileChecker("tupleThreeInt.sppl");
+    bool compStatus = compileChecker("tuple/tupleThreeInt.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "(2, 2, 2)");
@@ -155,7 +155,7 @@ void Test::tupleThreeInt() {
 }
 
 void Test::tupleThreeFloat() { 
-    bool compStatus = compileChecker("tupleThreeFloat.sppl");
+    bool compStatus = compileChecker("tuple/tupleThreeFloat.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "(2.000000, 2.000000, 2.000000)");
@@ -164,7 +164,7 @@ void Test::tupleThreeFloat() {
 }
 
 void Test::tupleThreeBool() { 
-    bool compStatus = compileChecker("tupleThreeBool.sppl");
+    bool compStatus = compileChecker("tuple/tupleThreeBool.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "(True, False, True)");
@@ -173,7 +173,7 @@ void Test::tupleThreeBool() {
 }
 
 void Test::tupleThreeChar() { 
-    bool compStatus = compileChecker("tupleThreeChar.sppl");
+    bool compStatus = compileChecker("tuple/tupleThreeChar.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "('c', 'h', 'a')");
@@ -182,7 +182,7 @@ void Test::tupleThreeChar() {
 }
 
 void Test::tupleThreeString() { 
-    bool compStatus = compileChecker("tupleThreeString.sppl");
+    bool compStatus = compileChecker("tuple/tupleThreeString.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "(\"string\", \"string\", \"string\")");
@@ -191,7 +191,7 @@ void Test::tupleThreeString() {
 }
 
 void Test::tupleMixed() { 
-    bool compStatus = compileChecker("tupleMixed.sppl");
+    bool compStatus = compileChecker("tuple/tupleMixed.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "(2, 2.000000, True, 'c', 'h', 'a', 'r', \"string\")");
@@ -200,7 +200,7 @@ void Test::tupleMixed() {
 }
 
 void Test::tupleListInt() { 
-    bool compStatus = compileChecker("tupleListInt.sppl");
+    bool compStatus = compileChecker("tuple/tupleListInt.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "([2], [2])");
@@ -209,7 +209,7 @@ void Test::tupleListInt() {
 }
 
 void Test::tupleListFloat() { 
-    bool compStatus = compileChecker("tupleListFloat.sppl");
+    bool compStatus = compileChecker("tuple/tupleListFloat.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "([2.000000], [2.000000])");
@@ -218,7 +218,7 @@ void Test::tupleListFloat() {
 }
 
 void Test::tupleListBool() { 
-    bool compStatus = compileChecker("tupleListBool.sppl");
+    bool compStatus = compileChecker("tuple/tupleListBool.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "([True], [False])");
@@ -227,7 +227,7 @@ void Test::tupleListBool() {
 }
 
 void Test::tupleListChar() { 
-    bool compStatus = compileChecker("tupleListChar.sppl");
+    bool compStatus = compileChecker("tuple/tupleListChar.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "(['c'], ['h'])");
@@ -236,7 +236,7 @@ void Test::tupleListChar() {
 }
 
 void Test::tupleListString() { 
-    bool compStatus = compileChecker("tupleListString.sppl");
+    bool compStatus = compileChecker("tuple/tupleListString.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "([\"string\"], [\"string\"])");
@@ -245,7 +245,7 @@ void Test::tupleListString() {
 }
 
 void Test::tupleNested() { 
-    bool compStatus = compileChecker("tupleNested.sppl");
+    bool compStatus = compileChecker("tuple/tupleNested.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "((1, 2), (3, 4))");
@@ -254,7 +254,7 @@ void Test::tupleNested() {
 }
 
 void Test::tupleTwoNested() { 
-    bool compStatus = compileChecker("tupleTwoNested.sppl");
+    bool compStatus = compileChecker("tuple/tupleTwoNested.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "((1, 2.000000), (True, ('c', \"har\")))");
@@ -263,7 +263,7 @@ void Test::tupleTwoNested() {
 }
 
 void Test::tupleSuperNested() { 
-    bool compStatus = compileChecker("tupleSuperNested.sppl");
+    bool compStatus = compileChecker("tuple/tupleSuperNested.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "('h', ('e', ('l', ('l', ('o', (' ', ('w', ('o', ('r', ('l', ('d', '!')))))))))))");
@@ -272,7 +272,7 @@ void Test::tupleSuperNested() {
 }
 
 void Test::tupleWrongType() { 
-    bool compStatus = compileChecker("tupleWrongType.sppl");
+    bool compStatus = compileChecker("tuple/tupleWrongType.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");

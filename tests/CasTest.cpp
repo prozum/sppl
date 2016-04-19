@@ -2,7 +2,7 @@
 
 
 void Test::casCountOneInt() { 
-    bool compStatus = compileChecker("casCountOneInt.sppl");
+    bool compStatus = compileChecker("cas/casCountOneInt.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "2");
@@ -11,7 +11,7 @@ void Test::casCountOneInt() {
 }
 
 void Test::casCountTwoInt() { 
-    bool compStatus = compileChecker("casCountTwoInt.sppl");
+    bool compStatus = compileChecker("cas/casCountTwoInt.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "2");
@@ -20,7 +20,7 @@ void Test::casCountTwoInt() {
 }
 
 void Test::casCountThreeInt() { 
-    bool compStatus = compileChecker("casCountThreeInt.sppl");
+    bool compStatus = compileChecker("cas/casCountThreeInt.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "2");
@@ -29,7 +29,7 @@ void Test::casCountThreeInt() {
 }
 
 void Test::casCountFourInt() { 
-    bool compStatus = compileChecker("casCountFourInt.sppl");
+    bool compStatus = compileChecker("cas/casCountFourInt.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "2");
@@ -38,7 +38,7 @@ void Test::casCountFourInt() {
 }
 
 void Test::casCountFiveInt() { 
-    bool compStatus = compileChecker("casCountFiveInt.sppl");
+    bool compStatus = compileChecker("cas/casCountFiveInt.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "2");
@@ -47,7 +47,7 @@ void Test::casCountFiveInt() {
 }
 
 void Test::casCountSixInt() { 
-    bool compStatus = compileChecker("casCountSixInt.sppl");
+    bool compStatus = compileChecker("cas/casCountSixInt.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "2");
@@ -56,7 +56,7 @@ void Test::casCountSixInt() {
 }
 
 void Test::casCountSevenInt() { 
-    bool compStatus = compileChecker("casCountSevenInt.sppl");
+    bool compStatus = compileChecker("cas/casCountSevenInt.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "2");
@@ -65,7 +65,7 @@ void Test::casCountSevenInt() {
 }
 
 void Test::casCountEightInt() { 
-    bool compStatus = compileChecker("casCountEightInt.sppl");
+    bool compStatus = compileChecker("cas/casCountEightInt.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "2");
@@ -74,7 +74,7 @@ void Test::casCountEightInt() {
 }
 
 void Test::casCountNineInt() { 
-    bool compStatus = compileChecker("casCountNineInt.sppl");
+    bool compStatus = compileChecker("cas/casCountNineInt.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "2");
@@ -83,7 +83,7 @@ void Test::casCountNineInt() {
 }
 
 void Test::casCountTenInt() { 
-    bool compStatus = compileChecker("casCountTenInt.sppl");
+    bool compStatus = compileChecker("cas/casCountTenInt.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "2");

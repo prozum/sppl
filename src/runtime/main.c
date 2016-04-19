@@ -13,6 +13,8 @@ void fun1 (void *t) {
     task_t *task = (task_t *)t;
 
     ((int_t *)(task->args))->res = 1;
+
+    printf("fun1 res: %d\n",  ((int_t *)(task->args))->res);
 }
 
 void fun2 (void *t) {
@@ -26,6 +28,7 @@ void fun2 (void *t) {
 void fun3 (void *t) {
 
     task_t *task = (task_t *)t;
+    int_t *arg = (int_t *)task->args;
 
     task->sub_task_len = 2;
     task->sub_tasks = malloc(sizeof(task_t) * 2);
@@ -44,14 +47,18 @@ void fun3 (void *t) {
     task->sub_tasks[0] = task1;
     task->sub_tasks[1] = task2;
 
-    add_task(task1);
     add_task(task2);
+    add_task(task1);
 
     printf("fun3\n");
 
-    yield(task);
+    yield_waiting(task);
 
-    ((int_t *)t)->res = arg1->res + arg2->res;
+    printf("fun1 res: %d\n", arg1->res);
+
+    printf("%d, %d\n", arg1->res, arg2->res);
+
+    arg->res = arg1->res + arg2->res;
 
     free(task->sub_tasks);
     free(arg1);
@@ -70,7 +77,7 @@ int main()
 
     rmain(1, task);
 
-    printf("1 - %d\n", args->res);
+    printf("result: %d\n", args->res);
 
     free(task);
     free(args);

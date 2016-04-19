@@ -25,6 +25,14 @@ void Test::tearDown() {
 bool Test::compileChecker(std::string name) {
     int compStatus;
 
+    ifstream f(name);
+    if (f.bad()) {
+        f.close();
+        CPPUNIT_ASSERT_MESSAGE("File \"" + name + "\" not found!", false);
+    } else {
+        f.close();
+    }
+
     try {
         compiler::Compiler compiler;
 
@@ -35,7 +43,7 @@ bool Test::compileChecker(std::string name) {
         compiler.setHeaderOutput("test.h");     // TODO: Use better name when fixed
         compiler.setInputs(in);
 
-        compiler.set_backend(backend);
+        compiler.setBackend(backend);
         compStatus = compiler.compile();
     }
     catch (...) {

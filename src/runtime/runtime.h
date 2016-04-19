@@ -5,7 +5,6 @@
 #include <ucontext.h>
 
 #include "queue.h"
-//#include "task.h"
 
 typedef void (*func)(void *);
 
@@ -29,7 +28,8 @@ typedef struct task_s {
 
 void add_task(task_t *task);
 int check_subtasks_done(task_t *task);
-void yield(task_t *task);
+void yield_waiting(task_t *task);
+void yield_blocked(task_t *task);
 
 typedef enum scheduler_state_e {
     SLACKING,
@@ -60,7 +60,7 @@ runtime_t runtime;
 
 void rmain(uint64_t sched_count, task_t *initial_task);
 void start_scheduler(void *sched_ptr);
-uint64_t get_active_workers();
 void set_active_worker(uint64_t id, scheduler_state_t state);
+uint64_t get_active_workers();
 
 #endif //SPPL_RUNTIME_H

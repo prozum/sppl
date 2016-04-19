@@ -11,9 +11,6 @@
 
 #define YY_NO_UNISTD_H
 
-// Ignore register storage class since it is deprecated in C++11
-#define register
-
 typedef parser::Parser::token token;
 typedef parser::Parser::token_type token_type;
 

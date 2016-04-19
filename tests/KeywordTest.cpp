@@ -2,7 +2,7 @@
 
 
 void Test::keywordInt() { 
-    bool compStatus = compileChecker("keywordInt.sppl");
+    bool compStatus = compileChecker("keyword/keywordInt.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -11,7 +11,7 @@ void Test::keywordInt() {
 }
 
 void Test::keywordFloat() { 
-    bool compStatus = compileChecker("keywordFloat.sppl");
+    bool compStatus = compileChecker("keyword/keywordFloat.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -20,7 +20,7 @@ void Test::keywordFloat() {
 }
 
 void Test::keywordBool() { 
-    bool compStatus = compileChecker("keywordBool.sppl");
+    bool compStatus = compileChecker("keyword/keywordBool.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -29,7 +29,7 @@ void Test::keywordBool() {
 }
 
 void Test::keywordChar() { 
-    bool compStatus = compileChecker("keywordChar.sppl");
+    bool compStatus = compileChecker("keyword/keywordChar.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -38,7 +38,7 @@ void Test::keywordChar() {
 }
 
 void Test::keywordString() { 
-    bool compStatus = compileChecker("keywordString.sppl");
+    bool compStatus = compileChecker("keyword/keywordString.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -47,7 +47,7 @@ void Test::keywordString() {
 }
 
 void Test::keywordDef() { 
-    bool compStatus = compileChecker("keywordDef.sppl");
+    bool compStatus = compileChecker("keyword/keywordDef.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -56,7 +56,7 @@ void Test::keywordDef() {
 }
 
 void Test::keywordMain() { 
-    bool compStatus = compileChecker("keywordMain.sppl");
+    bool compStatus = compileChecker("keyword/keywordMain.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");

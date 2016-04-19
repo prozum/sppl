@@ -2,37 +2,36 @@
 
 namespace compiler {
     Compiler::Compiler() :
-            //scope_generator(semantics::ScopeGenerator(&Global))
-    {
+            ScopeGen(semantics::ScopeGenerator(&Global)) {
 
     }
 
-    void Compiler::set_backend(Backend B)
+    void Compiler::setBackend(Backend B)
     {
         switch (B)
         {
 #ifdef CCPP
             case Backend::CPP:
-                generator = make_unique<codegen::CCodeGenerator>(*this);
+                CodeGen = make_unique<codegen::CCodeGenerator>(*this);
                 break;
 #endif
 #ifdef CGNUASM
             case Backend::GNUASM:
-                generator = make_unique<codegen::GasCodeGenerator>(*this);
+                CodeGen = make_unique<codegen::GasCodeGenerator>(*this);
                 break;
 #endif
 #ifdef CHASKELL
             case Backend::HASKELL:
-                generator = make_unique<codegen::HCodeGenerator>(*this);
+                CodeGen = make_unique<codegen::HCodeGenerator>(*this);
                 break;
 #endif
 #ifdef CLLVM
             case Backend::LLVM:
-                generator = make_unique<codegen::LLVMCodeGenerator>(*this);
+                CodeGen = make_unique<codegen::LLVMCodeGenerator>(*this);
                 break;
 #endif
             case Backend::PPRINTER:
-                //generator = make_unique<codegen::Printer>(*this);
+                CodeGen = make_unique<codegen::Printer>(*this);
                 break;
             default:
                 throw runtime_error("Not a valid backend!");
@@ -45,21 +44,19 @@ namespace compiler {
             return 1;
 
         /*
-        if (!accept(scope_generator))
+        if (!accept(ScopeGen))
             return 2;
 
-        if (!accept(type_checker))
+        if (!accept(TypeChecker))
             return 3;
 
-        if (!accept(optimizer))
+        if (!accept(Optimizer))
             return 4;
 
-        if (!accept(*generator))
+        if (!accept(*CodeGen))
             return 5;
-        */
+         */
 
         return 0;
     }
-
-
 }

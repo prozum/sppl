@@ -2,7 +2,7 @@
 
 
 void Test::addIntPosPos() { 
-    bool compStatus = compileChecker("addIntPosPos.sppl");
+    bool compStatus = compileChecker("add/addIntPosPos.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "4");
@@ -11,7 +11,7 @@ void Test::addIntPosPos() {
 }
 
 void Test::addIntZeroZero() { 
-    bool compStatus = compileChecker("addIntZeroZero.sppl");
+    bool compStatus = compileChecker("add/addIntZeroZero.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "0");
@@ -20,7 +20,7 @@ void Test::addIntZeroZero() {
 }
 
 void Test::addIntPosNeg() { 
-    bool compStatus = compileChecker("addIntPosNeg.sppl");
+    bool compStatus = compileChecker("add/addIntPosNeg.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "0");
@@ -29,7 +29,7 @@ void Test::addIntPosNeg() {
 }
 
 void Test::addIntNegPos() { 
-    bool compStatus = compileChecker("addIntNegPos.sppl");
+    bool compStatus = compileChecker("add/addIntNegPos.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "0");
@@ -38,7 +38,7 @@ void Test::addIntNegPos() {
 }
 
 void Test::addIntNegNeg() { 
-    bool compStatus = compileChecker("addIntNegNeg.sppl");
+    bool compStatus = compileChecker("add/addIntNegNeg.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "-4");
@@ -47,7 +47,7 @@ void Test::addIntNegNeg() {
 }
 
 void Test::addFloatPosPos() { 
-    bool compStatus = compileChecker("addFloatPosPos.sppl");
+    bool compStatus = compileChecker("add/addFloatPosPos.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "4.000000");
@@ -56,7 +56,7 @@ void Test::addFloatPosPos() {
 }
 
 void Test::addFloatZeroZero() { 
-    bool compStatus = compileChecker("addFloatZeroZero.sppl");
+    bool compStatus = compileChecker("add/addFloatZeroZero.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "0.000000");
@@ -65,7 +65,7 @@ void Test::addFloatZeroZero() {
 }
 
 void Test::addFloatPosNeg() { 
-    bool compStatus = compileChecker("addFloatPosNeg.sppl");
+    bool compStatus = compileChecker("add/addFloatPosNeg.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "0.000000");
@@ -74,7 +74,7 @@ void Test::addFloatPosNeg() {
 }
 
 void Test::addFloatNegPos() { 
-    bool compStatus = compileChecker("addFloatNegPos.sppl");
+    bool compStatus = compileChecker("add/addFloatNegPos.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "0.000000");
@@ -83,7 +83,7 @@ void Test::addFloatNegPos() {
 }
 
 void Test::addFloatNegNeg() { 
-    bool compStatus = compileChecker("addFloatNegNeg.sppl");
+    bool compStatus = compileChecker("add/addFloatNegNeg.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus == true);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "-4.000000");
@@ -92,7 +92,7 @@ void Test::addFloatNegNeg() {
 }
 
 void Test::addBoolTrueTrue() { 
-    bool compStatus = compileChecker("addBoolTrueTrue.sppl");
+    bool compStatus = compileChecker("add/addBoolTrueTrue.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -101,7 +101,7 @@ void Test::addBoolTrueTrue() {
 }
 
 void Test::addBoolTrueFalse() { 
-    bool compStatus = compileChecker("addBoolTrueFalse.sppl");
+    bool compStatus = compileChecker("add/addBoolTrueFalse.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -110,7 +110,7 @@ void Test::addBoolTrueFalse() {
 }
 
 void Test::addBoolFalseTrue() { 
-    bool compStatus = compileChecker("addBoolFalseTrue.sppl");
+    bool compStatus = compileChecker("add/addBoolFalseTrue.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -119,7 +119,7 @@ void Test::addBoolFalseTrue() {
 }
 
 void Test::addBoolFalseFalse() { 
-    bool compStatus = compileChecker("addBoolFalseFalse.sppl");
+    bool compStatus = compileChecker("add/addBoolFalseFalse.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -128,7 +128,7 @@ void Test::addBoolFalseFalse() {
 }
 
 void Test::addCharStrStr() { 
-    bool compStatus = compileChecker("addCharStrStr.sppl");
+    bool compStatus = compileChecker("add/addCharStrStr.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -137,7 +137,7 @@ void Test::addCharStrStr() {
 }
 
 void Test::addCharStrCha() { 
-    bool compStatus = compileChecker("addCharStrCha.sppl");
+    bool compStatus = compileChecker("add/addCharStrCha.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -146,7 +146,7 @@ void Test::addCharStrCha() {
 }
 
 void Test::addCharChaStr() { 
-    bool compStatus = compileChecker("addCharChaStr.sppl");
+    bool compStatus = compileChecker("add/addCharChaStr.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -155,7 +155,7 @@ void Test::addCharChaStr() {
 }
 
 void Test::addCharChaCha() { 
-    bool compStatus = compileChecker("addCharChaCha.sppl");
+    bool compStatus = compileChecker("add/addCharChaCha.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -164,7 +164,7 @@ void Test::addCharChaCha() {
 }
 
 void Test::addMixFloatInt() { 
-    bool compStatus = compileChecker("addMixFloatInt.sppl");
+    bool compStatus = compileChecker("add/addMixFloatInt.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
@@ -173,7 +173,7 @@ void Test::addMixFloatInt() {
 }
 
 void Test::addMixIntFloat() { 
-    bool compStatus = compileChecker("addMixIntFloat.sppl");
+    bool compStatus = compileChecker("add/addMixIntFloat.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, compStatus == false);
     if (compStatus == true) {
         bool execStatus = executeChecker("", "");
