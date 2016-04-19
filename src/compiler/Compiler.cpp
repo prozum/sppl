@@ -38,9 +38,13 @@ namespace compiler {
         }
     }
 
-    int Compiler::compile() {
+    int Compiler::compile(const string &Filename) {
+        return compile(vector<string>({Filename}));
+    }
 
-        if (!parseFiles())
+    int Compiler::compile(const vector<string> &Filenames) {
+
+        if (!parseFiles(Filenames))
             return 1;
 
         if (!accept(ScopeGen))
