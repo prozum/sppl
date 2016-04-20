@@ -3,22 +3,22 @@
 static void
 taskstart(uint y, uint x)
 {
-	Task *t;
+	task_t *t;
 	ulong z;
 
 	z = x<<16;	/* hide undefined 32-bit shift from 32-bit compilers */
 	z <<= 16;
 	z |= y;
-	t = (Task*)z;
+	t = (task_t*)z;
 
 	t->startfn(t->startarg);
 	taskexit(t);
 }
 
-static Task*
+static task_t*
 taskalloc(void (*fn)(void*), void *arg, uint stack)
 {
-	Task *t;
+	task_t *t;
 	sigset_t zero;
 	uint x, y;
 	ulong z;
@@ -65,7 +65,7 @@ taskalloc(void (*fn)(void*), void *arg, uint stack)
 void
 taskcreate(void (*fn)(void*), void *arg, uint stack)
 {
-	Task *t;
+	task_t *t;
 
 	t = taskalloc(fn, arg, stack);
 
@@ -78,7 +78,7 @@ taskcreate(void (*fn)(void*), void *arg, uint stack)
 
 
 void
-taskadd(Task *t)
+taskadd(task_t *t)
 {
     queue_head *head = malloc(sizeof(queue_head));
     head->item = (void *)t;
@@ -87,35 +87,35 @@ taskadd(Task *t)
 }
 
 void
-taskready(Task *t)
+taskready(task_t *t)
 {
     t->ready = 1;
     taskadd(t);
 }
 
 void
-taskswitch(Task *t)
+taskswitch(task_t *t)
 {
     needstack(t, 0);
 	contextswitch(&t->context, t->scheduler);
 }
 
 void
-taskyield(Task *t)
+taskyield(task_t *t)
 {
 	taskready(t);
 	taskswitch(t);
 }
 
 void
-taskexit(Task *t)
+taskexit(task_t *t)
 {
 	t->exiting = 1;
 	taskswitch(t);
 }
 
 void
-contextswitch(Context *from, Context *to)
+contextswitch(context_t *from, context_t *to)
 {
 	if(swapcontext(&from->uc, &to->uc) < 0){
 		fprint(2, "swapcontext failed: %r\n");
@@ -124,7 +124,7 @@ contextswitch(Context *from, Context *to)
 }
 
 void
-needstack(Task *t, int n)
+needstack(task_t *t, int n)
 {
 	if((char*)&t <= (char*)t->stk
 	|| (char*)&t - (char*)t->stk < 256+n){

@@ -9,7 +9,7 @@ typedef struct int_s {
 void fun1 (void *t) {
     printf("fun1\n");
 
-    Task *task = (Task *)t;
+    task_t *task = (task_t *)t;
 
     ((int_t *)(task->args))->res = 1;
 
@@ -19,7 +19,7 @@ void fun1 (void *t) {
 void fun2 (void *t) {
     printf("fun2\n");
 
-    Task *task = (Task *)t;
+    task_t *task = (task_t *)t;
 
     task->startarg
 

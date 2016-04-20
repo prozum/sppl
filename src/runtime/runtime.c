@@ -32,7 +32,7 @@ void rmain(uint64_t os_thread_count, void (*fn)(void*), void *arg) {
 
 void start_scheduler(void *sched_ptr) {
     scheduler_t *scheduler = (scheduler_t *) sched_ptr;
-    Task *t;
+    task_t *t;
 
     do {
         t = queue_get(runtime.queue)->item;

@@ -39,19 +39,12 @@ char *vseprint(char*, char*, char*, va_list);
 char *strecpy(char*, char*, char*);
 
 char        *argv0;
-void		contextswitch(Context *from, Context *to);
+void		contextswitch(context_t *from, context_t *to);
 
-typedef struct Task_s
+typedef struct task_s
 {
-    uint    sched_id;
-    char	name[256];	// offset known to acid
-    char	state[256];
-    struct Task	*next;
-    struct Task	*prev;
-    struct Task	*allnext;
-    struct Task	*allprev;
-    Context	context;
-    Context *scheduler;
+    context_t	context;
+    uint 	scheduler_id;
     uvlong	alarmtime;
     uchar	*stk;
     uint	stksize;
@@ -62,15 +55,15 @@ typedef struct Task_s
     void	(*startfn)(void*);
     void	*startarg;
     void	*udata;
-} Task;
+} task_t;
 
 void	taskcreate(void (*fn)(void*), void *arg, uint stack);
-void	taskadd(Task *t);
-void	taskexit(Task *t);
-void	taskyield(Task *t);
-void	needstack(Task *t, int);
-void	taskready(Task*);
-void	taskswitch(Task *t);
+void	taskadd(task_t *t);
+void	taskexit(task_t *t);
+void	taskyield(task_t *t);
+void	needstack(task_t *t, int);
+void	taskready(task_t*);
+void	taskswitch(task_t *t);
 unsigned int	taskdelay(unsigned int);
 unsigned int	taskid(void);
 
@@ -81,7 +74,7 @@ typedef enum scheduler_state_e {
 
 typedef struct scheduler_s {
     uint64_t id;
-    Context *context;
+    context_t *context;
 } scheduler_t;
 
 typedef struct runtime_s {
@@ -105,8 +98,8 @@ uint64_t get_active_workers();
 /*
 struct Tasklist	//used internally
 {
-	Task	*head;
-	Task	*tail;
+	task_t	*head;
+	task_t	*tail;
 };
  */
 

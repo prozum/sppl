@@ -42,7 +42,7 @@ enum
     STACK = 8192
 };
 
-typedef struct Context
+typedef struct context_s
 {
     ucontext_t	uc;
-} Context;
+} context_t;
