@@ -151,13 +151,13 @@ namespace common {
 
     string AlgebraicExpression::str() {
         // TODO fix strJoin problems. I give up for now
-        string Str("(" + Constructor);
+        string Str(Constructor);
 
         for (auto &Expr : Exprs) {
             Str += " " + Expr->str();
         }
 
-        return Str + ")";
+        return Str;
     }
 
 }

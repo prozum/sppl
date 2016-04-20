@@ -166,7 +166,7 @@ type:	    INTTYPE                                         { $$ = new Type(TypeId
 	|	    PARSTART signature PAREND                       { $$ = $2; }
 	|	    PARSTART tupletype COMMA type PAREND            { $$ = $2; $$->Loc = @1; $$->Subtypes.push_back(* $4); }
     |       generic                                         { $$ = $1; }
-	|       IDBIG types                                     { $$ = new Type(TypeId::CUSTOM, @1); $$->Name = * $1; delete $1; }
+	|       IDBIG types                                     { $$ = new Type(TypeId::CUSTOM, * $2, @1); $$->Name = * $1; delete $1; delete $2; }
 	|       PARSTART type PAREND                            { $$ = $2; }
 generic:    IDSMALL                                         { $$ = new Type(TypeId::GENERIC, @1); $$->Name = * $1; delete $1; }
 tupletype:  tupletype COMMA type                            { $$ = $1; $$->Subtypes.push_back(* $3); }

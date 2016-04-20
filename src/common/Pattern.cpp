@@ -123,11 +123,11 @@ namespace common {
     }
 
     string ListSplit::str() {
-        return "(" + Left->str() + " : " + Right->str() + ")";
+        return Left->str() + " : " + Right->str();
     }
 
     string AlgebraicPattern::str() {
-        return "(" + Constructor + " " + strJoin(Patterns, " ") + ")";
+        return Constructor + " " + strJoin(Patterns, " ");
     }
 
     string ParPattern::str() {

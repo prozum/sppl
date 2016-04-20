@@ -87,16 +87,7 @@ namespace common {
     }
 
     string Function::str() {
-        string Str("def " + Id + " : ");
-
-        for (size_t I = 0; I < Signature.Subtypes.size(); I++) {
-            Str += Signature.Subtypes[I].str();
-
-            if (I != Signature.Subtypes.size() - 1)
-                Str += " -> ";
-        }
-
-        Str += "\n";
+        string Str("def " + Id + " : " + Signature.str() + "\n");
 
         for (auto &Case : Cases) {
             Str += Case->str() + "\n";

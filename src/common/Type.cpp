@@ -83,22 +83,27 @@ namespace common {
             case TypeId::SIGNATURE:
                 return strJoin(" -> ");
             case TypeId::CUSTOM:
-                return Name;
+                return Name + " " + strJoin(" ");
             case TypeId::GENERIC:
-                return "<" + Name + ">";
+                return Name;
             default:
                 throw runtime_error("This should not happen!");
         }
     }
 
     string Type::strJoin(const std::string JoinStr) {
-        string Str("(");
+        string Str;
         for (size_t i = 0; i < Subtypes.size(); ++i) {
-            Str += Subtypes[i].str();
+            if (Subtypes[i].Id == TypeId::SIGNATURE ||
+                Subtypes[i].Id == TypeId::CUSTOM)
+                Str += "(" + Subtypes[i].str() + ")";
+            else
+                Str += Subtypes[i].str();
+
             if (i + 1 != Subtypes.size())
                 Str += JoinStr;
         }
 
-        return "(" + Str + ")";
+        return Str;
     }
 }
