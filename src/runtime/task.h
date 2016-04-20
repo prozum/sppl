@@ -41,31 +41,39 @@ char *strecpy(char*, char*, char*);
 char        *argv0;
 void		contextswitch(context_t *from, context_t *to);
 
+typedef enum task_state_e {
+    NEW,
+    WAITING,
+    RUNNING,
+    DONE
+} task_state_t;
+
 typedef struct task_s
 {
-    context_t	context;
+    context_t	 context;
+    task_state_t state;
     uint 	scheduler_id;
-    uvlong	alarmtime;
+    uint    sub_task_len;
+    struct  task_s  **sub_tasks;
     uchar	*stk;
     uint	stksize;
-    int	    exiting;
-    int	    alltaskslot;
-    int	    system;
-    int	    ready;
     void	(*startfn)(void*);
     void	*startarg;
-    void	*udata;
+    void	*ret_data;
 } task_t;
 
-void	taskcreate(void (*fn)(void*), void *arg, uint stack);
+task_t* taskalloc(void (*fn)(void*), void *arg, uint stack, uint sub_tasks);
+task_t* taskcreate(void (*fn)(void*), void *arg, uint sub_tasks);
 void	taskadd(task_t *t);
 void	taskexit(task_t *t);
 void	taskyield(task_t *t);
 void	needstack(task_t *t, int);
-void	taskready(task_t*);
 void	taskswitch(task_t *t);
-unsigned int	taskdelay(unsigned int);
-unsigned int	taskid(void);
+
+//void	taskcreate(void (*fn)(void*), void *arg, uint stack, uint sub_tasks);
+//void	taskready(task_t*);
+//unsigned int	taskdelay(unsigned int);
+//unsigned int	taskid(void);
 
 typedef enum scheduler_state_e {
     SLACKING,
@@ -90,7 +98,7 @@ typedef struct runtime_s {
 
 runtime_t   runtime;
 
-void rmain(uint64_t sched_count, void (*fn)(void*), void *arg);
+void rmain(uint64_t os_thread_count, task_t *initial);
 void start_scheduler(void *sched_ptr);
 void set_active_worker(uint64_t id, scheduler_state_t state);
 uint64_t get_active_workers();

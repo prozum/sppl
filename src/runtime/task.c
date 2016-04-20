@@ -1,22 +1,25 @@
 #include "task.h"
 
+uint        placeholder_stack_size = 256 * 1000;
+
 static void
 taskstart(uint y, uint x)
 {
 	task_t *t;
 	ulong z;
 
-	z = x<<16;	/* hide undefined 32-bit shift from 32-bit compilers */
+	z = x<<16;	//hide undefined 32-bit shift from 32-bit compilers
 	z <<= 16;
 	z |= y;
 	t = (task_t*)z;
 
-	t->startfn(t->startarg);
-	taskexit(t);
+	t->startfn((void *)t);
+	//taskexit(t);
 }
 
-static task_t*
-taskalloc(void (*fn)(void*), void *arg, uint stack)
+
+task_t*
+taskalloc(void (*fn)(void*), void *arg, uint stack, uint sub_tasks)
 {
 	task_t *t;
 	sigset_t zero;
@@ -31,9 +34,12 @@ taskalloc(void (*fn)(void*), void *arg, uint stack)
 	t->stksize = stack;
 	t->startfn = fn;
 	t->startarg = arg;
+	t->sub_task_len = sub_tasks;
+    t->sub_tasks = malloc(sizeof(task_t *) * sub_tasks);
+    t->state = NEW;
 
 	/* do a reasonable initialization */
-	memset(&t->context.uc, 0, sizeof t->context.uc);
+	memset(&t->context.uc, 0, sizeof(t->context.uc));
 	sigemptyset(&zero);
 	sigprocmask(SIG_BLOCK, &zero, &t->context.uc.uc_sigmask);
 
@@ -53,28 +59,38 @@ taskalloc(void (*fn)(void*), void *arg, uint stack)
 	 * function that takes some number of word-sized variables,
 	 * and on 64-bit machines pointers are bigger than words.
 	 */
+
 	z = (ulong)t;
 	y = z;
-	z >>= 16;	/* hide undefined 32-bit shift from 32-bit compilers */
+	z >>= 16;	//hide undefined 32-bit shift from 32-bit compilers
 	x = z>>16;
 	makecontext(&t->context.uc, (void(*)())taskstart, 2, y, x);
 
 	return t;
 }
 
-void
-taskcreate(void (*fn)(void*), void *arg, uint stack)
+task_t *
+taskcreate(void (*fn)(void*), void *arg, uint sub_tasks)
+{
+    return taskalloc(fn, arg, placeholder_stack_size, sub_tasks);
+}
+
+/*
+task_t *
+taskcreate(void (*fn)(void*), void *arg, uint stack, uint sub_tasks)
 {
 	task_t *t;
 
-	t = taskalloc(fn, arg, stack);
+	t = taskalloc(fn, arg, stack, sub_tasks);
+    t->state = NEW;
 
-	t->ready = 1;
+	//t->ready = 1;
 
 	queue_head *new = malloc(sizeof(queue_head));
 	new->item = (void *)t;
 	queue_add(new, runtime.queue);
 }
+ */
 
 
 void
@@ -87,30 +103,25 @@ taskadd(task_t *t)
 }
 
 void
-taskready(task_t *t)
-{
-    t->ready = 1;
-    taskadd(t);
-}
-
-void
 taskswitch(task_t *t)
 {
     needstack(t, 0);
-	contextswitch(&t->context, t->scheduler);
+	contextswitch(&t->context, runtime.scheduler_pool[t->scheduler_id].context);
 }
 
 void
 taskyield(task_t *t)
 {
-	taskready(t);
+    t->state = WAITING;
+    taskadd(t);
 	taskswitch(t);
 }
 
 void
 taskexit(task_t *t)
 {
-	t->exiting = 1;
+	//t->exiting = 1;
+    t->state = DONE;
 	taskswitch(t);
 }
 

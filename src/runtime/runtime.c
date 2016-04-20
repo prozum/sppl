@@ -3,7 +3,7 @@
 const uint  start_stack_size = 256*1024;
 
 //runtime entry point
-void rmain(uint64_t os_thread_count, void (*fn)(void*), void *arg) {
+void rmain(uint64_t os_thread_count, task_t *initial) {
     runtime.os_thread_count = os_thread_count;
     runtime.queue = create_queue();
     runtime.scheduler_pool = malloc(sizeof(scheduler_t) * os_thread_count);
@@ -11,7 +11,12 @@ void rmain(uint64_t os_thread_count, void (*fn)(void*), void *arg) {
     runtime.scheduler_status = malloc(sizeof(scheduler_state_t) * os_thread_count);
     pthread_mutex_init(&runtime.scheduler_status_lock, NULL);
 
-    taskcreate(fn, arg, start_stack_size);
+    queue_head m;
+    m.item = (void *)initial;
+
+    printf("Shit actually happens!\n");
+
+    queue_add(&m, runtime.queue);
 
     for (uint64_t i = 0; i < os_thread_count; ++i) {
         runtime.scheduler_pool[i].id = i;
@@ -33,6 +38,11 @@ void rmain(uint64_t os_thread_count, void (*fn)(void*), void *arg) {
 void start_scheduler(void *sched_ptr) {
     scheduler_t *scheduler = (scheduler_t *) sched_ptr;
     task_t *t;
+    scheduler->context = malloc(sizeof(context_t));
+
+    set_active_worker(scheduler->id, WORKING);
+
+    printf("Shit actually happens p2!\n");
 
     do {
         t = queue_get(runtime.queue)->item;
@@ -43,12 +53,8 @@ void start_scheduler(void *sched_ptr) {
             set_active_worker(scheduler->id, SLACKING);
         } else {
             set_active_worker(scheduler->id, WORKING);
-            t->ready = 0;
+            t->state = RUNNING;
             contextswitch(scheduler->context, &t->context);
-
-            if (t->exiting) {
-                free(t);
-            }
         }
     } while (1);
 
@@ -75,4 +81,15 @@ void set_active_worker(uint64_t id, scheduler_state_t state) {
     runtime.scheduler_status[id] = state;
 
     pthread_mutex_unlock(&runtime.scheduler_status_lock);
+}
+
+int get_subtasks_done(task_t *t) {
+
+    for (int i = 0; i < t->sub_task_len; ++i) {
+        if (t->sub_tasks[i]->state != DONE) {
+            return 0;
+        }
+    }
+
+    return 1;
 }
