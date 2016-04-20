@@ -336,6 +336,11 @@ class Test : public CppUnit::TestFixture{
         CPPUNIT_TEST(scopeSamePat);
         CPPUNIT_TEST(scopeSameFunc);
         CPPUNIT_TEST(scopeUndeclId);
+
+    // DotTest.cpp
+        CPPUNIT_TEST(dotNormal);
+        CPPUNIT_TEST(dotNumDot);
+        CPPUNIT_TEST(dotDotNum);
     CPPUNIT_TEST_SUITE_END();
 public:
     compiler::Backend backend;
@@ -668,7 +673,12 @@ protected:
     void scopeSameFunc();
     void scopeUndeclId();
 
-// Test.cpp
+    // Dot.cpp
+    void dotNormal();
+    void dotNumDot();
+    void dotDotNum();
+
+    // Test.cpp
     bool compileChecker(std::string name);
     bool executeChecker(std::string args, std::string expectedOutput);
     bool executeCPP(std::string args, std::string expectedOutput);
