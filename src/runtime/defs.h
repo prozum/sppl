@@ -19,6 +19,8 @@
 #include <inttypes.h>
 #include <stdarg.h>
 
+#include "queue.h"
+
 #define nil ((void*)0)
 
 #define ulong task_ulong

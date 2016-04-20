@@ -1,49 +1,9 @@
-#include "runtime.h"
-#include <stdio.h>
+#include "task.h"
 
-/*
-void add_task(task_t *task) {
-
-    task->state = NEW;
-
-    queue_head *head = malloc(sizeof(queue_head));
-    head->item = task;
-
-    queue_add(head, runtime.queue);
-}
-
-int check_subtasks_done(task_t *task) {
-
-    //printf("checking subtasks\n");
-
-    for (uint32_t i = 0; i < task->sub_task_len; ++i) {
-
-        if (task->sub_tasks[i]->state != DONE) {
-            return 0;
-        }
-    }
-
-    return 1;
-}
-
-void yield_waiting(task_t *task) {
-    task->state = WAITING;
-
-    queue_head *head = malloc(sizeof(queue_head));
-    head->item = task;
-    queue_add(head, runtime.queue);
-
-    task->context = malloc(sizeof(ucontext_t));
-
-    printf("scheduler id in yield: %lu\n", task->scheduler_id);
-
-    swapcontext(task->context, runtime.scheduler_pool[task->scheduler_id].context);
-}
- */
+const uint  start_stack_size = 256*1024;
 
 //runtime entry point
-/*
-void rmain(uint64_t os_thread_count, Task *initial) {
+void rmain(uint64_t os_thread_count, void (*fn)(void*), void *arg) {
     runtime.os_thread_count = os_thread_count;
     runtime.queue = create_queue();
     runtime.scheduler_pool = malloc(sizeof(scheduler_t) * os_thread_count);
@@ -51,11 +11,10 @@ void rmain(uint64_t os_thread_count, Task *initial) {
     runtime.scheduler_status = malloc(sizeof(scheduler_state_t) * os_thread_count);
     pthread_mutex_init(&runtime.scheduler_status_lock, NULL);
 
-    //add_task(initial_task);
+    taskcreate(fn, arg, start_stack_size);
 
     for (uint64_t i = 0; i < os_thread_count; ++i) {
         runtime.scheduler_pool[i].id = i;
-        //runtime.scheduler_pool[i].io_worker = malloc(sizeof(pthread_t));
         pthread_create(&runtime.thread_pool[i], NULL, (void *)start_scheduler, &runtime.scheduler_pool[i]);
     }
 
@@ -69,56 +28,31 @@ void rmain(uint64_t os_thread_count, Task *initial) {
 
     pthread_mutex_destroy(&runtime.scheduler_status_lock);
 }
- */
+
 
 void start_scheduler(void *sched_ptr) {
-
-    /*
-    scheduler_t *scheduler = (scheduler_t *)sched_ptr;
-
-    //scheduler->context = malloc(sizeof(ucontext_t));
-
-    queue_head *curr;
-    Task *curr_task;
+    scheduler_t *scheduler = (scheduler_t *) sched_ptr;
+    Task *t;
 
     do {
-        getcontext(scheduler->context);
+        t = queue_get(runtime.queue)->item;
 
-        curr = queue_get(runtime.queue);
-
-        if (curr != NULL) {
-
-            curr_task = (task_t *)(curr->item);
-            curr_task->scheduler_id = scheduler->id;
-
-            //printf("sched id: %lu", curr_task->scheduler_id);
-
-            set_active_worker(scheduler->id, WORKING);
-            if (curr_task->state == WAITING && check_subtasks_done(curr_task)) {
-                scheduler->curr_task = curr_task;
-                swapcontext(scheduler->context, scheduler->curr_task->context);
-            } else if (curr_task->state == NEW) {
-                scheduler->curr_task = curr_task;
-                scheduler->curr_task->state = ACTIVE;
-                scheduler->curr_task->f(curr_task);
-                scheduler->curr_task->state = DONE;
-            } else {
-                queue_add(curr, runtime.queue);
-            }
-        } else if (get_active_workers() == 0) {
+        if (get_active_workers() == 0) {
             break;
-        } else {
+        } else if (t == nil) {
             set_active_worker(scheduler->id, SLACKING);
+        } else {
+            set_active_worker(scheduler->id, WORKING);
+            t->ready = 0;
+            contextswitch(scheduler->context, &t->context);
+
+            if (t->exiting) {
+                free(t);
+            }
         }
     } while (1);
 
-    printf("inside run_scheduler about to free context\n");
-
-    free(scheduler->context);
-
     pthread_exit(NULL);
-
-     */
 }
 
 uint64_t get_active_workers() {

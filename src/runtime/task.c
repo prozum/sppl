@@ -1,8 +1,5 @@
 #include "task.h"
 
-static char *argv0;
-static	void		contextswitch(Context *from, Context *to);
-
 static void
 taskstart(uint y, uint x)
 {
@@ -66,7 +63,7 @@ taskalloc(void (*fn)(void*), void *arg, uint stack)
 }
 
 void
-taskcreate(void (*fn)(void*), void *arg, uint stack, queue_root *queue)
+taskcreate(void (*fn)(void*), void *arg, uint stack)
 {
 	Task *t;
 
@@ -76,14 +73,24 @@ taskcreate(void (*fn)(void*), void *arg, uint stack, queue_root *queue)
 
 	queue_head *new = malloc(sizeof(queue_head));
 	new->item = (void *)t;
-	queue_add(new, queue);
+	queue_add(new, runtime.queue);
+}
+
+
+void
+taskadd(Task *t)
+{
+    queue_head *head = malloc(sizeof(queue_head));
+    head->item = (void *)t;
+
+    queue_add(head, runtime.queue);
 }
 
 void
-taskready(Task *t, queue_root *queue)
+taskready(Task *t)
 {
     t->ready = 1;
-    taskadd(t, queue);
+    taskadd(t);
 }
 
 void
@@ -94,9 +101,9 @@ taskswitch(Task *t)
 }
 
 void
-taskyield(Task *t, queue_root *queue)
+taskyield(Task *t)
 {
-	taskready(t, queue);
+	taskready(t);
 	taskswitch(t);
 }
 
@@ -107,52 +114,13 @@ taskexit(Task *t)
 	taskswitch(t);
 }
 
-static void
+void
 contextswitch(Context *from, Context *to)
 {
 	if(swapcontext(&from->uc, &to->uc) < 0){
 		fprint(2, "swapcontext failed: %r\n");
 		assert(0);
 	}
-}
-
-void
-taskscheduler(void)
-{
-	int i;
-	Task *t;
-
-	//taskdebug("scheduler enter");
-	do{
-		//contextswitch(&taskschedcontext, &t->context);
-	} while (1);
-
-    pthread_exit(NULL);
-}
-
-void**
-taskdata(Task *t)
-{
-	return t->udata;
-}
-
-/*
- * debugging
- */
-void
-taskname(Task *t, char *fmt, ...)
-{
-	va_list arg;
-
-	va_start(arg, fmt);
-	vsnprint(t->name, sizeof t->name, fmt, arg);
-	va_end(arg);
-}
-
-char*
-taskgetname(Task *t)
-{
-	return t->name;
 }
 
 void
@@ -163,64 +131,6 @@ needstack(Task *t, int n)
 		fprint(2, "task stack overflow: &t=%p tstk=%p n=%d\n", &t, t->stk, 256+n);
 		abort();
 	}
-}
-
-/*
- * startup
- */
-
-static int taskargc;
-static char **taskargv;
-int mainstacksize;
-
-/*
-static void
-taskmainstart(void *v)
-{
-	taskname("taskmain");
-	taskmain(taskargc, taskargv);
-}
- */
-
-int
-main(int argc, char **argv)
-{
-
-    /*
-	struct sigaction sa, osa;
-
-	memset(&sa, 0, sizeof sa);
-	//sa.sa_handler = taskinfo;
-	sa.sa_flags = SA_RESTART;
-	sigaction(SIGQUIT, &sa, &osa);
-
-#ifdef SIGINFO
-	sigaction(SIGINFO, &sa, &osa);
-#endif
-
-	argv0 = argv[0];
-	taskargc = argc;
-	taskargv = argv;
-
-	if(mainstacksize == 0)
-		mainstacksize = 256*1024;
-	taskcreate(taskmainstart, nil, mainstacksize);
-	taskscheduler();
-
-	return 0;
-     */
-}
-
-/*
- * hooray for linked lists
- */
-void
-taskadd(Task *t, queue_root *queue)
-{
-    queue_head *head = malloc(sizeof(queue_head));
-    head->item = (void *)t;
-
-    queue_add(head, queue);
 }
 
 

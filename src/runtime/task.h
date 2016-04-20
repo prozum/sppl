@@ -1,5 +1,7 @@
+#ifndef __TASK_H__
+#define __TASK_H__
+
 #include "defs.h"
-#include "queue.h"
 
 #if defined(__arm__)
 int getmcontext(mcontext_t*);
@@ -36,6 +38,9 @@ char *vsnprint(char*, uint, char*, va_list);
 char *vseprint(char*, char*, char*, va_list);
 char *strecpy(char*, char*, char*);
 
+char        *argv0;
+void		contextswitch(Context *from, Context *to);
+
 typedef struct Task_s
 {
     uint    sched_id;
@@ -59,22 +64,43 @@ typedef struct Task_s
     void	*udata;
 } Task;
 
-void	taskcreate(void (*fn)(void*), void *arg, uint stack, queue_root *);
-void	taskadd(Task *t, queue_root *);
+void	taskcreate(void (*fn)(void*), void *arg, uint stack);
+void	taskadd(Task *t);
 void	taskexit(Task *t);
-void	taskmain(int argc, char *argv[]);
-void	taskyield(Task *t, queue_root *);
-void**	taskdata(Task *t);
+void	taskyield(Task *t);
 void	needstack(Task *t, int);
-void	taskname(Task *t, char*, ...);
-void	taskstate(char*, ...);
-char*	taskgetname(Task *t);
-char*	taskgetstate(void);
-void	tasksystem(void);
+void	taskready(Task*);
+void	taskswitch(Task *t);
 unsigned int	taskdelay(unsigned int);
 unsigned int	taskid(void);
-void	taskready(Task*, queue_root *);
-void	taskswitch(Task *t);
+
+typedef enum scheduler_state_e {
+    SLACKING,
+    WORKING
+} scheduler_state_t;
+
+typedef struct scheduler_s {
+    uint64_t id;
+    Context *context;
+} scheduler_t;
+
+typedef struct runtime_s {
+    uint64_t os_thread_count;
+    pthread_t *thread_pool;
+    scheduler_t *scheduler_pool;
+
+    queue_root *queue;
+
+    pthread_mutex_t scheduler_status_lock;
+    scheduler_state_t *scheduler_status;
+} runtime_t;
+
+runtime_t   runtime;
+
+void rmain(uint64_t sched_count, void (*fn)(void*), void *arg);
+void start_scheduler(void *sched_ptr);
+void set_active_worker(uint64_t id, scheduler_state_t state);
+uint64_t get_active_workers();
 
 /*
 struct Tasklist	//used internally
@@ -108,3 +134,5 @@ int		netannounce(int, char*, int);
 int		netaccept(int, char*, int*);
 int		netdial(int, char*, int);
 int		netlookup(char*, uint32_t*); //blocks entire program!
+
+#endif //__TASK_H__
