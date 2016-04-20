@@ -15,7 +15,7 @@
 
 class Test : public CppUnit::TestFixture{
     CPPUNIT_TEST_SUITE(Test);
-// AddTest.cpp
+    // AddTest.cpp
         CPPUNIT_TEST(addIntPosPos);
         CPPUNIT_TEST(addIntZeroZero);
         CPPUNIT_TEST(addIntPosNeg);
@@ -37,7 +37,7 @@ class Test : public CppUnit::TestFixture{
         CPPUNIT_TEST(addMixFloatInt);
         CPPUNIT_TEST(addMixIntFloat);
 
-// SubTest.cpp
+    // SubTest.cpp
         CPPUNIT_TEST(subIntPosPos);
         CPPUNIT_TEST(subIntZeroZero);
         CPPUNIT_TEST(subIntPosNeg);
@@ -59,7 +59,7 @@ class Test : public CppUnit::TestFixture{
         CPPUNIT_TEST(subMixFloatInt);
         CPPUNIT_TEST(subMixIntFloat);
 
-// MulTest.cpp
+    // MulTest.cpp
         CPPUNIT_TEST(mulIntPosPos);
         CPPUNIT_TEST(mulIntZeroZero);
         CPPUNIT_TEST(mulIntPosNeg);
@@ -81,7 +81,7 @@ class Test : public CppUnit::TestFixture{
         CPPUNIT_TEST(mulMixFloatInt);
         CPPUNIT_TEST(mulMixIntFloat);
 
-// DivTest.cpp
+    // DivTest.cpp
         CPPUNIT_TEST(divIntPosPos);
         CPPUNIT_TEST(divIntZeroZero);
         CPPUNIT_TEST(divIntPosNeg);
@@ -103,7 +103,7 @@ class Test : public CppUnit::TestFixture{
         CPPUNIT_TEST(divMixFloatInt);
         CPPUNIT_TEST(divMixIntFloat);
 
-// ModTest.cpp
+    // ModTest.cpp
         CPPUNIT_TEST(modIntPosPos);
         CPPUNIT_TEST(modIntZeroZero);
         CPPUNIT_TEST(modIntPosNeg);
@@ -125,7 +125,7 @@ class Test : public CppUnit::TestFixture{
         CPPUNIT_TEST(modMixFloatInt);
         CPPUNIT_TEST(modMixIntFloat);
 
-// BinBoolTest.cpp
+    // BinBoolTest.cpp
         CPPUNIT_TEST(binEqualTrueTrue);
         CPPUNIT_TEST(binEqualTrueFalse);
         CPPUNIT_TEST(binEqualFalseTrue);
@@ -159,7 +159,7 @@ class Test : public CppUnit::TestFixture{
         CPPUNIT_TEST(binLessFalseTrue);
         CPPUNIT_TEST(binLessFalseFalse);
 
-// BinValTest.cpp
+    // BinValTest.cpp
         CPPUNIT_TEST(binEqualIntInt);
         CPPUNIT_TEST(binNotEqualIntInt);
         CPPUNIT_TEST(binAndIntInt);
@@ -177,7 +177,7 @@ class Test : public CppUnit::TestFixture{
         CPPUNIT_TEST(binGreatFloatFloat);
         CPPUNIT_TEST(binLessFloatFloat);
 
-// SigTest.cpp
+    // SigTest.cpp
         CPPUNIT_TEST(sigLengthZeroInt);
         CPPUNIT_TEST(sigLengthOneInt);
         CPPUNIT_TEST(sigLengthTwoInt);
@@ -193,7 +193,7 @@ class Test : public CppUnit::TestFixture{
         CPPUNIT_TEST(patLengthLessInt);
         CPPUNIT_TEST(patLengthMoreInt);
 
-// CasTest.cpp
+    // CasTest.cpp
         CPPUNIT_TEST(casCountOneInt);
         CPPUNIT_TEST(casCountTwoInt);
         CPPUNIT_TEST(casCountThreeInt);
@@ -205,7 +205,7 @@ class Test : public CppUnit::TestFixture{
         CPPUNIT_TEST(casCountNineInt);
         CPPUNIT_TEST(casCountTenInt);
 
-// ListTest.cpp
+    // ListTest.cpp
         CPPUNIT_TEST(listCasEmpty);
         CPPUNIT_TEST(listAppendEmpty);
         CPPUNIT_TEST(listInt);
@@ -253,7 +253,7 @@ class Test : public CppUnit::TestFixture{
         CPPUNIT_TEST(listTupleChar);
         CPPUNIT_TEST(listTupleString);
 
-// TupleTest.cpp
+    // TupleTest.cpp
         CPPUNIT_TEST(tupleEmpty);
         CPPUNIT_TEST(tupleEmptyInt);
         CPPUNIT_TEST(tupleEmptyFloat);
@@ -286,7 +286,7 @@ class Test : public CppUnit::TestFixture{
         CPPUNIT_TEST(tupleSuperNested);
         CPPUNIT_TEST(tupleWrongType);
 
-// FuncTest.cpp
+    // FuncTest.cpp
         CPPUNIT_TEST(funcRetInt);
         CPPUNIT_TEST(funcRetFloat);
         CPPUNIT_TEST(funcRetBool);
@@ -321,7 +321,7 @@ class Test : public CppUnit::TestFixture{
         CPPUNIT_TEST(funcTupleIntIntToTupleIntIntRetInt);
         CPPUNIT_TEST(funcIntToIntRetToIntRetToInt);
 
-// KeywordTest.cpp
+    // KeywordTest.cpp
         CPPUNIT_TEST(keywordInt);
         CPPUNIT_TEST(keywordFloat);
         CPPUNIT_TEST(keywordBool);
@@ -330,6 +330,12 @@ class Test : public CppUnit::TestFixture{
         CPPUNIT_TEST(keywordDef);
         CPPUNIT_TEST(keywordMain);
         CPPUNIT_TEST(comment);
+
+    // ScopeTest.cpp
+        CPPUNIT_TEST(scopeNormal);
+        CPPUNIT_TEST(scopeSamePat);
+        CPPUNIT_TEST(scopeSameFunc);
+        CPPUNIT_TEST(scopeUndeclId);
     CPPUNIT_TEST_SUITE_END();
 public:
     compiler::Backend backend;
@@ -655,6 +661,12 @@ protected:
     void keywordDef();
     void keywordMain();
     void comment();
+
+// Scope.cpp
+    void scopeNormal();
+    void scopeSamePat();
+    void scopeSameFunc();
+    void scopeUndeclId();
 
 // Test.cpp
     bool compileChecker(std::string name);

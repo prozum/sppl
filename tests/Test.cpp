@@ -1,5 +1,4 @@
 #include <algorithm>
-#include <dirent.h>
 #include "Test.h"
 
 void Test::setUp() {
