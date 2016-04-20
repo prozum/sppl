@@ -37,13 +37,13 @@ namespace common {
             Elements(move(Elements)) { }
 
     TupleExpr::TupleExpr(vector<unique_ptr<Expression>> Elements,
-                                     Location Loc) :
+                         Location Loc) :
             Expression(Type(TypeId::TUPLE), Loc),
             Elements(move(Elements)) { }
 
     CallExpr::CallExpr(unique_ptr<Expression> Callee,
-               vector<unique_ptr<Expression>> Args,
-               Location Loc) :
+                       vector<unique_ptr<Expression>> Args,
+                       Location Loc) :
             Expression(Loc),
             Callee(move(Callee)),
             Args(move(Args)) { }
@@ -55,6 +55,13 @@ namespace common {
             Expr(move(Expr)),
             Args(move(Args)) { }
 
+    AlgebraicExpression::AlgebraicExpression(string Constructor,
+                                             vector<unique_ptr<Expression>> Exprs,
+                                             Location Loc) :
+            Expression(Type(TypeId::CUSTOM), Loc),
+            Constructor(Constructor),
+            Exprs(move(Exprs)) { }
+
     void IdExpr::accept(Visitor &V) { V.visit(*this); }
     void IntExpr::accept(Visitor &V) { V.visit(*this); }
     void FloatExpr::accept(Visitor &V) { V.visit(*this); }
@@ -64,6 +71,7 @@ namespace common {
     void TupleExpr::accept(Visitor &V) { V.visit(*this); }
     void CallExpr::accept(Visitor &V) { V.visit(*this); }
     void LambdaFunction::accept(Visitor &V) { V.visit(*this); }
+    void AlgebraicExpression::accept(Visitor &V) { V.visit(*this); }
 
     string IdExpr::str() {
         return Val;
@@ -139,6 +147,17 @@ namespace common {
         }
 
         return Str + " => " + Expr->str();
+    }
+
+    string AlgebraicExpression::str() {
+        // TODO fix strJoin problems. I give up for now
+        string Str("(" + Constructor);
+
+        for (auto &Expr : Exprs) {
+            Str += " " + Expr->str();
+        }
+
+        return Str + ")";
     }
 
 }

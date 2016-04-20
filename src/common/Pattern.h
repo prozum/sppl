@@ -93,6 +93,7 @@ namespace common {
 	};
 
 	class WildPattern : public Pattern {
+	public:
 		WildPattern(Location Loc);
 
 		virtual void accept(Visitor &V);
@@ -105,6 +106,27 @@ namespace common {
 		unique_ptr<Pattern> Right;
 
 		ListSplit(unique_ptr<Pattern>, unique_ptr<Pattern> Patterns, Location Loc);
+
+		virtual void accept(Visitor &V);
+		string str();
+	};
+
+	class AlgebraicPattern : public Pattern {
+	public:
+		string Constructor;
+		vector<unique_ptr<Pattern>> Patterns;
+
+		AlgebraicPattern(string Constructor, vector<unique_ptr<Pattern>> Patterns, Location Loc);
+
+		virtual void accept(Visitor &V);
+		string str();
+	};
+
+	class ParPattern : public Pattern {
+	public:
+		unique_ptr<Pattern> Pat;
+
+		ParPattern(unique_ptr<Pattern> Pat, Location Loc);
 
 		virtual void accept(Visitor &V);
 		string str();

@@ -12,6 +12,8 @@ namespace common {
     void TuplePattern::accept(Visitor &V) { V.visit(*this); }
     void ListSplit::accept(Visitor &V) { V.visit(*this); }
     void WildPattern::accept(Visitor &V) { V.visit(*this); }
+    void AlgebraicPattern::accept(Visitor &V) { V.visit(*this); }
+    void ParPattern::accept(Visitor &V) { V.visit(*this); }
 
     Pattern::Pattern(Type Ty, Location Loc) :
             Node(Loc),
@@ -59,6 +61,13 @@ namespace common {
             Left(move(left)),
             Right(move(Patterns)) { }
 
+    AlgebraicPattern::AlgebraicPattern(string Constructor,
+                                       vector<unique_ptr<Pattern>> Patterns,
+                                       Location Loc) :
+            Pattern(Type(TypeId::CUSTOM), Loc),
+            Constructor(Constructor),
+            Patterns(move(Patterns)) { }
+
     IdPattern::IdPattern(string Val,
            Location Loc) :
             Pattern(Type(TypeId::UNKNOWN), Loc),
@@ -66,6 +75,11 @@ namespace common {
 
     WildPattern::WildPattern(Location Loc) :
             Pattern(Type(TypeId::UNKNOWN), Loc) { }
+
+    ParPattern::ParPattern(unique_ptr<Pattern> Pat,
+                           Location Loc) :
+            Pattern(Type(TypeId::UNKNOWN), Loc),
+            Pat(move(Pat)) { }
 
     string IdPattern::str() {
         return Val;
@@ -110,5 +124,13 @@ namespace common {
 
     string ListSplit::str() {
         return "(" + Left->str() + " : " + Right->str() + ")";
+    }
+
+    string AlgebraicPattern::str() {
+        return "(" + Constructor + " " + strJoin(Patterns, " ") + ")";
+    }
+
+    string ParPattern::str() {
+        return "(" + Pat->str() + ")";
     }
 }

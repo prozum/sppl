@@ -107,4 +107,15 @@ namespace common {
         virtual void accept(Visitor &V);
         string str();
     };
+
+    class AlgebraicExpression : public Expression {
+    public:
+        string Constructor;
+        vector<unique_ptr<Expression>> Exprs;
+
+        AlgebraicExpression(string Constructor, vector<unique_ptr<Expression>> Exprs, Location Loc);
+
+        virtual void accept(Visitor &V);
+        string str();
+    };
 }

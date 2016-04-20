@@ -55,6 +55,8 @@ namespace common {
 	class TuplePattern;
 	class ListSplit;
 	class WildPattern;
+	class AlgebraicPattern;
+	class ParPattern;
 	class IntExpr;
 	class FloatExpr;
 	class CharExpr;
@@ -63,6 +65,7 @@ namespace common {
 	class TupleExpr;
 	class IdPattern;
 	class CallExpr;
+	class AlgebraicExpression;
 	class Visitor;
 	class Scope;
 
