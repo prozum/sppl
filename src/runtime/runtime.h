@@ -2,10 +2,9 @@
 #define SPPL_RUNTIME_H
 
 #include <pthread.h>
-#include <ucontext.h>
-
 #include "queue.h"
 
+/*
 typedef void (*func)(void *);
 
 typedef enum task_state_e {
@@ -30,6 +29,8 @@ void add_task(task_t *task);
 int check_subtasks_done(task_t *task);
 void yield_waiting(task_t *task);
 void yield_blocked(task_t *task);
+*/
+
 
 typedef enum scheduler_state_e {
     SLACKING,
@@ -38,9 +39,6 @@ typedef enum scheduler_state_e {
 
 typedef struct scheduler_s {
     uint64_t id;
-    ucontext_t *context;
-    task_t *curr_task;
-    pthread_t *io_worker;
 } scheduler_t;
 
 typedef struct runtime_s {
@@ -58,9 +56,11 @@ typedef struct runtime_s {
 // global runtime
 runtime_t runtime;
 
-void rmain(uint64_t sched_count, task_t *initial_task);
+/*
+void rmain(uint64_t sched_count, Task *initial);
 void start_scheduler(void *sched_ptr);
 void set_active_worker(uint64_t id, scheduler_state_t state);
 uint64_t get_active_workers();
+*/
 
 #endif //SPPL_RUNTIME_H

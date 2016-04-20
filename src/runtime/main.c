@@ -1,7 +1,9 @@
 #include "runtime.h"
+#include "task.h"
 
 #include <stdio.h>
 
+/*
 typedef struct int_s {
     int input;
     int res;
@@ -36,6 +38,8 @@ void fun3 (void *t) {
     int_t *arg1 = malloc(sizeof(int_t));
     int_t *arg2 = malloc(sizeof(int_t));
 
+    arg1->res = 1;
+
     task_t *task1 = malloc(sizeof(task_t));
     task1->f = fun1;
     task1->args = (void *)(arg1);
@@ -56,6 +60,10 @@ void fun3 (void *t) {
 
     printf("fun1 res: %d\n", arg1->res);
 
+    arg1->res = 1;
+
+    printf("fun1 res: %d\n", arg1->res);
+
     printf("%d, %d\n", arg1->res, arg2->res);
 
     arg->res = arg1->res + arg2->res;
@@ -66,7 +74,9 @@ void fun3 (void *t) {
     free(task1);
     free(task2);
 }
+*/
 
+/*
 int main()
 {
     task_t *task = malloc(sizeof(task_t));
@@ -83,4 +93,10 @@ int main()
     free(args);
 
     return 0;
+}
+ */
+
+void
+        taskmain(int argc, char **argv) {
+    
 }

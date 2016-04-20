@@ -32,7 +32,7 @@ namespace jit {
     public:
         SpplJit();
 
-        void eval(string Str);
+        int eval(string Str);
 
         static void initLLVM() {
             InitializeNativeTarget();
@@ -65,9 +65,10 @@ namespace jit {
         ModuleHandleT ModuleHandler;
 
         parser::Driver Driver;
-        codegen::LLVMCodeGenerator Generator;
-        semantics::ScopeGenerator ScopeGenerator;
+        semantics::ScopeGenerator ScopeGen;
         semantics::TypeChecker TypeChecker;
+        optimizer::GeneralOptimizer Optimizer;
+        codegen::LLVMCodeGenerator CodeGen;
 
 
         template<typename T>

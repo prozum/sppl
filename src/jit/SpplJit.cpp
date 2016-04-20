@@ -6,8 +6,8 @@ namespace jit {
             Machine(EngineBuilder().selectTarget()),
             Layout(Machine->createDataLayout()),
             CompileLayer(ObjectLayer, SimpleCompiler(*Machine)),
-            Generator(Driver),
-            ScopeGenerator(&Driver.Global)
+            ScopeGen(&Driver.Global),
+            CodeGen(Driver)
     {
         llvm::sys::DynamicLibrary::LoadLibraryPermanently(nullptr);
         createModule();
@@ -65,11 +65,11 @@ namespace jit {
 
     void SpplJit::createModule() {
         // Open a new module
-        Generator.Module = llvm::make_unique<llvm::Module>("SpplJit", getGlobalContext());
-        Generator.Module->setDataLayout(Machine->createDataLayout());
+        CodeGen.Module = llvm::make_unique<llvm::Module>("SpplJit", getGlobalContext());
+        CodeGen.Module->setDataLayout(Machine->createDataLayout());
 
         // Create a new pass manager attached to it
-        PassMgr = llvm::make_unique<legacy::FunctionPassManager>(Generator.Module.get());
+        PassMgr = llvm::make_unique<legacy::FunctionPassManager>(CodeGen.Module.get());
 
         // Add optimization passes
         PassMgr->add(createInstructionCombiningPass());
@@ -81,8 +81,6 @@ namespace jit {
 
 
     string SpplJit::getOutput(intptr_t data, common::Type Type) {
-        string Out;
-
         switch (Type.Id) {
             case common::TypeId::INT:
                 return to_string((int64_t) data);
@@ -90,10 +88,11 @@ namespace jit {
                 // WTF is double type a pointer
                 return to_string(*(double *) data);
             case common::TypeId::STRING:
-                Out += "\"";
-                Out += (char *) data;
-                Out += "\"";
-                return Out;
+                return "\"" + string((char *) data) + "\"";
+            case common::TypeId::BOOL:
+                return to_string((bool) data);
+            case common::TypeId::EMPTYLIST:
+                return "[]";
             case common::TypeId::TUPLE:
                 return getOutputTuple(data, Type.Subtypes);
             case common::TypeId::SIGNATURE:
@@ -134,28 +133,27 @@ namespace jit {
     }
 
 
-    void SpplJit::eval(std::string Str) {
+    int SpplJit::eval(std::string Str) {
         if (!Driver.parseString(Str))
-            return;
+            return 1;
 
-        if (!Driver.accept(ScopeGenerator)) {
-            return;
-        }
+        if (!Driver.accept(ScopeGen))
+            return 2;
 
-        if (!Driver.accept(TypeChecker)) {
-            return;
-        }
+        if (!Driver.accept(TypeChecker))
+            return 3;
 
-        // Generate ir_func
-        if (!Driver.accept(Generator)) {
-            return;
-        }
+        if (!Driver.accept(Optimizer))
+            return 4;
+
+        if (!Driver.accept(CodeGen))
+            return 5;
         auto FuncNode = Driver.Prog->Funcs[0].get();
-        auto FuncIR = Generator.Module->getFunction(FuncNode->Id);
+        auto FuncIR = CodeGen.Module->getFunction(FuncNode->Id);
         PassMgr->run(* FuncIR);
 
         // Store function in seperate module
-        ModuleHandler = addModule(std::move(Generator.Module));
+        ModuleHandler = addModule(std::move(CodeGen.Module));
         createModule();
 
         // Only run anonymous functions
@@ -171,5 +169,6 @@ namespace jit {
             removeModule(ModuleHandler);
         }
 
+        return 0;
     }
 }

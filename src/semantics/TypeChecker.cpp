@@ -15,23 +15,18 @@ namespace semantics
         for (auto &Func : Node.Funcs) {
             Func->accept(*this);
 
-            try {
-                if (Func->Id == "main") {
-                    if (Func->Signature.Subtypes.front() != StrList) {
-                        throw Error::Expected("Declaration of \"main\" had wrong input type",
-                                              StrList.str(),
-                                              Func->Signature.Subtypes.front().str(),
-                                              Func->Loc);
-                    } else if (Func->Signature.Subtypes.size() != 2) {
-                        throw Error::Expected("Function \"main\" had wrong number of input",
-                                              "2",
-                                              to_string(Func->Signature.Subtypes.size()),
-                                              Func->Loc);
-                    }
+            if (Func->Id == "main") {
+                if (Func->Signature.Subtypes.front() != StrList) {
+                    addError(Error::Expected("Declaration of \"main\" had wrong input type",
+                                          StrList.str(),
+                                          Func->Signature.Subtypes.front().str(),
+                                          Func->Loc));
+                } else if (Func->Signature.Subtypes.size() != 2) {
+                    addError(Error::Expected("Function \"main\" had wrong number of input",
+                                          "2",
+                                          to_string(Func->Signature.Subtypes.size()),
+                                          Func->Loc));
                 }
-            }
-            catch (Error err) {
-                Errors.push_back(err);
             }
 
         }

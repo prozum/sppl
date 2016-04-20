@@ -71,6 +71,8 @@ namespace codegen {
         void visit(common::Div &Node);
         void visit(common::Mod &Node);
 
+		void visit(common::And &Node);
+		void visit(common::Or &Node);
     	void visit(common::Equal &Node);
     	void visit(common::NotEqual &Node);
     	void visit(common::Lesser &Node);
