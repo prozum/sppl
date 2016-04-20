@@ -39,11 +39,10 @@ bool Test::compileChecker(std::string name) {
         in.push_back(name);
 
         compiler.setOutput("out.c");
-        compiler.setHeaderOutput("test.h");     // TODO: Use better name when fixed
-        compiler.setInputs(in);
+        compiler.setHeaderOutput("test.h");
 
         compiler.setBackend(backend);
-        compStatus = compiler.compile();
+        compStatus = compiler.compile(in);
     }
     catch (...) {
         CPPUNIT_ASSERT_MESSAGE("Exception Thrown In Compiler", false);
