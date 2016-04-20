@@ -231,3 +231,13 @@ void Test::funcIntToIntRetToIntRetToInt() {
     bool execStatus = executeChecker("", "2");
     CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
 }
+
+void Test::funcFuncOverloadLength() {
+    bool compStatus = compileChecker("func/funcFuncOverloadLength.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, !compStatus);
+}
+
+void Test::funcFuncOVerloadType() {
+    bool compStatus = compileChecker("func/funcFuncOVerloadType.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, !compStatus);
+}

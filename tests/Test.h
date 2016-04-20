@@ -320,6 +320,8 @@ class Test : public CppUnit::TestFixture{
         CPPUNIT_TEST(funcListIntToListIntRetListInt);
         CPPUNIT_TEST(funcTupleIntIntToTupleIntIntRetInt);
         CPPUNIT_TEST(funcIntToIntRetToIntRetToInt);
+        CPPUNIT_TEST(funcFuncOverloadLength);
+        CPPUNIT_TEST(funcFuncOVerloadType);
 
     // KeywordTest.cpp
         CPPUNIT_TEST(keywordInt);
@@ -656,6 +658,8 @@ protected:
     void funcListIntToListIntRetListInt();
     void funcTupleIntIntToTupleIntIntRetInt();
     void funcIntToIntRetToIntRetToInt();
+    void funcFuncOverloadLength();
+    void funcFuncOVerloadType();
 
 // KeywordTest.cpp
     void keywordInt();
