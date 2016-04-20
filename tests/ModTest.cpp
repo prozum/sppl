@@ -3,70 +3,70 @@
 void Test::modIntPosPos() { 
     bool compStatus = compileChecker("mod/modIntPosPos.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus);
-    bool execStatus = executeChecker("", "0");
+    bool execStatus = executeChecker("0");
     CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
 }
 
 void Test::modIntZeroZero() { 
     bool compStatus = compileChecker("mod/modIntZeroZero.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus);
-    bool execStatus = executeChecker("", "0");
+    bool execStatus = executeChecker("0");
     CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
 }
 
 void Test::modIntPosNeg() { 
     bool compStatus = compileChecker("mod/modIntPosNeg.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus);
-    bool execStatus = executeChecker("", "0");
+    bool execStatus = executeChecker("0");
     CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
 }
 
 void Test::modIntNegPos() { 
     bool compStatus = compileChecker("mod/modIntNegPos.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus);
-    bool execStatus = executeChecker("", "0");
+    bool execStatus = executeChecker("0");
     CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
 }
 
 void Test::modIntNegNeg() { 
     bool compStatus = compileChecker("mod/modIntNegNeg.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus);
-    bool execStatus = executeChecker("", "0");
+    bool execStatus = executeChecker("0");
     CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
 }
 
 void Test::modFloatPosPos() { 
     bool compStatus = compileChecker("mod/modFloatPosPos.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus);
-    bool execStatus = executeChecker("", "0.000000");
+    bool execStatus = executeChecker("0.000000");
     CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
 }
 
 void Test::modFloatZeroZero() { 
     bool compStatus = compileChecker("mod/modFloatZeroZero.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus);
-    bool execStatus = executeChecker("", "0.000000");
+    bool execStatus = executeChecker("0.000000");
     CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
 }
 
 void Test::modFloatPosNeg() { 
     bool compStatus = compileChecker("mod/modFloatPosNeg.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus);
-    bool execStatus = executeChecker("", "0.000000");
+    bool execStatus = executeChecker("0.000000");
     CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
 }
 
 void Test::modFloatNegPos() { 
     bool compStatus = compileChecker("mod/modFloatNegPos.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus);
-    bool execStatus = executeChecker("", "0.000000");
+    bool execStatus = executeChecker("0.000000");
     CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
 }
 
 void Test::modFloatNegNeg() { 
     bool compStatus = compileChecker("mod/modFloatNegNeg.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus);
-    bool execStatus = executeChecker("", "0.000000");
+    bool execStatus = executeChecker("0.000000");
     CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
 }
 

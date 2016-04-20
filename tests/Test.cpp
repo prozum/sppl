@@ -66,6 +66,10 @@ bool Test::executeChecker(std::string args, std::string expectedOutput) {
     return true;
 }
 
+bool Test::executeChecker(std::string expectedOutput) {
+    return executeChecker("", expectedOutput);
+}
+
 bool Test::checkIfFileExists(string file) {
     ifstream f(file);
     if (f.bad()) {

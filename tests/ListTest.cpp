@@ -3,133 +3,133 @@
 void Test::listCasEmpty() {
     bool compStatus = compileChecker("list/listCasEmpty.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus);
-    bool execStatus = executeChecker("", "2");
+    bool execStatus = executeChecker("2");
     CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
 }
 
 void Test::listAppendEmpty() { 
     bool compStatus = compileChecker("list/listAppendEmpty.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus);
-    bool execStatus = executeChecker("", "[1]");
+    bool execStatus = executeChecker("[1]");
     CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
 }
 
 void Test::listInt() { 
     bool compStatus = compileChecker("list/listInt.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus);
-    bool execStatus = executeChecker("", "[2]");
+    bool execStatus = executeChecker("[2]");
     CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
 }
 
 void Test::listFloat() { 
     bool compStatus = compileChecker("list/listFloat.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus);
-    bool execStatus = executeChecker("", "[2.000000]");
+    bool execStatus = executeChecker("[2.000000]");
     CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
 }
 
 void Test::listBool() { 
     bool compStatus = compileChecker("list/listBool.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus);
-    bool execStatus = executeChecker("", "[True]");
+    bool execStatus = executeChecker("[True]");
     CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
 }
 
 void Test::listChar() { 
     bool compStatus = compileChecker("list/listChar.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus);
-    bool execStatus = executeChecker("", "['c']");
+    bool execStatus = executeChecker("['c']");
     CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
 }
 
 void Test::listString() { 
     bool compStatus = compileChecker("list/listString.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus);
-    bool execStatus = executeChecker("", "[\"string\"]");
+    bool execStatus = executeChecker("[\"string\"]");
     CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
 }
 
 void Test::listListInt() { 
     bool compStatus = compileChecker("list/listListInt.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus);
-    bool execStatus = executeChecker("", "[[2]]");
+    bool execStatus = executeChecker("[[2]]");
     CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
 }
 
 void Test::listListFloat() { 
     bool compStatus = compileChecker("list/listListFloat.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus);
-    bool execStatus = executeChecker("", "[[2.000000]]");
+    bool execStatus = executeChecker("[[2.000000]]");
     CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
 }
 
 void Test::listListBool() { 
     bool compStatus = compileChecker("list/listListBool.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus);
-    bool execStatus = executeChecker("", "[[True]]");
+    bool execStatus = executeChecker("[[True]]");
     CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
 }
 
 void Test::listListChar() { 
     bool compStatus = compileChecker("list/listListChar.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus);
-    bool execStatus = executeChecker("", "[['c']]");
+    bool execStatus = executeChecker("[['c']]");
     CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
 }
 
 void Test::listListString() { 
     bool compStatus = compileChecker("list/listListString.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus);
-    bool execStatus = executeChecker("", "[[\"string\"]]");
+    bool execStatus = executeChecker("[[\"string\"]]");
     CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
 }
 
 void Test::listListListInt() { 
     bool compStatus = compileChecker("list/listListListInt.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus);
-    bool execStatus = executeChecker("", "[[[2]]]");
+    bool execStatus = executeChecker("[[[2]]]");
     CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
 }
 
 void Test::listAppendInt() { 
     bool compStatus = compileChecker("list/listAppendInt.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus);
-    bool execStatus = executeChecker("", "[1, 2, 3]");
+    bool execStatus = executeChecker("[1, 2, 3]");
     CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
 }
 
 void Test::listAppendFloat() { 
     bool compStatus = compileChecker("list/listAppendFloat.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus);
-    bool execStatus = executeChecker("", "[1.000000, 2.000000, 3.000000]");
+    bool execStatus = executeChecker("[1.000000, 2.000000, 3.000000]");
     CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
 }
 
 void Test::listAppendBool() { 
     bool compStatus = compileChecker("list/listAppendBool.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus);
-    bool execStatus = executeChecker("", "[True, False, True]");
+    bool execStatus = executeChecker("[True, False, True]");
     CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
 }
 
 void Test::listAppendChar() { 
     bool compStatus = compileChecker("list/listAppendChar.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus);
-    bool execStatus = executeChecker("", "['c', 'h', 'a', 'r']");
+    bool execStatus = executeChecker("['c', 'h', 'a', 'r']");
     CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
 }
 
 void Test::listAppendString() { 
     bool compStatus = compileChecker("list/listAppendString.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus);
-    bool execStatus = executeChecker("", "[\"string\", \"string\", \"string\"]");
+    bool execStatus = executeChecker("[\"string\", \"string\", \"string\"]");
     CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
 }
 
 void Test::listLongInt() { 
     bool compStatus = compileChecker("list/listLongInt.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus);
-    bool execStatus = executeChecker("", "[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0]");
+    bool execStatus = executeChecker("[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0]");
     CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
 }
 
@@ -241,41 +241,41 @@ void Test::listMixTypes() {
 void Test::listNestedDifLengthInt() { 
     bool compStatus = compileChecker("list/listNestedDifLengthInt.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus);
-    bool execStatus = executeChecker("", "[[1, 2, 3], [1, 2, 3, 4, 5, 6, 7, 8, 9, 0]]");
+    bool execStatus = executeChecker("[[1, 2, 3], [1, 2, 3, 4, 5, 6, 7, 8, 9, 0]]");
     CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
 }
 
 void Test::listTupleInt() { 
     bool compStatus = compileChecker("list/listTupleInt.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus);
-    bool execStatus = executeChecker("", "[(1, 2), (3, 4), (5, 6)]");
+    bool execStatus = executeChecker("[(1, 2), (3, 4), (5, 6)]");
     CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
 }
 
 void Test::listTupleFloat() { 
     bool compStatus = compileChecker("list/listTupleFloat.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus);
-    bool execStatus = executeChecker("", "[(1.000000, 2.000000), (3.000000, 4.000000), (5.000000, 6.000000)]");
+    bool execStatus = executeChecker("[(1.000000, 2.000000), (3.000000, 4.000000), (5.000000, 6.000000)]");
     CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
 }
 
 void Test::listTupleBool() { 
     bool compStatus = compileChecker("list/listTupleBool.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus);
-    bool execStatus = executeChecker("", "[(True, False), (False, True), (False, False)]");
+    bool execStatus = executeChecker("[(True, False), (False, True), (False, False)]");
     CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
 }
 
 void Test::listTupleChar() { 
     bool compStatus = compileChecker("list/listTupleChar.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus);
-    bool execStatus = executeChecker("", "[('c', 'h'), ('a', 'r'), ('c', 'h')]");
+    bool execStatus = executeChecker("[('c', 'h'), ('a', 'r'), ('c', 'h')]");
     CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
 }
 
 void Test::listTupleString() { 
     bool compStatus = compileChecker("list/listTupleString.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus);
-    bool execStatus = executeChecker("", "[(\"string\", \"string\"), (\"string\", \"string\"), (\"string\", \"string\")]");
+    bool execStatus = executeChecker("[(\"string\", \"string\"), (\"string\", \"string\"), (\"string\", \"string\")]");
     CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
 }

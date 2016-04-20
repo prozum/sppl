@@ -3,7 +3,7 @@
 void Test::scopeNormal() {
     bool compStatus = compileChecker("scope/scopeNormal.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus);
-    bool execStatus = executeChecker("", "10");
+    bool execStatus = executeChecker("10");
     CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
 }
 

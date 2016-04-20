@@ -321,7 +321,7 @@ class Test : public CppUnit::TestFixture{
         CPPUNIT_TEST(funcTupleIntIntToTupleIntIntRetInt);
         CPPUNIT_TEST(funcIntToIntRetToIntRetToInt);
         CPPUNIT_TEST(funcFuncOverloadLength);
-        CPPUNIT_TEST(funcFuncOVerloadType);
+        CPPUNIT_TEST(funcFuncOverloadType);
 
     // KeywordTest.cpp
         CPPUNIT_TEST(keywordInt);
@@ -659,7 +659,7 @@ protected:
     void funcTupleIntIntToTupleIntIntRetInt();
     void funcIntToIntRetToIntRetToInt();
     void funcFuncOverloadLength();
-    void funcFuncOVerloadType();
+    void funcFuncOverloadType();
 
 // KeywordTest.cpp
     void keywordInt();
@@ -685,6 +685,7 @@ protected:
     // Test.cpp
     bool compileChecker(std::string name);
     bool executeChecker(std::string args, std::string expectedOutput);
+    bool executeChecker(std::string expectedOutput);
     bool executeCPP(std::string args, std::string expectedOutput);
     bool executeLLVM(std::string args, std::string expectedOutput);
     bool checkIfFileExists(string file);

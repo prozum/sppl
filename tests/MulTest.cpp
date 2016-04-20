@@ -3,70 +3,70 @@
 void Test::mulIntPosPos() { 
     bool compStatus = compileChecker("mul/mulIntPosPos.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus);
-    bool execStatus = executeChecker("", "4");
+    bool execStatus = executeChecker("4");
     CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
 }
 
 void Test::mulIntZeroZero() { 
     bool compStatus = compileChecker("mul/mulIntZeroZero.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus);
-    bool execStatus = executeChecker("", "0");
+    bool execStatus = executeChecker("0");
     CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
 }
 
 void Test::mulIntPosNeg() { 
     bool compStatus = compileChecker("mul/mulIntPosNeg.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus);
-    bool execStatus = executeChecker("", "-4");
+    bool execStatus = executeChecker("-4");
     CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
 }
 
 void Test::mulIntNegPos() { 
     bool compStatus = compileChecker("mul/mulIntNegPos.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus);
-    bool execStatus = executeChecker("", "-4");
+    bool execStatus = executeChecker("-4");
     CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
 }
 
 void Test::mulIntNegNeg() { 
     bool compStatus = compileChecker("mul/mulIntNegNeg.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus);
-    bool execStatus = executeChecker("", "4");
+    bool execStatus = executeChecker("4");
     CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
 }
 
 void Test::mulFloatPosPos() { 
     bool compStatus = compileChecker("mul/mulFloatPosPos.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus);
-    bool execStatus = executeChecker("", "4.000000");
+    bool execStatus = executeChecker("4.000000");
     CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
 }
 
 void Test::mulFloatZeroZero() { 
     bool compStatus = compileChecker("mul/mulFloatZeroZero.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus);
-    bool execStatus = executeChecker("", "0.000000");
+    bool execStatus = executeChecker("0.000000");
     CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
 }
 
 void Test::mulFloatPosNeg() { 
     bool compStatus = compileChecker("mul/mulFloatPosNeg.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus);
-    bool execStatus = executeChecker("", "-4.000000");
+    bool execStatus = executeChecker("-4.000000");
     CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
 }
 
 void Test::mulFloatNegPos() { 
     bool compStatus = compileChecker("mul/mulFloatNegPos.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus);
-    bool execStatus = executeChecker("", "-4.000000");
+    bool execStatus = executeChecker("-4.000000");
     CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
 }
 
 void Test::mulFloatNegNeg() { 
     bool compStatus = compileChecker("mul/mulFloatNegNeg.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus);
-    bool execStatus = executeChecker("", "4.000000");
+    bool execStatus = executeChecker("4.000000");
     CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
 }
 

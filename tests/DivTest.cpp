@@ -3,70 +3,70 @@
 void Test::divIntPosPos() { 
     bool compStatus = compileChecker("div/divIntPosPos.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus);
-    bool execStatus = executeChecker("", "1");
+    bool execStatus = executeChecker("1");
     CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
 }
 
 void Test::divIntZeroZero() { 
     bool compStatus = compileChecker("div/divIntZeroZero.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus);
-    bool execStatus = executeChecker("", "0");
+    bool execStatus = executeChecker("0");
     CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
 }
 
 void Test::divIntPosNeg() { 
     bool compStatus = compileChecker("div/divIntPosNeg.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus);
-    bool execStatus = executeChecker("", "-1");
+    bool execStatus = executeChecker("-1");
     CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
 }
 
 void Test::divIntNegPos() { 
     bool compStatus = compileChecker("div/divIntNegPos.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus);
-    bool execStatus = executeChecker("", "-1");
+    bool execStatus = executeChecker("-1");
     CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
 }
 
 void Test::divIntNegNeg() { 
     bool compStatus = compileChecker("div/divIntNegNeg.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus);
-    bool execStatus = executeChecker("", "1");
+    bool execStatus = executeChecker("1");
     CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
 }
 
 void Test::divFloatPosPos() { 
     bool compStatus = compileChecker("div/divFloatPosPos.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus);
-    bool execStatus = executeChecker("", "1.000000");
+    bool execStatus = executeChecker("1.000000");
     CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
 }
 
 void Test::divFloatZeroZero() { 
     bool compStatus = compileChecker("div/divFloatZeroZero.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus);
-    bool execStatus = executeChecker("", "0.000000");
+    bool execStatus = executeChecker("0.000000");
     CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
 }
 
 void Test::divFloatPosNeg() { 
     bool compStatus = compileChecker("div/divFloatPosNeg.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus);
-    bool execStatus = executeChecker("", "-1.000000");
+    bool execStatus = executeChecker("-1.000000");
     CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
 }
 
 void Test::divFloatNegPos() { 
     bool compStatus = compileChecker("div/divFloatNegPos.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus);
-    bool execStatus = executeChecker("", "-1.000000");
+    bool execStatus = executeChecker("-1.000000");
     CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
 }
 
 void Test::divFloatNegNeg() { 
     bool compStatus = compileChecker("div/divFloatNegNeg.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus);
-    bool execStatus = executeChecker("", "1.000000");
+    bool execStatus = executeChecker("1.000000");
     CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
 }
 

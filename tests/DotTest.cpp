@@ -3,7 +3,7 @@
 void Test::dotNormal() {
     bool compStatus = compileChecker("dot/dotNormal.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus);
-    bool execStatus = executeChecker("", "2.000000");
+    bool execStatus = executeChecker("2.000000");
     CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
 }
 

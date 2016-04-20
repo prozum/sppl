@@ -38,7 +38,7 @@ void Test::keywordMain() {
 void Test::comment() { 
     bool compStatus = compileChecker("comment.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus);
-    bool execStatus = executeChecker("", "2");
+    bool execStatus = executeChecker("2");
     CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
 }
 
