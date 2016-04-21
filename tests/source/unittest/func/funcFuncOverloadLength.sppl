@@ -1,0 +1,8 @@
+def main : [String]->Int
+| s = func(1)+func(2,3)
+
+def func : Int->Int
+| n = n
+
+def func : Int->Int->Int
+| m n = m + n
