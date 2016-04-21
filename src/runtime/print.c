@@ -1,9 +1,5 @@
 #include "task.h"
 
-/*
- * Stripped down print library.  Plan 9 interface, new code.
- */
-
 enum
 {
 	FlagLong = 1<<0,
