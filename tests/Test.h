@@ -195,6 +195,8 @@ class Test : public CppUnit::TestFixture{
         CPPUNIT_TEST(patLengthMoreInt);
 
     // CasTest.cpp
+        CPPUNIT_TEST(casCountNoInt);
+        CPPUNIT_TEST(casCountZeroInt);
         CPPUNIT_TEST(casCountOneInt);
         CPPUNIT_TEST(casCountTwoInt);
         CPPUNIT_TEST(casCountThreeInt);
@@ -538,6 +540,8 @@ protected:
     void patLengthMoreInt();
 
 // CasTest.cpp
+    void casCountNoInt();
+    void casCountZeroInt();
     void casCountOneInt();
     void casCountTwoInt();
     void casCountThreeInt();

@@ -1,5 +1,17 @@
 #include "Test.h"
 
+void Test::casCountNoInt() {
+    bool compStatus = compileChecker("cas/casCountNoInt.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, !compStatus);
+}
+
+void Test::casCountZeroInt() {
+    bool compStatus = compileChecker("cas/casCountZeroInt.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus);
+    bool execStatus = executeChecker("2");
+    CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
+}
+
 void Test::casCountOneInt() { 
     bool compStatus = compileChecker("cas/casCountOneInt.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus);
