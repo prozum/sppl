@@ -119,3 +119,8 @@ void Test::subMixIntFloat() {
     bool compStatus = compileChecker("sub/subMixIntFloat.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, !compStatus);
 }
+
+void Test::subBoolNegative() {
+    bool compStatus = compileChecker("sub/subBoolNegative.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, !compStatus);
+}

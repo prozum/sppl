@@ -58,6 +58,7 @@ class Test : public CppUnit::TestFixture{
         CPPUNIT_TEST(subCharChaCha);
         CPPUNIT_TEST(subMixFloatInt);
         CPPUNIT_TEST(subMixIntFloat);
+        CPPUNIT_TEST(subBoolNegative);
 
     // MulTest.cpp
         CPPUNIT_TEST(mulIntPosPos);
@@ -322,6 +323,10 @@ class Test : public CppUnit::TestFixture{
         CPPUNIT_TEST(funcIntToIntRetToIntRetToInt);
         CPPUNIT_TEST(funcFuncOverloadLength);
         CPPUNIT_TEST(funcFuncOverloadType);
+        CPPUNIT_TEST(funcRetWrong);
+        CPPUNIT_TEST(funcParamCount);
+        CPPUNIT_TEST(funcParamCountLess);
+        CPPUNIT_TEST(funcParamCountMore);
 
     // KeywordTest.cpp
         CPPUNIT_TEST(keywordInt);
@@ -396,6 +401,7 @@ protected:
     void subCharChaCha();
     void subMixFloatInt();
     void subMixIntFloat();
+    void subBoolNegative();
 
 // MulTest.cpp
     void mulIntPosPos();
@@ -660,6 +666,10 @@ protected:
     void funcIntToIntRetToIntRetToInt();
     void funcFuncOverloadLength();
     void funcFuncOverloadType();
+    void funcRetWrong();
+    void funcParamCount();
+    void funcParamCountLess();
+    void funcParamCountMore();
 
 // KeywordTest.cpp
     void keywordInt();

@@ -241,3 +241,25 @@ void Test::funcFuncOverloadType() {
     bool compStatus = compileChecker("func/funcFuncOverloadType.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, !compStatus);
 }
+
+void Test::funcRetWrong() {
+    bool compStatus = compileChecker("func/funcRetWrong.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, !compStatus);
+}
+
+void Test::funcParamCount() {
+    bool compStatus = compileChecker("func/funcParamCount.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus);
+    bool execStatus = executeChecker("4");
+    CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
+}
+
+void Test::funcParamCountLess() {
+    bool compStatus = compileChecker("func/funcParamCountLess.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, !compStatus);
+}
+
+void Test::funcParamCountMore() {
+    bool compStatus = compileChecker("func/funcParamCountMore.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, !compStatus);
+}
