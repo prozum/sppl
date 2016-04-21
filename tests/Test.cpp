@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <stdlib.h>
 #include "Test.h"
 
 void Test::setUp() {
@@ -24,12 +25,8 @@ void Test::tearDown() {
 bool Test::compileChecker(std::string name) {
     int compStatus;
 
-    ifstream f(name);
-    if (f.bad()) {
-        f.close();
+    if (!checkIfFileExists(name)) {
         CPPUNIT_ASSERT_MESSAGE("File \"" + name + "\" not found!", false);
-    } else {
-        f.close();
     }
 
     try {
@@ -70,7 +67,7 @@ bool Test::executeChecker(std::string expectedOutput) {
     return executeChecker("", expectedOutput);
 }
 
-bool Test::checkIfFileExists(string file) {
+bool Test::checkIfFileExists(std::string file) {
     ifstream f(file);
     if (f.bad()) {
         f.close();
@@ -92,7 +89,7 @@ bool Test::executeCPP(std::string args, std::string expectedOutput) {
     }
 
     // Compile program
-    int status = system("gcc out.c -o prog");
+    int status = system("cc out.c -o prog");
 
     if (status != 0) {
         CPPUNIT_ASSERT_MESSAGE("C Compiler Error", false);
