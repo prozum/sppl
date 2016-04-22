@@ -197,7 +197,7 @@ patterns_comma_ne:  patterns_comma_ne COMMA pattern         { $$ = $1; $$->push_
 literal:	INTLITERAL                                      { $$ = new IntExpr($1, @1); }
 	|	FLOATLITERAL                                        { $$ = new FloatExpr($1, @1); }
 	|	CHARLITERAL                                         { $$ = new CharExpr($1, @1); }
-	|	STRINGLITERAL                                       { auto res = new ListExpr(vector<unique_ptr<Expression>>(), @1); for (auto Chr : * $1) res->Elements.push_back(make_unique<CharExpr>(Chr, @1)); delete $1; $$ = res; }
+	|	STRINGLITERAL                                       { $$ = new StringExpr(* $1, @1); delete $1; }
 expr:	expr OR expr                                        { $$ = new Or(unique_ptr<Expression>($1), unique_ptr<Expression>($3), @1); }
 	|	expr AND expr                                       { $$ = new And(unique_ptr<Expression>($1), unique_ptr<Expression>($3), @1); }
 	|	expr EQUAL expr                                     { $$ = new Equal(unique_ptr<Expression>($1), unique_ptr<Expression>($3), @1); }
@@ -214,7 +214,7 @@ expr:	expr OR expr                                        { $$ = new Or(unique_p
 	|   expr PROCON expr                                    { $$ = new ProducerConsumer(unique_ptr<Expression>($1), unique_ptr<Expression>($3), @1); }
 	|   expr CONCAT expr                                    { $$ = new Concat(unique_ptr<Expression>($1), unique_ptr<Expression>($3), @1); }
 	|	expr COLON expr                                     { $$ = new ListAdd(unique_ptr<Expression>($1), unique_ptr<Expression>($3), @1); }
-	|   expr TO type                                        { $$ = new To(unique_ptr<Expression>($1), @1); }
+	|   expr TO type                                        { $$ = new To(unique_ptr<Expression>($1), * $3, @1); delete $3; }
 	|	IDSMALL                                             { $$ = new IdExpr(* $1, @1); }
 	|	literal                                             { $$ = $1; }
 	|	SQSTART exprs_comma SQEND                           { $$ = new ListExpr(move(* $2), @1); delete $2; }

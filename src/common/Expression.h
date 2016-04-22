@@ -22,6 +22,7 @@ namespace common {
     
         virtual void accept(Visitor &V);
         string str();
+        unique_ptr<Node> clone();
     };
     
     class IntExpr : public Expression {
@@ -32,6 +33,7 @@ namespace common {
     
         virtual void accept(Visitor &V);
         string str();
+        unique_ptr<Node> clone();
     };
     
     class FloatExpr : public Expression {
@@ -42,6 +44,7 @@ namespace common {
     
         virtual void accept(Visitor &V);
         string str();
+        unique_ptr<Node> clone();
     };
     
     class CharExpr : public Expression {
@@ -52,6 +55,7 @@ namespace common {
     
         virtual void accept(Visitor &V);
         string str();
+        unique_ptr<Node> clone();
     };
 
     class BoolExpr : public Expression {
@@ -62,10 +66,21 @@ namespace common {
 
         virtual void accept(Visitor &V);
         string str();
+        unique_ptr<Node> clone();
+    };
+
+    class StringExpr : public Expression {
+    public:
+        string Val;
+
+        StringExpr(string Val, Location Loc);
+
+        virtual void accept(Visitor &V);
+        string str();
+        unique_ptr<Node> clone();
     };
 
     /* Other Expressions */
-
     class ListExpr : public Expression {
     public:
         vector<unique_ptr<Expression>> Elements;
@@ -74,6 +89,7 @@ namespace common {
 
         virtual void accept(Visitor &V);
         string str();
+        unique_ptr<Node> clone();
     };
 
     class TupleExpr : public Expression {
@@ -84,6 +100,7 @@ namespace common {
 
         virtual void accept(Visitor &V);
         string str();
+        unique_ptr<Node> clone();
     };
 
     class CallExpr : public Expression {
@@ -95,6 +112,7 @@ namespace common {
 
         virtual void accept(Visitor &V);
         string str();
+        unique_ptr<Node> clone();
     };
 
     class LambdaFunction : public Expression {
@@ -106,6 +124,7 @@ namespace common {
 
         virtual void accept(Visitor &V);
         string str();
+        unique_ptr<Node> clone();
     };
 
     class AlgebraicExpression : public Expression {
@@ -117,5 +136,6 @@ namespace common {
 
         virtual void accept(Visitor &V);
         string str();
+        unique_ptr<Node> clone();
     };
 }

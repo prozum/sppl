@@ -46,6 +46,11 @@ namespace compiler {
 
         cout << Prog->str() << endl;
 
+        accept(Unfolder);
+        cout << "--------------------------" << endl;
+
+        cout << Prog->str() << endl;
+
         /*
         if (!accept(ScopeGen))
             return 2;

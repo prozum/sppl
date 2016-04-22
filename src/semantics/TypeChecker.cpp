@@ -9,18 +9,16 @@ namespace semantics
     TypeChecker::TypeChecker() { }
 
     void TypeChecker::visit(Program &Node) {
-
         // Visit children
         for (auto &Decl : Node.Decls) {
             Decl->accept(*this);
         }
-        // Visit stops here
     }
 
     void TypeChecker::visit(Function &Node) {
         CurFunc = &Node;
 
-        auto StrList = Type(TypeId::LIST, vector<Type>({ Type(TypeId::CHAR) }));
+        auto StrList = Type(TypeId::LIST, vector<Type>({ Type(TypeId::STRING) }));
 
         if (Node.Id == "main") {
             if (Node.Signature.Subtypes.front() != StrList) {
@@ -45,7 +43,6 @@ namespace semantics
                 Errors.push_back(err);
             }
         }
-        // Visit stops here
     }
 
     void TypeChecker::visit(Case &Node) {
@@ -54,13 +51,13 @@ namespace semantics
             Pattern->accept(*this);
         }
         Node.Expr->accept(*this);
-        // Visit stops here
 
         // Set signature for anonymous function
         if (CurFunc->Anon) {
             CurFunc->Signature = Type(TypeId::SIGNATURE, vector<Type>({Node.Expr->RetTy}));
         }
 
+        // Make sure there is the same number of patterns as arguments to the function
         if (Node.Patterns.size() != CurFunc->Signature.Subtypes.size() - 1) {
             throw Error::Expected("Wrong pattern count",
                                   to_string(CurFunc->Signature.Subtypes.size() - 1),
@@ -89,7 +86,6 @@ namespace semantics
         // Visit children
         Node.Left->accept(*this);
         Node.Right->accept(*this);
-        // Visit stops here
 
         if (Node.Left->RetTy.Id != TypeId::BOOL ||
             Node.Left->RetTy.Id != Node.Right->RetTy.Id) {
@@ -432,21 +428,21 @@ namespace semantics
 
 
     void TypeChecker::visit(IdPattern &Node) {
-        if (!Node.Scp->exists(Node.Val)) {
+        if (!Node.Scp->declExists(Node.Val)) {
             throw Error(Node.Val + ": Id does not exist in the current scope",
                         Node.Loc);
         }
 
-        Node.RetTy = Node.Scp->getType(Node.Val);
+        Node.RetTy = Node.Scp->getDeclType(Node.Val);
     }
 
     void TypeChecker::visit(IdExpr &Node) {
-        if (!Node.Scp->exists(Node.Val)) {
+        if (!Node.Scp->declExists(Node.Val)) {
             throw Error(Node.Val + ": Id does not exist in the current scope",
                         Node.Loc);
         }
 
-        Node.RetTy = Node.Scp->getType(Node.Val);
+        Node.RetTy = Node.Scp->getDeclType(Node.Val);
     }
 
     void TypeChecker::visit(CallExpr &Node) {

@@ -20,6 +20,7 @@ namespace common {
 
 		virtual void accept(Visitor &V);
 		string str();
+		unique_ptr<Node> clone();
 	};
 
 	class IntPattern : public Pattern {
@@ -30,6 +31,7 @@ namespace common {
 
 		virtual void accept(Visitor &V);
 		string str();
+		unique_ptr<Node> clone();
 	};
 
 	class FloatPattern : public Pattern {
@@ -40,6 +42,7 @@ namespace common {
 
 		virtual void accept(Visitor &V);
 		string str();
+		unique_ptr<Node> clone();
 	};
 
 	class CharPattern : public Pattern {
@@ -50,6 +53,7 @@ namespace common {
 
 		virtual void accept(Visitor &V);
 		string str();
+		unique_ptr<Node> clone();
 	};
 
 	class BoolPattern : public Pattern {
@@ -60,6 +64,7 @@ namespace common {
 
 		virtual void accept(Visitor &V);
 		string str();
+		unique_ptr<Node> clone();
 	};
 
 	class StringPattern : public Pattern {
@@ -70,6 +75,7 @@ namespace common {
 
 		virtual void accept(Visitor &V);
 		string str();
+		unique_ptr<Node> clone();
 	};
 
 	class ListPattern : public Pattern {
@@ -80,6 +86,7 @@ namespace common {
 
 		virtual void accept(Visitor &V);
 		string str();
+		unique_ptr<Node> clone();
 	};
 
 	class TuplePattern : public Pattern {
@@ -90,6 +97,7 @@ namespace common {
 
 		virtual void accept(Visitor &V);
 		string str();
+		unique_ptr<Node> clone();
 	};
 
 	class WildPattern : public Pattern {
@@ -98,6 +106,7 @@ namespace common {
 
 		virtual void accept(Visitor &V);
 		string str();
+		unique_ptr<Node> clone();
 	};
 
 	class ListSplit : public Pattern {
@@ -109,6 +118,7 @@ namespace common {
 
 		virtual void accept(Visitor &V);
 		string str();
+		unique_ptr<Node> clone();
 	};
 
 	class AlgebraicPattern : public Pattern {
@@ -120,6 +130,7 @@ namespace common {
 
 		virtual void accept(Visitor &V);
 		string str();
+		unique_ptr<Node> clone();
 	};
 
 	class ParPattern : public Pattern {
@@ -130,5 +141,6 @@ namespace common {
 
 		virtual void accept(Visitor &V);
 		string str();
+		unique_ptr<Node> clone();
 	};
 }

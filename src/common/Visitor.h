@@ -58,6 +58,7 @@ namespace common {
 		virtual void visit(FloatExpr &Node) { throw runtime_error( "Not implemented"); }
 		virtual void visit(CharExpr &Node) { throw runtime_error( "Not implemented"); }
 		virtual void visit(BoolExpr &Node) { throw runtime_error( "Not implemented"); }
+		virtual void visit(StringExpr &Node) { throw runtime_error( "Not implemented"); }
 		virtual void visit(ListExpr &Node) { throw runtime_error( "Not implemented"); }
 		virtual void visit(TupleExpr &Node) { throw runtime_error( "Not implemented"); }
 		virtual void visit(CallExpr &Node) { throw runtime_error( "Not implemented"); }

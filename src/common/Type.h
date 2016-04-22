@@ -3,6 +3,7 @@
 #include "Location.h"
 
 #include <vector>
+#include <unordered_map>
 #include <string>
 
 using namespace std;
@@ -15,6 +16,7 @@ namespace common {
         FLOAT,
         CHAR,
 		BOOL,
+		STRING,
 		LIST,
 		TUPLE,
 		SIGNATURE,
@@ -35,6 +37,7 @@ namespace common {
 		Type(TypeId Id, Location Loc);
 		Type(TypeId Id, std::vector<Type> Subtypes);
 		Type(TypeId Id, std::vector<Type> Subtypes, Location Loc);
+		Type(TypeId Id, std::vector<Type> Subtypes, string Name);
 		Type(TypeId Id, std::vector<Type> Subtypes, string Name, Location Loc);
 
 		bool operator==(const Type &Other) const;

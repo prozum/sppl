@@ -30,6 +30,13 @@ namespace common {
 
     Type::Type(TypeId Id,
                vector<Type> Subtypes,
+               string Name) :
+            Id(Id),
+            Subtypes(Subtypes),
+            Name(Name) { }
+
+    Type::Type(TypeId Id,
+               vector<Type> Subtypes,
                string Name,
                Location Loc) :
             Id(Id),
@@ -41,6 +48,21 @@ namespace common {
         if (Id != Other.Id)
             return false;
         switch (Id) {
+            case TypeId::GENERIC:
+                return Name == Other.Name;
+            case TypeId::CUSTOM:
+                if (Name == Other.Name) {
+                    if (Subtypes.size() != Other.Subtypes.size())
+                        return false;
+
+                    for (size_t i = 0; i < Subtypes.size(); ++i) {
+                        if (Subtypes[i] != Other.Subtypes[i]) {
+                            return false;
+                        }
+                    }
+                } else {
+                    return false;
+                }
             case TypeId::LIST:
                 return Subtypes[0] == Other.Subtypes[0];
             case TypeId::SIGNATURE:
@@ -48,7 +70,7 @@ namespace common {
                 if (Subtypes.size() != Other.Subtypes.size())
                     return false;
 
-                for (unsigned i = 0; i < Subtypes.size(); ++i) {
+                for (size_t i = 0; i < Subtypes.size(); ++i) {
                     if (Subtypes[i] != Other.Subtypes[i]) {
                         return false;
                     }
@@ -76,6 +98,8 @@ namespace common {
                 return "Char";
             case TypeId::BOOL:
                 return "Bool";
+            case TypeId::STRING:
+                return "String";
             case TypeId::LIST:
                 return "[" + Subtypes[0].str() + "]";
             case TypeId::TUPLE:
