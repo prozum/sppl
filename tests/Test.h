@@ -350,6 +350,15 @@ class Test : public CppUnit::TestFixture{
         CPPUNIT_TEST(dotNormal);
         CPPUNIT_TEST(dotNumDot);
         CPPUNIT_TEST(dotDotNum);
+
+    // Precedence.cpp
+        CPPUNIT_TEST(precAndOr);
+        CPPUNIT_TEST(precEqualAnd);
+        CPPUNIT_TEST(precLessEqual);
+        CPPUNIT_TEST(precAddLess);
+        CPPUNIT_TEST(precMulAdd);
+        CPPUNIT_TEST(precNegMul);
+
     CPPUNIT_TEST_SUITE_END();
 public:
     compiler::Backend backend;
@@ -691,10 +700,18 @@ protected:
     void scopeSameFunc();
     void scopeUndeclId();
 
-    // Dot.cpp
+    // DotTest.cpp
     void dotNormal();
     void dotNumDot();
     void dotDotNum();
+
+    // PrecedenceTest.cpp
+    void precAndOr();
+    void precEqualAnd();
+    void precLessEqual();
+    void precAddLess();
+    void precMulAdd();
+    void precNegMul();
 
     // Test.cpp
     bool compileChecker(std::string name);
