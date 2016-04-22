@@ -350,6 +350,7 @@ class Test : public CppUnit::TestFixture{
         CPPUNIT_TEST(dotNormal);
         CPPUNIT_TEST(dotNumDot);
         CPPUNIT_TEST(dotDotNum);
+        CPPUNIT_TEST(dotMultiDot);
 
     // Precedence.cpp
         CPPUNIT_TEST(precAndOr);
@@ -704,6 +705,7 @@ protected:
     void dotNormal();
     void dotNumDot();
     void dotDotNum();
+    void dotMultiDot();
 
     // PrecedenceTest.cpp
     void precAndOr();

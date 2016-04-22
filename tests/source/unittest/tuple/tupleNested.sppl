@@ -1,5 +1,2 @@
 def main : [String]->((Int, Int), (Int,Int))
-| s = func()
-
-def func : ((Int, Int), (Int,Int))
-|  = ((1,2),(3,4))
+| s = ((1,2),(3,4))

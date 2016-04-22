@@ -9,10 +9,15 @@ void Test::dotNormal() {
 
 void Test::dotNumDot() {
     bool compStatus = compileChecker("dot/dotNumDot.sppl");
-    CPPUNIT_ASSERT_MESSAGE(compMsgFail, !compStatus);
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, !compStatus);
 }
 
 void Test::dotDotNum() {
     bool compStatus = compileChecker("dot/dotDotNum.sppl");
-    CPPUNIT_ASSERT_MESSAGE(compMsgFail, !compStatus);
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, !compStatus);
+}
+
+void Test::dotMultiDot() {
+    bool compStatus = compileChecker("dot/dotMultiDot.sppl");
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, !compStatus);
 }

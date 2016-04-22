@@ -1,5 +1,2 @@
 def main : [String]->Float
-| s = func()
-
-def func : Float
-|  = 0.0-0.0
+| s = 0.0-0.0

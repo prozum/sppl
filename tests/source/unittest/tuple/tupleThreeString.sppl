@@ -1,5 +1,2 @@
 def main : [String]->(String, String, String)
-| s = func()
-
-def func : (String, String, String)
-|  = ("string","string","string")
+| s = ("string","string","string")

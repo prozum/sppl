@@ -1,0 +1,2 @@
+def main : [String]->Bool
+| s = 2+2<3

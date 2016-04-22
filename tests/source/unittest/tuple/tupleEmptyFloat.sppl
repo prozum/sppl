@@ -1,5 +1,2 @@
 def main : [String]->(Float)
-| s = func()
-
-def func : (Float)
-|  = ()
+| s = ()

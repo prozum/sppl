@@ -1,5 +1,2 @@
 def main : [String]->[Char]
-| s = func()
-
-def func : [Char]
-|  = [2.0]
+| s = [2.0]

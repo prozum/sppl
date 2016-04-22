@@ -1,5 +1,2 @@
 def main : [String]->(Char, Char, Char)
-| s = func()
-
-def func : (Char, Char, Char)
-|  = ('c','h','a')
+| s = ('c','h','a')

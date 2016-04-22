@@ -1,5 +1,2 @@
 def main : [String]->((Int, Float), (Bool, (Char, String)))
-| s = func()
-
-def func : ((Int, Float), (Bool, (Char, String)))
-|  = ((1,2.0),(True,('c',"har")))
+| s = ((1,2.0),(True,('c',"har")))

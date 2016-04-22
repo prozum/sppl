@@ -1,5 +1,2 @@
 def main : [String]->[(Float, Float)]
-| s = func()
-
-def func : [(Float, Float)]
-|  = [(1.0,2.0),(3.0,4.0),(5.0,6.0)]
+| s = [(1.0,2.0),(3.0,4.0),(5.0,6.0)]

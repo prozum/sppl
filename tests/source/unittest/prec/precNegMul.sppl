@@ -1,0 +1,5 @@
+def main : [String]->Int
+| s = func(2)
+
+def func : Int->Int
+| n = -n*2
