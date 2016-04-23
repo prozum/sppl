@@ -285,7 +285,7 @@ namespace semantics {
         
     }
 
-    void GenericUnfolder::visit(AlgebraicExpression &Node) {
+    void GenericUnfolder::visit(AlgebraicExpr &Node) {
         
     }
 

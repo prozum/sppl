@@ -306,8 +306,9 @@ namespace semantics {
     void ScopeGenerator::visit(IntExpr &Node) { }
     void ScopeGenerator::visit(FloatExpr &Node) { }
     void ScopeGenerator::visit(CharExpr &Node) { }
+    void ScopeGenerator::visit(StringExpr &Node) { }
 
-    void ScopeGenerator::visit(AlgebraicExpression &Node) {
+    void ScopeGenerator::visit(AlgebraicExpr &Node) {
         for (auto &Expr: Node.Exprs) {
             Expr->accept(*this);
         }

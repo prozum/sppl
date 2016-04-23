@@ -127,12 +127,12 @@ namespace common {
         unique_ptr<Node> clone();
     };
 
-    class AlgebraicExpression : public Expression {
+    class AlgebraicExpr : public Expression {
     public:
         string Constructor;
         vector<unique_ptr<Expression>> Exprs;
 
-        AlgebraicExpression(string Constructor, vector<unique_ptr<Expression>> Exprs, Location Loc);
+        AlgebraicExpr(string Constructor, vector<unique_ptr<Expression>> Exprs, Location Loc);
 
         virtual void accept(Visitor &V);
         string str();

@@ -56,7 +56,7 @@ namespace semantics {
         void visit(ListExpr &Node);
         void visit(TupleExpr &Node);
         void visit(CallExpr &Node);
-        void visit(AlgebraicExpression &Node);
+        void visit(AlgebraicExpr &Node);
 
     private:
         Program *Prog = nullptr;

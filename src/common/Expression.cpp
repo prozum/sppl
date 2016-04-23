@@ -55,7 +55,7 @@ namespace common {
             Expr(move(Expr)),
             Args(move(Args)) { }
 
-    AlgebraicExpression::AlgebraicExpression(string Constructor,
+    AlgebraicExpr::AlgebraicExpr(string Constructor,
                                              vector<unique_ptr<Expression>> Exprs,
                                              Location Loc) :
             Expression(Type(TypeId::CUSTOM), Loc),
@@ -77,7 +77,7 @@ namespace common {
     void TupleExpr::accept(Visitor &V) { V.visit(*this); }
     void CallExpr::accept(Visitor &V) { V.visit(*this); }
     void LambdaFunction::accept(Visitor &V) { V.visit(*this); }
-    void AlgebraicExpression::accept(Visitor &V) { V.visit(*this); }
+    void AlgebraicExpr::accept(Visitor &V) { V.visit(*this); }
 
     unique_ptr<Node> IdExpr::clone() {
         return unique_ptr<Node>((Node*)new IdExpr(Val, Loc));
@@ -149,8 +149,8 @@ namespace common {
         return unique_ptr<Node>((Node*)Res);
     }
 
-    unique_ptr<Node> AlgebraicExpression::clone() {
-        auto Res = new AlgebraicExpression(Constructor, vector<unique_ptr<Expression>>(), Loc);
+    unique_ptr<Node> AlgebraicExpr::clone() {
+        auto Res = new AlgebraicExpr(Constructor, vector<unique_ptr<Expression>>(), Loc);
 
         for (auto &Expr: Exprs) {
             auto Ptr = Expr->clone().release();
@@ -240,7 +240,7 @@ namespace common {
         return Str + " => " + Expr->str();
     }
 
-    string AlgebraicExpression::str() {
+    string AlgebraicExpr::str() {
         // TODO fix strJoin problems. I give up for now
         string Str(Constructor);
 

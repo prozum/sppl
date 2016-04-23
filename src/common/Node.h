@@ -67,7 +67,7 @@ namespace common {
 	class TupleExpr;
 	class IdPattern;
 	class CallExpr;
-	class AlgebraicExpression;
+	class AlgebraicExpr;
 	class Visitor;
 	class Scope;
 

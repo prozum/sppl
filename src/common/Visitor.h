@@ -63,6 +63,6 @@ namespace common {
 		virtual void visit(TupleExpr &Node) { throw runtime_error( "Not implemented"); }
 		virtual void visit(CallExpr &Node) { throw runtime_error( "Not implemented"); }
 		virtual void visit(Type &Node) { throw runtime_error( "Not implemented"); }
-		virtual void visit(AlgebraicExpression &Node) { throw runtime_error( "Not implemented"); }
+		virtual void visit(AlgebraicExpr &Node) { throw runtime_error( "Not implemented"); }
 	};
 }
