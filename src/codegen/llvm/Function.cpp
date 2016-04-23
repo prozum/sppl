@@ -17,7 +17,7 @@ void LLVMCodeGenerator::visit(common::Function &Node) {
     // Setup return block and phi node
     CurRetBlock = BasicBlock::Create(getGlobalContext(), "ret", CurFunc);
     Builder.SetInsertPoint(CurRetBlock);
-    CurPhiNode = Builder.CreatePHI(CurFunc->getReturnType(), (unsigned int)Node.Cases.size(), "rettmp");
+    CurPhiNode = Builder.CreatePHI(CurFunc->getReturnType(), (unsigned)Node.Cases.size(), "rettmp");
     Builder.CreateRet(CurPhiNode);
 
     // Setup names for arguments
