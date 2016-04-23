@@ -104,9 +104,14 @@ using namespace std;
     return token::STRINGLITERAL;
 }
 
-[a-zA-Z][a-zA-Z0-9_]* {
+[a-z][a-zA-Z0-9_]* {
     yylval->Str = new string(yytext);
-    return token::ID;
+    return token::IDSMALL;
+}
+
+[A-Z][a-zA-Z0-9_]* {
+    yylval->Str = new string(yytext);
+    return token::IDBIG;
 }
 
 "\\" {
@@ -205,12 +210,24 @@ using namespace std;
     return token::PAREND;
 }
 
+"{"	{
+    return token::CURLSTART;
+}
+
+"}"	{
+    return token::CURLEND;
+}
+
 "!"	{
     return token::EXMARK;
 }
 
 ","	{
     return token::COMMA;
+}
+
+"::"	{
+    return token::COLONCOLON;
 }
 
 ":"	{

@@ -3,6 +3,7 @@
 #include "Location.h"
 
 #include <vector>
+#include <unordered_map>
 #include <string>
 #include <memory>
 
@@ -55,14 +56,18 @@ namespace common {
 	class TuplePattern;
 	class ListSplit;
 	class WildPattern;
+	class AlgebraicPattern;
+	class ParPattern;
 	class IntExpr;
 	class FloatExpr;
 	class CharExpr;
 	class BoolExpr;
+	class StringExpr;
 	class ListExpr;
 	class TupleExpr;
 	class IdPattern;
 	class CallExpr;
+	class AlgebraicExpression;
 	class Visitor;
 	class Scope;
 
@@ -78,6 +83,7 @@ namespace common {
 
 		virtual void accept(Visitor &V) = 0;
 		virtual string str() = 0;
+		virtual unique_ptr<Node> clone() = 0;
 	};
 
 	class Program : public Node {
@@ -89,6 +95,7 @@ namespace common {
 
 		virtual void accept(Visitor &V);
 		string str();
+		unique_ptr<Node> clone();
 	};
 
 	/* Declaration */
@@ -96,10 +103,10 @@ namespace common {
 	class Declaration : public Node {
 	public:
 		Declaration(Location Loc);
-		Declaration(Type Ty, Location Loc);
 
 		virtual void accept(Visitor &V) = 0;
 		virtual string str() = 0;
+		virtual unique_ptr<Node> clone() = 0;
 	};
 
 	class Function : public Declaration {
@@ -115,9 +122,9 @@ namespace common {
 
 		virtual void accept(Visitor &V);
 		string str();
+		unique_ptr<Node> clone();
 	};
 
-	// TODO Implement ADT
 	class AlgebraicDT : public Declaration {
 	public:
 		string Name;
@@ -128,6 +135,7 @@ namespace common {
 
 		virtual void accept(Visitor &V);
 		string str();
+		unique_ptr<Node> clone();
 	};
 
 	class Product : public Node {
@@ -139,6 +147,7 @@ namespace common {
 
 		virtual void accept(Visitor &V);
 		string str();
+		unique_ptr<Node> clone();
 	};
 
 	class Case : public Node {
@@ -152,16 +161,19 @@ namespace common {
 
 		virtual void accept(Visitor &V);
 		string str();
+		unique_ptr<Node> clone();
 	};
 
 	class LambdaArg : public Node {
 	public:
 		string Id;
+		Scope* Scp;
 
 		LambdaArg(string Id, Location Loc);
 
 		virtual void accept(Visitor &V);
 		string str();
+		unique_ptr<Node> clone();
 	};
 
 	template<class T>

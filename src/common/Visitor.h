@@ -51,14 +51,18 @@ namespace common {
 		virtual void visit(TuplePattern &Node) { throw runtime_error( "Not implemented"); }
 		virtual void visit(ListSplit &Node) { throw runtime_error( "Not implemented"); }
 		virtual void visit(WildPattern &Node) { throw runtime_error( "Not implemented"); }
+		virtual void visit(AlgebraicPattern &Node) { throw runtime_error( "Not implemented"); }
+		virtual void visit(ParPattern &Node) { throw runtime_error( "Not implemented"); }
 		virtual void visit(IdExpr &Node) { throw runtime_error( "Not implemented"); }
 		virtual void visit(IntExpr &Node) { throw runtime_error( "Not implemented"); }
 		virtual void visit(FloatExpr &Node) { throw runtime_error( "Not implemented"); }
 		virtual void visit(CharExpr &Node) { throw runtime_error( "Not implemented"); }
 		virtual void visit(BoolExpr &Node) { throw runtime_error( "Not implemented"); }
+		virtual void visit(StringExpr &Node) { throw runtime_error( "Not implemented"); }
 		virtual void visit(ListExpr &Node) { throw runtime_error( "Not implemented"); }
 		virtual void visit(TupleExpr &Node) { throw runtime_error( "Not implemented"); }
 		virtual void visit(CallExpr &Node) { throw runtime_error( "Not implemented"); }
 		virtual void visit(Type &Node) { throw runtime_error( "Not implemented"); }
+		virtual void visit(AlgebraicExpression &Node) { throw runtime_error( "Not implemented"); }
 	};
 }

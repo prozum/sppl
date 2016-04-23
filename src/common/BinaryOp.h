@@ -21,6 +21,7 @@ namespace common {
 
 		virtual void accept(Visitor &V);
 		string str();
+		unique_ptr<Node> clone();
 	};
 
 	class Sub : public BinaryOp {
@@ -29,6 +30,7 @@ namespace common {
 
 		virtual void accept(Visitor &V);
 		string str();
+		unique_ptr<Node> clone();
 	};
 
 	class Mul : public BinaryOp {
@@ -37,6 +39,7 @@ namespace common {
 
 		virtual void accept(Visitor &V);
 		string str();
+		unique_ptr<Node> clone();
 	};
 
 	class Div : public BinaryOp {
@@ -45,6 +48,7 @@ namespace common {
 
 		virtual void accept(Visitor &v);
 		string str();
+		unique_ptr<Node> clone();
 	};
 
 	class Mod : public BinaryOp {
@@ -53,6 +57,7 @@ namespace common {
 
 		virtual void accept(Visitor &V);
 		string str();
+		unique_ptr<Node> clone();
 	};
 
 	class ListAdd : public BinaryOp {
@@ -61,14 +66,16 @@ namespace common {
 
 		virtual void accept(Visitor &V);
 		string str();
+		unique_ptr<Node> clone();
 	};
 
-		class Or : public BinaryOp {
+	class Or : public BinaryOp {
 	public:
 		Or(unique_ptr<Expression> Left, unique_ptr<Expression> Right, Location Loc);
 
 		virtual void accept(Visitor &V);
 		string str();
+		unique_ptr<Node> clone();
 	};
 
 	class And : public BinaryOp {
@@ -77,6 +84,7 @@ namespace common {
 
 		virtual void accept(Visitor &V);
 		string str();
+		unique_ptr<Node> clone();
 	};
 
 	class Equal : public BinaryOp {
@@ -85,6 +93,7 @@ namespace common {
 
 		virtual void accept(Visitor &V);
 		string str();
+		unique_ptr<Node> clone();
 	};
 
 	class NotEqual : public BinaryOp {
@@ -93,6 +102,7 @@ namespace common {
 
 		virtual void accept(Visitor &V);
 		string str();
+		unique_ptr<Node> clone();
 	};
 
 	class Lesser : public BinaryOp {
@@ -101,6 +111,7 @@ namespace common {
 
 		virtual void accept(Visitor &V);
 		string str();
+		unique_ptr<Node> clone();
 	};
 
 	class Greater : public BinaryOp {
@@ -109,6 +120,7 @@ namespace common {
 
 		virtual void accept(Visitor &V);
 		string str();
+		unique_ptr<Node> clone();
 	};
 
 	class LesserEq : public BinaryOp {
@@ -117,6 +129,7 @@ namespace common {
 
 		virtual void accept(Visitor &V);
 		string str();
+		unique_ptr<Node> clone();
 	};
 
 	class GreaterEq : public BinaryOp {
@@ -125,6 +138,7 @@ namespace common {
 
 		virtual void accept(Visitor &V);
 		string str();
+		unique_ptr<Node> clone();
 	};
 
 	class ProducerConsumer : public BinaryOp {
@@ -133,6 +147,7 @@ namespace common {
 
 		virtual void accept(Visitor &V);
 		string str();
+		unique_ptr<Node> clone();
 	};
 
 	class Concat : public BinaryOp {
@@ -141,5 +156,9 @@ namespace common {
 
 		virtual void accept(Visitor &V);
 		string str();
+		unique_ptr<Node> clone();
 	};
+
+	template<class T>
+	unique_ptr<Node> cloneBinaryOp(BinaryOp& Op);
 }

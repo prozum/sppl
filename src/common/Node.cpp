@@ -13,6 +13,65 @@ namespace common {
     void AlgebraicDT::accept(Visitor &V) { V.visit(*this); }
     void Product::accept(Visitor &V) { V.visit(*this); }
 
+    unique_ptr<Node> Program::clone() {
+        auto Res = new Program(vector<unique_ptr<Declaration>>(), Loc);
+
+        for (auto &Decl: Decls) {
+            auto Clone = Decl->clone().release();
+            Res->Decls.push_back(unique_ptr<Declaration>((Declaration*)Clone));
+        }
+
+        return unique_ptr<Node>((Node*)Res);
+    }
+
+    unique_ptr<Node> Function::clone() {
+        auto Res = new Function(Id, Signature, Loc);
+
+        for (auto &Cse: Cases) {
+            auto Clone = Cse->clone().release();
+            Res->Cases.push_back(unique_ptr<Case>((Case*)Clone));
+        }
+
+        return unique_ptr<Node>((Node*)Res);
+    }
+
+    unique_ptr<Node> Case::clone() {
+        Case* Res;
+        auto NewExpr = Expr->clone().release();
+        if (When) {
+            auto NewWhen = When->clone().release();
+            Res = new Case(unique_ptr<Expression>((Expression*)NewExpr), unique_ptr<Expression>((Expression*)NewWhen), vector<unique_ptr<Pattern>>(), Loc);
+        } else {
+            Res = new Case(unique_ptr<Expression>((Expression*)NewExpr), nullptr, vector<unique_ptr<Pattern>>(), Loc);
+        }
+
+        for (auto &Pat: Patterns) {
+            auto Clone = Pat->clone().release();
+            Res->Patterns.push_back(unique_ptr<Pattern>((Pattern*)Clone));
+        }
+
+        return unique_ptr<Node>((Node*)Res);
+    }
+
+    unique_ptr<Node> LambdaArg::clone() {
+        return unique_ptr<Node>((Node*)new LambdaArg(Id, Loc));
+    }
+
+    unique_ptr<Node> AlgebraicDT::clone() {
+        auto Res = new AlgebraicDT(Name, TypeConstructor, vector<unique_ptr<Product>>(), Loc);
+
+        for (auto &Prod: Sum) {
+            auto Clone = Prod->clone().release();
+            Res->Sum.push_back(unique_ptr<Product>((Product*)Clone));
+        }
+
+        return unique_ptr<Node>((Node*)Res);
+    }
+
+    unique_ptr<Node> Product::clone() {
+        return unique_ptr<Node>((Node*) new Product(Constructor, Values, Loc));
+    }
+
     Node::Node(Location Loc) :
             Loc(Loc) { }
 
@@ -31,9 +90,6 @@ namespace common {
     Declaration::Declaration(Location Loc) :
             Node(Loc) { }
 
-    Declaration::Declaration(Type Ty, Location Loc) :
-            Node(Loc) { }
-
     Function::Function(unique_ptr<Expression> AnonFunc) :
             Declaration(AnonFunc->Loc),
             Id(ANON_FUNC_NAME),
@@ -45,7 +101,7 @@ namespace common {
     Function::Function(string Id,
                        Type Ty,
                        Location Loc) :
-            Declaration(Ty.Subtypes.front(), Loc),
+            Declaration(Loc),
             Id(Id),
             Signature(Ty) { }
 
@@ -87,16 +143,7 @@ namespace common {
     }
 
     string Function::str() {
-        string Str("def " + Id + " : ");
-
-        for (size_t I = 0; I < Signature.Subtypes.size(); I++) {
-            Str += Signature.Subtypes[I].str();
-
-            if (I != Signature.Subtypes.size() - 1)
-                Str += " -> ";
-        }
-
-        Str += "\n";
+        string Str("def " + Id + " : " + Signature.str() + "\n");
 
         for (auto &Case : Cases) {
             Str += Case->str() + "\n";

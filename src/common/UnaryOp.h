@@ -21,6 +21,7 @@ namespace common {
 
 		virtual void accept(Visitor &V);
 		string str();
+		unique_ptr<Node> clone();
 	};
 
 	class Not : public UnaryOp {
@@ -30,6 +31,7 @@ namespace common {
 
 		virtual void accept(Visitor &V);
 		string str();
+		unique_ptr<Node> clone();
 	};
 
 	class Negative : public UnaryOp {
@@ -39,13 +41,20 @@ namespace common {
 
 		virtual void accept(Visitor &V);
 		string str();
+		unique_ptr<Node> clone();
 	};
 
 	class To : public UnaryOp {
 	public:
-		To(unique_ptr<Expression> Child, Location Loc);
+		Type TypeCast;
+
+		To(unique_ptr<Expression> Child, Type TypeCast, Location Loc);
 
 		virtual void accept(Visitor &V);
 		string str();
+		unique_ptr<Node> clone();
 	};
+
+	template<class T>
+	unique_ptr<Node> cloneUnaryOp(UnaryOp& Op);
 }

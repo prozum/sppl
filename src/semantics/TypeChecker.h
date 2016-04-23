@@ -12,6 +12,8 @@ using namespace std;
 namespace semantics {
     class TypeChecker : public Visitor {
     public:
+        bool IgnoreGenerics = false;
+
         TypeChecker();
 
         virtual void visit(Program &Node);

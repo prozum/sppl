@@ -4,23 +4,49 @@ namespace common {
     Scope::Scope(common::Scope *Scp)
             : Parent(Scp) { }
 
-    bool common::Scope::exists(std::string Id) {
-        auto Got = Decls.find(Id);
+    bool common::Scope::declExists(std::string Id) {
+        return exists(Id, Decls);
+    }
 
-        if (Got != Decls.end())
+    bool Scope::typeExists(std::string Id) {
+        return exists(Id, Types);
+    }
+
+    bool Scope::conExists(std::string Id) {
+        return exists(Id, Constructors);
+    }
+
+    template<class T>
+    bool Scope::exists(std::string Id, unordered_map<string, T> Map) {
+        auto Got = Map.find(Id);
+
+        if (Got != Map.end())
             return true;
 
         if (Parent)
-            return Parent->exists(Id);
+            return Parent->exists(Id, Map);
         else
             return false;
     }
 
-    Type Scope::getType(std::string Id) {
-        auto Got = this->Decls.find(Id);
+    Type Scope::getDeclType(std::string Id) {
+        return get(Id, Decls);
+    }
 
-        if (Got == this->Decls.end()) {
-            return this->Parent->getType(Id);
+    AlgebraicDT& Scope::getADT(std::string Id) {
+        return get(Id, Types);
+    }
+
+    Product& Scope::getCon(std::string Id) {
+        return get(Id, Constructors);
+    }
+
+    template<class T>
+    T Scope::get(std::string Id, unordered_map<string, T> List) {
+        auto Got = List.find(Id);
+
+        if (Got == List.end()) {
+            return this->Parent->get(Id, List);
         } else {
             return Got->second;
         }

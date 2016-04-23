@@ -2,6 +2,7 @@
 
 #include "Driver.h"
 #include "CodeGenerator.h"
+#include "GenericUnfolder.h"
 #include "TypeChecker.h"
 #include "ScopeGenerator.h"
 #include "GeneralOptimizer.h"
@@ -47,6 +48,7 @@ namespace compiler {
         Compiler();
 
         unique_ptr<CodeGenerator> CodeGen;
+        semantics::GenericUnfolder Unfolder;
         semantics::ScopeGenerator ScopeGen;
         semantics::TypeChecker TypeChecker;
         optimizer::GeneralOptimizer Optimizer;

@@ -44,6 +44,14 @@ namespace compiler {
         if (!parseFiles())
             return 1;
 
+        cout << Prog->str() << endl;
+
+        accept(Unfolder);
+        cout << "--------------------------" << endl;
+
+        cout << Prog->str() << endl;
+
+        /*
         if (!accept(ScopeGen))
             return 2;
 
@@ -55,6 +63,7 @@ namespace compiler {
 
         if (!accept(*CodeGen))
             return 5;
+        */
 
         return 0;
     }
