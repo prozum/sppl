@@ -4,27 +4,33 @@ namespace common {
     Scope::Scope(common::Scope *Scp)
             : Parent(Scp) { }
 
-    bool common::Scope::declExists(std::string Id) {
-        return exists(Id, Decls);
-    }
-
-    bool Scope::typeExists(std::string Id) {
-        return exists(Id, Types);
-    }
-
-    bool Scope::conExists(std::string Id) {
-        return exists(Id, Constructors);
-    }
-
-    template<class T>
-    bool Scope::exists(std::string Id, unordered_map<string, T> Map) {
-        auto Got = Map.find(Id);
-
-        if (Got != Map.end())
+    bool Scope::declExists(std::string Id) {
+        if (Decls.find(Id) != Decls.end())
             return true;
 
         if (Parent)
-            return Parent->exists(Id, Map);
+            return Parent->declExists(Id);
+        else
+            return false;
+    }
+
+    bool Scope::typeExists(std::string Id) {
+        if (Types.find(Id) != Types.end())
+            return true;
+
+        if (Parent)
+            return Parent->typeExists(Id);
+        else
+            return false;
+    }
+
+
+    bool Scope::conExists(std::string Id) {
+        if (Constructors.find(Id) != Constructors.end())
+            return true;
+
+        if (Parent)
+            return Parent->conExists(Id);
         else
             return false;
     }

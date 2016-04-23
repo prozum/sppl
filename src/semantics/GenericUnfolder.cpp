@@ -1,7 +1,3 @@
-//
-// Created by hejsil on 4/21/16.
-//
-
 #include "GenericUnfolder.h"
 
 namespace semantics {
