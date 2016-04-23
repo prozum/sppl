@@ -36,25 +36,34 @@ namespace common {
     }
 
     Type Scope::getDeclType(std::string Id) {
-        return get(Id, Decls);
+        auto Got = Decls.find(Id);
+
+        if (Got == Decls.end()) {
+            return Parent->getDeclType(Id);
+        }
+
+        return Got->second;
     }
 
     AlgebraicDT& Scope::getADT(std::string Id) {
-        return get(Id, Types);
+        auto Got = Types.find(Id);
+
+        if (Got == Types.end()) {
+            return Parent->getADT(Id);
+        }
+
+        return Got->second;
+
     }
 
     Product& Scope::getCon(std::string Id) {
-        return get(Id, Constructors);
-    }
+        auto Got = Constructors.find(Id);
 
-    template<class T>
-    T Scope::get(std::string Id, unordered_map<string, T> List) {
-        auto Got = List.find(Id);
-
-        if (Got == List.end()) {
-            return this->Parent->get(Id, List);
-        } else {
-            return Got->second;
+        if (Got == Constructors.end()) {
+            return Parent->getCon(Id);
         }
+
+        return Got->second;
     }
+
 }

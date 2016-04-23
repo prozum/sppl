@@ -34,9 +34,5 @@ namespace common {
 
         Product &getCon(std::string Id);
 
-    private:
-
-        template<class T>
-        T get(std::string Id, unordered_map<string, T> Map);
     };
 }
