@@ -13,6 +13,7 @@ namespace semantics
         for (auto &Decl : Node.Decls) {
             Decl->accept(*this);
         }
+        // Visit stops here
     }
 
     void TypeChecker::visit(Function &Node) {
@@ -43,6 +44,11 @@ namespace semantics
                 Errors.push_back(err);
             }
         }
+        // Visit stops here
+
+        // Set return type
+        if (!hasError())
+            Node.Ty = Node.Signature.Subtypes.back();
     }
 
     void TypeChecker::visit(Case &Node) {

@@ -43,7 +43,7 @@ namespace parser {
         ofstream FHOut;
 
         unique_ptr<common::Program> Prog;
-        Scanner Snr;
+        Scanner Scr;
         Parser Psr;
         common::Scope Global;
 
@@ -51,17 +51,16 @@ namespace parser {
         bool TraceParsing = false;
 
         bool nextInput();
-        vector<string> Filenames;
+        vector<string> Files;
         size_t CurFile = 0;
 
         void setOutput(string Filename);
-        void setInputs(vector<string> Filenames);
         void setHeaderOutput(string Filename);
 
         bool parseStream(std::istream &In, const std::string &Src = "stream");
         bool parseString(const std::string &Input, const std::string &Src = "string");
         bool parseFile(const std::string &Filename);
-        bool parseFiles();
+        bool parseFiles(const vector<std::string> &Filenames);
 
         bool accept(common::Visitor &V);
 
