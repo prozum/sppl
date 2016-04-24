@@ -56,8 +56,8 @@ Value *LLVMCodeGenerator::compare(Value *Val1, Value *Val2)
         return Builder.CreateFCmpONE(Val1, Val2, "cmptmp");
     else if (Val1->getType()->isIntegerTy())
         return Builder.CreateICmpEQ(Val1, Val2, "cmptmp");
-    else
-        throw runtime_error("This should not happen!");
+
+    throw runtime_error("This should not happen!");
 }
 
 void LLVMCodeGenerator::visit(common::Case &Node) {
@@ -91,7 +91,7 @@ void LLVMCodeGenerator::visit(common::Case &Node) {
             // Check arguments
             CurVal = Arguments[i - 1];
             Node.Patterns[i - 1]->accept(*this);
-            CurVal = compare(CurVal, Arguments[i - 1]);
+            //CurVal = compare(CurVal, Arguments[i - 1]);
 
             // Create condition
             Builder.CreateCondBr(CurVal, TrueBlock, FalseBlock);
