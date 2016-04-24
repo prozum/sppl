@@ -25,4 +25,5 @@ void LLVMCodeGenerator::visit(common::CharPattern &Node) {
 
 void LLVMCodeGenerator::visit(common::IdPattern &Node) {
     ContextValues[Node.Val] = CurVal;
+    CurVal = ConstantInt::get(llvm::Type::getInt1Ty(getGlobalContext()), 1);
 }

@@ -8,8 +8,14 @@ namespace semantics {
 
     void ScopeGenerator::visit(Program &Node) {
         // Visit children
+
         for (auto &Func : Node.Decls) {
-            Func->accept(*this);
+            try {
+                Func->accept(*this);
+            }
+            catch (Error err) {
+                Errors.push_back(err);
+            }
         }
     }
 

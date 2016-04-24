@@ -91,7 +91,6 @@ void LLVMCodeGenerator::visit(common::Case &Node) {
             // Check arguments
             CurVal = Arguments[i - 1];
             Node.Patterns[i - 1]->accept(*this);
-            //CurVal = compare(CurVal, Arguments[i - 1]);
 
             // Create condition
             Builder.CreateCondBr(CurVal, TrueBlock, FalseBlock);
