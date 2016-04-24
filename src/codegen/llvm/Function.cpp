@@ -4,7 +4,6 @@ using namespace llvm;
 using namespace codegen;
 
 void LLVMCodeGenerator::visit(common::Function &Node) {
-
     // Create function and entry block
     CurFunc = llvm::Function::Create(getFuncType(Node.Signature), llvm::Function::ExternalLinkage, Node.Id, Module.get());
     BasicBlock *Entry = BasicBlock::Create(getGlobalContext(), "entry", CurFunc);
@@ -18,6 +17,7 @@ void LLVMCodeGenerator::visit(common::Function &Node) {
     CurRetBlock = BasicBlock::Create(getGlobalContext(), "ret", CurFunc);
     Builder.SetInsertPoint(CurRetBlock);
     CurPhiNode = Builder.CreatePHI(CurFunc->getReturnType(), (unsigned)Node.Cases.size(), "rettmp");
+
     Builder.CreateRet(CurPhiNode);
 
     // Setup names for arguments

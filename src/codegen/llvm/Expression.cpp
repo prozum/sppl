@@ -15,6 +15,10 @@ void LLVMCodeGenerator::visit(common::BoolExpr &Node) {
     CurVal = ConstantInt::get(getType(Node.RetTy), (uint64_t)Node.Val);
 }
 
+void LLVMCodeGenerator::visit(common::StringExpr &Node) {
+    CurVal = Builder.CreateGlobalString(Node.Val, CurFunc->getName() + ".str");
+}
+
 void LLVMCodeGenerator::visit(common::CharExpr &Node) {
     CurVal = ConstantInt::get(getType(Node.RetTy), (uint64_t)Node.Val);
 }
@@ -85,11 +89,3 @@ void LLVMCodeGenerator::visit(common::CallExpr &Node) {
 
     CurVal = Builder.CreateCall(Callee, Args, "calltmp");
 }
-
-
-/*
-void LLVMCodeGenerator::visit(common::String &Node) {
-    CurVal = Builder.CreateGlobalString(Node.Val, CurFunc->getName() + ".str");
-
-}
-*/

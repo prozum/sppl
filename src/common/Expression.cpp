@@ -64,7 +64,7 @@ namespace common {
 
     StringExpr::StringExpr(string Val,
                            Location Loc) :
-            Expression(Type(TypeId::STRING), Loc),
+            Expression(Type(TypeId::STRING, Val.size() + 1), Loc),
             Val(Val) { }
 
     void IdExpr::accept(Visitor &V) { V.visit(*this); }

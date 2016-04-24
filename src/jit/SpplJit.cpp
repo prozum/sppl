@@ -81,20 +81,16 @@ namespace jit {
 
 
     string SpplJit::getOutput(intptr_t data, common::Type Type) {
-        string Out;
-
         switch (Type.Id) {
             case common::TypeId::INT:
                 return to_string((int64_t) data);
             case common::TypeId::FLOAT:
                 // WTF is double type a pointer
                 return to_string(*(double *) data);
-/*            case common::TypeId::STRING:
-                Out += "\"";
-                Out += (char *) data;
-                Out += "\"";
-                return Out;
-*/
+            case common::TypeId::CHAR:
+                return "'" + string(1, (char) data) + "'";
+            case common::TypeId::STRING:
+                return "\"" + string((char *) data) + "\"";
             case common::TypeId::TUPLE:
                 return getOutputTuple(data, Type.Subtypes);
             case common::TypeId::SIGNATURE:
@@ -116,11 +112,11 @@ namespace jit {
                     Out += getOutput(addr, Subtypes[i]);
                     addr += sizeof(double);
                     break;
-/*                case common::TypeId::STRING:
+                case common::TypeId::STRING:
                     Out += getOutput(*(intptr_t *) addr, Subtypes[i]);
                     addr += sizeof(intptr_t *);
                     break;
-*/
+
                 case common::TypeId::TUPLE:
                     Out += getOutputTuple(*(intptr_t *) addr, Subtypes[i].Subtypes);
                     addr += sizeof(intptr_t *);

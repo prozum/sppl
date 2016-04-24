@@ -44,6 +44,7 @@ namespace semantics {
         virtual void visit(ListSplit &Node);
         virtual void visit(ListExpr &Node);
         virtual void visit(TupleExpr &Node);
+        virtual void visit(StringExpr &Node);
         virtual void visit(CharExpr &Node);
         virtual void visit(FloatExpr &Node);
         virtual void visit(IntExpr &Node);

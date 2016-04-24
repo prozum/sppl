@@ -424,6 +424,7 @@ namespace semantics
 
     void TypeChecker::visit(IntExpr &Node) { }
     void TypeChecker::visit(FloatExpr &Node) { }
+    void TypeChecker::visit(StringExpr &Node) { }
     void TypeChecker::visit(CharExpr &Node) { }
 
 

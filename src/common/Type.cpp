@@ -5,27 +5,35 @@ namespace common {
 
     Type::Type() { }
 
-    Type::~Type() {
-    }
+    Type::~Type() { }
 
     Type::Type(TypeId Id) :
-            Id(Id) { }
+            Id(Id),
+            NumSubtypes(0) { }
+
+    Type::Type(TypeId Id,
+            size_t NumSubtypes) :
+            Id(Id),
+            NumSubtypes(NumSubtypes) { }
 
     Type::Type(TypeId Id,
            Location Loc) :
             Id(Id),
+            NumSubtypes(0),
             Loc(Loc) { }
 
     Type::Type(TypeId Id,
                vector<Type> Subtypes) :
                 Id(Id),
-                Subtypes(Subtypes) { }
+                Subtypes(Subtypes),
+                NumSubtypes(Subtypes.size()) { }
 
     Type::Type(TypeId Id,
                vector<Type> Subtypes,
                Location Loc) :
                 Id(Id),
                 Subtypes(Subtypes),
+                NumSubtypes(Subtypes.size()),
                 Loc(Loc) { }
 
     Type::Type(TypeId Id,
@@ -33,6 +41,7 @@ namespace common {
                string Name) :
             Id(Id),
             Subtypes(Subtypes),
+            NumSubtypes(Subtypes.size()),
             Name(Name) { }
 
     Type::Type(TypeId Id,
@@ -41,6 +50,7 @@ namespace common {
                Location Loc) :
             Id(Id),
             Subtypes(Subtypes),
+            NumSubtypes(Subtypes.size()),
             Name(Name),
             Loc(Loc) { }
 
