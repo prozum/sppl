@@ -50,7 +50,14 @@ namespace semantics
         for (auto &Pattern : Node.Patterns) {
             Pattern->accept(*this);
         }
-        Node.Expr->accept(*this);
+
+        try {
+            Node.Expr->accept(*this);
+        }
+        catch (Error err) {
+            Errors.push_back(err);
+            return;
+        }
 
         // Set signature for anonymous function
         if (CurFunc->Anon) {

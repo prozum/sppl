@@ -19,20 +19,14 @@ namespace common {
         std::vector<unique_ptr<Scope>> Children;
 
         Scope() : Scope(nullptr) { }
-
         Scope(Scope *Scp);
 
         bool declExists(std::string Id);
-
         bool typeExists(std::string Id);
-
         bool conExists(std::string Id);
 
         Type getDeclType(std::string Id);
-
         AlgebraicDT &getADT(std::string Id);
-
         Product &getCon(std::string Id);
-
     };
 }

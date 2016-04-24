@@ -13,63 +13,77 @@ namespace common {
     void AlgebraicDT::accept(Visitor &V) { V.visit(*this); }
     void Product::accept(Visitor &V) { V.visit(*this); }
 
-    unique_ptr<Node> Program::clone() {
+    unique_ptr<Node> Node::clone() const {
+        return unique_ptr<Node>(doClone());
+    }
+
+    unique_ptr<Declaration> Declaration::clone() const {
+        return unique_ptr<Declaration>(doClone());
+    }
+
+    unique_ptr<Case> Case::clone() const {
+        return unique_ptr<Case>(doClone());
+    }
+
+    unique_ptr<LambdaArg> LambdaArg::clone() const {
+        return unique_ptr<LambdaArg>(doClone());
+    }
+
+    unique_ptr<Product> Product::clone() const {
+        return unique_ptr<Product>(doClone());
+    }
+
+    Program *Program::doClone() const {
         auto Res = new Program(vector<unique_ptr<Declaration>>(), Loc);
 
         for (auto &Decl: Decls) {
-            auto Clone = Decl->clone().release();
-            Res->Decls.push_back(unique_ptr<Declaration>((Declaration*)Clone));
+            Res->Decls.push_back(Decl->clone());
         }
 
-        return unique_ptr<Node>((Node*)Res);
+        return Res;
     }
 
-    unique_ptr<Node> Function::clone() {
+    Function *Function::doClone() const {
         auto Res = new Function(Id, Signature, Loc);
 
-        for (auto &Cse: Cases) {
-            auto Clone = Cse->clone().release();
-            Res->Cases.push_back(unique_ptr<Case>((Case*)Clone));
+        for (auto &Case: Cases) {
+            Res->Cases.push_back(Case->clone());
         }
 
-        return unique_ptr<Node>((Node*)Res);
+        return Res;
     }
 
-    unique_ptr<Node> Case::clone() {
-        Case* Res;
-        auto NewExpr = Expr->clone().release();
+    Case *Case::doClone() const {
+        Case *Res;
         if (When) {
-            auto NewWhen = When->clone().release();
-            Res = new Case(unique_ptr<Expression>((Expression*)NewExpr), unique_ptr<Expression>((Expression*)NewWhen), vector<unique_ptr<Pattern>>(), Loc);
+            Res = new Case(Expr->clone(), When->clone(), vector<unique_ptr<Pattern>>(), Loc);
         } else {
-            Res = new Case(unique_ptr<Expression>((Expression*)NewExpr), nullptr, vector<unique_ptr<Pattern>>(), Loc);
+            Res = new Case(Expr->clone(), nullptr, vector<unique_ptr<Pattern>>(), Loc);
         }
 
         for (auto &Pat: Patterns) {
-            auto Clone = Pat->clone().release();
-            Res->Patterns.push_back(unique_ptr<Pattern>((Pattern*)Clone));
+            Res->Patterns.push_back(Pat->clone());
         }
 
-        return unique_ptr<Node>((Node*)Res);
+        return Res;
     }
 
-    unique_ptr<Node> LambdaArg::clone() {
-        return unique_ptr<Node>((Node*)new LambdaArg(Id, Loc));
+    LambdaArg *LambdaArg::doClone() const {
+        return new LambdaArg(Id, Loc);
     }
 
-    unique_ptr<Node> AlgebraicDT::clone() {
+    AlgebraicDT *AlgebraicDT::doClone() const {
         auto Res = new AlgebraicDT(Name, TypeConstructor, vector<unique_ptr<Product>>(), Loc);
 
         for (auto &Prod: Sum) {
-            auto Clone = Prod->clone().release();
-            Res->Sum.push_back(unique_ptr<Product>((Product*)Clone));
+            Res->Sum.push_back(Prod->clone());
         }
 
-        return unique_ptr<Node>((Node*)Res);
+        return Res;
     }
 
-    unique_ptr<Node> Product::clone() {
-        return unique_ptr<Node>((Node*) new Product(Constructor, Values, Loc));
+    Product *Product::doClone() const {
+        return new Product(Constructor, Values, Loc);
     }
 
     Node::Node(Location Loc) :

@@ -13,6 +13,9 @@ namespace common {
 		BinaryOp(unique_ptr<Expression> Left, unique_ptr<Expression> Right, Location Loc);
 
 		virtual void accept(Visitor &V) = 0;
+		unique_ptr<BinaryOp> clone() const;
+	private:
+		virtual BinaryOp *doClone() const = 0;
 	};
 
 	class Add : public BinaryOp {
@@ -21,7 +24,8 @@ namespace common {
 
 		virtual void accept(Visitor &V);
 		string str();
-		unique_ptr<Node> clone();
+	private:
+		virtual BinaryOp *doClone() const;
 	};
 
 	class Sub : public BinaryOp {
@@ -30,7 +34,8 @@ namespace common {
 
 		virtual void accept(Visitor &V);
 		string str();
-		unique_ptr<Node> clone();
+	private:
+		virtual BinaryOp *doClone() const;
 	};
 
 	class Mul : public BinaryOp {
@@ -39,7 +44,9 @@ namespace common {
 
 		virtual void accept(Visitor &V);
 		string str();
-		unique_ptr<Node> clone();
+		unique_ptr<Node> const clone();
+	private:
+		virtual BinaryOp *doClone() const;
 	};
 
 	class Div : public BinaryOp {
@@ -48,7 +55,9 @@ namespace common {
 
 		virtual void accept(Visitor &v);
 		string str();
-		unique_ptr<Node> clone();
+		unique_ptr<Node> const clone();
+	private:
+		virtual BinaryOp *doClone() const;
 	};
 
 	class Mod : public BinaryOp {
@@ -57,7 +66,9 @@ namespace common {
 
 		virtual void accept(Visitor &V);
 		string str();
-		unique_ptr<Node> clone();
+		unique_ptr<Node> const clone();
+	private:
+		virtual BinaryOp *doClone() const;
 	};
 
 	class ListAdd : public BinaryOp {
@@ -66,7 +77,9 @@ namespace common {
 
 		virtual void accept(Visitor &V);
 		string str();
-		unique_ptr<Node> clone();
+		unique_ptr<Node> const clone();
+	private:
+		virtual BinaryOp *doClone() const;
 	};
 
 	class Or : public BinaryOp {
@@ -75,7 +88,9 @@ namespace common {
 
 		virtual void accept(Visitor &V);
 		string str();
-		unique_ptr<Node> clone();
+		unique_ptr<Node> const clone();
+	private:
+		virtual BinaryOp *doClone() const;
 	};
 
 	class And : public BinaryOp {
@@ -84,7 +99,9 @@ namespace common {
 
 		virtual void accept(Visitor &V);
 		string str();
-		unique_ptr<Node> clone();
+		unique_ptr<Node> const clone();
+	private:
+		virtual BinaryOp *doClone() const;
 	};
 
 	class Equal : public BinaryOp {
@@ -93,7 +110,9 @@ namespace common {
 
 		virtual void accept(Visitor &V);
 		string str();
-		unique_ptr<Node> clone();
+		unique_ptr<Node> const clone();
+	private:
+		virtual BinaryOp *doClone() const;
 	};
 
 	class NotEqual : public BinaryOp {
@@ -102,7 +121,9 @@ namespace common {
 
 		virtual void accept(Visitor &V);
 		string str();
-		unique_ptr<Node> clone();
+		unique_ptr<Node> const clone();
+	private:
+		virtual BinaryOp *doClone() const;
 	};
 
 	class Lesser : public BinaryOp {
@@ -111,7 +132,9 @@ namespace common {
 
 		virtual void accept(Visitor &V);
 		string str();
-		unique_ptr<Node> clone();
+		unique_ptr<Node> const clone();
+	private:
+		virtual BinaryOp *doClone() const;
 	};
 
 	class Greater : public BinaryOp {
@@ -120,7 +143,9 @@ namespace common {
 
 		virtual void accept(Visitor &V);
 		string str();
-		unique_ptr<Node> clone();
+		unique_ptr<Node> const clone();
+	private:
+		virtual BinaryOp *doClone() const;
 	};
 
 	class LesserEq : public BinaryOp {
@@ -129,7 +154,9 @@ namespace common {
 
 		virtual void accept(Visitor &V);
 		string str();
-		unique_ptr<Node> clone();
+		unique_ptr<Node> const clone();
+	private:
+		virtual BinaryOp *doClone() const;
 	};
 
 	class GreaterEq : public BinaryOp {
@@ -138,7 +165,9 @@ namespace common {
 
 		virtual void accept(Visitor &V);
 		string str();
-		unique_ptr<Node> clone();
+		unique_ptr<Node> const clone();
+	private:
+		virtual BinaryOp *doClone() const;
 	};
 
 	class ProducerConsumer : public BinaryOp {
@@ -147,7 +176,9 @@ namespace common {
 
 		virtual void accept(Visitor &V);
 		string str();
-		unique_ptr<Node> clone();
+		unique_ptr<Node> const clone();
+	private:
+		virtual BinaryOp *doClone() const;
 	};
 
 	class Concat : public BinaryOp {
@@ -156,9 +187,11 @@ namespace common {
 
 		virtual void accept(Visitor &V);
 		string str();
-		unique_ptr<Node> clone();
+		unique_ptr<Node> const clone();
+	private:
+		virtual BinaryOp *doClone() const;
 	};
 
 	template<class T>
-	unique_ptr<Node> cloneBinaryOp(BinaryOp& Op);
+	T *cloneBinaryOp(const T& Op);
 }

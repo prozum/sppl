@@ -10,8 +10,8 @@ namespace common {
 
         if (Parent)
             return Parent->declExists(Id);
-        else
-            return false;
+
+        return false;
     }
 
     bool Scope::typeExists(std::string Id) {
@@ -20,8 +20,8 @@ namespace common {
 
         if (Parent)
             return Parent->typeExists(Id);
-        else
-            return false;
+
+        return false;
     }
 
 
@@ -31,8 +31,8 @@ namespace common {
 
         if (Parent)
             return Parent->conExists(Id);
-        else
-            return false;
+
+        return false;
     }
 
     Type Scope::getDeclType(std::string Id) {
