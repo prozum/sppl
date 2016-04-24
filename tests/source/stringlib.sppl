@@ -20,7 +20,7 @@ def ParseStringAcc : String -> Int -> Int
 | "" acc       = acc
 | (x : xs) acc = ParseStringAcc(xs, (acc * 10) + ParseChar(x))
 
-def ParseChar : Char -> Int
+def ParseChar : CharPattern -> Int
 | '0' = 0
 | '1' = 1
 | '2' = 2
@@ -78,7 +78,7 @@ def IfElse : Bool -> String -> String -> String
 | True a b = a
 | False a b = b
 
-def IntToChar : Int -> Char
+def IntToChar : Int -> CharPattern
 | 0 = '0'
 | 1 = '1'
 | 2 = '2'
@@ -90,11 +90,11 @@ def IntToChar : Int -> Char
 | 8 = '8'
 | 9 = '9'
 
-def StrMap : (Char -> Char) -> String -> String
+def StrMap : (CharPattern -> CharPattern) -> String -> String
 | f "" = ""
 | f (x : xs) = f(x) : StrMap(f, xs)
 
-def ToUpper : Char -> Char
+def ToUpper : CharPattern -> CharPattern
 | 'q' = 'Q'
 | 'w' = 'W'
 | 'e' = 'E'

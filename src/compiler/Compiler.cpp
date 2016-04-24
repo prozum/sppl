@@ -2,7 +2,8 @@
 
 namespace compiler {
     Compiler::Compiler() :
-            ScopeGen(semantics::ScopeGenerator(&Global)) {
+            ScopeGen(semantics::ScopeGenerator(&Global))
+    {
 
     }
 
@@ -22,7 +23,7 @@ namespace compiler {
 #endif
 #ifdef CHASKELL
             case Backend::HASKELL:
-                CodeGen = make_unique<codegen::HCodeGenerator>(*this);
+                generator = make_unique<codegen::HCodeGenerator>(*this);
                 break;
 #endif
 #ifdef CLLVM
@@ -47,6 +48,14 @@ namespace compiler {
         if (!parseFiles(Filenames))
             return 1;
 
+        cout << Prog->str() << endl;
+
+        accept(Unfolder);
+        cout << "--------------------------" << endl;
+
+        cout << Prog->str() << endl;
+
+        /*
         if (!accept(ScopeGen))
             return 2;
 
@@ -58,6 +67,7 @@ namespace compiler {
 
         if (!accept(*CodeGen))
             return 5;
+        */
 
         return 0;
     }

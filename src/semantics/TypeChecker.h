@@ -12,6 +12,8 @@ using namespace std;
 namespace semantics {
     class TypeChecker : public Visitor {
     public:
+        bool IgnoreGenerics = false;
+
         TypeChecker();
 
         virtual void visit(Program &Node);
@@ -31,20 +33,24 @@ namespace semantics {
         virtual void visit(Div &Node);
         virtual void visit(Mod &Node);
         virtual void visit(ListAdd &Node);
-        virtual void visit(Par &Node);
+        virtual void visit(ParExpr &Node);
         virtual void visit(Not &Node);
-        virtual void visit(Int &Node);
-        virtual void visit(Float &Node);
-        virtual void visit(Bool &Node);
-        virtual void visit(Char &Node);
-        virtual void visit(String &Node);
+        virtual void visit(IntPattern &Node);
+        virtual void visit(FloatPattern &Node);
+        virtual void visit(CharPattern &Node);
+        virtual void visit(BoolPattern &Node);
         virtual void visit(ListPattern &Node);
         virtual void visit(TuplePattern &Node);
         virtual void visit(ListSplit &Node);
-        virtual void visit(List &Node);
-        virtual void visit(Tuple &Node);
-        virtual void visit(Id &Node);
-        virtual void visit(Call &Node);
+        virtual void visit(ListExpr &Node);
+        virtual void visit(TupleExpr &Node);
+        virtual void visit(StringExpr &Node);
+        virtual void visit(CharExpr &Node);
+        virtual void visit(FloatExpr &Node);
+        virtual void visit(IntExpr &Node);
+        virtual void visit(IdPattern &Node);
+        virtual void visit(IdExpr &Node);
+        virtual void visit(CallExpr &Node);
 
     private:
         Function *CurFunc;

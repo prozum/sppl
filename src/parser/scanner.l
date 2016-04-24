@@ -49,61 +49,81 @@ using namespace std;
     return token::DEF;
 }
 
-"Int" {
-    return token::INTTYPE;
+"type" {
+    return token::TYPE;
 }
 
-"Bool"	{
-    return token::BOOLTYPE;
+"Int" {
+    return token::INTTYPE;
 }
 
 "Float"	{
     return token::FLOATTYPE;
 }
 
-"String" {
-    return token::STRINGTYPE;
-}
-
 "Char"	{
     return token::CHARTYPE;
 }
 
+"Bool"	{
+    return token::BOOLTYPE;
+}
+
+"include" {
+    return token::INCLUDE;
+}
+
+"to" {
+    return token::TO;
+}
+
+"when" {
+    return token::WHEN;
+}
+
 [0-9]+ {
-    yylval->long_int = atol(yytext);
+    yylval->LongInt = atol(yytext);
     return token::INTLITERAL;
 }
 
 [0-9]+"."[0-9]+ {
-    yylval->long_double = atof(yytext);
+    yylval->LongDouble = atof(yytext);
     return token::FLOATLITERAL;
 }
 
 "'"[^']"'" {
 
-    yylval->chr = yytext[1];
+    yylval->Chr = yytext[1];
     return token::CHARLITERAL;
 }
 
 "\""[^"]*"\"" {
-    yylval->str = new string(yytext);
-    yylval->str->pop_back();
-    yylval->str->erase(0, 1);
+    yylval->Str = new string(yytext);
+    yylval->Str->pop_back();
+    yylval->Str->erase(0, 1);
     return token::STRINGLITERAL;
 }
 
-"True"|"False" {
-    yylval->boolean = string(yytext) == "True";
-    return token::BOOLLITERAL;
+[a-z][a-zA-Z0-9_]* {
+    yylval->Str = new string(yytext);
+    return token::IDSMALL;
 }
 
-[a-zA-Z_][a-zA-Z0-9_]* {
-    yylval->str = new string(yytext);
-    return token::ID;
+[A-Z][a-zA-Z0-9_]* {
+    yylval->Str = new string(yytext);
+    return token::IDBIG;
+}
+
+"\\" {
+    return token::BACKSLASH;
 }
 
 "->" {
     return token::ARROR;
+}
+
+"=>" {
+    return token::LAMBARROW;
 }
 
 "==" {
@@ -121,9 +141,23 @@ using namespace std;
 "||" {
     return token::OR;
 }
+
+"_" {
+    return token::WILD;
+}
+
+"++" {
+    return token::CONCAT;
+}
+
+"|>" {
+    return token::PROCON;
+}
+
 "<=" {
     return token::LESSEREQUAL;
 }
+
 ">=" {
     return token::GREATEREQUAL;
 }
@@ -176,12 +210,24 @@ using namespace std;
     return token::PAREND;
 }
 
+"{"	{
+    return token::CURLSTART;
+}
+
+"}"	{
+    return token::CURLEND;
+}
+
 "!"	{
     return token::EXMARK;
 }
 
 ","	{
     return token::COMMA;
+}
+
+"::"	{
+    return token::COLONCOLON;
 }
 
 ":"	{

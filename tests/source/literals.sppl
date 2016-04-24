@@ -2,11 +2,11 @@ def intliteral : Int -> Int
 	| 0 = 10
 	| n = -10
 
-def floatliteral : Int -> Float
+def floatliteral : Int -> FloatPattern
 	| 0 = 0.1
 	| n = -0.1
 
-def charliteral : Int -> Char
+def charliteral : Int -> CharPattern
 	| 0 = 'a'
 	| 1 = '\n'
 	| 2 = '0'

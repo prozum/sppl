@@ -3,74 +3,88 @@
 #include "Node.h"
 
 namespace common {
-
-	class Pattern : public Expression {
+	class Pattern : public Node {
 	public:
-		Pattern(Location Loc);
+		Type RetTy;
 		Pattern(Type Ty, Location Loc);
 
 		virtual void accept(Visitor &V) = 0;
+		unique_ptr<Pattern> clone() const;
+	private:
+		Pattern *doClone() const = 0;
 	};
 
-	class Id : public Pattern {
+	class IdPattern : public Pattern {
 	public:
 		string Val;
 		Scope* Scp;
 
-		Id(string Val, Location Loc);
+		IdPattern(string Val, Location Loc);
 
 		virtual void accept(Visitor &V);
 		string str();
+	private:
+		Pattern *doClone() const;
 	};
 
-	class Int : public Pattern {
+	class IntPattern : public Pattern {
 	public:
 		long Val;
 
-		Int(long Val, Location Loc);
+		IntPattern(long Val, Location Loc);
 
 		virtual void accept(Visitor &V);
 		string str();
+	private:
+		Pattern *doClone() const;
 	};
 
-	class Float : public Pattern {
+	class FloatPattern : public Pattern {
 	public:
 		double Val;
 
-		Float(double Val, Location Loc);
+		FloatPattern(double Val, Location Loc);
 
 		virtual void accept(Visitor &V);
 		string str();
+	private:
+		Pattern *doClone() const;
 	};
 
-	class Bool : public Pattern {
-	public:
-		bool Val;
-
-		Bool(bool Val, Location Loc);
-
-		virtual void accept(Visitor &V);
-		string str();
-	};
-
-	class Char : public Pattern {
+	class CharPattern : public Pattern {
 	public:
 		char Val;
 
-		Char(char Val, Location Loc);
+		CharPattern(char Val, Location Loc);
 
 		virtual void accept(Visitor &V);
 		string str();
+	private:
+		Pattern *doClone() const;
 	};
 
-	class String : public Pattern {
+	class BoolPattern : public Pattern {
+	public:
+		bool Val;
+
+		BoolPattern(bool Val, Location Loc);
+
+		virtual void accept(Visitor &V);
+		string str();
+	private:
+		Pattern *doClone() const;
+	};
+
+	class StringPattern : public Pattern {
 	public:
 		string Val;
 
-		String(string Val, Location Loc);
+		StringPattern(string Val, Location Loc);
 
 		virtual void accept(Visitor &V);
 		string str();
+	private:
+		Pattern *doClone() const;
 	};
 
 	class ListPattern : public Pattern {
@@ -81,6 +95,8 @@ namespace common {
 
 		virtual void accept(Visitor &V);
 		string str();
+	private:
+		Pattern *doClone() const;
 	};
 
 	class TuplePattern : public Pattern {
@@ -91,6 +107,18 @@ namespace common {
 
 		virtual void accept(Visitor &V);
 		string str();
+	private:
+		Pattern *doClone() const;
+	};
+
+	class WildPattern : public Pattern {
+	public:
+		WildPattern(Location Loc);
+
+		virtual void accept(Visitor &V);
+		string str();
+	private:
+		Pattern *doClone() const;
 	};
 
 	class ListSplit : public Pattern {
@@ -102,5 +130,32 @@ namespace common {
 
 		virtual void accept(Visitor &V);
 		string str();
+	private:
+		Pattern *doClone() const;
+	};
+
+	class AlgebraicPattern : public Pattern {
+	public:
+		string Constructor;
+		vector<unique_ptr<Pattern>> Patterns;
+
+		AlgebraicPattern(string Constructor, vector<unique_ptr<Pattern>> Patterns, Location Loc);
+
+		virtual void accept(Visitor &V);
+		string str();
+	private:
+		Pattern *doClone() const;
+	};
+
+	class ParPattern : public Pattern {
+	public:
+		unique_ptr<Pattern> Pat;
+
+		ParPattern(unique_ptr<Pattern> Pat, Location Loc);
+
+		virtual void accept(Visitor &V);
+		string str();
+	private:
+		Pattern *doClone() const;
 	};
 }

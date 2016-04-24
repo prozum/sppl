@@ -29,20 +29,18 @@ namespace optimizer {
         void visit(Div &Node);
         void visit(Mod &Node);
         void visit(ListAdd &Node);
-        void visit(Par &Node);
+        void visit(ParExpr &Node);
         void visit(Not &Node);
-        void visit(Int &Node);
-        void visit(Float &Node);
-        void visit(Bool &Node);
-        void visit(Char &Node);
-        void visit(String &Node);
+        void visit(IntPattern &Node);
+        void visit(FloatPattern &Node);
+        void visit(CharPattern &Node);
         void visit(ListPattern &Node);
         void visit(TuplePattern &Node);
         void visit(ListSplit &Node);
-        void visit(List &Node);
-        void visit(Tuple &Node);
-        void visit(Id &Node);
-        void visit(Call &Node);
+        void visit(ListExpr &Node);
+        void visit(TupleExpr &Node);
+        void visit(IdPattern &Node);
+        void visit(CallExpr &Node);
         void visit(Type &Node);
     };
 }

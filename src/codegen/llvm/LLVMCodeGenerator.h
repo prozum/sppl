@@ -1,4 +1,7 @@
 #pragma once
+#include "CodeGenerator.h"
+#include "Driver.h"
+
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/Module.h>
 #include <llvm/IR/Verifier.h>
@@ -12,18 +15,11 @@
 #include <unordered_map>
 #include <iostream>
 
-#include "CodeGenerator.h"
-#include "Driver.h"
 
 using namespace std;
 using namespace parser;
 
 namespace codegen {
-
-    enum Context {
-        PATTERN,
-        EXPR,
-    };
 
     class LLVMCodeGenerator : public CodeGenerator {
       public:
@@ -35,12 +31,10 @@ namespace codegen {
         unique_ptr<llvm::Module> Module;
         std::map<std::string, llvm::Value *> ContextValues;
 
-    	string ModuleString();
 
     	std::unordered_map<common::Type, llvm::StructType *> TupleTypes;
     	std::unordered_map<common::Type, llvm::StructType *> ListTypes;
         std::unordered_map<common::Type, llvm::FunctionType *> FuncTypes;
-    	std::map<std::string, llvm::Function *> Functions;
 
         llvm::Function *CurFunc;
         llvm::Value *CurVal;
@@ -52,18 +46,17 @@ namespace codegen {
         std::vector<llvm::Argument *> Arguments;
         size_t CurCaseId;
         size_t LastCaseId;
-        Context Ctx;
+
+		string ModuleString();
 
         void visit(common::Function &Node);
         void visit(common::Case &Node);
 
-        void visit(common::Int &Node);
-        void visit(common::Float &Node);
-        void visit(common::Bool &Node);
-        void visit(common::Char &Node);
-        void visit(common::String &Node);
-    	void visit(common::Tuple &Node);
-    	void visit(common::List &Node);
+		void visit(common::IdPattern &Node);
+        void visit(common::IntPattern &Node);
+        void visit(common::FloatPattern &Node);
+        void visit(common::BoolPattern &Node);
+        void visit(common::CharPattern &Node);
 
         void visit(common::Add &Node);
         void visit(common::Sub &Node);
@@ -80,9 +73,16 @@ namespace codegen {
     	void visit(common::LesserEq &Node);
     	void visit(common::GreaterEq &Node);
 
-    	void visit(common::Id &Node);
-        void visit(common::Call &Node);
-    	void visit(common::Par &Node);
+		void visit(common::IdExpr &Node);
+        void visit(common::IntExpr &Node);
+        void visit(common::FloatExpr &Node);
+        void visit(common::BoolExpr &Node);
+        void visit(common::CharExpr &Node);
+		void visit(common::StringExpr &Node);
+    	void visit(common::TupleExpr &Node);
+    	void visit(common::ListExpr &Node);
+        void visit(common::CallExpr &Node);
+    	void visit(common::ParExpr &Node);
 
         llvm::Type *getType(common::Type Ty, bool Ptr = false);
     	llvm::StructType *getTupleType(common::Type Ty);
