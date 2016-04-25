@@ -25,25 +25,33 @@ namespace semantics {
 
         if (!CurScope->declExists(Node.Id) || Node.Anon) {
             CurScope->Decls.insert({Node.Id, Node.Signature});
-
-            // Visit children
-            for (auto &Case : Node.Cases) {
-                Case->accept(*this);
-            }
         } else {
             throw Error(Node.Id + " has already been declared", Node.Loc);
         }
     }
 
     void ScopeGenerator::visit(AlgebraicDT &Node) {
-        CurScope->Types.insert({ Node.Name, Node });
+        if (!CurScope->typeExists(Node.Name)) {
+            CurScope->Types.insert({ Node.Name, Node });
+
+            for (auto &Product: Node.Sum) {
+                Product->accept(*this);
+            }
+        } else {
+            throw Error(Node.Name + " has already been declared", Node.Loc);
+        }
     }
 
     void ScopeGenerator::visit(Product &Node) {
-
+        if (!CurScope->conExists(Node.Constructor)) {
+            CurScope->Constructors.insert({ Node.Constructor, Node });
+        } else {
+            throw Error(Node.Constructor + " has already been declared", Node.Loc);
+        }
     }
 
 
+    // TODO The Scope generater should only handle the global scope
     void ScopeGenerator::visit(Case &Node) {
         auto CaseScope = new Scope(CurScope);
         CurScope->Children.push_back(unique_ptr<Scope>(CaseScope));

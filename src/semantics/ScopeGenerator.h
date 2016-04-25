@@ -15,6 +15,8 @@ namespace semantics {
         ScopeGenerator(Scope* Scp);
 
         void visit(Program &Node);
+
+    private:
         void visit(Function &Node);
         void visit(AlgebraicDT &Node);
         void visit(Product &Node);
@@ -64,7 +66,6 @@ namespace semantics {
         void visit(StringExpr &Node);
         void visit(AlgebraicExpr &Node);
 
-    private:
         Scope *CurScope;
         Function *CurFunc;
     };
