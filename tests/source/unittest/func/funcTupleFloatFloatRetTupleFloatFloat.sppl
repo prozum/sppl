@@ -1,5 +1,5 @@
-def main : [String]->(Float,Float)
+def main : [String]->(FloatPattern,FloatPattern)
 | n = func1((2.0,2.0))
 
-def func1 : (Float,Float)->(Float,Float)
+def func1 : (FloatPattern,FloatPattern)->(FloatPattern,FloatPattern)
 | n = n

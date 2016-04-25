@@ -3,6 +3,7 @@
 #include "Location.h"
 
 #include <vector>
+#include <unordered_map>
 #include <string>
 #include <memory>
 
@@ -15,13 +16,17 @@ namespace common {
 	// Forward declarations
 	class Node;
 	class Expression;
+	class Declaration;
 	class BinaryOp;
 	class UnaryOp;
 	class Type;
 	class Pattern;
 	class Program;
 	class Function;
+	class AlgebraicDT;
+	class Product;
 	class Case;
+	class LambdaArg;
 	class Or;
 	class And;
 	class Equal;
@@ -36,61 +41,80 @@ namespace common {
 	class Div;
 	class Mod;
 	class ListAdd;
-	class Par;
+	class ParExpr;
 	class Not;
-	class Int;
-	class Float;
-	class Bool;
-	class Char;
-	class String;
+	class Negative;
+	class ProducerConsumer;
+	class Concat;
+	class LambdaFunction;
+	class IntPattern;
+	class FloatPattern;
+	class CharPattern;
+	class BoolPattern;
+	class StringPattern;
 	class ListPattern;
 	class TuplePattern;
 	class ListSplit;
-	class List;
-	class Tuple;
-	class Id;
-	class Call;
+	class WildPattern;
+	class AlgebraicPattern;
+	class ParPattern;
+	class IntExpr;
+	class FloatExpr;
+	class CharExpr;
+	class BoolExpr;
+	class StringExpr;
+	class ListExpr;
+	class TupleExpr;
+	class IdPattern;
+	class CallExpr;
+	class AlgebraicExpr;
 	class Visitor;
 	class Scope;
 
 	// Abstract Nodes
 	class Node {
 	public:
-		Type Ty;
 		Location Loc;
 
 		Node(Location Loc);
-		Node(Type Ty, Location Loc);
-        Node(const Node&) = delete;
-        Node& operator=(const Node&) = delete;
+		Node(const Node &Other);
+		//virtual Node &operator=(const Node &Other) = 0;
         ~Node() = default;
+		unique_ptr<Node> clone() const;
 
 		virtual void accept(Visitor &V) = 0;
 		virtual string str() = 0;
+	private:
+		virtual Node *doClone() const = 0;
 	};
 
 	class Program : public Node {
 	public:
-		vector<unique_ptr<Function>> Funcs;
+		vector<unique_ptr<Declaration>> Decls;
 
-		Program(vector<unique_ptr<Function>> Funcs, Location Loc);
+		Program(vector<unique_ptr<Declaration>> Decls, Location Loc);
 		Program(unique_ptr<Expression> AnonFunc, Location Loc);
 
-		virtual void accept(Visitor &V);
+		void accept(Visitor &V);
 		string str();
-	};
 
-	class Expression : public Node {
-	public:
-		Expression(Location Loc);
-		Expression(Type Ty, Location Loc);
-
-		virtual void accept(Visitor &V) = 0;
+		unique_ptr<Program> clone() const;
+	private:
+		virtual Program* doClone() const;
 	};
 
 	/* Declaration */
 
-	class Function : public Node {
+	class Declaration : public Node {
+	public:
+		Declaration(Location Loc);
+
+		unique_ptr<Declaration> clone() const;
+	private:
+		virtual Declaration* doClone() const = 0;
+	};
+
+	class Function : public Declaration {
 	public:
 		string Id;
 		Type Signature;
@@ -101,55 +125,72 @@ namespace common {
 		Function(unique_ptr<Expression> AnonFunc);
 		Function(string Id, Type Ty, Location Loc);
 
-		virtual void accept(Visitor &V);
+		void accept(Visitor &V);
 		string str();
+	private:
+		virtual Function* doClone() const;
+	};
+
+	class AlgebraicDT : public Declaration {
+	public:
+		string Name;
+		vector<Type> TypeConstructor;
+		vector<unique_ptr<Product>> Sum;
+
+		AlgebraicDT(string Name, vector<Type> TypeConstructor, vector<unique_ptr<Product>> Sum, Location Loc);
+
+		void accept(Visitor &V);
+		string str();
+		unique_ptr<AlgebraicDT> clone() const;
+	private:
+		virtual AlgebraicDT* doClone() const;
+	};
+
+	class Product : public Node {
+	public:
+		AlgebraicDT *Parent = nullptr;
+
+		string Constructor;
+		vector<Type> Values;
+
+		Product(string Constructor, vector<Type> Values, Location Loc);
+
+		void accept(Visitor &V);
+		string str();
+		unique_ptr<Product> clone() const;
+	private:
+		virtual Product* doClone() const;
 	};
 
 	class Case : public Node {
 	public:
 		unique_ptr<Expression> Expr;
+		unique_ptr<Expression> When;
 		vector<unique_ptr<Pattern>> Patterns;
 		bool TailRec = false;
 
-		Case(unique_ptr<Expression> Expr, vector<unique_ptr<Pattern>> Patterns, Location Loc);
+		Case(unique_ptr<Expression> Expr, unique_ptr<Expression> When, vector<unique_ptr<Pattern>> Patterns, Location Loc);
 
-		virtual void accept(Visitor &V);
+		void accept(Visitor &V);
 		string str();
+		unique_ptr<Case> clone() const;
+	private:
+		virtual Case* doClone() const;
 	};
 
-	class Call : public Expression {
+	class LambdaArg : public Node {
 	public:
-		unique_ptr<Expression> Callee;
-		vector<unique_ptr<Expression>> Args;
+		string Id;
+		Scope* Scp;
 
-		Call(unique_ptr<Expression> Callee, vector<unique_ptr<Expression>> Args, Location Loc);
+		LambdaArg(string Id, Location Loc);
 
-		virtual void accept(Visitor &V);
+		void accept(Visitor &V);
 		string str();
+		unique_ptr<LambdaArg> clone() const;
+	private:
+		virtual LambdaArg* doClone() const;
 	};
-
-	/* Other Expressions */
-
-	class List : public Expression {
-	public:
-		vector<unique_ptr<Expression>> Elements;
-
-		List(vector<unique_ptr<Expression>> Elements, Location Loc);
-
-		virtual void accept(Visitor &V);
-		string str();
-	};
-
-	class Tuple : public Expression {
-	public:
-		vector<unique_ptr<Expression>> Elements;
-
-		Tuple(vector<unique_ptr<Expression>> Elements, Location Loc);
-
-		virtual void accept(Visitor &V);
-		string str();
-	};
-
 
 	template<class T>
 	string strJoin(T &List, const std::string JoinStr);

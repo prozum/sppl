@@ -1,6 +1,6 @@
-def main : [String]->Char
+def main : [String]->CharPattern
 | s = func('c')
 
-def func : Char->Char
-| Char = 'c'
+def func : CharPattern->CharPattern
+| CharPattern = 'c'
 | arg0  = 'c'

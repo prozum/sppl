@@ -10,7 +10,7 @@ namespace optimizer {
 
     void ParallelOptimizer::visit(Program &Node)
     {
-        for (auto &Func : Node.Funcs){
+        for (auto &Func : Node.Decls){
             Func->accept(*this);
         }
     }
@@ -100,7 +100,7 @@ namespace optimizer {
 
     }
 
-    void ParallelOptimizer::visit(Par &Node)
+    void ParallelOptimizer::visit(ParExpr &Node)
     {
 
     }
@@ -125,36 +125,28 @@ namespace optimizer {
 
     }
 
-    void ParallelOptimizer::visit(Int &Node)
+    void ParallelOptimizer::visit(IntPattern &Node)
     {
     }
 
-    void ParallelOptimizer::visit(Float &Node)
+    void ParallelOptimizer::visit(FloatPattern &Node)
     {
     }
 
-    void ParallelOptimizer::visit(Bool &Node)
+    void ParallelOptimizer::visit(CharPattern &Node)
     {
     }
 
-    void ParallelOptimizer::visit(Char &Node)
-    {
-    }
-
-    void ParallelOptimizer::visit(String &Node)
-    {
-    }
-
-    void ParallelOptimizer::visit(List &Node)
+    void ParallelOptimizer::visit(ListExpr &Node)
     {
 
     }
 
-    void ParallelOptimizer::visit(Id &Node)
+    void ParallelOptimizer::visit(IdPattern &Node)
     {
     }
 
-    void ParallelOptimizer::visit(Call &Node)
+    void ParallelOptimizer::visit(CallExpr &Node)
     {
 
     }
@@ -163,7 +155,7 @@ namespace optimizer {
     {
     }
 
-    void ParallelOptimizer::visit(Tuple &Node) {
+    void ParallelOptimizer::visit(TupleExpr &Node) {
 
     }
 }

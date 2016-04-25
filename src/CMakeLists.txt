@@ -1,7 +1,7 @@
 add_subdirectory(common)
 add_subdirectory(parser)
-add_subdirectory(codegen)
 add_subdirectory(compiler)
+add_subdirectory(codegen)
 add_subdirectory(optimizer)
 add_subdirectory(runtime)
 add_subdirectory(semantics)

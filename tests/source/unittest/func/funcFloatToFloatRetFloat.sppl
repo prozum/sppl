@@ -1,8 +1,8 @@
-def main : [String]->Float
+def main : [String]->FloatPattern
 | n = func1(func2)
 
-def func1 : (Float->Float)->Float
+def func1 : (FloatPattern->FloatPattern)->FloatPattern
 | f = f(2.0)
 
-def func2 : Float->Float
+def func2 : FloatPattern->FloatPattern
 | n = n

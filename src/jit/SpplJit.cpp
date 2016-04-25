@@ -6,15 +6,15 @@ namespace jit {
             Machine(EngineBuilder().selectTarget()),
             Layout(Machine->createDataLayout()),
             CompileLayer(ObjectLayer, SimpleCompiler(*Machine)),
-            ScopeGen(&Driver.Global),
-            CodeGen(Driver)
+            CodeGen(Drv),
+            ScopeGen(&Drv.Global)
     {
         llvm::sys::DynamicLibrary::LoadLibraryPermanently(nullptr);
         createModule();
 
         // Time is short, mortal
-        Driver.setOutput("/dev/null");
-        Driver.setHeaderOutput("/dev/null");
+        Drv.setOutput("/dev/null");
+        Drv.setHeaderOutput("/dev/null");
     }
 
     SpplJit::ModuleHandleT SpplJit::addModule(std::unique_ptr<llvm::Module> M) {
@@ -87,12 +87,12 @@ namespace jit {
             case common::TypeId::FLOAT:
                 // WTF is double type a pointer
                 return to_string(*(double *) data);
+            case common::TypeId::CHAR:
+                return "'" + string(1, (char) data) + "'";
             case common::TypeId::STRING:
                 return "\"" + string((char *) data) + "\"";
             case common::TypeId::BOOL:
                 return to_string((bool) data);
-            case common::TypeId::EMPTYLIST:
-                return "[]";
             case common::TypeId::TUPLE:
                 return getOutputTuple(data, Type.Subtypes);
             case common::TypeId::SIGNATURE:
@@ -134,23 +134,37 @@ namespace jit {
 
 
     int SpplJit::eval(std::string Str) {
-        if (!Driver.parseString(Str))
+        if (!Drv.parseString(Str))
             return 1;
 
-        if (!Driver.accept(ScopeGen))
+        if (!Drv.accept(ScopeGen))
             return 2;
 
-        if (!Driver.accept(TypeChecker))
+        if (!Drv.accept(TypeChecker))
             return 3;
 
-        if (!Driver.accept(Optimizer))
-            return 4;
+        //if (!Drv.accept(Optimizer))
+        //    return 4;
 
-        if (!Driver.accept(CodeGen))
+        // Generate ir_func
+        if (!Drv.accept(CodeGen))
             return 5;
-        auto FuncNode = Driver.Prog->Funcs[0].get();
-        auto FuncIR = CodeGen.Module->getFunction(FuncNode->Id);
-        PassMgr->run(* FuncIR);
+        auto FuncNode = static_cast<common::Function *>(Drv.Prog->Decls[0].get());
+
+        // Optimize
+#if SPPLDEBUG
+        cout << "#------------------------------------------------------------------------------#" << endl;
+        cout << "|                                 Unoptimized                                  |" << endl;
+        cout << "#------------------------------------------------------------------------------#" << endl;
+        cout << CodeGen.ModuleString();
+#endif
+        PassMgr->run(* CodeGen.Module->getFunction(FuncNode->Id));
+#if SPPLDEBUG
+        cout << "#------------------------------------------------------------------------------#" << endl;
+        cout << "|                                  Optimized                                   |" << endl;
+        cout << "#------------------------------------------------------------------------------#" << endl;
+        cout << CodeGen.ModuleString();
+#endif
 
         // Store function in seperate module
         ModuleHandler = addModule(std::move(CodeGen.Module));
@@ -162,8 +176,8 @@ namespace jit {
             auto FuncJIT = (size_t (*)()) Func.getAddress();
 
             assert(FuncJIT != NULL);
-            string Output = getOutput(FuncJIT(), FuncNode->Ty);
-            cout << Output << "\t\ttype: " << FuncNode->Ty.str() << endl;
+            string Output = getOutput(FuncJIT(), FuncNode->Signature.Subtypes.back());
+            cout << Output << "\t\ttype: " << FuncNode->Signature.Subtypes.back().str() << endl;
 
             // Remove module
             removeModule(ModuleHandler);

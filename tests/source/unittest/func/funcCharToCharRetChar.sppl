@@ -1,8 +1,8 @@
-def main : [String]->Char
+def main : [String]->CharPattern
 | n = func1(func2)
 
-def func1 : (Char->Char)->Char
+def func1 : (CharPattern->CharPattern)->CharPattern
 | f = f('c')
 
-def func2 : Char->Char
+def func2 : CharPattern->CharPattern
 | n = n

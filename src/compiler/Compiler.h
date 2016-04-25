@@ -28,7 +28,7 @@
 #endif
 
 
-
+using namespace parser;
 using namespace common;
 
 namespace compiler {
