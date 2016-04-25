@@ -5,11 +5,6 @@ namespace semantics {
         Prog = &Node;
 
         findGenerics();
-
-        for (auto &Decl: Node.Decls) {
-            Decl->accept(*this);
-        }
-
         removeGenerics();
     }
 
@@ -20,7 +15,8 @@ namespace semantics {
 
                 if (isGeneric(*Func)) {
                     if (GenericFuncs.find(Func->Id) == GenericFuncs.end()) {
-                        GenericFuncs.insert({ Func->Id, *Func });
+                        auto Ptr = Decl.release();
+                        GenericFuncs[Func->Id] = unique_ptr<Function>((Function*)Ptr);
                     } else {
                         throw Error(Func->Id + " was declared twice", Func->Loc);
                     }
@@ -30,7 +26,8 @@ namespace semantics {
 
                 if (isGeneric(*ADT)) {
                     if (GenericTypes.find(ADT->Name) == GenericTypes.end()) {
-                        GenericTypes.insert({ ADT->Name, *ADT });
+                        auto Ptr = Decl.release();
+                        GenericTypes[ADT->Name] = unique_ptr<AlgebraicDT>((AlgebraicDT*)ADT);
                     } else {
                         throw Error(ADT->Name + " was declared twice", ADT->Loc);
                     }
