@@ -19,21 +19,21 @@ namespace compiler {
 #endif
 #ifdef CGNUASM
             case Backend::GNUASM:
-                CodeGen = make_unique<codegen::GasCodeGenerator>(*this);
+                CodeGen = std::make_unique<codegen::GasCodeGenerator>(*this);
                 break;
 #endif
 #ifdef CHASKELL
             case Backend::HASKELL:
-                generator = make_unique<codegen::HCodeGenerator>(*this);
+                CodeGen = std::make_unique<codegen::HCodeGenerator>(*this);
                 break;
 #endif
 #ifdef CLLVM
             case Backend::LLVM:
-                CodeGen = make_unique<codegen::LLVMCodeGenerator>(*this);
+                CodeGen = std::make_unique<codegen::LLVMCodeGenerator>(*this);
                 break;
 #endif
             case Backend::PPRINTER:
-                CodeGen = make_unique<codegen::Printer>(*this);
+                CodeGen = std::make_unique<codegen::Printer>(*this);
                 break;
             default:
                 throw runtime_error("Not a valid backend!");

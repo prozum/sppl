@@ -14,20 +14,17 @@ namespace codegen {
     {
         //os << "module PlaceHolder where" << endl;
 
-        for (auto &Func : Node.Funcs) {
-            if (Func->Id != "main") {
-                Func->accept(*this);
-            } else {
-                *Drv.Out << "main = putStrLn (show (";
-                Func->Cases.front()->Expr->accept(*this);
-                *Drv.Out << "))\n";
-            }
+        for (auto &Decl : Node.Decls) {
+            Decl->accept(*this);
         }
     }
 
     void HCodeGenerator::visit(Function &Node)
     {
         CurFunc = &Node;
+
+        if (Node.Id == "main")
+            *Drv.Out << "main = putStrLn (show (";
 
         *Drv.Out << Node.Id << " :: ";
 
@@ -45,6 +42,8 @@ namespace codegen {
             Case->accept(*this);
         }
 
+        if (Node.Id == "main")
+            *Drv.Out << "))";
         *Drv.Out << endl;
     }
 
@@ -188,7 +187,7 @@ namespace codegen {
         Node.Right->accept(*this);
     }
 
-    void HCodeGenerator::visit(Par &Node)
+    void HCodeGenerator::visit(ParExpr &Node)
     {
         *Drv.Out << "(";
         Node.Child->accept(*this);
@@ -242,32 +241,32 @@ namespace codegen {
         *Drv.Out << ")";
     }
 
-    void HCodeGenerator::visit(Int &Node)
+    void HCodeGenerator::visit(IntExpr &Node)
     {
         *Drv.Out << Node.Val;
     }
 
-    void HCodeGenerator::visit(Float &Node)
+    void HCodeGenerator::visit(FloatExpr &Node)
     {
         *Drv.Out << Node.Val;
     }
 
-    void HCodeGenerator::visit(Bool &Node)
+    void HCodeGenerator::visit(BoolExpr &Node)
     {
         *Drv.Out << Node.Val;
     }
 
-    void HCodeGenerator::visit(Char &Node)
+    void HCodeGenerator::visit(CharExpr &Node)
     {
         *Drv.Out << Node.Val;
     }
 
-    void HCodeGenerator::visit(String &Node)
+    void HCodeGenerator::visit(StringExpr &Node)
     {
         *Drv.Out << Node.Val;
     }
 
-    void HCodeGenerator::visit(List &Node)
+    void HCodeGenerator::visit(ListExpr &Node)
     {
         *Drv.Out << "[";
 
@@ -283,7 +282,7 @@ namespace codegen {
         *Drv.Out << "]";
     }
 
-    void HCodeGenerator::visit(Tuple &Node)
+    void HCodeGenerator::visit(TupleExpr &Node)
     {
         *Drv.Out << "(";
 
@@ -299,12 +298,12 @@ namespace codegen {
         *Drv.Out << ")";
     }
 
-    void HCodeGenerator::visit(Id &Node)
+    void HCodeGenerator::visit(IdExpr &Node)
     {
         *Drv.Out << Node.Val;
     }
 
-    void HCodeGenerator::visit(Call &Node)
+    void HCodeGenerator::visit(CallExpr &Node)
     {
         *Drv.Out << "(";
         Node.Callee->accept(*this);

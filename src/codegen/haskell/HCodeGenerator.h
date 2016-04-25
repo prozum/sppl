@@ -28,17 +28,20 @@ namespace codegen {
             void visit(Div &Node);
             void visit(Mod &Node);
             void visit(ListAdd &Node);
-            void visit(Par &Node);
+            void visit(ParExpr &Node);
             void visit(Not &Node);
-            void visit(IntPattern &Node);
-            void visit(FloatPattern &Node);
-            void visit(BoolPattern &Node);
-            void visit(CharPattern &Node);
+            void visit(IntExpr &Node);
+            void visit(FloatExpr &Node);
+            void visit(BoolExpr &Node);
+            void visit(CharExpr &Node);
+            void visit(StringExpr &Node);
             void visit(ListPattern &Node);
             void visit(TuplePattern &Node);
             void visit(ListSplit &Node);
-            void visit(IdPattern &Node);
-            void visit(Call &Node);
+            void visit(IdExpr &Node);
+            void visit(CallExpr &Node);
+            void visit(ListExpr &Node);
+            void visit(TupleExpr &Node);
 
         private:
             Function *CurFunc;
