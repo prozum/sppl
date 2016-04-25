@@ -2,7 +2,8 @@
 
 namespace compiler {
     Compiler::Compiler() :
-            ScopeGen(semantics::ScopeGenerator(&Global))
+            ScopeGen(semantics::ScopeGenerator(&Global)),
+            TypeChecker(semantics::TypeChecker(&Global))
     {
 
     }

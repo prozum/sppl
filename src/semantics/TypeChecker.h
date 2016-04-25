@@ -60,10 +60,10 @@ namespace semantics {
         void visit(FloatExpr &Node);
         void visit(CharExpr &Node);
         void visit(BoolExpr &Node);
+        void visit(StringExpr &Node);
         void visit(ListExpr &Node);
         void visit(TupleExpr &Node);
         void visit(CallExpr &Node);
-        void visit(AlgebraicExpression &Node);
 
         Scope *GlobalScope;
         Scope *CurScope;
