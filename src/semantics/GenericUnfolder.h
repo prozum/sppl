@@ -1,19 +1,14 @@
-#pragma once
-
-#include <stack>
 #include "Node.h"
 #include "Visitor.h"
-#include "Printer.h"
+
+#include <stack>
+#include <unordered_map>
 
 using namespace common;
-using namespace codegen;
 
 namespace semantics {
-
-    class ScopeGenerator : public Visitor {
+    class GenericUnfolder : public Visitor {
     public:
-        ScopeGenerator(Scope* Scp);
-
         void visit(Program &Node);
         void visit(Function &Node);
         void visit(AlgebraicDT &Node);
@@ -61,11 +56,20 @@ namespace semantics {
         void visit(ListExpr &Node);
         void visit(TupleExpr &Node);
         void visit(CallExpr &Node);
-        void visit(StringExpr &Node);
         void visit(AlgebraicExpr &Node);
 
     private:
-        Scope *CurScope;
-        Function *CurFunc;
+        Program *Prog = nullptr;
+        Function *CurrentFunc = nullptr;
+
+        unordered_map<string, AlgebraicDT&> GenericTypes;
+        unordered_map<string, Function&> GenericFuncs;
+
+        bool isGeneric(Function&);
+        bool isGeneric(AlgebraicDT&);
+        bool isGeneric(Type&);
+        void findGenerics();
+        void removeGenerics();
     };
 }
+

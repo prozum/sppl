@@ -6,15 +6,15 @@ namespace jit {
             Machine(EngineBuilder().selectTarget()),
             Layout(Machine->createDataLayout()),
             CompileLayer(ObjectLayer, SimpleCompiler(*Machine)),
-            ScopeGen(&Driver.Global),
-            CodeGen(Driver)
+            CodeGen(Drv),
+            ScopeGen(&Drv.Global)
     {
         llvm::sys::DynamicLibrary::LoadLibraryPermanently(nullptr);
         createModule();
 
         // Time is short, mortal
-        Driver.setOutput("/dev/null");
-        Driver.setHeaderOutput("/dev/null");
+        Drv.setOutput("/dev/null");
+        Drv.setHeaderOutput("/dev/null");
     }
 
     SpplJit::ModuleHandleT SpplJit::addModule(std::unique_ptr<llvm::Module> M) {
@@ -87,6 +87,8 @@ namespace jit {
             case common::TypeId::FLOAT:
                 // WTF is double type a pointer
                 return to_string(*(double *) data);
+            case common::TypeId::CHAR:
+                return "'" + string(1, (char) data) + "'";
             case common::TypeId::STRING:
                 return "\"" + string((char *) data) + "\"";
             case common::TypeId::BOOL:
@@ -134,21 +136,22 @@ namespace jit {
 
 
     int SpplJit::eval(std::string Str) {
-        if (!Driver.parseString(Str))
+        if (!Drv.parseString(Str))
             return 1;
 
-        if (!Driver.accept(ScopeGen))
+        if (!Drv.accept(ScopeGen))
             return 2;
 
-        if (!Driver.accept(TypeChecker))
+        if (!Drv.accept(TypeChecker))
             return 3;
 
-        if (!Driver.accept(Optimizer))
+        if (!Drv.accept(Optimizer))
             return 4;
 
-        if (!Driver.accept(CodeGen))
+        // Generate ir_func
+        if (!Drv.accept(CodeGen))
             return 5;
-        auto FuncNode = Driver.Prog->Funcs[0].get();
+        auto FuncNode = static_cast<common::Function *>(Drv.Prog->Decls[0].get());
         auto FuncIR = CodeGen.Module->getFunction(FuncNode->Id);
         PassMgr->run(* FuncIR);
 

@@ -1,7 +1,6 @@
 #pragma once
 
-#include "Node.h"
-
+#include "Expression.h"
 #include <memory>
 
 namespace common {
@@ -13,15 +12,21 @@ namespace common {
 		UnaryOp(unique_ptr<Expression> Child, Location Loc);
 
 		virtual void accept(Visitor &V) = 0;
+
+		unique_ptr<UnaryOp> clone() const;
+	private:
+		virtual UnaryOp *doClone() const = 0;
 	};
 
-	class Par : public UnaryOp {
+	class ParExpr : public UnaryOp {
 	public:
-
-		Par(unique_ptr<Expression> Child, Location Loc);
+		ParExpr(unique_ptr<Expression> Child, Location Loc);
 
 		virtual void accept(Visitor &V);
 		string str();
+
+	private:
+		virtual UnaryOp *doClone() const;
 	};
 
 	class Not : public UnaryOp {
@@ -31,5 +36,33 @@ namespace common {
 
 		virtual void accept(Visitor &V);
 		string str();
+	private:
+		virtual UnaryOp *doClone() const;
 	};
+
+	class Negative : public UnaryOp {
+	public:
+
+		Negative(unique_ptr<Expression> Child, Location Loc);
+
+		virtual void accept(Visitor &V);
+		string str();
+	private:
+		virtual UnaryOp *doClone() const;
+	};
+
+	class To : public UnaryOp {
+	public:
+		Type TypeCast;
+
+		To(unique_ptr<Expression> Child, Type TypeCast, Location Loc);
+
+		virtual void accept(Visitor &V);
+		string str();
+	private:
+		virtual UnaryOp *doClone() const;
+	};
+
+	template<class T>
+	unique_ptr<Node> const cloneUnaryOp(UnaryOp& Op);
 }

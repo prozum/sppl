@@ -4,25 +4,66 @@ namespace common {
     Scope::Scope(common::Scope *Scp)
             : Parent(Scp) { }
 
-    bool common::Scope::exists(std::string Id) {
-        auto Got = Decls.find(Id);
-
-        if (Got != Decls.end())
+    bool Scope::declExists(std::string Id) {
+        if (Decls.find(Id) != Decls.end())
             return true;
 
         if (Parent)
-            return Parent->exists(Id);
-        else
-            return false;
+            return Parent->declExists(Id);
+
+        return false;
     }
 
-    Type Scope::getType(std::string Id) {
-        auto Got = this->Decls.find(Id);
+    bool Scope::typeExists(std::string Id) {
+        if (Types.find(Id) != Types.end())
+            return true;
 
-        if (Got == this->Decls.end()) {
-            return this->Parent->getType(Id);
-        } else {
-            return Got->second;
+        if (Parent)
+            return Parent->typeExists(Id);
+
+        return false;
+    }
+
+
+    bool Scope::conExists(std::string Id) {
+        if (Constructors.find(Id) != Constructors.end())
+            return true;
+
+        if (Parent)
+            return Parent->conExists(Id);
+
+        return false;
+    }
+
+    Type Scope::getDeclType(std::string Id) {
+        auto Got = Decls.find(Id);
+
+        if (Got == Decls.end()) {
+            return Parent->getDeclType(Id);
         }
+
+        return Got->second;
     }
+
+    AlgebraicDT& Scope::getADT(std::string Id) {
+        auto Got = Types.find(Id);
+
+        if (Got == Types.end()) {
+            return Parent->getADT(Id);
+        }
+
+        return Got->second;
+
+    }
+
+    Product& Scope::getCon(std::string Id) {
+        auto Got = Constructors.find(Id);
+
+        if (Got == Constructors.end()) {
+            return Parent->getCon(Id);
+        }
+
+        return Got->second;
+    }
+
 }

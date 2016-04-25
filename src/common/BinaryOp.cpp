@@ -1,4 +1,5 @@
 #include "BinaryOp.h"
+#include "Expression.h"
 #include "Visitor.h"
 
 namespace common {
@@ -17,6 +18,8 @@ namespace common {
     void Greater::accept(Visitor &V) { V.visit(*this); }
     void LesserEq::accept(Visitor &V) { V.visit(*this); }
     void GreaterEq::accept(Visitor &V) { V.visit(*this); }
+    void ProducerConsumer::accept(Visitor &V) { V.visit(*this); }
+    void Concat::accept(Visitor &V) { V.visit(*this); }
 
     BinaryOp::BinaryOp(unique_ptr<Expression> Left,
                    unique_ptr<Expression> Right,
@@ -95,6 +98,16 @@ namespace common {
                          Location Loc) :
             BinaryOp(move(Left), move(Right), Loc) { }
 
+    ProducerConsumer::ProducerConsumer(unique_ptr<Expression> Left,
+                                           unique_ptr<Expression> Right,
+                                           Location Loc) :
+            BinaryOp(move(Left), move(Right), Loc) { }
+
+    Concat::Concat(unique_ptr<Expression> Left,
+                   unique_ptr<Expression> Right,
+                   Location Loc) :
+            BinaryOp(move(Left), move(Right), Loc) { }
+
     string Or::str() {
         return Left->str() + " || " + Right->str();
     }
@@ -151,4 +164,83 @@ namespace common {
         return Left->str() + " : " + Right->str();
     }
 
+    string ProducerConsumer::str() {
+        return Left->str() + " |> " + Right->str();
+    }
+
+    string Concat::str() {
+        return Left->str() + " ++ " + Right->str();
+    }
+
+
+    BinaryOp *Or::doClone() const {
+        return cloneBinaryOp<Or>(*this);
+    }
+
+    BinaryOp *And::doClone() const {
+        return cloneBinaryOp<And>(*this);
+    }
+
+    BinaryOp *Equal::doClone() const {
+        return cloneBinaryOp<Equal>(*this);
+    }
+
+    BinaryOp *NotEqual::doClone() const {
+        return cloneBinaryOp<NotEqual>(*this);
+    }
+
+    BinaryOp *Lesser::doClone() const {
+        return cloneBinaryOp<Lesser>(*this);
+    }
+
+    BinaryOp *Greater::doClone() const {
+        return cloneBinaryOp<Greater>(*this);
+    }
+
+    BinaryOp *LesserEq::doClone() const {
+        return cloneBinaryOp<LesserEq>(*this);
+    }
+
+    BinaryOp *GreaterEq::doClone() const {
+        return cloneBinaryOp<GreaterEq>(*this);
+    }
+
+    BinaryOp *Add::doClone() const {
+        return cloneBinaryOp<Add>(*this);
+    }
+
+    BinaryOp *Sub::doClone() const {
+        return cloneBinaryOp<Sub>(*this);
+    }
+
+    BinaryOp *Mul::doClone() const {
+        return cloneBinaryOp<Mul>(*this);
+    }
+
+    BinaryOp *Div::doClone() const {
+        return cloneBinaryOp<Div>(*this);
+    }
+
+    BinaryOp *Mod::doClone() const {
+        return cloneBinaryOp<Mod>(*this);
+    }
+
+    BinaryOp *ListAdd::doClone() const {
+        return cloneBinaryOp<ListAdd>(*this);
+    }
+
+    BinaryOp *ProducerConsumer::doClone() const {
+        return cloneBinaryOp<ProducerConsumer>(*this);
+    }
+
+    BinaryOp *Concat::doClone() const {
+        return cloneBinaryOp<Concat>(*this);
+    }
+
+    template<class T>   
+    T *cloneBinaryOp(const T& Op) {
+        auto Left = Op.Left->clone();
+        auto Right = Op.Right->clone();
+        return new T(Op.Left->clone(), Op.Right->clone(), Op.Loc);
+    }
 }
