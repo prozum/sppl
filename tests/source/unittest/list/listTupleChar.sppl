@@ -1,5 +1,2 @@
-def main : [String]->[(CharPattern, CharPattern)]
-| s = func()
-
-def func : [(CharPattern, CharPattern)]
-|  = [('c','h'),('a','r'),('c','h')]
+def main : [String]->[(Char, Char)]
+| s = [('c','h'),('a','r'),('c','h')]

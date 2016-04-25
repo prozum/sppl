@@ -8,24 +8,24 @@ namespace common {
     void To::accept(Visitor &V) { V.visit(*this); }
     void Negative::accept(Visitor &V) { V.visit(*this); }
 
-    unique_ptr<Node> ParExpr::clone() {
-        auto NewChild = Child->clone().release();
-        return unique_ptr<Node>((Node*)new ParExpr(unique_ptr<Expression>((Expression*)NewChild), Loc));
+    unique_ptr<UnaryOp> UnaryOp::clone() const {
+        return unique_ptr<UnaryOp>(doClone());
     }
 
-    unique_ptr<Node> Not::clone() {
-        auto NewChild = Child->clone().release();
-        return unique_ptr<Node>((Node*)new Not(unique_ptr<Expression>((Expression*)NewChild), Loc));
+    UnaryOp *ParExpr::doClone() const {
+        return new ParExpr(Child->clone(), Loc);
     }
 
-    unique_ptr<Node> To::clone() {
-        auto NewChild = Child->clone().release();
-        return unique_ptr<Node>((Node*)new To(unique_ptr<Expression>((Expression*)NewChild), TypeCast, Loc));
+    UnaryOp *Not::doClone() const {
+        return new Not(Child->clone(), Loc);
     }
 
-    unique_ptr<Node> Negative::clone() {
-        auto NewChild = Child->clone().release();
-        return unique_ptr<Node>((Node*)new Negative(unique_ptr<Expression>((Expression*)NewChild), Loc));
+    UnaryOp *To::doClone() const {
+        return new To(Child->clone(), TypeCast, Loc);
+    }
+
+    UnaryOp *Negative::doClone() const {
+        return new Negative(Child->clone(), Loc);
     }
 
     UnaryOp::UnaryOp(unique_ptr<Expression> Child,
@@ -69,10 +69,7 @@ namespace common {
     }
 
     template<class T>
-    unique_ptr<Node> cloneUnaryOp(UnaryOp& Op) {
-        auto Child = Op.Child->clone().release();
-        auto Res = new T(unique_ptr<Expression>((Expression*)Child), Op.Loc);
-        return unique_ptr<Node>((Node*)Res);
+    T *const cloneUnaryOp(T& Op) {
+        return new T(Op.Child->clone(), Op.Loc);
     }
-
 }

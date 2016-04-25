@@ -4,51 +4,66 @@ namespace common {
     Scope::Scope(common::Scope *Scp)
             : Parent(Scp) { }
 
-    bool common::Scope::declExists(std::string Id) {
-        return exists(Id, Decls);
-    }
-
-    bool Scope::typeExists(std::string Id) {
-        return exists(Id, Types);
-    }
-
-    bool Scope::conExists(std::string Id) {
-        return exists(Id, Constructors);
-    }
-
-    template<class T>
-    bool Scope::exists(std::string Id, unordered_map<string, T> Map) {
-        auto Got = Map.find(Id);
-
-        if (Got != Map.end())
+    bool Scope::declExists(std::string Id) {
+        if (Decls.find(Id) != Decls.end())
             return true;
 
         if (Parent)
-            return Parent->exists(Id, Map);
-        else
-            return false;
+            return Parent->declExists(Id);
+
+        return false;
+    }
+
+    bool Scope::typeExists(std::string Id) {
+        if (Types.find(Id) != Types.end())
+            return true;
+
+        if (Parent)
+            return Parent->typeExists(Id);
+
+        return false;
+    }
+
+
+    bool Scope::conExists(std::string Id) {
+        if (Constructors.find(Id) != Constructors.end())
+            return true;
+
+        if (Parent)
+            return Parent->conExists(Id);
+
+        return false;
     }
 
     Type Scope::getDeclType(std::string Id) {
-        return get(Id, Decls);
+        auto Got = Decls.find(Id);
+
+        if (Got == Decls.end()) {
+            return Parent->getDeclType(Id);
+        }
+
+        return Got->second;
     }
 
     AlgebraicDT& Scope::getADT(std::string Id) {
-        return get(Id, Types);
+        auto Got = Types.find(Id);
+
+        if (Got == Types.end()) {
+            return Parent->getADT(Id);
+        }
+
+        return Got->second;
+
     }
 
     Product& Scope::getCon(std::string Id) {
-        return get(Id, Constructors);
-    }
+        auto Got = Constructors.find(Id);
 
-    template<class T>
-    T Scope::get(std::string Id, unordered_map<string, T> List) {
-        auto Got = List.find(Id);
-
-        if (Got == List.end()) {
-            return this->Parent->get(Id, List);
-        } else {
-            return Got->second;
+        if (Got == Constructors.end()) {
+            return Parent->getCon(Id);
         }
+
+        return Got->second;
     }
+
 }

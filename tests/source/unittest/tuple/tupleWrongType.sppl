@@ -1,5 +1,2 @@
-def main : [String]->(Int,FloatPattern,Bool,CharPattern,String)
-| s = func()
-
-def func : (Int,FloatPattern,Bool,CharPattern,String)
-|  = (1.2,True,'c',"string",1)
+def main : [String]->(Int,Float,Bool,Char,String)
+| s = (1.2,True,'c',"string",1)

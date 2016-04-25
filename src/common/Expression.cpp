@@ -55,7 +55,7 @@ namespace common {
             Expr(move(Expr)),
             Args(move(Args)) { }
 
-    AlgebraicExpression::AlgebraicExpression(string Constructor,
+    AlgebraicExpr::AlgebraicExpr(string Constructor,
                                              vector<unique_ptr<Expression>> Exprs,
                                              Location Loc) :
             Expression(Type(TypeId::CUSTOM), Loc),
@@ -64,7 +64,7 @@ namespace common {
 
     StringExpr::StringExpr(string Val,
                            Location Loc) :
-            Expression(Type(TypeId::STRING), Loc),
+            Expression(Type(TypeId::STRING, Val.size() + 1), Loc),
             Val(Val) { }
 
     void IdExpr::accept(Visitor &V) { V.visit(*this); }
@@ -77,33 +77,37 @@ namespace common {
     void TupleExpr::accept(Visitor &V) { V.visit(*this); }
     void CallExpr::accept(Visitor &V) { V.visit(*this); }
     void LambdaFunction::accept(Visitor &V) { V.visit(*this); }
-    void AlgebraicExpression::accept(Visitor &V) { V.visit(*this); }
+    void AlgebraicExpr::accept(Visitor &V) { V.visit(*this); }
 
-    unique_ptr<Node> IdExpr::clone() {
-        return unique_ptr<Node>((Node*)new IdExpr(Val, Loc));
+    unique_ptr<Expression> Expression::clone() const {
+        return unique_ptr<Expression>(doClone());
     }
 
-    unique_ptr<Node> IntExpr::clone() {
-        return unique_ptr<Node>((Node*)new IntExpr(Val, Loc));
+    Expression *IdExpr::doClone() const {
+        return new IdExpr(Val, Loc);
     }
 
-    unique_ptr<Node> FloatExpr::clone() {
-        return unique_ptr<Node>((Node*)new FloatExpr(Val, Loc));
+    Expression *IntExpr::doClone() const {
+        return new IntExpr(Val, Loc);
     }
 
-    unique_ptr<Node> CharExpr::clone() {
-        return unique_ptr<Node>((Node*)new CharExpr(Val, Loc));
+    Expression *FloatExpr::doClone() const {
+        return new FloatExpr(Val, Loc);
     }
 
-    unique_ptr<Node> BoolExpr::clone() {
-        return unique_ptr<Node>((Node*)new BoolExpr(Val, Loc));
+    Expression *CharExpr::doClone() const {
+        return new CharExpr(Val, Loc);
     }
 
-    unique_ptr<Node> StringExpr::clone() {
-        return unique_ptr<Node>((Node*)new StringExpr(Val, Loc));
+    Expression *BoolExpr::doClone() const {
+        return new BoolExpr(Val, Loc);
     }
 
-    unique_ptr<Node> ListExpr::clone() {
+    Expression *StringExpr::doClone() const {
+        return new StringExpr(Val, Loc);
+    }
+
+    Expression *ListExpr::doClone() const {
         auto Res = new ListExpr(vector<unique_ptr<Expression>>(), Loc);
 
         for (auto &Element: Elements) {
@@ -111,10 +115,10 @@ namespace common {
             Res->Elements.push_back(unique_ptr<Expression>((Expression*)Ptr));
         }
 
-        return unique_ptr<Node>((Node*)Res);
+        return Res;
     }
 
-    unique_ptr<Node> TupleExpr::clone() {
+    Expression *TupleExpr::doClone() const {
         auto Res = new TupleExpr(vector<unique_ptr<Expression>>(), Loc);
 
         for (auto &Element: Elements) {
@@ -122,10 +126,10 @@ namespace common {
             Res->Elements.push_back(unique_ptr<Expression>((Expression*)Ptr));
         }
 
-        return unique_ptr<Node>((Node*)Res);
+        return Res;
     }
 
-    unique_ptr<Node> CallExpr::clone() {
+    Expression *CallExpr::doClone() const {
         auto NewCallee = Callee->clone().release();
         auto Res = new CallExpr(unique_ptr<Expression>((Expression*)NewCallee), vector<unique_ptr<Expression>>(), Loc);
 
@@ -134,30 +138,27 @@ namespace common {
             Res->Args.push_back(unique_ptr<Expression>((Expression*)Ptr));
         }
 
-        return unique_ptr<Node>((Node*)Res);
+        return Res;
     }
 
-    unique_ptr<Node> LambdaFunction::clone() {
-        auto NewExpr = Expr->clone().release();
-        auto Res = new LambdaFunction(unique_ptr<Expression>((Expression*)NewExpr), vector<unique_ptr<LambdaArg>>(), Loc);
+    Expression *LambdaFunction::doClone() const {
+        auto Res = new LambdaFunction(Expr->clone(), vector<unique_ptr<LambdaArg>>(), Loc);
 
         for (auto &Arg: Args) {
-            auto Ptr = Arg->clone().release();
-            Res->Args.push_back(unique_ptr<LambdaArg>((LambdaArg*)Ptr));
+            Res->Args.push_back(Arg->clone());
         }
 
-        return unique_ptr<Node>((Node*)Res);
+        return Res;
     }
 
-    unique_ptr<Node> AlgebraicExpression::clone() {
-        auto Res = new AlgebraicExpression(Constructor, vector<unique_ptr<Expression>>(), Loc);
+    Expression *AlgebraicExpr::doClone() const {
+        auto Res = new AlgebraicExpr(Constructor, vector<unique_ptr<Expression>>(), Loc);
 
         for (auto &Expr: Exprs) {
-            auto Ptr = Expr->clone().release();
-            Res->Exprs.push_back(unique_ptr<Expression>((Expression*)Ptr));
+            Res->Exprs.push_back(Expr->clone());
         }
 
-        return unique_ptr<Node>((Node*)Res);
+        return Res;
     }
 
     string IdExpr::str() {
@@ -240,7 +241,7 @@ namespace common {
         return Str + " => " + Expr->str();
     }
 
-    string AlgebraicExpression::str() {
+    string AlgebraicExpr::str() {
         // TODO fix strJoin problems. I give up for now
         string Str(Constructor);
 

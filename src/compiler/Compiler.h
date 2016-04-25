@@ -53,7 +53,8 @@ namespace compiler {
         semantics::TypeChecker TypeChecker;
         optimizer::GeneralOptimizer Optimizer;
 
-        int compile();
+        int compile(const string &Filename);
+        int compile(const vector<string> &Filenames);
 
         void setBackend(Backend B);
     };

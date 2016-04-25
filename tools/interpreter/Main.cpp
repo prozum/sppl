@@ -20,8 +20,7 @@ int main(int argc, char *argv[]) {
         std::stringstream Buffer;
         Buffer << f.rdbuf();
 
-        JIT.eval(Buffer.str());
-        return 0;
+        return JIT.eval(Buffer.str());
     }
 
     string Input("");

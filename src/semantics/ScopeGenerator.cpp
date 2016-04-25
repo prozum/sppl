@@ -8,8 +8,14 @@ namespace semantics {
 
     void ScopeGenerator::visit(Program &Node) {
         // Visit children
+
         for (auto &Func : Node.Decls) {
-            Func->accept(*this);
+            try {
+                Func->accept(*this);
+            }
+            catch (Error err) {
+                Errors.push_back(err);
+            }
         }
     }
 
@@ -314,8 +320,9 @@ namespace semantics {
     void ScopeGenerator::visit(IntExpr &Node) { }
     void ScopeGenerator::visit(FloatExpr &Node) { }
     void ScopeGenerator::visit(CharExpr &Node) { }
+    void ScopeGenerator::visit(StringExpr &Node) { }
 
-    void ScopeGenerator::visit(AlgebraicExpression &Node) {
+    void ScopeGenerator::visit(AlgebraicExpr &Node) {
         for (auto &Expr: Node.Exprs) {
             Expr->accept(*this);
         }

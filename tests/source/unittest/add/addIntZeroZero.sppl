@@ -1,5 +1,2 @@
 def main : [String]->Int
-| s = func()
-
-def func : Int
-|  = 0+0
+| s = 0+0

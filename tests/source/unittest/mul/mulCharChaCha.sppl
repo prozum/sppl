@@ -1,5 +1,2 @@
-def main : [String]->CharPattern
-| s = func()
-
-def func : CharPattern
-|  = 'c'*'c'
+def main : [String]->Char
+| s = 'c'*'c'

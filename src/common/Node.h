@@ -67,7 +67,7 @@ namespace common {
 	class TupleExpr;
 	class IdPattern;
 	class CallExpr;
-	class AlgebraicExpression;
+	class AlgebraicExpr;
 	class Visitor;
 	class Scope;
 
@@ -77,13 +77,15 @@ namespace common {
 		Location Loc;
 
 		Node(Location Loc);
-        Node(const Node&) = delete;
-        Node& operator=(const Node&) = delete;
+		Node(const Node &Other);
+		//virtual Node &operator=(const Node &Other) = 0;
         ~Node() = default;
+		unique_ptr<Node> clone() const;
 
 		virtual void accept(Visitor &V) = 0;
 		virtual string str() = 0;
-		virtual unique_ptr<Node> clone() = 0;
+	private:
+		virtual Node *doClone() const = 0;
 	};
 
 	class Program : public Node {
@@ -93,9 +95,12 @@ namespace common {
 		Program(vector<unique_ptr<Declaration>> Decls, Location Loc);
 		Program(unique_ptr<Expression> AnonFunc, Location Loc);
 
-		virtual void accept(Visitor &V);
+		void accept(Visitor &V);
 		string str();
-		unique_ptr<Node> clone();
+
+		unique_ptr<Program> clone() const;
+	private:
+		virtual Program* doClone() const;
 	};
 
 	/* Declaration */
@@ -104,9 +109,9 @@ namespace common {
 	public:
 		Declaration(Location Loc);
 
-		virtual void accept(Visitor &V) = 0;
-		virtual string str() = 0;
-		virtual unique_ptr<Node> clone() = 0;
+		unique_ptr<Declaration> clone() const;
+	private:
+		virtual Declaration* doClone() const = 0;
 	};
 
 	class Function : public Declaration {
@@ -120,9 +125,10 @@ namespace common {
 		Function(unique_ptr<Expression> AnonFunc);
 		Function(string Id, Type Ty, Location Loc);
 
-		virtual void accept(Visitor &V);
+		void accept(Visitor &V);
 		string str();
-		unique_ptr<Node> clone();
+	private:
+		virtual Function* doClone() const;
 	};
 
 	class AlgebraicDT : public Declaration {
@@ -133,9 +139,11 @@ namespace common {
 
 		AlgebraicDT(string Name, vector<Type> TypeConstructor, vector<unique_ptr<Product>> Sum, Location Loc);
 
-		virtual void accept(Visitor &V);
+		void accept(Visitor &V);
 		string str();
-		unique_ptr<Node> clone();
+		unique_ptr<AlgebraicDT> clone() const;
+	private:
+		virtual AlgebraicDT* doClone() const;
 	};
 
 	class Product : public Node {
@@ -145,9 +153,11 @@ namespace common {
 
 		Product(string Constructor, vector<Type> Values, Location Loc);
 
-		virtual void accept(Visitor &V);
+		void accept(Visitor &V);
 		string str();
-		unique_ptr<Node> clone();
+		unique_ptr<Product> clone() const;
+	private:
+		virtual Product* doClone() const;
 	};
 
 	class Case : public Node {
@@ -159,9 +169,11 @@ namespace common {
 
 		Case(unique_ptr<Expression> Expr, unique_ptr<Expression> When, vector<unique_ptr<Pattern>> Patterns, Location Loc);
 
-		virtual void accept(Visitor &V);
+		void accept(Visitor &V);
 		string str();
-		unique_ptr<Node> clone();
+		unique_ptr<Case> clone() const;
+	private:
+		virtual Case* doClone() const;
 	};
 
 	class LambdaArg : public Node {
@@ -171,9 +183,11 @@ namespace common {
 
 		LambdaArg(string Id, Location Loc);
 
-		virtual void accept(Visitor &V);
+		void accept(Visitor &V);
 		string str();
-		unique_ptr<Node> clone();
+		unique_ptr<LambdaArg> clone() const;
+	private:
+		virtual LambdaArg* doClone() const;
 	};
 
 	template<class T>

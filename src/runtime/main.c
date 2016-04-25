@@ -1,6 +1,4 @@
-#include "runtime.h"
-
-#include <stdio.h>
+#include "task.h"
 
 typedef struct int_s {
     int input;
@@ -12,9 +10,9 @@ void fun1 (void *t) {
 
     task_t *task = (task_t *)t;
 
-    ((int_t *)(task->args))->res = 1;
+    ((int_t *)(task->startarg))->res = 1;
 
-    printf("fun1 res: %d\n",  ((int_t *)(task->args))->res);
+    printf("fun1 res: %d\n",  ((int_t *)(task->startarg))->res);
 }
 
 void fun2 (void *t) {
@@ -22,37 +20,35 @@ void fun2 (void *t) {
 
     task_t *task = (task_t *)t;
 
-    ((int_t *)(task->args))->res = 1;
+    ((int_t *)(task->startarg))->res = 1;
 }
 
 void fun3 (void *t) {
 
     task_t *task = (task_t *)t;
-    int_t *arg = (int_t *)task->args;
-
-    task->sub_task_len = 2;
-    task->sub_tasks = malloc(sizeof(task_t) * 2);
+    int_t *arg = (int_t *)task->startarg;
 
     int_t *arg1 = malloc(sizeof(int_t));
     int_t *arg2 = malloc(sizeof(int_t));
 
-    task_t *task1 = malloc(sizeof(task_t));
-    task1->f = fun1;
-    task1->args = (void *)(arg1);
+    arg1->res = 1;
 
-    task_t *task2 = malloc(sizeof(task_t));
-    task2->f = fun2;
-    task2->args = (void *)(arg2);
+    task_t *task1 = taskcreate(fun1, (void *)arg1, 0);
+    task_t *task2 = taskcreate(fun2, (void *)arg2, 0);
 
     task->sub_tasks[0] = task1;
     task->sub_tasks[1] = task2;
 
-    add_task(task2);
-    add_task(task1);
+    taskadd(task2);
+    taskadd(task1);
 
     printf("fun3\n");
 
-    yield_waiting(task);
+    taskyield(task);
+
+    printf("fun1 res: %d\n", arg1->res);
+
+    arg1->res = 1;
 
     printf("fun1 res: %d\n", arg1->res);
 
@@ -60,27 +56,22 @@ void fun3 (void *t) {
 
     arg->res = arg1->res + arg2->res;
 
+    /*
     free(task->sub_tasks);
     free(arg1);
     free(arg2);
     free(task1);
     free(task2);
+     */
 }
 
-int main()
-{
-    task_t *task = malloc(sizeof(task_t));
-    int_t *args = malloc(sizeof(int_t));
+int main() {
 
-    task->args = (void *)(args);
-    task->f = fun3;
+    int_t *arg = malloc(sizeof(int_t) * 1);
 
-    rmain(1, task);
+    task_t *task = taskcreate(fun3, arg, 2);
 
-    printf("result: %d\n", args->res);
-
-    free(task);
-    free(args);
+    rmain(2, task);
 
     return 0;
 }

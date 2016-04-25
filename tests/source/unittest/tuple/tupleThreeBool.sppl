@@ -1,5 +1,2 @@
 def main : [String]->(Bool,Bool, Bool)
-| s = func()
-
-def func : (Bool,Bool, Bool)
-|  = (True, False, True)
+| s = (True, False, True)

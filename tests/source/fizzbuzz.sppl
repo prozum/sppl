@@ -35,7 +35,7 @@ def parsestringacc : String -> Int -> Int
 | "" acc       = acc
 | (x : xs) acc = parsestringacc(xs, (acc * 10) + parsechar(x))
 
-def parsechar : CharPattern -> Int
+def parsechar : Char -> Int
 | '0' = 0
 | '1' = 1
 | '2' = 2

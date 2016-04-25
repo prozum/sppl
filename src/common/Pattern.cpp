@@ -15,42 +15,45 @@ namespace common {
     void AlgebraicPattern::accept(Visitor &V) { V.visit(*this); }
     void ParPattern::accept(Visitor &V) { V.visit(*this); }
 
-    unique_ptr<Node> IntPattern::clone() {
-        return unique_ptr<Node>((Node*)new IntPattern(Val, Loc));
+    unique_ptr<Pattern> Pattern::clone() const {
+        return unique_ptr<Pattern>(doClone());
     }
 
-    unique_ptr<Node> FloatPattern::clone() {
-        return unique_ptr<Node>((Node*)new FloatPattern(Val, Loc));
+    Pattern *IntPattern::doClone() const {
+        return new IntPattern(Val, Loc);
     }
 
-    unique_ptr<Node> CharPattern::clone() {
-        return unique_ptr<Node>((Node*)new CharPattern(Val, Loc));
+    Pattern *FloatPattern::doClone() const {
+        return new FloatPattern(Val, Loc);
     }
 
-    unique_ptr<Node> BoolPattern::clone() {
-        return unique_ptr<Node>((Node*)new BoolPattern(Val, Loc));
+    Pattern *CharPattern::doClone() const {
+        return new CharPattern(Val, Loc);
     }
 
-    unique_ptr<Node> StringPattern::clone() {
-        return unique_ptr<Node>((Node*)new StringPattern(Val, Loc));
+    Pattern *BoolPattern::doClone() const {
+        return new BoolPattern(Val, Loc);
     }
 
-    unique_ptr<Node> IdPattern::clone() {
-        return unique_ptr<Node>((Node*)new IdPattern(Val, Loc));
+    Pattern *StringPattern::doClone() const {
+        return new StringPattern(Val, Loc);
     }
 
-    unique_ptr<Node> ListPattern::clone() {
+    Pattern *IdPattern::doClone() const {
+        return new IdPattern(Val, Loc);
+    }
+
+    Pattern *ListPattern::doClone() const {
         auto Res = new ListPattern(vector<unique_ptr<Pattern>>(), Loc);
 
         for (auto &Pat: Patterns) {
-            auto Clone = Pat->clone().release();
-            Res->Patterns.push_back(unique_ptr<Pattern>((Pattern*)Clone));
+            Res->Patterns.push_back(Pat->clone());
         }
 
-        return unique_ptr<Node>((Node*)Res);
+        return Res;
     }
 
-    unique_ptr<Node> TuplePattern::clone() {
+    Pattern *TuplePattern::doClone() const {
         auto Res = new TuplePattern(vector<unique_ptr<Pattern>>(), Loc);
 
         for (auto &Pat: Patterns) {
@@ -58,34 +61,32 @@ namespace common {
             Res->Patterns.push_back(unique_ptr<Pattern>((Pattern*)Clone));
         }
 
-        return unique_ptr<Node>((Node*)Res);
+        return Res;
     }
 
-    unique_ptr<Node> ListSplit::clone() {
+    Pattern *ListSplit::doClone() const {
         auto NewLeft = Left->clone().release();
         auto NewRight = Right->clone().release();
         auto Res = new ListSplit(unique_ptr<Pattern>((Pattern*)NewLeft), unique_ptr<Pattern>((Pattern*)NewRight), Loc);
-        return unique_ptr<Node>((Node*)Res);
+        return Res;
     }
 
-    unique_ptr<Node> WildPattern::clone() {
-        return unique_ptr<Node>((Node*)new WildPattern(Loc));
+    Pattern *WildPattern::doClone() const {
+        return new WildPattern(Loc);
     }
 
-    unique_ptr<Node> AlgebraicPattern::clone() {
+    Pattern *AlgebraicPattern::doClone() const {
         auto Res = new AlgebraicPattern(Constructor, vector<unique_ptr<Pattern>>(), Loc);
 
         for (auto &Pat: Patterns) {
-            auto Clone = Pat->clone().release();
-            Res->Patterns.push_back(unique_ptr<Pattern>((Pattern*)Clone));
+            Res->Patterns.push_back(Pat->clone());
         }
 
-        return unique_ptr<Node>((Node*)Res);
+        return Res;
     }
 
-    unique_ptr<Node> ParPattern::clone() {
-        auto NewChild = Pat->clone().release();
-        return unique_ptr<Node>((Node*)new ParPattern(unique_ptr<Pattern>((Pattern*)NewChild), Loc));
+    Pattern *ParPattern::doClone() const {
+        return new ParPattern(Pat->clone(), Loc);
     }
 
 

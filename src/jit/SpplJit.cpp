@@ -81,20 +81,20 @@ namespace jit {
 
 
     string SpplJit::getOutput(intptr_t data, common::Type Type) {
-        string Out;
-
         switch (Type.Id) {
             case common::TypeId::INT:
                 return to_string((int64_t) data);
             case common::TypeId::FLOAT:
                 // WTF is double type a pointer
                 return to_string(*(double *) data);
-/*            case common::TypeId::STRING:
-                Out += "\"";
-                Out += (char *) data;
-                Out += "\"";
-                return Out;
-*/
+            case common::TypeId::CHAR:
+                return "'" + string(1, (char) data) + "'";
+            case common::TypeId::STRING:
+                return "\"" + string((char *) data) + "\"";
+            case common::TypeId::BOOL:
+                return to_string((bool) data);
+            case common::TypeId::EMPTYLIST:
+                return "[]";
             case common::TypeId::TUPLE:
                 return getOutputTuple(data, Type.Subtypes);
             case common::TypeId::SIGNATURE:
@@ -116,11 +116,10 @@ namespace jit {
                     Out += getOutput(addr, Subtypes[i]);
                     addr += sizeof(double);
                     break;
-/*                case common::TypeId::STRING:
+                case common::TypeId::STRING:
                     Out += getOutput(*(intptr_t *) addr, Subtypes[i]);
                     addr += sizeof(intptr_t *);
                     break;
-*/
                 case common::TypeId::TUPLE:
                     Out += getOutputTuple(*(intptr_t *) addr, Subtypes[i].Subtypes);
                     addr += sizeof(intptr_t *);
@@ -136,22 +135,22 @@ namespace jit {
     }
 
 
-    void SpplJit::eval(std::string Str) {
+    int SpplJit::eval(std::string Str) {
         if (!Drv.parseString(Str))
-            return;
+            return 1;
 
-        if (!Drv.accept(ScopeGen)) {
-            return;
-        }
+        if (!Drv.accept(ScopeGen))
+            return 2;
 
-        if (!Drv.accept(TypeChecker)) {
-            return;
-        }
+        if (!Drv.accept(TypeChecker))
+            return 3;
+
+        if (!Drv.accept(Optimizer))
+            return 4;
 
         // Generate ir_func
-        if (!Drv.accept(CodeGen)) {
-            return;
-        }
+        if (!Drv.accept(CodeGen))
+            return 5;
         auto FuncNode = static_cast<common::Function *>(Drv.Prog->Decls[0].get());
         auto FuncIR = CodeGen.Module->getFunction(FuncNode->Id);
         PassMgr->run(* FuncIR);
@@ -166,12 +165,13 @@ namespace jit {
             auto FuncJIT = (size_t (*)()) Func.getAddress();
 
             assert(FuncJIT != NULL);
-            string Output = getOutput(FuncJIT(), FuncNode->Signature.Subtypes.back());
-            cout << Output << "\t\ttype: " << FuncNode->Signature.Subtypes.back().str() << endl;
+            string Output = getOutput(FuncJIT(), FuncNode->Ty);
+            cout << Output << "\t\ttype: " << FuncNode->Ty.str() << endl;
 
             // Remove module
             removeModule(ModuleHandler);
         }
 
+        return 0;
     }
 }

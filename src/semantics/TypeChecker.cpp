@@ -13,6 +13,7 @@ namespace semantics
         for (auto &Decl : Node.Decls) {
             Decl->accept(*this);
         }
+        // Visit stops here
     }
 
     void TypeChecker::visit(Function &Node) {
@@ -44,6 +45,11 @@ namespace semantics
                 Errors.push_back(err);
             }
         }
+        // Visit stops here
+
+        // Set return type
+        if (!hasError())
+            Node.Ty = Node.Signature.Subtypes.back();
     }
 
     void TypeChecker::visit(Case &Node) {
@@ -56,7 +62,14 @@ namespace semantics
             Node.Patterns[i]->RetTy = CurFunc->Signature.Subtypes[i];
             Node.Patterns[i]->accept(*this);
         }
-        Node.Expr->accept(*this);
+
+        try {
+            Node.Expr->accept(*this);
+        }
+        catch (Error err) {
+            Errors.push_back(err);
+            return;
+        }
 
         // Set signature for anonymous function
         if (CurFunc->Anon) {
@@ -456,6 +469,7 @@ namespace semantics
 
     void TypeChecker::visit(IntExpr &Node) { }
     void TypeChecker::visit(FloatExpr &Node) { }
+    void TypeChecker::visit(StringExpr &Node) { }
     void TypeChecker::visit(CharExpr &Node) { }
 
     void TypeChecker::visit(IdExpr &Node) {

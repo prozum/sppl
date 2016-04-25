@@ -1,0 +1,2 @@
+def main : [String]->Int
+| n = 2

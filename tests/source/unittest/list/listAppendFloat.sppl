@@ -1,5 +1,2 @@
-def main : [String]->[FloatPattern]
-| s = func()
-
-def func : [FloatPattern]
-|  = 1.0:[2.0,3.0]
+def main : [String]->[Float]
+| s = 1.0:[2.0,3.0]

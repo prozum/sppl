@@ -1,5 +1,2 @@
-def main : [String]->FloatPattern
-| s = func()
-
-def func : FloatPattern
-|  = 0.0*0.0
+def main : [String]->Float
+| s = 0.0*0.0

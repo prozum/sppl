@@ -1,7 +1,3 @@
-//
-// Created by hejsil on 4/21/16.
-//
-
 #include "GenericUnfolder.h"
 
 namespace semantics {
@@ -289,7 +285,7 @@ namespace semantics {
         
     }
 
-    void GenericUnfolder::visit(AlgebraicExpression &Node) {
+    void GenericUnfolder::visit(AlgebraicExpr &Node) {
         
     }
 

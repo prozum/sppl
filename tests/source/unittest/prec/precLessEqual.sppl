@@ -1,0 +1,2 @@
+def main : [String]->Bool
+| s = False == 0 < 0

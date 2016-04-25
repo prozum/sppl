@@ -1,11 +1,8 @@
-//
-// Created by hejsil on 4/21/16.
-//
+#include "Node.h"
+#include "Visitor.h"
 
 #include <stack>
 #include <unordered_map>
-#include "Node.h"
-#include "Visitor.h"
 
 using namespace common;
 
@@ -61,7 +58,7 @@ namespace semantics {
         void visit(ListExpr &Node);
         void visit(TupleExpr &Node);
         void visit(CallExpr &Node);
-        void visit(AlgebraicExpression &Node);
+        void visit(AlgebraicExpr &Node);
 
         Program *Prog = nullptr;
         Function *CurrentFunc = nullptr;

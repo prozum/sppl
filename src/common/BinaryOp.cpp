@@ -173,74 +173,74 @@ namespace common {
     }
 
 
-    unique_ptr<Node> Or::clone() {
+    BinaryOp *Or::doClone() const {
         return cloneBinaryOp<Or>(*this);
     }
 
-    unique_ptr<Node> And::clone() {
+    BinaryOp *And::doClone() const {
         return cloneBinaryOp<And>(*this);
     }
 
-    unique_ptr<Node> Equal::clone() {
+    BinaryOp *Equal::doClone() const {
         return cloneBinaryOp<Equal>(*this);
     }
 
-    unique_ptr<Node> NotEqual::clone() {
+    BinaryOp *NotEqual::doClone() const {
         return cloneBinaryOp<NotEqual>(*this);
     }
 
-    unique_ptr<Node> Lesser::clone() {
+    BinaryOp *Lesser::doClone() const {
         return cloneBinaryOp<Lesser>(*this);
     }
 
-    unique_ptr<Node> Greater::clone() {
+    BinaryOp *Greater::doClone() const {
         return cloneBinaryOp<Greater>(*this);
     }
 
-    unique_ptr<Node> LesserEq::clone() {
+    BinaryOp *LesserEq::doClone() const {
         return cloneBinaryOp<LesserEq>(*this);
     }
 
-    unique_ptr<Node> GreaterEq::clone() {
+    BinaryOp *GreaterEq::doClone() const {
         return cloneBinaryOp<GreaterEq>(*this);
     }
 
-    unique_ptr<Node> Add::clone() {
+    BinaryOp *Add::doClone() const {
         return cloneBinaryOp<Add>(*this);
     }
 
-    unique_ptr<Node> Sub::clone() {
+    BinaryOp *Sub::doClone() const {
         return cloneBinaryOp<Sub>(*this);
     }
 
-    unique_ptr<Node> Mul::clone() {
+    BinaryOp *Mul::doClone() const {
         return cloneBinaryOp<Mul>(*this);
     }
 
-    unique_ptr<Node> Div::clone() {
+    BinaryOp *Div::doClone() const {
         return cloneBinaryOp<Div>(*this);
     }
 
-    unique_ptr<Node> Mod::clone() {
+    BinaryOp *Mod::doClone() const {
         return cloneBinaryOp<Mod>(*this);
     }
 
-    unique_ptr<Node> ListAdd::clone() {
+    BinaryOp *ListAdd::doClone() const {
         return cloneBinaryOp<ListAdd>(*this);
     }
 
-    unique_ptr<Node> ProducerConsumer::clone() {
+    BinaryOp *ProducerConsumer::doClone() const {
         return cloneBinaryOp<ProducerConsumer>(*this);
     }
 
-    unique_ptr<Node> Concat::clone() {
+    BinaryOp *Concat::doClone() const {
         return cloneBinaryOp<Concat>(*this);
     }
 
-    template<class T>
-    unique_ptr<Node> cloneBinaryOp(BinaryOp& Op) {
-        auto Left = Op.Left->clone().release();
-        auto Right = Op.Right->clone().release();
-        return unique_ptr<Node>((Node*)new T(unique_ptr<Expression>((Expression*)Left), unique_ptr<Expression>((Expression*)Right), Op.Loc));
+    template<class T>   
+    T *cloneBinaryOp(const T& Op) {
+        auto Left = Op.Left->clone();
+        auto Right = Op.Right->clone();
+        return new T(Op.Left->clone(), Op.Right->clone(), Op.Loc);
     }
 }

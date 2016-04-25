@@ -12,16 +12,21 @@ namespace common {
 		UnaryOp(unique_ptr<Expression> Child, Location Loc);
 
 		virtual void accept(Visitor &V) = 0;
+
+		unique_ptr<UnaryOp> clone() const;
+	private:
+		virtual UnaryOp *doClone() const = 0;
 	};
 
 	class ParExpr : public UnaryOp {
 	public:
-
 		ParExpr(unique_ptr<Expression> Child, Location Loc);
 
 		virtual void accept(Visitor &V);
 		string str();
-		unique_ptr<Node> clone();
+
+	private:
+		virtual UnaryOp *doClone() const;
 	};
 
 	class Not : public UnaryOp {
@@ -31,7 +36,8 @@ namespace common {
 
 		virtual void accept(Visitor &V);
 		string str();
-		unique_ptr<Node> clone();
+	private:
+		virtual UnaryOp *doClone() const;
 	};
 
 	class Negative : public UnaryOp {
@@ -41,7 +47,8 @@ namespace common {
 
 		virtual void accept(Visitor &V);
 		string str();
-		unique_ptr<Node> clone();
+	private:
+		virtual UnaryOp *doClone() const;
 	};
 
 	class To : public UnaryOp {
@@ -52,9 +59,10 @@ namespace common {
 
 		virtual void accept(Visitor &V);
 		string str();
-		unique_ptr<Node> clone();
+	private:
+		virtual UnaryOp *doClone() const;
 	};
 
 	template<class T>
-	unique_ptr<Node> cloneUnaryOp(UnaryOp& Op);
+	unique_ptr<Node> const cloneUnaryOp(UnaryOp& Op);
 }

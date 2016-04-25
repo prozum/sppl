@@ -1,0 +1,2 @@
+def main : [String]->Float
+| s = 2.0.0

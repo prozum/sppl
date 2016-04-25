@@ -2,29 +2,25 @@
 #include "Scanner.h"
 #include "Parser.h"
 
-
 namespace parser {
-
-
-
     Driver::Driver(ostream *out, ostream *hout, ostream *mout) :
             Out(out),
             HOut(hout),
             MOut(mout),
-            Snr(* this),
+            Scr(* this),
             Psr(* this),
             Global(new common::Scope()) { }
 
     bool Driver::nextInput() {
         if (SrcType != SourceType::FILES)
             return false;
-        if (Filenames.size() > CurFile) {
-            FIn = ifstream(Filenames[CurFile]);
+        if (Files.size() > CurFile) {
+            FIn = ifstream(Files[CurFile]);
             In = &FIn;
             if (!FIn.good())
                 return false;
-            Snr.switch_streams(In, MOut);
-            Source = Filenames[CurFile++];
+            Scr.switch_streams(In, MOut);
+            Source = Files[CurFile++];
             return true;
         }
         return false;
@@ -33,10 +29,6 @@ namespace parser {
     void Driver::setOutput(string Filename) {
         FOut =  ofstream(Filename);
         Out = &FOut;
-    }
-
-    void Driver::setInputs(vector<string> Filenames) {
-        this->Filenames = Filenames;
     }
 
     void Driver::setHeaderOutput(string Filename) {
@@ -48,8 +40,8 @@ namespace parser {
         SrcType = SourceType::STREAM;
         Source = Src;
 
-        Snr.switch_streams(&In, MOut);
-        Snr.set_debug(TraceScanning);
+        Scr.switch_streams(&In, MOut);
+        Scr.set_debug(TraceScanning);
         Psr.set_debug_level(TraceParsing);
 
         return (Psr.parse() == 0);
@@ -65,8 +57,9 @@ namespace parser {
         return parseStream(in, Filename);
     }
 
-    bool Driver::parseFiles() {
+    bool Driver::parseFiles(const vector<string> &Filenames) {
         SrcType = SourceType::FILES;
+        Files = Filenames;
 
         if (!nextInput())
             return false;

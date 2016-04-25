@@ -5,8 +5,8 @@
 %initial-action {
     @$.begin.Src = @$.end.Src = Drv.Source;
 }
-%debug
 %parse-param { class Driver &Drv }
+%debug
 %error-verbose
 
 // Parser.h
@@ -18,7 +18,6 @@
 
 using namespace common;
 using namespace std;
-
 }
 
 // Parser.cpp
@@ -27,7 +26,7 @@ using namespace std;
 
 // Connect bison parser to flex scanner
 #undef yylex
-#define yylex Drv.Snr.lex
+#define yylex Drv.Scr.lex
 %}
 
 %union {
@@ -218,7 +217,7 @@ expr:	expr OR expr                                        { $$ = new Or(unique_p
 	|	IDSMALL                                             { $$ = new IdExpr(* $1, @1); }
 	|	literal                                             { $$ = $1; }
 	|	SQSTART exprs_comma SQEND                           { $$ = new ListExpr(move(* $2), @1); delete $2; }
-	| 	IDBIG exprs                                         { $$ = new AlgebraicExpression(* $1, move(* $2), @1); delete $1; delete $2; }
+	| 	IDBIG exprs                                         { $$ = new AlgebraicExpr(* $1, move(* $2), @1); delete $1; delete $2; }
 	|   PARSTART exprs_comma_ne COMMA expr PAREND           { $2->push_back(unique_ptr<Expression>($4)); $$ = new TupleExpr(move(* $2), @1); delete $2; }
 	|	PARSTART expr PAREND                                { $$ = new ParExpr(unique_ptr<Expression>($2), @1); }
 	|	expr PARSTART exprs_comma PAREND                    { $$ = new CallExpr(unique_ptr<Expression>($1), move(* $3), @1); delete $3; }

@@ -1,4 +1,7 @@
 #pragma once
+#include "CodeGenerator.h"
+#include "Driver.h"
+
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/Module.h>
 #include <llvm/IR/Verifier.h>
@@ -12,8 +15,6 @@
 #include <unordered_map>
 #include <iostream>
 
-#include "CodeGenerator.h"
-#include "Driver.h"
 
 using namespace std;
 using namespace parser;
@@ -30,7 +31,6 @@ namespace codegen {
         unique_ptr<llvm::Module> Module;
         std::map<std::string, llvm::Value *> ContextValues;
 
-    	string ModuleString();
 
     	std::unordered_map<common::Type, llvm::StructType *> TupleTypes;
     	std::unordered_map<common::Type, llvm::StructType *> ListTypes;
@@ -47,6 +47,8 @@ namespace codegen {
         size_t CurCaseId;
         size_t LastCaseId;
 
+		string ModuleString();
+
         void visit(common::Function &Node);
         void visit(common::Case &Node);
 
@@ -62,6 +64,8 @@ namespace codegen {
         void visit(common::Div &Node);
         void visit(common::Mod &Node);
 
+		void visit(common::And &Node);
+		void visit(common::Or &Node);
     	void visit(common::Equal &Node);
     	void visit(common::NotEqual &Node);
     	void visit(common::Lesser &Node);
@@ -74,6 +78,7 @@ namespace codegen {
         void visit(common::FloatExpr &Node);
         void visit(common::BoolExpr &Node);
         void visit(common::CharExpr &Node);
+		void visit(common::StringExpr &Node);
     	void visit(common::TupleExpr &Node);
     	void visit(common::ListExpr &Node);
         void visit(common::CallExpr &Node);
