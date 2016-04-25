@@ -18,12 +18,14 @@ void rmain(uint64_t os_thread_count, task_t *initial) {
 
     queue_add(&m, runtime.queue);
 
-    for (uint64_t i = 0; i < os_thread_count; ++i) {
+    uint64_t i, j;
+
+    for (i = 0; i < os_thread_count; ++i) {
         runtime.scheduler_pool[i].id = i;
         pthread_create(&runtime.thread_pool[i], NULL, (void *)start_scheduler, &runtime.scheduler_pool[i]);
     }
 
-    for (uint64_t j = 0; j < os_thread_count; ++j) {
+    for (j = 0; j < os_thread_count; ++j) {
         pthread_join(runtime.thread_pool[j], NULL);
     }
 
@@ -38,23 +40,35 @@ void rmain(uint64_t os_thread_count, task_t *initial) {
 void start_scheduler(void *sched_ptr) {
     scheduler_t *scheduler = (scheduler_t *) sched_ptr;
     task_t *t;
+    queue_head *head;
+
     scheduler->context = malloc(sizeof(context_t));
 
     set_active_worker(scheduler->id, WORKING);
 
-    printf("Shit actually happens p2!\n");
-
     do {
-        t = queue_get(runtime.queue)->item;
+        head = queue_get(runtime.queue);
+
+        if (head != nil) {
+            t = (task_t *)head->item;
+            if (t->state == NEW) {
+                set_active_worker(scheduler->id, WORKING);
+                t->state = RUNNING;
+                t->scheduler_id = (uint)scheduler->id;
+                contextswitch(scheduler->context, &t->context);
+            } else if (t->state == WAITING && get_subtasks_done(t) != 0) {
+                printf("shit's working\n");
+                set_active_worker(scheduler->id, WORKING);
+                t->state = RUNNING;
+                t->scheduler_id = (uint)scheduler->id;
+                contextswitch(scheduler->context, &t->context);
+            }
+        } else {
+            set_active_worker(scheduler->id, SLACKING);
+        }
 
         if (get_active_workers() == 0) {
             break;
-        } else if (t == nil) {
-            set_active_worker(scheduler->id, SLACKING);
-        } else {
-            set_active_worker(scheduler->id, WORKING);
-            t->state = RUNNING;
-            contextswitch(scheduler->context, &t->context);
         }
     } while (1);
 
@@ -64,9 +78,9 @@ void start_scheduler(void *sched_ptr) {
 uint64_t get_active_workers() {
     pthread_mutex_lock(&runtime.scheduler_status_lock);
 
-    uint64_t acc = 0;
+    uint64_t i, acc = 0;
 
-    for (uint64_t i = 0; i < runtime.os_thread_count; ++i) {
+    for (i = 0; i < runtime.os_thread_count; ++i) {
         acc += runtime.scheduler_status[i];
     }
 
@@ -85,11 +99,15 @@ void set_active_worker(uint64_t id, scheduler_state_t state) {
 
 int get_subtasks_done(task_t *t) {
 
-    for (int i = 0; i < t->sub_task_len; ++i) {
+    int i;
+
+    for (i = 0; i < t->sub_task_len; ++i) {
         if (t->sub_tasks[i]->state != DONE) {
             return 0;
         }
     }
+
+    printf("subtasks done\n");
 
     return 1;
 }

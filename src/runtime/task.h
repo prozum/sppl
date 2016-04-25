@@ -70,11 +70,6 @@ void	taskyield(task_t *t);
 void	needstack(task_t *t, int);
 void	taskswitch(task_t *t);
 
-//void	taskcreate(void (*fn)(void*), void *arg, uint stack, uint sub_tasks);
-//void	taskready(task_t*);
-//unsigned int	taskdelay(unsigned int);
-//unsigned int	taskid(void);
-
 typedef enum scheduler_state_e {
     SLACKING,
     WORKING
@@ -102,6 +97,7 @@ void rmain(uint64_t os_thread_count, task_t *initial);
 void start_scheduler(void *sched_ptr);
 void set_active_worker(uint64_t id, scheduler_state_t state);
 uint64_t get_active_workers();
+int get_subtasks_done(task_t *t);
 
 /*
 struct Tasklist	//used internally
