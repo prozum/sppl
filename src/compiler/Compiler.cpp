@@ -14,7 +14,7 @@ namespace compiler {
         {
 #ifdef CCPP
             case Backend::CPP:
-                CodeGen = make_unique<codegen::CCodeGenerator>(*this);
+                CodeGen = std::make_unique<codegen::CCodeGenerator>(*this);
                 break;
 #endif
 #ifdef CGNUASM
