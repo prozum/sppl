@@ -53,6 +53,16 @@ using namespace std;
     return token::TYPE;
 }
 
+"True" {
+    yylval->Boolean = true;
+    return token::BOOLLITERAL;
+}
+
+"False" {
+    yylval->Boolean = false;
+    return token::BOOLLITERAL;
+}
+
 "Int" {
     return token::INTTYPE;
 }
@@ -63,6 +73,10 @@ using namespace std;
 
 "Char"	{
     return token::CHARTYPE;
+}
+
+"String"	{
+    return token::STRINGTYPE;
 }
 
 "Bool"	{

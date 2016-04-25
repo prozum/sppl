@@ -2,7 +2,8 @@
 
 namespace compiler {
     Compiler::Compiler() :
-            ScopeGen(semantics::ScopeGenerator(&Global))
+            ScopeGen(semantics::ScopeGenerator(&Global)),
+            TypeChecker(semantics::TypeChecker(&Global))
     {
 
     }
@@ -50,18 +51,17 @@ namespace compiler {
 
         cout << Prog->str() << endl;
 
-        accept(Unfolder);
+        if (!accept(ScopeGen))
+            return 2;
+
         cout << "--------------------------" << endl;
 
         cout << Prog->str() << endl;
 
-        /*
-        if (!accept(ScopeGen))
-            return 2;
-
         if (!accept(TypeChecker))
             return 3;
 
+        /*
         if (!accept(Optimizer))
             return 4;
 

@@ -14,6 +14,9 @@ namespace common {
         unordered_map<string, Type> Decls;
         unordered_map<string, AlgebraicDT &> Types;
         unordered_map<string, Product &> Constructors;
+        unordered_map<string, shared_ptr<AlgebraicDT>> GenericADT;
+        unordered_map<string, shared_ptr<Function>> GenericFuncs;
+        unordered_map<string, unordered_map<Type, string>> GeneratedGenerics;
 
         Scope *Parent;
         std::vector<unique_ptr<Scope>> Children;
@@ -21,12 +24,11 @@ namespace common {
         Scope() : Scope(nullptr) { }
         Scope(Scope *Scp);
 
-        bool declExists(std::string Id);
-        bool typeExists(std::string Id);
-        bool conExists(std::string Id);
-
-        Type getDeclType(std::string Id);
-        AlgebraicDT &getADT(std::string Id);
-        Product &getCon(std::string Id);
+        bool tryGetDecl(string Id, Type &OutType);
+        bool tryGetADT(string Id, AlgebraicDT *&OutADT);
+        bool tryGetCon(string Id, Product *&OutProduct);
+        bool tryGetGenFunc(string Id, Function *&OutFunc);
+        bool tryGetGenADT(string Id, AlgebraicDT *&OutADT);
+        bool tryGetGenerated(std::string Id, Type Ty, std::string *OutName);
     };
 }
