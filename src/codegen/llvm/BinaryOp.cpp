@@ -67,6 +67,29 @@ void LLVMCodeGenerator::visit(common::Mod &Node) {
     }
 }
 
+
+void LLVMCodeGenerator::visit(common::And &Node) {
+    assert(Node.Left->RetTy.Id == common::TypeId::BOOL && Node.Right->RetTy.Id == common::TypeId::BOOL);
+
+    Node.Left->accept(*this);
+    auto Left = CurVal;
+    Node.Right->accept(*this);
+    auto Right = CurVal;
+
+    CurVal = Builder.CreateAnd(Left, Right, "andtmp");
+}
+
+void LLVMCodeGenerator::visit(common::Or &Node) {
+    assert(Node.Left->RetTy.Id == common::TypeId::BOOL && Node.Right->RetTy.Id == common::TypeId::BOOL);
+
+    Node.Left->accept(*this);
+    auto Left = CurVal;
+    Node.Right->accept(*this);
+    auto Right = CurVal;
+
+    CurVal = Builder.CreateOr(Left, Right, "ortmp");
+}
+
 void LLVMCodeGenerator::visit(common::Equal &Node) {
     Node.Left->accept(*this);
     auto left = CurVal;

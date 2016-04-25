@@ -93,8 +93,6 @@ namespace jit {
                 return "\"" + string((char *) data) + "\"";
             case common::TypeId::BOOL:
                 return to_string((bool) data);
-            case common::TypeId::EMPTYLIST:
-                return "[]";
             case common::TypeId::TUPLE:
                 return getOutputTuple(data, Type.Subtypes);
             case common::TypeId::SIGNATURE:
@@ -145,15 +143,28 @@ namespace jit {
         if (!Drv.accept(TypeChecker))
             return 3;
 
-        if (!Drv.accept(Optimizer))
-            return 4;
+        //if (!Drv.accept(Optimizer))
+        //    return 4;
 
         // Generate ir_func
         if (!Drv.accept(CodeGen))
             return 5;
         auto FuncNode = static_cast<common::Function *>(Drv.Prog->Decls[0].get());
-        auto FuncIR = CodeGen.Module->getFunction(FuncNode->Id);
-        PassMgr->run(* FuncIR);
+
+        // Optimize
+#if SPPLDEBUG
+        cout << "#------------------------------------------------------------------------------#" << endl;
+        cout << "|                                 Unoptimized                                  |" << endl;
+        cout << "#------------------------------------------------------------------------------#" << endl;
+        cout << CodeGen.ModuleString();
+#endif
+        PassMgr->run(* CodeGen.Module->getFunction(FuncNode->Id));
+#if SPPLDEBUG
+        cout << "#------------------------------------------------------------------------------#" << endl;
+        cout << "|                                  Optimized                                   |" << endl;
+        cout << "#------------------------------------------------------------------------------#" << endl;
+        cout << CodeGen.ModuleString();
+#endif
 
         // Store function in seperate module
         ModuleHandler = addModule(std::move(CodeGen.Module));
@@ -165,8 +176,8 @@ namespace jit {
             auto FuncJIT = (size_t (*)()) Func.getAddress();
 
             assert(FuncJIT != NULL);
-            string Output = getOutput(FuncJIT(), FuncNode->Ty);
-            cout << Output << "\t\ttype: " << FuncNode->Ty.str() << endl;
+            string Output = getOutput(FuncJIT(), FuncNode->Signature.Subtypes.back());
+            cout << Output << "\t\ttype: " << FuncNode->Signature.Subtypes.back().str() << endl;
 
             // Remove module
             removeModule(ModuleHandler);

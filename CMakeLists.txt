@@ -36,6 +36,7 @@ else()
 endif()
 
 if(DEBUG)
+    add_definitions(-DSPPLDEBUG)
     set(CMAKE_BUILD_TYPE Debug)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall -pedantic -Wno-unused-parameter")
 else()

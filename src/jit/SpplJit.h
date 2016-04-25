@@ -69,7 +69,6 @@ namespace jit {
         semantics::ScopeGenerator ScopeGen;
         semantics::TypeChecker TypeChecker;
         optimizer::GeneralOptimizer Optimizer;
-        codegen::LLVMCodeGenerator CodeGen;
 
 
         template<typename T>

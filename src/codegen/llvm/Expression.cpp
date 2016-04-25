@@ -25,7 +25,7 @@ void LLVMCodeGenerator::visit(common::CharExpr &Node) {
 
 void LLVMCodeGenerator::visit(common::IdExpr &Node) {
     // Pattern value
-    CurVal = ContextValues[Node.Val];
+    CurVal = CtxVals[Node.Val];
     if (CurVal)
         return;
 

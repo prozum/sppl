@@ -18,6 +18,7 @@
 
 using namespace std;
 using namespace parser;
+using namespace llvm;
 
 namespace codegen {
 
@@ -25,30 +26,45 @@ namespace codegen {
       public:
         LLVMCodeGenerator(parser::Driver &driver);
 
-        void visit(common::Program &node);
 
         llvm::IRBuilder<> Builder;
         unique_ptr<llvm::Module> Module;
-        std::map<std::string, llvm::Value *> ContextValues;
-
+        std::map<std::string, llvm::Value *> CtxVals;
 
     	std::unordered_map<common::Type, llvm::StructType *> TupleTypes;
     	std::unordered_map<common::Type, llvm::StructType *> ListTypes;
         std::unordered_map<common::Type, llvm::FunctionType *> FuncTypes;
 
-        llvm::Function *CurFunc;
-        llvm::Value *CurVal;
+        /*
         llvm::BasicBlock *CurPatternBlock;
         llvm::BasicBlock *CurCaseBlock;
-        llvm::BasicBlock *CurErrorBlock;
+        */
+
+        llvm::Value *CurVal;
+
+        llvm::Function *CurFunc;
+        llvm::BasicBlock *CurEntry;
+        llvm::BasicBlock *CurErrBlock;
         llvm::BasicBlock *CurRetBlock;
         llvm::PHINode *CurPhiNode;
-        std::vector<llvm::Argument *> Arguments;
-        size_t CurCaseId;
-        size_t LastCaseId;
+
+        vector<Argument *> Args;
+        vector<Argument *>::const_iterator CurArg;
+
+        vector<unique_ptr<Case>>::const_iterator CurCase;
+        vector<BasicBlock *> CaseBlocks;
+        vector<BasicBlock *>::const_iterator CurCaseBlock;
+        vector<BasicBlock *>::const_iterator LastCaseBlock;
+
+        vector<unique_ptr<Pattern>>::const_iterator CurPat;
+        vector<vector<BasicBlock *>> PatVecBlocks;
+        vector<vector<BasicBlock *>>::const_iterator CurPatVecBlock;
+        vector<BasicBlock *>::const_iterator CurPatBlock;
+        vector<BasicBlock *>::const_iterator LastPatBlock;
 
 		string ModuleString();
 
+        void visit(common::Program &node);
         void visit(common::Function &Node);
         void visit(common::Case &Node);
 
@@ -88,7 +104,5 @@ namespace codegen {
     	llvm::StructType *getTupleType(common::Type Ty);
     	llvm::StructType *getListType(common::Type Ty);
         llvm::FunctionType *getFuncType(common::Type Ty);
-
-	    llvm::Value *compare(llvm::Value *Val1, llvm::Value *Val2);
 	};
 }
