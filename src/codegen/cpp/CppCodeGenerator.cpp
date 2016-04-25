@@ -26,15 +26,18 @@ namespace codegen
         generateStd();
 
         // Find the main function
-        for (auto &Func : Node.Decls)
-            if (Func->Id == "main")
-                Main = Func.get();
+        for (auto &Decl : Node.Decls) {
+            if (typeid(*Decl.get()) == typeid(Function) &&
+                ((Function*)Decl.get())->Id == "main") {
+                Main = (Function*)Decl.get();
+            }
+        }
 
         if (!Main)
             throw "No main, help!";
 
         // Get the type of main, so that return type of main is generated
-        getType(Main->RetTy);
+        getType(Main->Signature.Subtypes.back());
 
         // Generate real main function, that calls the users main
         string StrListName = getList(StringList);
@@ -47,7 +50,7 @@ namespace codegen
                    "        args = " << GGenerated << GAdd << StrListName << "(args, " << GGenerated << GCreate << GString << "(argv[i])); \n"
                    "    } \n"
                    " \n"
-                   "    " << GGenerated << GPrint << GString << "("  << ToStrings[Main->RetTy] << "(" << GGlobal << GUser << GMain << ".call(&" << GGlobal << GUser << GMain << ", args))); \n"
+                   "    " << GGenerated << GPrint << GString << "("  << ToStrings[Main->Signature.Subtypes.back()] << "(" << GGlobal << GUser << GMain << ".call(&" << GGlobal << GUser << GMain << ", args))); \n"
                    "    return 0; \n"
                    "} \n"
                    " \n";
@@ -63,7 +66,7 @@ namespace codegen
     {
         stringstream Func;
         stringstream ArgName;
-        string RetType = getType(Node.RetTy);
+        string RetType = getType(Node.Signature.Subtypes.back());
         string ArgType;
         string Signature = getEnvironment(Node.Signature);
 
@@ -169,7 +172,7 @@ namespace codegen
         ExprStack.push(stringstream());
 
         if (Node.TailRec) {
-            auto C = (Call*)Node.Expr.get();
+            auto C = (CallExpr*)Node.Expr.get();
             for (size_t i = 0; i < CurFunc->Signature.Subtypes.size() - 1; ++i) {
                 ExprStack.push(stringstream());
                 C->Args[i]->accept(*this);
@@ -350,7 +353,7 @@ namespace codegen
         ExprStack.top() << ")";
     }
 
-    void CCodeGenerator::visit(Par &Node)
+    void CCodeGenerator::visit(ParExpr &Node)
     {
         ExprStack.top() << "(";
         Node.Child->accept(*this);
@@ -536,7 +539,7 @@ namespace codegen
 
     }
 
-    void CCodeGenerator::visit(Bool &Node)
+    void CCodeGenerator::visit(BoolExpr &Node)
     {
         // If pattern, then generate an expression for matching on this pattern
         if (IdCtx == IdContext::PATTERN) {
@@ -572,7 +575,7 @@ namespace codegen
         }
     }
 
-    void CCodeGenerator::visit(String &Node)
+    void CCodeGenerator::visit(StringExpr &Node)
     {
         // If pattern, then generate an expression for matching on this pattern
         if (IdCtx == IdContext::PATTERN) {
@@ -593,7 +596,7 @@ namespace codegen
         }
     }
 
-    void CCodeGenerator::visit(ListExpression &Node)
+    void CCodeGenerator::visit(ListExpr &Node)
     {
         string Name = getList(Node.RetTy);
 
@@ -608,7 +611,7 @@ namespace codegen
         ExprStack.top() << ")";
     }
 
-    void CCodeGenerator::visit(TupleExpression &Node)
+    void CCodeGenerator::visit(TupleExpr &Node)
     {
         string Name = getTuple(Node.RetTy);
 
@@ -652,8 +655,9 @@ namespace codegen
         } else {
             bool IsDeclared = false;
 
-            for (auto &Func : Prog->Decls) {
-                if (Func->Id == Node.Val) {
+            for (auto &Decl: Prog->Decls) {
+                if (typeid(*Decl.get()) == typeid(Function) &&
+                    ((Function*)Decl.get())->Id == Node.Val) {
                     IsDeclared = true;
                     break;
                 }
@@ -667,7 +671,7 @@ namespace codegen
         }
     }
 
-    void CCodeGenerator::visit(Call &Node)
+    void CCodeGenerator::visit(CallExpr &Node)
     {
         string Name = GGenerated + GClosure + to_string(EnvCount++);
         string Assignment = getEnvironment(Node.Callee->RetTy) + "* " + Name + " = ";

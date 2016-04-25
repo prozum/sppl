@@ -148,6 +148,8 @@ namespace common {
 
 	class Product : public Node {
 	public:
+		AlgebraicDT *Parent = nullptr;
+
 		string Constructor;
 		vector<Type> Values;
 

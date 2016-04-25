@@ -64,9 +64,10 @@ namespace semantics {
         void visit(ListExpr &Node);
         void visit(TupleExpr &Node);
         void visit(CallExpr &Node);
+        void visit(AlgebraicExpr &Node);
 
-        Scope *GlobalScope;
         Scope *CurScope;
+        Scope *GlobalScope;
         Function *CurFunc;
     };
 }

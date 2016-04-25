@@ -120,8 +120,8 @@ namespace common {
                 return Name + " " + strJoin(" ");
             case TypeId::GENERIC:
                 return Name;
-            default:
-                throw runtime_error("This should not happen!");
+            case TypeId::UNKNOWN:
+                return "_Unknown_";
         }
     }
 

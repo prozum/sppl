@@ -17,7 +17,6 @@ namespace common {
 	class IdPattern : public Pattern {
 	public:
 		string Val;
-		Scope* Scp;
 
 		IdPattern(string Val, Location Loc);
 

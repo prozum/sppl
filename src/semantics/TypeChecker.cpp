@@ -9,11 +9,10 @@ namespace semantics
     TypeChecker::TypeChecker(Scope *Scp) : CurScope(Scp), GlobalScope(Scp) { }
 
     void TypeChecker::visit(Program &Node) {
-        // TypeChecker::visit children
+        // visit children
         for (auto &Decl : Node.Decls) {
             Decl->accept(*this);
         }
-        // TypeChecker::visit stops here
     }
 
     void TypeChecker::visit(Function &Node) {
@@ -36,35 +35,34 @@ namespace semantics
             }
         }
 
-        // TypeChecker::visit children
+        // visit children
         for (auto &Case : Node.Cases) {
+            auto CaseScope = new Scope(CurScope);
+            CurScope->Children.push_back(unique_ptr<Scope>(CaseScope));
+            CurScope = CaseScope;
+
             try {
                 Case->accept(*this);
             }
             catch (Error err) {
                 Errors.push_back(err);
             }
+
+            CurScope = CurScope->Parent;
         }
     }
 
-    void TypeChecker::visit(Case &Node) {
-        auto CaseScope = new Scope(CurScope);
-        CurScope->Children.push_back(unique_ptr<Scope>(CaseScope));
-        CurScope = CaseScope;
+    void TypeChecker::visit(AlgebraicDT &Node) {}
+    void TypeChecker::visit(Product &Node) {}
 
-        // TypeChecker::visit children
+    void TypeChecker::visit(Case &Node) {
+
+        // visit children
         for (size_t i = 0; i < Node.Patterns.size(); ++i) {
             Node.Patterns[i]->RetTy = CurFunc->Signature.Subtypes[i];
             Node.Patterns[i]->accept(*this);
         }
-
-        try {
-            Node.Expr->accept(*this);
-        }
-        catch (Error err) {
-            Errors.push_back(err);
-            return;
-        }
+        Node.Expr->accept(*this);
 
         // Set signature for anonymous function
         if (CurFunc->Anon) {
@@ -95,6 +93,7 @@ namespace semantics
                                   Node.Loc);
         }
     }
+
 
     // Patterns
     void TypeChecker::visit(IntPattern &Node) {
@@ -133,6 +132,15 @@ namespace semantics
         }
     }
 
+    void TypeChecker::visit(StringPattern &Node) {
+        if (Node.RetTy.Id != TypeId::STRING) {
+            throw Error::Expected("Type mismatch",
+                                  Node.RetTy.str(),
+                                  Type(TypeId::STRING).str(),
+                                  Node.Loc);
+        }
+    }
+
     void TypeChecker::visit(ListPattern &Node) {
         if (Node.RetTy.Id != TypeId::LIST) {
             throw Error::Expected("Type mismatch",
@@ -141,7 +149,7 @@ namespace semantics
                                   Node.Loc);
         }
 
-        // TypeChecker::visit children
+        // visit children
         for (auto &Pattern : Node.Patterns) {
             Pattern->RetTy = Node.RetTy.Subtypes.front();
             Pattern->accept(*this);
@@ -163,7 +171,7 @@ namespace semantics
                                   Node.Loc);
         }
 
-        // TypeChecker::visit children
+        // visit children
         for (size_t i = 0; i < Node.RetTy.Subtypes.size(); ++i) {
             Node.Patterns[i]->RetTy = Node.RetTy.Subtypes[i];
             Node.Patterns[i]->accept(*this);
@@ -171,21 +179,30 @@ namespace semantics
     }
 
     void TypeChecker::visit(ListSplit &Node) {
-        if (Node.RetTy.Id != TypeId::LIST) {
+        if (Node.RetTy.Id == TypeId::LIST) {
+            Node.Left->RetTy = Node.RetTy.Subtypes.front();
+            Node.Right->RetTy = Node.RetTy;
+        } else if (Node.RetTy.Id == TypeId::STRING) {
+            Node.Left->RetTy = Type(TypeId::CHAR);
+            Node.Right->RetTy = Node.RetTy;
+        } else {
             throw Error::Expected("Type mismatch",
                                   Node.RetTy.str(),
                                   "List",
                                   Node.Loc);
         }
 
-        // TypeChecker::visit children
+
+        // visit children
         Node.Left->accept(*this);
         Node.Right->accept(*this);
     }
 
 
     void TypeChecker::visit(IdPattern &Node) {
-        if (Node.Scp->declExists(Node.Val)) {
+        Type Out;
+
+        if (CurScope->tryGetDecl(Node.Val, Out)) {
             throw Error(Node.Val + " was already declared in the current scope.",
                         Node.Loc);
         }
@@ -193,10 +210,38 @@ namespace semantics
         CurScope->Decls.insert({ Node.Val, Node.RetTy });
     }
 
+    void TypeChecker::visit(WildPattern &Node) { }
+
+    void TypeChecker::visit(AlgebraicPattern &Node) {
+        auto Got = CurScope->Constructors.find(Node.Constructor);
+
+        if (Got != CurScope->Constructors.end()) {
+            if (Got->second.Values.size() != Node.Patterns.size()) {
+                throw Error::Expected("Data constructor for " + Node.Constructor + " has the wrong number of input",
+                                      to_string(Got->second.Values.size()),
+                                      to_string(Node.Patterns.size()),
+                                      Node.Loc);
+            }
+
+            for (size_t i = 0; i < Node.Patterns.size(); ++i) {
+                Node.Patterns[i]->RetTy = Got->second.Values[i];
+                Node.Patterns[i]->accept(*this);
+            }
+        } else {
+            throw Error(Node.Constructor + " doesn't exist in the current scope",
+                        Node.Loc);
+        }
+    }
+
+    void TypeChecker::visit(ParPattern &Node) {
+        Node.Pat->RetTy = Node.RetTy;
+        Node.Pat->accept(*this);
+    }
+
 
     // Expressions
     void TypeChecker::visit(Or &Node) {
-        // TypeChecker::visit children
+        // visit children
         Node.Left->accept(*this);
         Node.Right->accept(*this);
 
@@ -210,10 +255,10 @@ namespace semantics
     }
 
     void TypeChecker::visit(And &Node) {
-        // TypeChecker::visit children
+        // visit children
         Node.Left->accept(*this);
         Node.Right->accept(*this);
-        // TypeChecker::visit stops here
+        // visit stops here
 
         if (Node.Left->RetTy.Id != TypeId::BOOL ||
             Node.Left->RetTy.Id != Node.Right->RetTy.Id) {
@@ -225,10 +270,10 @@ namespace semantics
     }
 
     void TypeChecker::visit(Equal &Node) {
-        // TypeChecker::visit children
+        // visit children
         Node.Left->accept(*this);
         Node.Right->accept(*this);
-        // TypeChecker::visit stops here
+        // visit stops here
 
         if ((Node.Left->RetTy.Id != TypeId::INT && Node.Left->RetTy.Id != TypeId::FLOAT) ||
             Node.Left->RetTy.Id != Node.Right->RetTy.Id) {
@@ -236,14 +281,14 @@ namespace semantics
                                 Node);
         }
 
-        Node.RetTy = Node.Left->RetTy;
+        Node.RetTy = Type(TypeId::BOOL);
     }
 
     void TypeChecker::visit(NotEqual &Node) {
-        // TypeChecker::visit children
+        // visit children
         Node.Left->accept(*this);
         Node.Right->accept(*this);
-        // TypeChecker::visit stops here
+        // visit stops here
 
         if ((Node.Left->RetTy.Id != TypeId::INT && Node.Left->RetTy.Id != TypeId::FLOAT) ||
             Node.Left->RetTy.Id != Node.Right->RetTy.Id) {
@@ -255,10 +300,10 @@ namespace semantics
     }
 
     void TypeChecker::visit(Lesser &Node) {
-        // TypeChecker::visit children
+        // visit children
         Node.Left->accept(*this);
         Node.Right->accept(*this);
-        // TypeChecker::visit stops here
+        // visit stops here
 
         if ((Node.Left->RetTy.Id != TypeId::INT && Node.Left->RetTy.Id != TypeId::FLOAT) ||
             Node.Left->RetTy.Id != Node.Right->RetTy.Id) {
@@ -270,10 +315,10 @@ namespace semantics
     }
 
     void TypeChecker::visit(Greater &Node) {
-        // TypeChecker::visit children
+        // visit children
         Node.Left->accept(*this);
         Node.Right->accept(*this);
-        // TypeChecker::visit stops here
+        // visit stops here
 
         if ((Node.Left->RetTy.Id != TypeId::INT && Node.Left->RetTy.Id != TypeId::FLOAT) ||
             Node.Left->RetTy.Id != Node.Right->RetTy.Id) {
@@ -285,10 +330,10 @@ namespace semantics
     }
 
     void TypeChecker::visit(LesserEq &Node) {
-        // TypeChecker::visit children
+        // visit children
         Node.Left->accept(*this);
         Node.Right->accept(*this);
-        // TypeChecker::visit stops here
+        // visit stops here
 
         if ((Node.Left->RetTy.Id != TypeId::INT && Node.Left->RetTy.Id != TypeId::FLOAT) ||
             Node.Left->RetTy.Id != Node.Right->RetTy.Id) {
@@ -300,10 +345,10 @@ namespace semantics
     }
 
     void TypeChecker::visit(GreaterEq &Node) {
-        // TypeChecker::visit children
+        // visit children
         Node.Left->accept(*this);
         Node.Right->accept(*this);
-        // TypeChecker::visit stops here
+        // visit stops here
 
         if ((Node.Left->RetTy.Id != TypeId::INT && Node.Left->RetTy.Id != TypeId::FLOAT) ||
             Node.Left->RetTy.Id != Node.Right->RetTy.Id) {
@@ -315,10 +360,10 @@ namespace semantics
     }
 
     void TypeChecker::visit(Add &Node) {
-        // TypeChecker::visit children
+        // visit children
         Node.Left->accept(*this);
         Node.Right->accept(*this);
-        // TypeChecker::visit stops here
+        // visit stops here
 
         if ((Node.Left->RetTy.Id != TypeId::INT && Node.Left->RetTy.Id != TypeId::FLOAT) ||
             Node.Left->RetTy.Id != Node.Right->RetTy.Id) {
@@ -330,10 +375,10 @@ namespace semantics
     }
 
     void TypeChecker::visit(Sub &Node) {
-        // TypeChecker::visit children
+        // visit children
         Node.Left->accept(*this);
         Node.Right->accept(*this);
-        // TypeChecker::visit stops here
+        // visit stops here
 
         if ((Node.Left->RetTy.Id != TypeId::INT && Node.Left->RetTy.Id != TypeId::FLOAT) ||
             Node.Left->RetTy.Id != Node.Right->RetTy.Id) {
@@ -345,10 +390,10 @@ namespace semantics
     }
 
     void TypeChecker::visit(Mul &Node) {
-        // TypeChecker::visit children
+        // visit children
         Node.Left->accept(*this);
         Node.Right->accept(*this);
-        // TypeChecker::visit stops here
+        // visit stops here
 
         if ((Node.Left->RetTy.Id != TypeId::INT && Node.Left->RetTy.Id != TypeId::FLOAT) ||
             Node.Left->RetTy.Id != Node.Right->RetTy.Id) {
@@ -360,10 +405,10 @@ namespace semantics
     }
 
     void TypeChecker::visit(Div &Node) {
-        // TypeChecker::visit children
+        // visit children
         Node.Left->accept(*this);
         Node.Right->accept(*this);
-        // TypeChecker::visit stops here
+        // visit stops here
 
         if ((Node.Left->RetTy.Id != TypeId::INT && Node.Left->RetTy.Id != TypeId::FLOAT) ||
             Node.Left->RetTy.Id != Node.Right->RetTy.Id) {
@@ -375,10 +420,10 @@ namespace semantics
     }
 
     void TypeChecker::visit(Mod &Node) {
-        // TypeChecker::visit children
+        // visit children
         Node.Left->accept(*this);
         Node.Right->accept(*this);
-        // TypeChecker::visit stops here
+        // visit stops here
 
         if ((Node.Left->RetTy.Id != TypeId::INT && Node.Left->RetTy.Id != TypeId::FLOAT) ||
             Node.Left->RetTy.Id != Node.Right->RetTy.Id) {
@@ -390,10 +435,10 @@ namespace semantics
     }
 
     void TypeChecker::visit(ListAdd &Node) {
-        // TypeChecker::visit children
+        // visit children
         Node.Left->accept(*this);
         Node.Right->accept(*this);
-        // TypeChecker::visit stops here
+        // visit stops here
 
         if (Node.Right->RetTy.Id != TypeId::LIST) {
             throw Error::Binary("Right must be a ListExpression",
@@ -408,17 +453,62 @@ namespace semantics
         Node.RetTy = Node.Right->RetTy;
     }
 
+    void TypeChecker::visit(To &Node) {
+        // TODO Implement To Type Checking
+    }
+
+    void TypeChecker::visit(AlgebraicExpr &Node) {
+        Product *Out;
+
+        for (auto &Expr: Node.Exprs) {
+            Expr->accept(*this);
+        }
+
+        if (CurScope->tryGetCon(Node.Constructor, Out)) {
+
+
+
+
+        } else {
+            throw Error(Node.Constructor + ": Data constructor does not exist in the current scope",
+                        Node.Loc);
+        }
+    }
+
+    void TypeChecker::visit(LambdaFunction &Node) {
+        // TODO Implement LambdaFunction Type Checking
+    }
+    void TypeChecker::visit(LambdaArg &Node) {
+        // TODO Implement LambdaArg Type Checking
+    }
+    void TypeChecker::visit(ProducerConsumer &Node) {
+        // TODO Implement ProducerConsumer Type Checking
+    }
+    void TypeChecker::visit(Concat &Node) {
+        // TODO Implement Concat Type Checking
+    }
+
     void TypeChecker::visit(ParExpr &Node) {
-        // TypeChecker::visit children
+        // visit children
         Node.Child->accept(*this);
+
+        Node.RetTy = Node.Child->RetTy;
+    }
+    void TypeChecker::visit(Negative &Node) {
+        // visit children
+        Node.Child->accept(*this);
+
+        if (Node.Child->RetTy.Id != TypeId::INT && Node.Child->RetTy.Id != TypeId::FLOAT) {
+            throw Error::Unary("Operator only operates on Int or Float typed children",
+                               Node);
+        }
 
         Node.RetTy = Node.Child->RetTy;
     }
 
     void TypeChecker::visit(Not &Node) {
-        // TypeChecker::visit children
+        // visit children
         Node.Child->accept(*this);
-        // TypeChecker::visit stops here
 
         if (Node.Child->RetTy.Id != TypeId::BOOL) {
             throw Error::Unary("Operator only operates on Bool typed children",
@@ -429,31 +519,36 @@ namespace semantics
     }
 
     void TypeChecker::visit(ListExpr &Node) {
-        // TypeChecker::visit children
+        // visit children
         for (auto &Element : Node.Elements) {
             Element->accept(*this);
         }
-        // TypeChecker::visit stops here
 
-        for (size_t i = 0; i < Node.Elements.size() - 1; ++i) {
-            if (Node.Elements[i]->RetTy != Node.Elements[i + 1]->RetTy) {
-                throw Error::Expected("All items in a ListExpression must be same type",
-                                      Node.Elements[i]->str(),
-                                      Node.Elements[i + 1]->str(),
-                                      Node.Elements[i + 1]->Loc);
+        if (Node.Elements.size() != 0) {
+            for (size_t i = 0; i < Node.Elements.size() - 1; ++i) {
+                if (Node.Elements[i]->RetTy != Node.Elements[i + 1]->RetTy) {
+                    throw Error::Expected("All items in a ListExpression must be same type",
+                                          Node.Elements[i]->str(),
+                                          Node.Elements[i + 1]->str(),
+                                          Node.Elements[i + 1]->Loc);
+                }
             }
+
+            Node.RetTy = Type(TypeId::LIST);
+            Node.RetTy.Subtypes.push_back(Node.Elements[0]->RetTy);
+        } else {
+            Node.RetTy = Type(TypeId::LIST);
+            Node.RetTy.Subtypes.push_back(Type(TypeId::GENERIC));
         }
 
-        Node.RetTy = Type(TypeId::LIST);
-        Node.RetTy.Subtypes.push_back(Node.Elements[0]->RetTy);
     }
 
     void TypeChecker::visit(TupleExpr &Node) {
-        // TypeChecker::visit children
+        // visit children
         for (auto &Element : Node.Elements) {
             Element->accept(*this);
         }
-        // TypeChecker::visit stops here
+        // visit stops here
 
         Node.RetTy = Type(TypeId::TUPLE);
 
@@ -462,28 +557,25 @@ namespace semantics
         }
     }
 
-    void TypeChecker::visit(IntExpr &Node) { }
-    void TypeChecker::visit(FloatExpr &Node) { }
-    void TypeChecker::visit(StringExpr &Node) { }
-    void TypeChecker::visit(CharExpr &Node) { }
-
     void TypeChecker::visit(IdExpr &Node) {
-        if (!Node.Scp->declExists(Node.Val)) {
+        Type Out;
+
+        if (!CurScope->tryGetDecl(Node.Val, Out)) {
             throw Error(Node.Val + ": Id does not exist in the current scope",
                         Node.Loc);
         }
 
-        Node.RetTy = Node.Scp->getDeclType(Node.Val);
+        Node.RetTy = Out;
     }
 
     void TypeChecker::visit(CallExpr &Node) {
 
-        // TypeChecker::visit children
+        // visit children
         Node.Callee->accept(*this);
         for (auto &Arg : Node.Args) {
             Arg->accept(*this);
         }
-        // TypeChecker::visit stops here
+        // visit stops here
 
         if (Node.Callee->RetTy.Id != TypeId::SIGNATURE) {
             throw Error::Expected("Can't call a type that is not a Signature",
@@ -500,7 +592,9 @@ namespace semantics
         }
 
         for (size_t i = 0; i < Node.Args.size(); ++i) {
-            if (Node.Args[i]->RetTy != Node.Callee->RetTy.Subtypes[i]) {
+            if (false) {
+                // TODO Generic support here
+            } else if (Node.Args[i]->RetTy != Node.Callee->RetTy.Subtypes[i]) {
                 throw Error::Expected("Function was called with an invalid argument",
                                       Node.Callee->RetTy.Subtypes[i].str(),
                                       Node.Args[i]->RetTy.str(),
@@ -511,21 +605,10 @@ namespace semantics
         Node.RetTy = Node.Callee->RetTy.Subtypes.back();
     }
 
+    void TypeChecker::visit(IntExpr &Node) { }
+    void TypeChecker::visit(FloatExpr &Node) { }
+    void TypeChecker::visit(StringExpr &Node) { }
+    void TypeChecker::visit(CharExpr &Node) { }
+    void TypeChecker::visit(BoolExpr &Node) { }
 
-
-
-
-    void TypeChecker::visit(BoolExpr &Node) {}
-    void TypeChecker::visit(WildPattern &Node) {}
-    void TypeChecker::visit(AlgebraicPattern &Node) {}
-    void TypeChecker::visit(ParPattern &Node) {}
-    void TypeChecker::visit(StringPattern &Node) {}
-    void TypeChecker::visit(Negative &Node) {}
-    void TypeChecker::visit(LambdaFunction &Node) {}
-    void TypeChecker::visit(ProducerConsumer &Node) {}
-    void TypeChecker::visit(Concat &Node) {}
-    void TypeChecker::visit(To &Node) {}
-    void TypeChecker::visit(LambdaArg &Node) {}
-    void TypeChecker::visit(AlgebraicDT &Node) {}
-    void TypeChecker::visit(Product &Node) {}
 }

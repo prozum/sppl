@@ -23,11 +23,11 @@ namespace common {
     }
 
     Error Error::Binary(string Msg, common::BinaryOp &Op) {
-        return Error("'" + Op.str() + "' " + Msg + ": Left: '" + Op.Left->str() + "' Right: '" + Op.Right->str() + "'", Op.Loc);
+        return Error("'" + Op.str() + "' " + Msg + ": Left: '" + Op.Left->RetTy.str() + "' Right: '" + Op.Right->RetTy.str() + "'", Op.Loc);
     }
 
     Error Error::Unary(string Msg, common::UnaryOp &Op) {
-        return Error("'" + Op.str() + "' " + Msg + ": Child: '" + Op.Child->str() + "'", Op.Loc);
+        return Error("'" + Op.str() + "' " + Msg + ": Child: '" + Op.Child->RetTy.str() + "'", Op.Loc);
     }
 
 }

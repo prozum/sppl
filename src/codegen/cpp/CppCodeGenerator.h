@@ -22,10 +22,14 @@ namespace codegen {
     {
         public:
             CCodeGenerator(Driver &Drv);
-
             void visit(Program &Node);
+
+        private:
             void visit(Function &Node);
+            void visit(AlgebraicDT &Node);
+            void visit(Product &Node);
             void visit(Case &Node);
+            void visit(LambdaArg &Node);
             void visit(Or &Node);
             void visit(And &Node);
             void visit(Equal &Node);
@@ -40,20 +44,36 @@ namespace codegen {
             void visit(Div &Node);
             void visit(Mod &Node);
             void visit(ListAdd &Node);
-            void visit(Par &Node);
+            void visit(ProducerConsumer &Node);
+            void visit(Concat &Node);
+            void visit(To &Node);
+            void visit(ParExpr &Node);
             void visit(Not &Node);
+            void visit(Negative &Node);
+            void visit(LambdaFunction &Node);
+            void visit(IdPattern &Node);
             void visit(IntPattern &Node);
             void visit(FloatPattern &Node);
             void visit(CharPattern &Node);
+            void visit(BoolPattern &Node);
+            void visit(StringPattern &Node);
             void visit(ListPattern &Node);
             void visit(TuplePattern &Node);
             void visit(ListSplit &Node);
-            void visit(ListExpression &Node);
-            void visit(TupleExpression &Node);
-            void visit(IdPattern &Node);
-            void visit(Call &Node);
+            void visit(WildPattern &Node);
+            void visit(AlgebraicPattern &Node);
+            void visit(ParPattern &Node);
+            void visit(IdExpr &Node);
+            void visit(IntExpr &Node);
+            void visit(FloatExpr &Node);
+            void visit(CharExpr &Node);
+            void visit(BoolExpr &Node);
+            void visit(StringExpr &Node);
+            void visit(ListExpr &Node);
+            void visit(TupleExpr &Node);
+            void visit(CallExpr &Node);
+            void visit(AlgebraicExpr &Node);
 
-        private:
             const string GGenerated = "generated_";
             const string GUser = "user_";
             const string GAdd = "add_";

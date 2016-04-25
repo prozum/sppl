@@ -20,7 +20,6 @@ namespace common {
     class IdExpr : public Expression {
     public:
         string Val;
-        Scope* Scp;
     
         IdExpr(string Val, Location Loc);
     
