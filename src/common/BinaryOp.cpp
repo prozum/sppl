@@ -237,7 +237,7 @@ namespace common {
         return cloneBinaryOp<Concat>(*this);
     }
 
-    template<class T>   
+    template<class T>
     unique_ptr<Node> cloneBinaryOp(BinaryOp& Op) {
         auto Left = Op.Left->clone().release();
         auto Right = Op.Right->clone().release();

@@ -15,6 +15,8 @@ namespace semantics {
         void visit(Program &Node);
         void visit(Function &Node);
         void visit(AlgebraicDT &Node);
+
+    private:
         void visit(Product &Node);
         void visit(Case &Node);
         void visit(LambdaArg &Node);
@@ -61,12 +63,11 @@ namespace semantics {
         void visit(CallExpr &Node);
         void visit(AlgebraicExpression &Node);
 
-    private:
         Program *Prog = nullptr;
         Function *CurrentFunc = nullptr;
 
-        unordered_map<string, AlgebraicDT&> GenericTypes;
-        unordered_map<string, Function&> GenericFuncs;
+        unordered_map<string, unique_ptr<AlgebraicDT>> GenericTypes;
+        unordered_map<string, unique_ptr<Function>> GenericFuncs;
 
         bool isGeneric(Function&);
         bool isGeneric(AlgebraicDT&);

@@ -12,46 +12,61 @@ using namespace std;
 namespace semantics {
     class TypeChecker : public Visitor {
     public:
-        bool IgnoreGenerics = false;
+        TypeChecker(Scope* Scp);
 
-        TypeChecker();
-
-        virtual void visit(Program &Node);
-        virtual void visit(Function &Node);
-        virtual void visit(Case &Node);
-        virtual void visit(Or &Node);
-        virtual void visit(And &Node);
-        virtual void visit(Equal &Node);
-        virtual void visit(NotEqual &Node);
-        virtual void visit(Lesser &Node);
-        virtual void visit(Greater &Node);
-        virtual void visit(LesserEq &Node);
-        virtual void visit(GreaterEq &Node);
-        virtual void visit(Add &Node);
-        virtual void visit(Sub &Node);
-        virtual void visit(Mul &Node);
-        virtual void visit(Div &Node);
-        virtual void visit(Mod &Node);
-        virtual void visit(ListAdd &Node);
-        virtual void visit(ParExpr &Node);
-        virtual void visit(Not &Node);
-        virtual void visit(IntPattern &Node);
-        virtual void visit(FloatPattern &Node);
-        virtual void visit(CharPattern &Node);
-        virtual void visit(BoolPattern &Node);
-        virtual void visit(ListPattern &Node);
-        virtual void visit(TuplePattern &Node);
-        virtual void visit(ListSplit &Node);
-        virtual void visit(ListExpr &Node);
-        virtual void visit(TupleExpr &Node);
-        virtual void visit(CharExpr &Node);
-        virtual void visit(FloatExpr &Node);
-        virtual void visit(IntExpr &Node);
-        virtual void visit(IdPattern &Node);
-        virtual void visit(IdExpr &Node);
-        virtual void visit(CallExpr &Node);
+        void visit(Program &Node);
 
     private:
+        void visit(Function &Node);
+        void visit(AlgebraicDT &Node);
+        void visit(Product &Node);
+        void visit(Case &Node);
+        void visit(LambdaArg &Node);
+        void visit(Or &Node);
+        void visit(And &Node);
+        void visit(Equal &Node);
+        void visit(NotEqual &Node);
+        void visit(Lesser &Node);
+        void visit(Greater &Node);
+        void visit(LesserEq &Node);
+        void visit(GreaterEq &Node);
+        void visit(Add &Node);
+        void visit(Sub &Node);
+        void visit(Mul &Node);
+        void visit(Div &Node);
+        void visit(Mod &Node);
+        void visit(ListAdd &Node);
+        void visit(ProducerConsumer &Node);
+        void visit(Concat &Node);
+        void visit(To &Node);
+        void visit(ParExpr &Node);
+        void visit(Not &Node);
+        void visit(Negative &Node);
+        void visit(LambdaFunction &Node);
+        void visit(IdPattern &Node);
+        void visit(IntPattern &Node);
+        void visit(FloatPattern &Node);
+        void visit(CharPattern &Node);
+        void visit(BoolPattern &Node);
+        void visit(StringPattern &Node);
+        void visit(ListPattern &Node);
+        void visit(TuplePattern &Node);
+        void visit(ListSplit &Node);
+        void visit(WildPattern &Node);
+        void visit(AlgebraicPattern &Node);
+        void visit(ParPattern &Node);
+        void visit(IdExpr &Node);
+        void visit(IntExpr &Node);
+        void visit(FloatExpr &Node);
+        void visit(CharExpr &Node);
+        void visit(BoolExpr &Node);
+        void visit(ListExpr &Node);
+        void visit(TupleExpr &Node);
+        void visit(CallExpr &Node);
+        void visit(AlgebraicExpression &Node);
+
+        Scope *GlobalScope;
+        Scope *CurScope;
         Function *CurFunc;
     };
 }
