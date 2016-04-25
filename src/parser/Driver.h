@@ -8,7 +8,7 @@
 #include "Visitor.h"
 
 #include <fstream>
-#include <iostream>
+#include <ostream>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -25,23 +25,24 @@ enum class SourceType {
 
 class Driver {
   public:
-    Driver(ostream *out = &cout, ostream *hout = &cout, ostream *mout = &cout);
+    Driver(std::ostream *out = &std::cout, std::ostream *hout = &std::cout,
+           std::ostream *mout = &std::cout);
 
     SourceType SrcType = SourceType::UNKNOWN;
     std::string Source;
 
     // Code, header and message streams
-    istream *In;
-    ostream *Out;
-    ostream *HOut;
-    ostream *MOut;
+    std::istream *In;
+    std::ostream *Out;
+    std::ostream *HOut;
+    std::ostream *MOut;
 
     // File streams
-    ifstream FIn;
-    ofstream FOut;
-    ofstream FHOut;
+    std::ifstream FIn;
+    std::ofstream FOut;
+    std::ofstream FHOut;
 
-    unique_ptr<common::Program> Prog;
+    std::unique_ptr<common::Program> Prog;
     Scanner Scr;
     Parser Psr;
     common::Scope Global;
@@ -50,22 +51,22 @@ class Driver {
     bool TraceParsing = false;
 
     bool nextInput();
-    vector<string> Files;
+    std::vector<std::string> Files;
     size_t CurFile = 0;
 
-    void setOutput(string Filename);
-    void setHeaderOutput(string Filename);
+    void setOutput(std::string Filename);
+    void setHeaderOutput(std::string Filename);
 
     bool parseStream(std::istream &In, const std::string &Src = "stream");
     bool parseString(const std::string &Input,
-                     const std::string &Src = "string");
+                     const std::string &Src = "std::string");
     bool parseFile(const std::string &Filename);
-    bool parseFiles(const vector<std::string> &Filenames);
+    bool parseFiles(const std::vector<std::string> &Filenames);
 
     bool accept(common::Visitor &V);
 
     void error(const common::Location &Loc, const std::string &Msg);
     void error(const std::string &Msg);
-    void showError(Error Err);
+    void showError(common::Error Err);
 };
 }

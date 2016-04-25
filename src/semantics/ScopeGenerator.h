@@ -5,27 +5,24 @@
 #include "Visitor.h"
 #include <stack>
 
-using namespace common;
-using namespace codegen;
-
 namespace semantics {
 
-class ScopeGenerator : public Visitor {
+class ScopeGenerator : public common::Visitor {
   public:
-    ScopeGenerator(Scope *Scp);
+    ScopeGenerator(common::Scope *Scp);
 
-    void visit(Program &Node);
+    void visit(common::Program &Node);
 
   private:
-    void visit(Function &Node);
-    void visit(AlgebraicDT &Node);
-    void visit(Product &Node);
+    void visit(common::Function &Node);
+    void visit(common::AlgebraicDT &Node);
+    void visit(common::Product &Node);
 
-    bool isGeneric(Function &);
-    bool isGeneric(AlgebraicDT &);
-    bool isGeneric(Type &);
+    bool isGeneric(common::Function &);
+    bool isGeneric(common::AlgebraicDT &);
+    bool isGeneric(common::Type &);
 
-    Scope *CurScope;
-    AlgebraicDT *CurADT;
+    common::Scope *CurScope;
+    common::AlgebraicDT *CurADT;
 };
 }

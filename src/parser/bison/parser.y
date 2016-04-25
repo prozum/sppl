@@ -1,7 +1,7 @@
 %name-prefix "parser"
 %define "parser_class_name" {Parser}
 %locations
-%define api.location.type {Location}
+%define api.location.type {common::Location}
 %initial-action {
     @$.begin.Src = @$.end.Src = Drv.Source;
 }
@@ -16,13 +16,14 @@
 #include <string>
 #include <vector>
 
-using namespace common;
-using namespace std;
 }
 
 // Parser.cpp
 %{
 #include "Driver.h"
+
+using namespace std;
+using namespace common;
 
 // Connect bison parser to flex scanner
 #undef yylex
@@ -35,24 +36,24 @@ using namespace std;
     long double                         LongDouble;
     bool                                Boolean;
 
-    string *                            Str;
+    std::string *                            Str;
 
-    Declaration *                       Decl;
-    Function *                          Func;
-    AlgebraicDT *                       ADT;
-    Product *                           Prod;
-    Type *                              Ty;
-    Case *                              Cse;
-    Pattern *                           Pat;
-    Expression *                        Expr;
+    common::Declaration *                       Decl;
+    common::Function *                          Func;
+    common::AlgebraicDT *                       ADT;
+    common::Product *                           Prod;
+    common::Type *                              Ty;
+    common::Case *                              Cse;
+    common::Pattern *                           Pat;
+    common::Expression *                        Expr;
 
-    vector<unique_ptr<Declaration>> *   DeclVec;
-    vector<Type> *                      TypeVec;
-    vector<unique_ptr<Case>> *          CaseVec;
-    vector<unique_ptr<Pattern>> *       PatternVec;
-    vector<unique_ptr<LambdaArg>> *     ArgVec;
-    vector<unique_ptr<Expression>> *    ExprVec;
-    vector<unique_ptr<Product>> *       ProdVec;
+    std::vector<std::unique_ptr<common::Declaration>> *   DeclVec;
+    std::vector<common::Type> *                           TypeVec;
+    std::vector<std::unique_ptr<common::Case>> *          CaseVec;
+    std::vector<std::unique_ptr<common::Pattern>> *       PatternVec;
+    std::vector<std::unique_ptr<common::LambdaArg>> *     ArgVec;
+    std::vector<std::unique_ptr<common::Expression>> *    ExprVec;
+    std::vector<std::unique_ptr<common::Product>> *       ProdVec;
 }
 
 %token END 0 "End"

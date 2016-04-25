@@ -2,6 +2,8 @@
 #include "ScopeGenerator.h"
 #include <iostream>
 
+using namespace std;
+using namespace common;
 using namespace semantics;
 
 ScopeGenerator::ScopeGenerator(Scope *Scp) : CurScope(Scp) {}

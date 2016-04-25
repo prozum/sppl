@@ -1,5 +1,6 @@
 #include "Error.h"
 
+using namespace std;
 using namespace common;
 
 Error::Error(std::string Msg) : Msg(Msg), Loc() {}

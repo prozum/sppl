@@ -1,6 +1,7 @@
 #include "UnaryOp.h"
 #include "Visitor.h"
 
+using namespace std;
 using namespace common;
 
 void ParExpr::accept(Visitor &V) { V.visit(*this); }

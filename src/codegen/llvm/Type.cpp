@@ -1,7 +1,8 @@
 #include "LLVMCodeGenerator.h"
 
-using namespace codegen;
+using namespace std;
 using namespace llvm;
+using namespace codegen;
 
 llvm::Type *LLVMCodeGenerator::getType(common::Type Ty, bool Ptr) {
     llvm::Type *new_type;

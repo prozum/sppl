@@ -7,11 +7,8 @@
 #include <ostream>
 #include <string>
 
-using namespace std;
-
 namespace parser {
-
-class CodeGenerator : public Visitor {
+class CodeGenerator : public common::Visitor {
   public:
     Driver &Drv;
 

@@ -8,65 +8,63 @@
 #include <iostream>
 #include <map>
 #include <string>
-
-using namespace common;
+#include <vector>
 
 namespace codegen {
-
 class GasCodeGenerator : public parser::CodeGenerator {
   public:
     GasCodeGenerator(parser::Driver &Drv);
 
-    void visit(Program &Node);
-    void visit(Function &Node);
-    void visit(Case &Node);
-    void visit(Or &Node);
-    void visit(And &Node);
-    void visit(Equal &Node);
-    void visit(NotEqual &Node);
-    void visit(Lesser &Node);
-    void visit(Greater &Node);
-    void visit(LesserEq &Node);
-    void visit(GreaterEq &Node);
-    void visit(Add &Node);
-    void visit(Sub &Node);
-    void visit(Mul &Node);
-    void visit(Div &Node);
-    void visit(Mod &Node);
-    void visit(ListAdd &Node);
-    void visit(ParExpr &Node);
-    void visit(Not &Node);
-    void visit(IntExpr &Node);
-    void visit(FloatExpr &Node);
-    void visit(BoolExpr &Node);
-    void visit(CharExpr &Node);
-    void visit(StringExpr &Node);
-    void visit(ListExpr &Node);
-    void visit(TupleExpr &Node);
-    void visit(ListSplit &Node);
-    void visit(IdExpr &Node);
-    void visit(CallExpr &Node);
-    void visit(Type &Node);
+    void visit(common::Program &Node);
+    void visit(common::Function &Node);
+    void visit(common::Case &Node);
+    void visit(common::Or &Node);
+    void visit(common::And &Node);
+    void visit(common::Equal &Node);
+    void visit(common::NotEqual &Node);
+    void visit(common::Lesser &Node);
+    void visit(common::Greater &Node);
+    void visit(common::LesserEq &Node);
+    void visit(common::GreaterEq &Node);
+    void visit(common::Add &Node);
+    void visit(common::Sub &Node);
+    void visit(common::Mul &Node);
+    void visit(common::Div &Node);
+    void visit(common::Mod &Node);
+    void visit(common::ListAdd &Node);
+    void visit(common::ParExpr &Node);
+    void visit(common::Not &Node);
+    void visit(common::IntExpr &Node);
+    void visit(common::FloatExpr &Node);
+    void visit(common::BoolExpr &Node);
+    void visit(common::CharExpr &Node);
+    void visit(common::StringExpr &Node);
+    void visit(common::ListExpr &Node);
+    void visit(common::TupleExpr &Node);
+    void visit(common::ListSplit &Node);
+    void visit(common::IdExpr &Node);
+    void visit(common::CallExpr &Node);
+    void visit(common::Type &Node);
 
   private:
-    string getType(Type *Ty);
-    string buildSource();
+    std::string getType(common::Type *Ty);
+    std::string buildSource();
 
-    string Func;     // Contains the current function
-    string FuncName; // Contains the name of the current function
+    std::string Func;     // Contains the current function
+    std::string FuncName; // Contains the name of the current function
 
-    vector<string> FuncVector; // Contains all functions that have been read
-    vector<string> FuncGlobl;  // Contains a globl for all functions
+    std::vector<std::string> FuncVector; // Contains all functions that have been read
+    std::vector<std::string> FuncGlobl;  // Contains a globl for all functions
 
     size_t CaseCount = 0; // Used to count the current case
     size_t Cases = 0;     // Number of cases
                           // These may be moved into function later
 
-    std::map<string, string> VarMap;
+    std::map<std::string, std::string> VarMap;
 
     typedef struct {
-        string TypeName;
-        string TypeValue;
+        std::string TypeName;
+        std::string TypeValue;
     } Helper;
 
     Helper Hpr;

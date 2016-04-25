@@ -7,15 +7,15 @@ namespace common {
 
 class BinaryOp : public Expression {
   public:
-    unique_ptr<Expression> Left;
-    unique_ptr<Expression> Right;
+    std::unique_ptr<Expression> Left;
+    std::unique_ptr<Expression> Right;
 
-    BinaryOp(unique_ptr<Expression> Left, unique_ptr<Expression> Right,
+    BinaryOp(std::unique_ptr<Expression> Left, std::unique_ptr<Expression> Right,
              Location Loc);
 
     virtual void accept(Visitor &V) = 0;
 
-    unique_ptr<BinaryOp> clone() const;
+    std::unique_ptr<BinaryOp> clone() const;
 
   private:
     virtual BinaryOp *doClone() const = 0;
@@ -23,12 +23,12 @@ class BinaryOp : public Expression {
 
 class Add : public BinaryOp {
   public:
-    Add(unique_ptr<Expression> Left, unique_ptr<Expression> Right,
+    Add(std::unique_ptr<Expression> Left, std::unique_ptr<Expression> Right,
         Location Loc);
 
     virtual void accept(Visitor &V);
 
-    string str();
+    std::string str();
 
   private:
     virtual BinaryOp *doClone() const;
@@ -36,12 +36,12 @@ class Add : public BinaryOp {
 
 class Sub : public BinaryOp {
   public:
-    Sub(unique_ptr<Expression> Left, unique_ptr<Expression> Right,
+    Sub(std::unique_ptr<Expression> Left, std::unique_ptr<Expression> Right,
         Location Loc);
 
     virtual void accept(Visitor &V);
 
-    string str();
+    std::string str();
 
   private:
     virtual BinaryOp *doClone() const;
@@ -49,12 +49,12 @@ class Sub : public BinaryOp {
 
 class Mul : public BinaryOp {
   public:
-    Mul(unique_ptr<Expression> Left, unique_ptr<Expression> Right,
+    Mul(std::unique_ptr<Expression> Left, std::unique_ptr<Expression> Right,
         Location Loc);
 
     virtual void accept(Visitor &V);
 
-    string str();
+    std::string str();
 
   private:
     virtual BinaryOp *doClone() const;
@@ -62,12 +62,12 @@ class Mul : public BinaryOp {
 
 class Div : public BinaryOp {
   public:
-    Div(unique_ptr<Expression> Left, unique_ptr<Expression> Right,
+    Div(std::unique_ptr<Expression> Left, std::unique_ptr<Expression> Right,
         Location Loc);
 
     virtual void accept(Visitor &v);
 
-    string str();
+    std::string str();
 
   private:
     virtual BinaryOp *doClone() const;
@@ -75,12 +75,12 @@ class Div : public BinaryOp {
 
 class Mod : public BinaryOp {
   public:
-    Mod(unique_ptr<Expression> Left, unique_ptr<Expression> Right,
+    Mod(std::unique_ptr<Expression> Left, std::unique_ptr<Expression> Right,
         Location Loc);
 
     virtual void accept(Visitor &V);
 
-    string str();
+    std::string str();
 
   private:
     virtual BinaryOp *doClone() const;
@@ -88,12 +88,12 @@ class Mod : public BinaryOp {
 
 class ListAdd : public BinaryOp {
   public:
-    ListAdd(unique_ptr<Expression> Left, unique_ptr<Expression> Right,
+    ListAdd(std::unique_ptr<Expression> Left, std::unique_ptr<Expression> Right,
             Location Loc);
 
     virtual void accept(Visitor &V);
 
-    string str();
+    std::string str();
 
   private:
     virtual BinaryOp *doClone() const;
@@ -101,11 +101,11 @@ class ListAdd : public BinaryOp {
 
 class Or : public BinaryOp {
   public:
-    Or(unique_ptr<Expression> Left, unique_ptr<Expression> Right, Location Loc);
+    Or(std::unique_ptr<Expression> Left, std::unique_ptr<Expression> Right, Location Loc);
 
     virtual void accept(Visitor &V);
 
-    string str();
+    std::string str();
 
   private:
     virtual BinaryOp *doClone() const;
@@ -113,12 +113,12 @@ class Or : public BinaryOp {
 
 class And : public BinaryOp {
   public:
-    And(unique_ptr<Expression> Left, unique_ptr<Expression> Right,
+    And(std::unique_ptr<Expression> Left, std::unique_ptr<Expression> Right,
         Location Loc);
 
     virtual void accept(Visitor &V);
 
-    string str();
+    std::string str();
 
   private:
     virtual BinaryOp *doClone() const;
@@ -126,12 +126,12 @@ class And : public BinaryOp {
 
 class Equal : public BinaryOp {
   public:
-    Equal(unique_ptr<Expression> Left, unique_ptr<Expression> Right,
+    Equal(std::unique_ptr<Expression> Left, std::unique_ptr<Expression> Right,
           Location Loc);
 
     virtual void accept(Visitor &V);
 
-    string str();
+    std::string str();
 
   private:
     virtual BinaryOp *doClone() const;
@@ -139,12 +139,12 @@ class Equal : public BinaryOp {
 
 class NotEqual : public BinaryOp {
   public:
-    NotEqual(unique_ptr<Expression> Left, unique_ptr<Expression> Right,
+    NotEqual(std::unique_ptr<Expression> Left, std::unique_ptr<Expression> Right,
              Location Loc);
 
     virtual void accept(Visitor &V);
 
-    string str();
+    std::string str();
 
   private:
     virtual BinaryOp *doClone() const;
@@ -152,12 +152,12 @@ class NotEqual : public BinaryOp {
 
 class Lesser : public BinaryOp {
   public:
-    Lesser(unique_ptr<Expression> Left, unique_ptr<Expression> Right,
+    Lesser(std::unique_ptr<Expression> Left, std::unique_ptr<Expression> Right,
            Location Loc);
 
     virtual void accept(Visitor &V);
 
-    string str();
+    std::string str();
 
   private:
     virtual BinaryOp *doClone() const;
@@ -165,12 +165,12 @@ class Lesser : public BinaryOp {
 
 class Greater : public BinaryOp {
   public:
-    Greater(unique_ptr<Expression> Left, unique_ptr<Expression> Right,
+    Greater(std::unique_ptr<Expression> Left, std::unique_ptr<Expression> Right,
             Location Loc);
 
     virtual void accept(Visitor &V);
 
-    string str();
+    std::string str();
 
   private:
     virtual BinaryOp *doClone() const;
@@ -178,12 +178,12 @@ class Greater : public BinaryOp {
 
 class LesserEq : public BinaryOp {
   public:
-    LesserEq(unique_ptr<Expression> Left, unique_ptr<Expression> Right,
+    LesserEq(std::unique_ptr<Expression> Left, std::unique_ptr<Expression> Right,
              Location Loc);
 
     virtual void accept(Visitor &V);
 
-    string str();
+    std::string str();
 
   private:
     virtual BinaryOp *doClone() const;
@@ -191,12 +191,12 @@ class LesserEq : public BinaryOp {
 
 class GreaterEq : public BinaryOp {
   public:
-    GreaterEq(unique_ptr<Expression> Left, unique_ptr<Expression> Right,
+    GreaterEq(std::unique_ptr<Expression> Left, std::unique_ptr<Expression> Right,
               Location Loc);
 
     virtual void accept(Visitor &V);
 
-    string str();
+    std::string str();
 
   private:
     virtual BinaryOp *doClone() const;
@@ -204,12 +204,12 @@ class GreaterEq : public BinaryOp {
 
 class ProducerConsumer : public BinaryOp {
   public:
-    ProducerConsumer(unique_ptr<Expression> Left, unique_ptr<Expression> Right,
+    ProducerConsumer(std::unique_ptr<Expression> Left, std::unique_ptr<Expression> Right,
                      Location Loc);
 
     virtual void accept(Visitor &V);
 
-    string str();
+    std::string str();
 
   private:
     virtual BinaryOp *doClone() const;
@@ -217,12 +217,12 @@ class ProducerConsumer : public BinaryOp {
 
 class Concat : public BinaryOp {
   public:
-    Concat(unique_ptr<Expression> Left, unique_ptr<Expression> Right,
+    Concat(std::unique_ptr<Expression> Left, std::unique_ptr<Expression> Right,
            Location Loc);
 
     virtual void accept(Visitor &V);
 
-    string str();
+    std::string str();
 
   private:
     virtual BinaryOp *doClone() const;

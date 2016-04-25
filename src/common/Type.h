@@ -6,8 +6,6 @@
 #include <unordered_map>
 #include <vector>
 
-using namespace std;
-
 namespace common {
 
 enum class TypeId {
@@ -27,9 +25,9 @@ enum class TypeId {
 class Type {
   public:
     TypeId Id;
-    vector<Type> Subtypes;
+    std::vector<Type> Subtypes;
     size_t NumSubtypes;
-    string Name;
+    std::string Name;
     Location Loc;
 
     Type();
@@ -39,15 +37,15 @@ class Type {
     Type(TypeId Id, Location Loc);
     Type(TypeId Id, std::vector<Type> Subtypes);
     Type(TypeId Id, std::vector<Type> Subtypes, Location Loc);
-    Type(TypeId Id, std::vector<Type> Subtypes, string Name);
-    Type(TypeId Id, std::vector<Type> Subtypes, string Name, Location Loc);
+    Type(TypeId Id, std::vector<Type> Subtypes, std::string Name);
+    Type(TypeId Id, std::vector<Type> Subtypes, std::string Name, Location Loc);
 
     bool operator==(const Type &Other) const;
     bool operator!=(const Type &Other) const;
     Type operator[](const size_t Index);
 
-    string str();
-    string strJoin(string JoinStr);
+    std::string str();
+    std::string strJoin(std::string JoinStr);
 };
 }
 

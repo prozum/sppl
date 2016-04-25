@@ -3,46 +3,44 @@
 #include "CodeGenerator.h"
 #include <string>
 
-using namespace common;
-
 namespace codegen {
 class HCodeGenerator : public parser::CodeGenerator {
   public:
     HCodeGenerator(parser::Driver &Drv);
 
-    void visit(Program &Node);
-    void visit(Function &Node);
-    void visit(Case &Node);
-    void visit(Or &Node);
-    void visit(And &Node);
-    void visit(Equal &Node);
-    void visit(NotEqual &Node);
-    void visit(Lesser &Node);
-    void visit(Greater &Node);
-    void visit(LesserEq &Node);
-    void visit(GreaterEq &Node);
-    void visit(Add &Node);
-    void visit(Sub &Node);
-    void visit(Mul &Node);
-    void visit(Div &Node);
-    void visit(Mod &Node);
-    void visit(ListAdd &Node);
-    void visit(ParExpr &Node);
-    void visit(Not &Node);
-    void visit(IntExpr &Node);
-    void visit(FloatExpr &Node);
-    void visit(BoolExpr &Node);
-    void visit(CharExpr &Node);
-    void visit(StringExpr &Node);
-    void visit(ListPattern &Node);
-    void visit(TuplePattern &Node);
-    void visit(ListSplit &Node);
-    void visit(IdExpr &Node);
-    void visit(CallExpr &Node);
-    void visit(ListExpr &Node);
-    void visit(TupleExpr &Node);
+    void visit(common::Program &Node);
+    void visit(common::Function &Node);
+    void visit(common::Case &Node);
+    void visit(common::Or &Node);
+    void visit(common::And &Node);
+    void visit(common::Equal &Node);
+    void visit(common::NotEqual &Node);
+    void visit(common::Lesser &Node);
+    void visit(common::Greater &Node);
+    void visit(common::LesserEq &Node);
+    void visit(common::GreaterEq &Node);
+    void visit(common::Add &Node);
+    void visit(common::Sub &Node);
+    void visit(common::Mul &Node);
+    void visit(common::Div &Node);
+    void visit(common::Mod &Node);
+    void visit(common::ListAdd &Node);
+    void visit(common::ParExpr &Node);
+    void visit(common::Not &Node);
+    void visit(common::IntExpr &Node);
+    void visit(common::FloatExpr &Node);
+    void visit(common::BoolExpr &Node);
+    void visit(common::CharExpr &Node);
+    void visit(common::StringExpr &Node);
+    void visit(common::ListPattern &Node);
+    void visit(common::TuplePattern &Node);
+    void visit(common::ListSplit &Node);
+    void visit(common::IdExpr &Node);
+    void visit(common::CallExpr &Node);
+    void visit(common::ListExpr &Node);
+    void visit(common::TupleExpr &Node);
 
   private:
-    Function *CurFunc;
+    common::Function *CurFunc;
 };
 }

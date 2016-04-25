@@ -15,17 +15,13 @@
 #include <iostream>
 #include <unordered_map>
 
-using namespace std;
-using namespace parser;
-using namespace llvm;
-
 namespace codegen {
-class LLVMCodeGenerator : public CodeGenerator {
+class LLVMCodeGenerator : public parser::CodeGenerator {
   public:
     LLVMCodeGenerator(parser::Driver &driver);
 
     llvm::IRBuilder<> Builder;
-    unique_ptr<llvm::Module> Module;
+    std::unique_ptr<llvm::Module> Module;
     std::map<std::string, llvm::Value *> CtxVals;
 
     std::unordered_map<common::Type, llvm::StructType *> TupleTypes;
@@ -40,21 +36,21 @@ class LLVMCodeGenerator : public CodeGenerator {
     llvm::BasicBlock *CurRetBlock;
     llvm::PHINode *CurPhiNode;
 
-    vector<Argument *> Args;
-    vector<Argument *>::const_iterator CurArg;
+    std::vector<llvm::Argument *> Args;
+    std::vector<llvm::Argument *>::const_iterator CurArg;
 
-    vector<unique_ptr<Case>>::const_iterator CurCase;
-    vector<BasicBlock *> CaseBlocks;
-    vector<BasicBlock *>::const_iterator CurCaseBlock;
-    vector<BasicBlock *>::const_iterator LastCaseBlock;
+    std::vector<std::unique_ptr<common::Case>>::const_iterator CurCase;
+    std::vector<llvm::BasicBlock *> CaseBlocks;
+    std::vector<llvm::BasicBlock *>::const_iterator CurCaseBlock;
+    std::vector<llvm::BasicBlock *>::const_iterator LastCaseBlock;
 
-    vector<unique_ptr<Pattern>>::const_iterator CurPat;
-    vector<vector<BasicBlock *>> PatVecBlocks;
-    vector<vector<BasicBlock *>>::const_iterator CurPatVecBlock;
-    vector<BasicBlock *>::const_iterator CurPatBlock;
-    vector<BasicBlock *>::const_iterator LastPatBlock;
+    std::vector<std::unique_ptr<common::Pattern>>::const_iterator CurPat;
+    std::vector<std::vector<llvm::BasicBlock *>> PatVecBlocks;
+    std::vector<std::vector<llvm::BasicBlock *>>::const_iterator CurPatVecBlock;
+    std::vector<llvm::BasicBlock *>::const_iterator CurPatBlock;
+    std::vector<llvm::BasicBlock *>::const_iterator LastPatBlock;
 
-    string ModuleString();
+    std::string ModuleString();
 
     void visit(common::Program &node);
     void visit(common::Function &Node);

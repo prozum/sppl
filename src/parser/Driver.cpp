@@ -2,6 +2,8 @@
 #include "Parser.h"
 #include "Scanner.h"
 
+using namespace std;
+using namespace common;
 using namespace parser;
 
 Driver::Driver(ostream *out, ostream *hout, ostream *mout)

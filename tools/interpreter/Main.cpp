@@ -3,6 +3,7 @@
 
 #include <regex>
 
+using namespace std;
 using namespace jit;
 
 int main(int argc, char *argv[]) {

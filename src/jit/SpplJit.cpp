@@ -1,5 +1,8 @@
 #include "SpplJit.h"
 
+using namespace std;
+using namespace llvm;
+using namespace llvm::orc;
 using namespace jit;
 
 SpplJit::SpplJit()

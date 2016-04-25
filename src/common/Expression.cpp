@@ -1,6 +1,7 @@
 #include "Expression.h"
 #include "Visitor.h"
 
+using namespace std;
 using namespace common;
 
 Expression::Expression(Location Loc) : Node(Loc), RetTy(TypeId::UNKNOWN) {}

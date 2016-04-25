@@ -1,6 +1,6 @@
 #pragma once
-#include "../../semantics/ScopeGenerator.h"
-#include "../../semantics/TypeChecker.h"
+#include "ScopeGenerator.h"
+#include "TypeChecker.h"
 #include "CodeGenerator.h"
 #include "Node.h"
 #include <sstream>
@@ -8,134 +8,130 @@
 #include <unordered_map>
 #include <vector>
 
-using namespace common;
-using namespace std;
-
 namespace codegen {
-
 enum class IdContext { PATTERN, EXPR };
 
-class CCodeGenerator : public CodeGenerator {
+class CCodeGenerator : public parser::CodeGenerator {
   public:
-    CCodeGenerator(Driver &Drv);
-    void visit(Program &Node);
+    CCodeGenerator(parser::Driver &Drv);
+    void visit(common::Program &Node);
 
   private:
-    void visit(Function &Node);
-    //            void visit(AlgebraicDT &Node);
-    //            void visit(Product &Node);
-    void visit(Case &Node);
-    //            void visit(LambdaArg &Node);
-    void visit(Or &Node);
-    void visit(And &Node);
-    void visit(Equal &Node);
-    void visit(NotEqual &Node);
-    void visit(Lesser &Node);
-    void visit(Greater &Node);
-    void visit(LesserEq &Node);
-    void visit(GreaterEq &Node);
-    void visit(Add &Node);
-    void visit(Sub &Node);
-    void visit(Mul &Node);
-    void visit(Div &Node);
-    void visit(Mod &Node);
-    void visit(ListAdd &Node);
-    //            void visit(ProducerConsumer &Node);
-    //            void visit(Concat &Node);
-    //            void visit(To &Node);
-    void visit(ParExpr &Node);
-    void visit(Not &Node);
-    //            void visit(Negative &Node);
-    //            void visit(LambdaFunction &Node);
-    void visit(IdPattern &Node);
-    void visit(IntPattern &Node);
-    void visit(FloatPattern &Node);
-    void visit(CharPattern &Node);
-    //            void visit(BoolPattern &Node);
-    //            void visit(StringPattern &Node);
-    void visit(ListPattern &Node);
-    void visit(TuplePattern &Node);
-    void visit(ListSplit &Node);
-    //            void visit(WildPattern &Node);
-    //            void visit(AlgebraicPattern &Node);
-    //            void visit(ParPattern &Node);
-    //            void visit(IdExpr &Node);
-    //            void visit(IntExpr &Node);
-    //            void visit(FloatExpr &Node);
-    //            void visit(CharExpr &Node);
-    void visit(BoolExpr &Node);
-    void visit(StringExpr &Node);
-    void visit(ListExpr &Node);
-    void visit(TupleExpr &Node);
-    void visit(CallExpr &Node);
-    //            void visit(AlgebraicExpr &Node);
+    void visit(common::Function &Node);
+    void visit(common::AlgebraicDT &Node);
+    void visit(common::Product &Node);
+    void visit(common::Case &Node);
+    void visit(common::LambdaArg &Node);
+    void visit(common::Or &Node);
+    void visit(common::And &Node);
+    void visit(common::Equal &Node);
+    void visit(common::NotEqual &Node);
+    void visit(common::Lesser &Node);
+    void visit(common::Greater &Node);
+    void visit(common::LesserEq &Node);
+    void visit(common::GreaterEq &Node);
+    void visit(common::Add &Node);
+    void visit(common::Sub &Node);
+    void visit(common::Mul &Node);
+    void visit(common::Div &Node);
+    void visit(common::Mod &Node);
+    void visit(common::ListAdd &Node);
+    void visit(common::ProducerConsumer &Node);
+    void visit(common::Concat &Node);
+    void visit(common::To &Node);
+    void visit(common::ParExpr &Node);
+    void visit(common::Not &Node);
+    void visit(common::Negative &Node);
+    void visit(common::LambdaFunction &Node);
+    void visit(common::IdPattern &Node);
+    void visit(common::IntPattern &Node);
+    void visit(common::FloatPattern &Node);
+    void visit(common::CharPattern &Node);
+    void visit(common::BoolPattern &Node);
+    void visit(common::StringPattern &Node);
+    void visit(common::ListPattern &Node);
+    void visit(common::TuplePattern &Node);
+    void visit(common::ListSplit &Node);
+    void visit(common::WildPattern &Node);
+    void visit(common::AlgebraicPattern &Node);
+    void visit(common::ParPattern &Node);
+    void visit(common::IdExpr &Node);
+    void visit(common::IntExpr &Node);
+    void visit(common::FloatExpr &Node);
+    void visit(common::CharExpr &Node);
+    void visit(common::BoolExpr &Node);
+    void visit(common::StringExpr &Node);
+    void visit(common::ListExpr &Node);
+    void visit(common::TupleExpr &Node);
+    void visit(common::CallExpr &Node);
+    void visit(common::AlgebraicExpr &Node);
 
-    const string GGenerated = "generated_";
-    const string GUser = "user_";
-    const string GAdd = "add_";
-    const string GCreate = "create_";
-    const string GCompare = "compare_";
-    const string GConcat = "concat_";
-    const string GPrint = "print_";
-    const string GAt = "at_";
-    const string GValueAt = "valueat_";
-    const string GToString = "tostring_";
-    const string GFloat = "double";
-    const string GInt = "int64_t";
-    const string GChar = "int";
-    const string GBool = "int";
-    const string GString = "string";
-    const string GList = "list";
-    const string GSignature = "signature";
-    const string GTuple = "tuple";
-    const string GNext = "next";
-    const string GValue = "value";
-    const string GEmpty = "empty";
-    const string GSize = "size";
-    const string GItem = "item";
-    const string GArg = "arg";
-    const string GClosure = "closure";
-    const string GGlobal = "global";
-    const string GMain = "main";
+    const std::string GGenerated = "generated_";
+    const std::string GUser = "user_";
+    const std::string GAdd = "add_";
+    const std::string GCreate = "create_";
+    const std::string GCompare = "compare_";
+    const std::string GConcat = "concat_";
+    const std::string GPrint = "print_";
+    const std::string GAt = "at_";
+    const std::string GValueAt = "valueat_";
+    const std::string GToString = "tostd::string_";
+    const std::string GFloat = "double";
+    const std::string GInt = "int64_t";
+    const std::string GChar = "int";
+    const std::string GBool = "int";
+    const std::string GString = "std::string";
+    const std::string GList = "list";
+    const std::string GSignature = "signature";
+    const std::string GTuple = "tuple";
+    const std::string GNext = "next";
+    const std::string GValue = "value";
+    const std::string GEmpty = "empty";
+    const std::string GSize = "size";
+    const std::string GItem = "item";
+    const std::string GArg = "arg";
+    const std::string GClosure = "closure";
+    const std::string GGlobal = "global";
+    const std::string GMain = "main";
 
-    stringstream Buffer;
-    ostream *Output;
-    ostream *Header;
+    std::stringstream Buffer;
+    std::ostream *Output;
+    std::ostream *Header;
 
     int TupleCount = 0;
     int ListCount = 0;
     int SigCount = 0;
     int OobCount = 0;
     int EnvCount = 0;
-    unordered_map<Type, string> Tuples;
-    unordered_map<Type, string> Lists;
-    unordered_map<Type, string> Closures;
-    unordered_map<Type, string> ToStrings;
-    vector<string> ArgNames;
-    vector<string> GetValueBuilder;
-    vector<string> Assignments;
-    vector<int> ListOffsets;
+    std::unordered_map<common::Type, std::string> Tuples;
+    std::unordered_map<common::Type, std::string> Lists;
+    std::unordered_map<common::Type, std::string> Closures;
+    std::unordered_map<common::Type, std::string> ToStrings;
+    std::vector<std::string> ArgNames;
+    std::vector<std::string> GetValueBuilder;
+    std::vector<std::string> Assignments;
+    std::vector<int> ListOffsets;
     IdContext IdCtx;
-    string LastPattern;
-    string StringTypeName;
+    std::string LastPattern;
+    std::string StringTypeName;
 
-    std::stack<stringstream> ExprStack;
+    std::stack<std::stringstream> ExprStack;
 
-    Type StringList;
-    Type RealString;
+    common::Type StringList;
+    common::Type RealString;
 
-    Program *Prog;
-    Function *CurFunc;
+    common::Program *Prog;
+    common::Function *CurFunc;
 
-    string getType(Type &Ty);
-    string generateList(Type &Ty);
-    string generateTuple(Type &Ty);
-    string generateEnvironment(Type &Ty);
-    string getList(Type &Ty);
-    string getTuple(Type &Ty);
-    string getEnvironment(Type &Ty);
+    std::string getType(common::Type &Ty);
+    std::string generateList(common::Type &Ty);
+    std::string generateTuple(common::Type &Ty);
+    std::string generateEnvironment(common::Type &Ty);
+    std::string getList(common::Type &Ty);
+    std::string getTuple(common::Type &Ty);
+    std::string getEnvironment(common::Type &Ty);
     void generateStd();
     void outputBuffer();
-    void outputEqual(Type &Ty, Expression &Left, Expression &Right);
+    void outputEqual(common::Type &Ty, common::Expression &Left, common::Expression &Right);
 };
 }

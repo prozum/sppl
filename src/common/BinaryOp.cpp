@@ -1,6 +1,7 @@
 #include "BinaryOp.h"
 #include "Visitor.h"
 
+using namespace std;
 using namespace common;
 
 void Add::accept(Visitor &V) { V.visit(*this); }

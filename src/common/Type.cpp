@@ -1,7 +1,9 @@
 #include "Type.h"
 #include "Node.h"
 
+using namespace std;
 using namespace common;
+
 
 Type::Type() {}
 

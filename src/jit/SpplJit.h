@@ -24,43 +24,41 @@
 #include <llvm/Support/TargetSelect.h>
 #include <llvm/Transforms/Scalar.h>
 
-using namespace llvm;
-using namespace llvm::orc;
 
 namespace jit {
 class SpplJit {
   public:
     SpplJit();
 
-    int eval(string Str);
+    int eval(std::string Str);
 
     static void initLLVM() {
-        InitializeNativeTarget();
-        InitializeNativeTargetAsmPrinter();
-        InitializeNativeTargetAsmParser();
+        llvm::InitializeNativeTarget();
+        llvm::InitializeNativeTargetAsmPrinter();
+        llvm::InitializeNativeTargetAsmParser();
     }
 
-    typedef ObjectLinkingLayer<> ObjLayerT;
-    typedef IRCompileLayer<ObjLayerT> CompileLayerT;
+    typedef llvm::orc::ObjectLinkingLayer<> ObjLayerT;
+    typedef llvm::orc::IRCompileLayer<ObjLayerT> CompileLayerT;
     typedef CompileLayerT::ModuleSetHandleT ModuleHandleT;
 
     void createModule();
     ModuleHandleT addModule(std::unique_ptr<llvm::Module> M);
     void removeModule(ModuleHandleT Handler);
 
-    JITSymbol findSymbol(const std::string Name);
-    JITSymbol findMangledSymbol(const std::string &Name);
+    llvm::orc::JITSymbol findSymbol(const std::string Name);
+    llvm::orc::JITSymbol findMangledSymbol(const std::string &Name);
     std::string mangle(const std::string &Name);
 
-    string getOutput(intptr_t Data, common::Type Type);
-    string getOutputTuple(intptr_t Addr, vector<common::Type> Subtypes);
+    std::string getOutput(intptr_t Data, common::Type Type);
+    std::string getOutputTuple(intptr_t Addr, std::vector<common::Type> Subtypes);
 
-    std::unique_ptr<TargetMachine> Machine;
-    const DataLayout Layout;
+    std::unique_ptr<llvm::TargetMachine> Machine;
+    const llvm::DataLayout Layout;
     ObjLayerT ObjectLayer;
     CompileLayerT CompileLayer;
 
-    std::unique_ptr<legacy::FunctionPassManager> PassMgr;
+    std::unique_ptr<llvm::legacy::FunctionPassManager> PassMgr;
     std::vector<ModuleHandleT> ModuleHandles;
     ModuleHandleT ModuleHandler;
 

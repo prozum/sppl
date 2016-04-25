@@ -1,7 +1,9 @@
 #include "Pattern.h"
 #include "Visitor.h"
 
+using namespace std;
 using namespace common;
+
 void IntPattern::accept(Visitor &V) { V.visit(*this); }
 void FloatPattern::accept(Visitor &V) { V.visit(*this); }
 void CharPattern::accept(Visitor &V) { V.visit(*this); }

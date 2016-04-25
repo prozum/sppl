@@ -7,8 +7,6 @@
 #include <unordered_map>
 #include <vector>
 
-using namespace std;
-
 #define ANON_FUNC_NAME "__anon_func"
 
 namespace common {
@@ -138,11 +136,11 @@ class Node {
     // virtual Node &operator=(const Node &Other) = 0;
     ~Node() = default;
 
-    unique_ptr<Node> clone() const;
+    std::unique_ptr<Node> clone() const;
 
     virtual void accept(Visitor &V) = 0;
 
-    virtual string str() = 0;
+    virtual std::string str() = 0;
 
   private:
     virtual Node *doClone() const = 0;
@@ -150,17 +148,17 @@ class Node {
 
 class Program : public Node {
   public:
-    vector<unique_ptr<Declaration>> Decls;
+    std::vector<std::unique_ptr<Declaration>> Decls;
 
-    Program(vector<unique_ptr<Declaration>> Decls, Location Loc);
+    Program(std::vector<std::unique_ptr<Declaration>> Decls, Location Loc);
 
-    Program(unique_ptr<Expression> AnonFunc, Location Loc);
+    Program(std::unique_ptr<Expression> AnonFunc, Location Loc);
 
     void accept(Visitor &V);
 
-    string str();
+    std::string str();
 
-    unique_ptr<Program> clone() const;
+    std::unique_ptr<Program> clone() const;
 
   private:
     virtual Program *doClone() const;
@@ -172,7 +170,7 @@ class Declaration : public Node {
   public:
     Declaration(Location Loc);
 
-    unique_ptr<Declaration> clone() const;
+    std::unique_ptr<Declaration> clone() const;
 
   private:
     virtual Declaration *doClone() const = 0;
@@ -180,19 +178,19 @@ class Declaration : public Node {
 
 class Function : public Declaration {
   public:
-    string Id;
+    std::string Id;
     Type Signature;
-    vector<unique_ptr<Case>> Cases;
+    std::vector<std::unique_ptr<Case>> Cases;
     Scope *Scp;
     bool Anon = false;
 
-    Function(unique_ptr<Expression> AnonFunc);
+    Function(std::unique_ptr<Expression> AnonFunc);
 
-    Function(string Id, Type Ty, Location Loc);
+    Function(std::string Id, Type Ty, Location Loc);
 
     void accept(Visitor &V);
 
-    string str();
+    std::string str();
 
   private:
     virtual Function *doClone() const;
@@ -200,18 +198,18 @@ class Function : public Declaration {
 
 class AlgebraicDT : public Declaration {
   public:
-    string Name;
-    vector<Type> TypeConstructor;
-    vector<unique_ptr<Product>> Sum;
+    std::string Name;
+    std::vector<Type> TypeConstructor;
+    std::vector<std::unique_ptr<Product>> Sum;
 
-    AlgebraicDT(string Name, vector<Type> TypeConstructor,
-                vector<unique_ptr<Product>> Sum, Location Loc);
+    AlgebraicDT(std::string Name, std::vector<Type> TypeConstructor,
+                std::vector<std::unique_ptr<Product>> Sum, Location Loc);
 
     void accept(Visitor &V);
 
-    string str();
+    std::string str();
 
-    unique_ptr<AlgebraicDT> clone() const;
+    std::unique_ptr<AlgebraicDT> clone() const;
 
   private:
     virtual AlgebraicDT *doClone() const;
@@ -221,16 +219,16 @@ class Product : public Node {
   public:
     AlgebraicDT *Parent = nullptr;
 
-    string Constructor;
-    vector<Type> Values;
+    std::string Constructor;
+    std::vector<Type> Values;
 
-    Product(string Constructor, vector<Type> Values, Location Loc);
+    Product(std::string Constructor, std::vector<Type> Values, Location Loc);
 
     void accept(Visitor &V);
 
-    string str();
+    std::string str();
 
-    unique_ptr<Product> clone() const;
+    std::unique_ptr<Product> clone() const;
 
   private:
     virtual Product *doClone() const;
@@ -238,19 +236,19 @@ class Product : public Node {
 
 class Case : public Node {
   public:
-    unique_ptr<Expression> Expr;
-    unique_ptr<Expression> When;
-    vector<unique_ptr<Pattern>> Patterns;
+    std::unique_ptr<Expression> Expr;
+    std::unique_ptr<Expression> When;
+    std::vector<std::unique_ptr<Pattern>> Patterns;
     bool TailRec = false;
 
-    Case(unique_ptr<Expression> Expr, unique_ptr<Expression> When,
-         vector<unique_ptr<Pattern>> Patterns, Location Loc);
+    Case(std::unique_ptr<Expression> Expr, std::unique_ptr<Expression> When,
+         std::vector<std::unique_ptr<Pattern>> Patterns, Location Loc);
 
     void accept(Visitor &V);
 
-    string str();
+    std::string str();
 
-    unique_ptr<Case> clone() const;
+    std::unique_ptr<Case> clone() const;
 
   private:
     virtual Case *doClone() const;
@@ -258,20 +256,20 @@ class Case : public Node {
 
 class LambdaArg : public Node {
   public:
-    string Id;
+    std::string Id;
     Scope *Scp;
 
-    LambdaArg(string Id, Location Loc);
+    LambdaArg(std::string Id, Location Loc);
 
     void accept(Visitor &V);
 
-    string str();
+    std::string str();
 
-    unique_ptr<LambdaArg> clone() const;
+    std::unique_ptr<LambdaArg> clone() const;
 
   private:
     virtual LambdaArg *doClone() const;
 };
 
-template <class T> string strJoin(T &List, const std::string JoinStr);
+template <class T> std::string strJoin(T &List, const std::string JoinStr);
 }

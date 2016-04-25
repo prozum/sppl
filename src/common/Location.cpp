@@ -1,5 +1,6 @@
 #include "Location.h"
 
+using namespace std;
 using namespace common;
 
 Location::Location() {}

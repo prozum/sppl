@@ -1,5 +1,6 @@
 #include "LLVMCodeGenerator.h"
 
+using namespace std;
 using namespace llvm;
 using namespace codegen;
 

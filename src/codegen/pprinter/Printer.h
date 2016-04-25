@@ -5,15 +5,11 @@
 
 #include <string>
 
-using namespace std;
-using namespace common;
-using namespace parser;
-
 namespace codegen {
-class Printer : public CodeGenerator {
+class Printer : public parser::CodeGenerator {
   public:
-    Printer(Driver &Drv);
+    Printer(parser::Driver &Drv);
 
-    virtual void visit(Program &Node);
+    virtual void visit(common::Program &Node);
 };
 }

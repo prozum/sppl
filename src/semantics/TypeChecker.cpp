@@ -3,6 +3,7 @@
 #include "Scope.h"
 
 using namespace std;
+using namespace common;
 using namespace semantics;
 
 TypeChecker::TypeChecker(Scope *Scp) : CurScope(Scp), GlobalScope(Scp) {}

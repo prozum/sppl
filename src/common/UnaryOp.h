@@ -7,13 +7,13 @@ namespace common {
 
 class UnaryOp : public Expression {
   public:
-    unique_ptr<Expression> Child;
+    std::unique_ptr<Expression> Child;
 
-    UnaryOp(unique_ptr<Expression> Child, Location Loc);
+    UnaryOp(std::unique_ptr<Expression> Child, Location Loc);
 
     virtual void accept(Visitor &V) = 0;
 
-    unique_ptr<UnaryOp> clone() const;
+    std::unique_ptr<UnaryOp> clone() const;
 
   private:
     virtual UnaryOp *doClone() const = 0;
@@ -21,10 +21,10 @@ class UnaryOp : public Expression {
 
 class ParExpr : public UnaryOp {
   public:
-    ParExpr(unique_ptr<Expression> Child, Location Loc);
+    ParExpr(std::unique_ptr<Expression> Child, Location Loc);
 
     virtual void accept(Visitor &V);
-    string str();
+    std::string str();
 
   private:
     virtual UnaryOp *doClone() const;
@@ -32,10 +32,10 @@ class ParExpr : public UnaryOp {
 
 class Not : public UnaryOp {
   public:
-    Not(unique_ptr<Expression> Child, Location Loc);
+    Not(std::unique_ptr<Expression> Child, Location Loc);
 
     virtual void accept(Visitor &V);
-    string str();
+    std::string str();
 
   private:
     virtual UnaryOp *doClone() const;
@@ -43,10 +43,10 @@ class Not : public UnaryOp {
 
 class Negative : public UnaryOp {
   public:
-    Negative(unique_ptr<Expression> Child, Location Loc);
+    Negative(std::unique_ptr<Expression> Child, Location Loc);
 
     virtual void accept(Visitor &V);
-    string str();
+    std::string str();
 
   private:
     virtual UnaryOp *doClone() const;
@@ -56,14 +56,14 @@ class To : public UnaryOp {
   public:
     Type TypeCast;
 
-    To(unique_ptr<Expression> Child, Type TypeCast, Location Loc);
+    To(std::unique_ptr<Expression> Child, Type TypeCast, Location Loc);
 
     virtual void accept(Visitor &V);
-    string str();
+    std::string str();
 
   private:
     virtual UnaryOp *doClone() const;
 };
 
-template <class T> unique_ptr<Node> const cloneUnaryOp(UnaryOp &Op);
+template <class T> std::unique_ptr<Node> const cloneUnaryOp(UnaryOp &Op);
 }

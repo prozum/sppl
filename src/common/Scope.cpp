@@ -1,6 +1,8 @@
 #include "Scope.h"
 
+using namespace std;
 using namespace common;
+
 Scope::Scope(common::Scope *Scp) : Parent(Scp) {}
 
 bool Scope::tryGetDecl(std::string Id, Type &OutType) {

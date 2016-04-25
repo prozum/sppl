@@ -27,24 +27,21 @@
 #include "LLVMCodeGenerator.h"
 #endif
 
-using namespace parser;
-using namespace common;
-
 namespace compiler {
 
 enum Backend { CPP, GNUASM, HASKELL, LLVM, PPRINTER };
 
-class Compiler : public Driver {
+class Compiler : public parser::Driver {
   public:
     Compiler();
 
-    unique_ptr<CodeGenerator> CodeGen;
+    std::unique_ptr<parser::CodeGenerator> CodeGen;
     semantics::ScopeGenerator ScopeGen;
     semantics::TypeChecker TypeChecker;
     optimizer::GeneralOptimizer Optimizer;
 
-    int compile(const string &Filename);
-    int compile(const vector<string> &Filenames);
+    int compile(const std::string &Filename);
+    int compile(const std::vector<std::string> &Filenames);
 
     void setBackend(Backend B);
 };

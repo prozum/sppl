@@ -9,7 +9,7 @@ class Pattern : public Node {
     Pattern(Type Ty, Location Loc);
 
     virtual void accept(Visitor &V) = 0;
-    unique_ptr<Pattern> clone() const;
+    std::unique_ptr<Pattern> clone() const;
 
   private:
     Pattern *doClone() const = 0;
@@ -17,12 +17,12 @@ class Pattern : public Node {
 
 class IdPattern : public Pattern {
   public:
-    string Val;
+    std::string Val;
 
-    IdPattern(string Val, Location Loc);
+    IdPattern(std::string Val, Location Loc);
 
     virtual void accept(Visitor &V);
-    string str();
+    std::string str();
 
   private:
     Pattern *doClone() const;
@@ -35,7 +35,7 @@ class IntPattern : public Pattern {
     IntPattern(long Val, Location Loc);
 
     virtual void accept(Visitor &V);
-    string str();
+    std::string str();
 
   private:
     Pattern *doClone() const;
@@ -48,7 +48,7 @@ class FloatPattern : public Pattern {
     FloatPattern(double Val, Location Loc);
 
     virtual void accept(Visitor &V);
-    string str();
+    std::string str();
 
   private:
     Pattern *doClone() const;
@@ -61,7 +61,7 @@ class CharPattern : public Pattern {
     CharPattern(char Val, Location Loc);
 
     virtual void accept(Visitor &V);
-    string str();
+    std::string str();
 
   private:
     Pattern *doClone() const;
@@ -74,7 +74,7 @@ class BoolPattern : public Pattern {
     BoolPattern(bool Val, Location Loc);
 
     virtual void accept(Visitor &V);
-    string str();
+    std::string str();
 
   private:
     Pattern *doClone() const;
@@ -82,12 +82,12 @@ class BoolPattern : public Pattern {
 
 class StringPattern : public Pattern {
   public:
-    string Val;
+    std::string Val;
 
-    StringPattern(string Val, Location Loc);
+    StringPattern(std::string Val, Location Loc);
 
     virtual void accept(Visitor &V);
-    string str();
+    std::string str();
 
   private:
     Pattern *doClone() const;
@@ -95,12 +95,12 @@ class StringPattern : public Pattern {
 
 class ListPattern : public Pattern {
   public:
-    vector<unique_ptr<Pattern>> Patterns;
+    std::vector<std::unique_ptr<Pattern>> Patterns;
 
-    ListPattern(vector<unique_ptr<Pattern>> Patterns, Location Loc);
+    ListPattern(std::vector<std::unique_ptr<Pattern>> Patterns, Location Loc);
 
     virtual void accept(Visitor &V);
-    string str();
+    std::string str();
 
   private:
     Pattern *doClone() const;
@@ -108,12 +108,12 @@ class ListPattern : public Pattern {
 
 class TuplePattern : public Pattern {
   public:
-    vector<unique_ptr<Pattern>> Patterns;
+    std::vector<std::unique_ptr<Pattern>> Patterns;
 
-    TuplePattern(vector<unique_ptr<Pattern>> Patterns, Location Loc);
+    TuplePattern(std::vector<std::unique_ptr<Pattern>> Patterns, Location Loc);
 
     virtual void accept(Visitor &V);
-    string str();
+    std::string str();
 
   private:
     Pattern *doClone() const;
@@ -124,7 +124,7 @@ class WildPattern : public Pattern {
     WildPattern(Location Loc);
 
     virtual void accept(Visitor &V);
-    string str();
+    std::string str();
 
   private:
     Pattern *doClone() const;
@@ -132,13 +132,13 @@ class WildPattern : public Pattern {
 
 class ListSplit : public Pattern {
   public:
-    unique_ptr<Pattern> Left;
-    unique_ptr<Pattern> Right;
+    std::unique_ptr<Pattern> Left;
+    std::unique_ptr<Pattern> Right;
 
-    ListSplit(unique_ptr<Pattern>, unique_ptr<Pattern> Patterns, Location Loc);
+    ListSplit(std::unique_ptr<Pattern>, std::unique_ptr<Pattern> Patterns, Location Loc);
 
     virtual void accept(Visitor &V);
-    string str();
+    std::string str();
 
   private:
     Pattern *doClone() const;
@@ -146,14 +146,14 @@ class ListSplit : public Pattern {
 
 class AlgebraicPattern : public Pattern {
   public:
-    string Constructor;
-    vector<unique_ptr<Pattern>> Patterns;
+    std::string Constructor;
+    std::vector<std::unique_ptr<Pattern>> Patterns;
 
-    AlgebraicPattern(string Constructor, vector<unique_ptr<Pattern>> Patterns,
+    AlgebraicPattern(std::string Constructor, std::vector<std::unique_ptr<Pattern>> Patterns,
                      Location Loc);
 
     virtual void accept(Visitor &V);
-    string str();
+    std::string str();
 
   private:
     Pattern *doClone() const;
@@ -161,12 +161,12 @@ class AlgebraicPattern : public Pattern {
 
 class ParPattern : public Pattern {
   public:
-    unique_ptr<Pattern> Pat;
+    std::unique_ptr<Pattern> Pat;
 
-    ParPattern(unique_ptr<Pattern> Pat, Location Loc);
+    ParPattern(std::unique_ptr<Pattern> Pat, Location Loc);
 
     virtual void accept(Visitor &V);
-    string str();
+    std::string str();
 
   private:
     Pattern *doClone() const;
