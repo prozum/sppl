@@ -7,7 +7,8 @@ namespace jit {
             Layout(Machine->createDataLayout()),
             CompileLayer(ObjectLayer, SimpleCompiler(*Machine)),
             CodeGen(Drv),
-            ScopeGen(&Drv.Global)
+            ScopeGen(&Drv.Global),
+            TypeChecker(&Drv.Global)
     {
         llvm::sys::DynamicLibrary::LoadLibraryPermanently(nullptr);
         createModule();
