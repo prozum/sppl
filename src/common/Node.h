@@ -1,11 +1,11 @@
 #pragma once
-#include "Type.h"
 #include "Location.h"
+#include "Type.h"
 
-#include <vector>
-#include <unordered_map>
-#include <string>
 #include <memory>
+#include <string>
+#include <unordered_map>
+#include <vector>
 
 using namespace std;
 
@@ -13,187 +13,194 @@ using namespace std;
 
 namespace common {
 
-	// Forward declarations
-	class Node;
-	class Expression;
-	class Declaration;
-	class BinaryOp;
-	class UnaryOp;
-	class Type;
-	class Pattern;
-	class Program;
-	class Function;
-	class AlgebraicDT;
-	class Product;
-	class Case;
-	class LambdaArg;
-	class Or;
-	class And;
-	class Equal;
-	class NotEqual;
-	class Lesser;
-	class Greater;
-	class LesserEq;
-	class GreaterEq;
-	class Add;
-	class Sub;
-	class Mul;
-	class Div;
-	class Mod;
-	class ListAdd;
-	class ParExpr;
-	class Not;
-	class Negative;
-	class ProducerConsumer;
-	class Concat;
-	class LambdaFunction;
-	class IntPattern;
-	class FloatPattern;
-	class CharPattern;
-	class BoolPattern;
-	class StringPattern;
-	class ListPattern;
-	class TuplePattern;
-	class ListSplit;
-	class WildPattern;
-	class AlgebraicPattern;
-	class ParPattern;
-	class IntExpr;
-	class FloatExpr;
-	class CharExpr;
-	class BoolExpr;
-	class StringExpr;
-	class ListExpr;
-	class TupleExpr;
-	class IdPattern;
-	class CallExpr;
-	class AlgebraicExpr;
-	class Visitor;
-	class Scope;
+// Forward declarations
+class Node;
+class Expression;
+class Declaration;
+class BinaryOp;
+class UnaryOp;
+class Type;
+class Pattern;
+class Program;
+class Function;
+class AlgebraicDT;
+class Product;
+class Case;
+class LambdaArg;
+class Or;
+class And;
+class Equal;
+class NotEqual;
+class Lesser;
+class Greater;
+class LesserEq;
+class GreaterEq;
+class Add;
+class Sub;
+class Mul;
+class Div;
+class Mod;
+class ListAdd;
+class ParExpr;
+class Not;
+class Negative;
+class ProducerConsumer;
+class Concat;
+class LambdaFunction;
+class IntPattern;
+class FloatPattern;
+class CharPattern;
+class BoolPattern;
+class StringPattern;
+class ListPattern;
+class TuplePattern;
+class ListSplit;
+class WildPattern;
+class AlgebraicPattern;
+class ParPattern;
+class IntExpr;
+class FloatExpr;
+class CharExpr;
+class BoolExpr;
+class StringExpr;
+class ListExpr;
+class TupleExpr;
+class IdPattern;
+class CallExpr;
+class AlgebraicExpr;
+class Visitor;
+class Scope;
 
-	// Abstract Nodes
-	class Node {
-	public:
-		Location Loc;
+// Abstract Nodes
+class Node {
+  public:
+    Location Loc;
 
-		Node(Location Loc);
-		Node(const Node &Other);
-		//virtual Node &operator=(const Node &Other) = 0;
-        ~Node() = default;
-		unique_ptr<Node> clone() const;
+    Node(Location Loc);
+    Node(const Node &Other);
+    // virtual Node &operator=(const Node &Other) = 0;
+    ~Node() = default;
+    unique_ptr<Node> clone() const;
 
-		virtual void accept(Visitor &V) = 0;
-		virtual string str() = 0;
-	private:
-		virtual Node *doClone() const = 0;
-	};
+    virtual void accept(Visitor &V) = 0;
+    virtual string str() = 0;
 
-	class Program : public Node {
-	public:
-		vector<unique_ptr<Declaration>> Decls;
+  private:
+    virtual Node *doClone() const = 0;
+};
 
-		Program(vector<unique_ptr<Declaration>> Decls, Location Loc);
-		Program(unique_ptr<Expression> AnonFunc, Location Loc);
+class Program : public Node {
+  public:
+    vector<unique_ptr<Declaration>> Decls;
 
-		void accept(Visitor &V);
-		string str();
+    Program(vector<unique_ptr<Declaration>> Decls, Location Loc);
+    Program(unique_ptr<Expression> AnonFunc, Location Loc);
 
-		unique_ptr<Program> clone() const;
-	private:
-		virtual Program* doClone() const;
-	};
+    void accept(Visitor &V);
+    string str();
 
-	/* Declaration */
+    unique_ptr<Program> clone() const;
 
-	class Declaration : public Node {
-	public:
-		Declaration(Location Loc);
+  private:
+    virtual Program *doClone() const;
+};
 
-		unique_ptr<Declaration> clone() const;
-	private:
-		virtual Declaration* doClone() const = 0;
-	};
+/* Declaration */
 
-	class Function : public Declaration {
-	public:
-		string Id;
-		Type Signature;
-        vector<unique_ptr<Case>> Cases;
-		Scope* Scp;
-		bool Anon = false;
+class Declaration : public Node {
+  public:
+    Declaration(Location Loc);
 
-		Function(unique_ptr<Expression> AnonFunc);
-		Function(string Id, Type Ty, Location Loc);
+    unique_ptr<Declaration> clone() const;
 
-		void accept(Visitor &V);
-		string str();
-	private:
-		virtual Function* doClone() const;
-	};
+  private:
+    virtual Declaration *doClone() const = 0;
+};
 
-	class AlgebraicDT : public Declaration {
-	public:
-		string Name;
-		vector<Type> TypeConstructor;
-		vector<unique_ptr<Product>> Sum;
+class Function : public Declaration {
+  public:
+    string Id;
+    Type Signature;
+    vector<unique_ptr<Case>> Cases;
+    Scope *Scp;
+    bool Anon = false;
 
-		AlgebraicDT(string Name, vector<Type> TypeConstructor, vector<unique_ptr<Product>> Sum, Location Loc);
+    Function(unique_ptr<Expression> AnonFunc);
+    Function(string Id, Type Ty, Location Loc);
 
-		void accept(Visitor &V);
-		string str();
-		unique_ptr<AlgebraicDT> clone() const;
-	private:
-		virtual AlgebraicDT* doClone() const;
-	};
+    void accept(Visitor &V);
+    string str();
 
-	class Product : public Node {
-	public:
-		AlgebraicDT *Parent = nullptr;
+  private:
+    virtual Function *doClone() const;
+};
 
-		string Constructor;
-		vector<Type> Values;
+class AlgebraicDT : public Declaration {
+  public:
+    string Name;
+    vector<Type> TypeConstructor;
+    vector<unique_ptr<Product>> Sum;
 
-		Product(string Constructor, vector<Type> Values, Location Loc);
+    AlgebraicDT(string Name, vector<Type> TypeConstructor,
+                vector<unique_ptr<Product>> Sum, Location Loc);
 
-		void accept(Visitor &V);
-		string str();
-		unique_ptr<Product> clone() const;
-	private:
-		virtual Product* doClone() const;
-	};
+    void accept(Visitor &V);
+    string str();
+    unique_ptr<AlgebraicDT> clone() const;
 
-	class Case : public Node {
-	public:
-		unique_ptr<Expression> Expr;
-		unique_ptr<Expression> When;
-		vector<unique_ptr<Pattern>> Patterns;
-		bool TailRec = false;
+  private:
+    virtual AlgebraicDT *doClone() const;
+};
 
-		Case(unique_ptr<Expression> Expr, unique_ptr<Expression> When, vector<unique_ptr<Pattern>> Patterns, Location Loc);
+class Product : public Node {
+  public:
+    AlgebraicDT *Parent = nullptr;
 
-		void accept(Visitor &V);
-		string str();
-		unique_ptr<Case> clone() const;
-	private:
-		virtual Case* doClone() const;
-	};
+    string Constructor;
+    vector<Type> Values;
 
-	class LambdaArg : public Node {
-	public:
-		string Id;
-		Scope* Scp;
+    Product(string Constructor, vector<Type> Values, Location Loc);
 
-		LambdaArg(string Id, Location Loc);
+    void accept(Visitor &V);
+    string str();
+    unique_ptr<Product> clone() const;
 
-		void accept(Visitor &V);
-		string str();
-		unique_ptr<LambdaArg> clone() const;
-	private:
-		virtual LambdaArg* doClone() const;
-	};
+  private:
+    virtual Product *doClone() const;
+};
 
-	template<class T>
-	string strJoin(T &List, const std::string JoinStr);
+class Case : public Node {
+  public:
+    unique_ptr<Expression> Expr;
+    unique_ptr<Expression> When;
+    vector<unique_ptr<Pattern>> Patterns;
+    bool TailRec = false;
+
+    Case(unique_ptr<Expression> Expr, unique_ptr<Expression> When,
+         vector<unique_ptr<Pattern>> Patterns, Location Loc);
+
+    void accept(Visitor &V);
+    string str();
+    unique_ptr<Case> clone() const;
+
+  private:
+    virtual Case *doClone() const;
+};
+
+class LambdaArg : public Node {
+  public:
+    string Id;
+    Scope *Scp;
+
+    LambdaArg(string Id, Location Loc);
+
+    void accept(Visitor &V);
+    string str();
+    unique_ptr<LambdaArg> clone() const;
+
+  private:
+    virtual LambdaArg *doClone() const;
+};
+
+template <class T> string strJoin(T &List, const std::string JoinStr);
 }
-
-

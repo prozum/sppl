@@ -5,64 +5,65 @@
 
 namespace common {
 
-	class UnaryOp : public Expression {
-	public:
-		unique_ptr<Expression> Child;
+class UnaryOp : public Expression {
+  public:
+    unique_ptr<Expression> Child;
 
-		UnaryOp(unique_ptr<Expression> Child, Location Loc);
+    UnaryOp(unique_ptr<Expression> Child, Location Loc);
 
-		virtual void accept(Visitor &V) = 0;
+    virtual void accept(Visitor &V) = 0;
 
-		unique_ptr<UnaryOp> clone() const;
-	private:
-		virtual UnaryOp *doClone() const = 0;
-	};
+    unique_ptr<UnaryOp> clone() const;
 
-	class ParExpr : public UnaryOp {
-	public:
-		ParExpr(unique_ptr<Expression> Child, Location Loc);
+  private:
+    virtual UnaryOp *doClone() const = 0;
+};
 
-		virtual void accept(Visitor &V);
-		string str();
+class ParExpr : public UnaryOp {
+  public:
+    ParExpr(unique_ptr<Expression> Child, Location Loc);
 
-	private:
-		virtual UnaryOp *doClone() const;
-	};
+    virtual void accept(Visitor &V);
+    string str();
 
-	class Not : public UnaryOp {
-	public:
+  private:
+    virtual UnaryOp *doClone() const;
+};
 
-		Not(unique_ptr<Expression> Child, Location Loc);
+class Not : public UnaryOp {
+  public:
+    Not(unique_ptr<Expression> Child, Location Loc);
 
-		virtual void accept(Visitor &V);
-		string str();
-	private:
-		virtual UnaryOp *doClone() const;
-	};
+    virtual void accept(Visitor &V);
+    string str();
 
-	class Negative : public UnaryOp {
-	public:
+  private:
+    virtual UnaryOp *doClone() const;
+};
 
-		Negative(unique_ptr<Expression> Child, Location Loc);
+class Negative : public UnaryOp {
+  public:
+    Negative(unique_ptr<Expression> Child, Location Loc);
 
-		virtual void accept(Visitor &V);
-		string str();
-	private:
-		virtual UnaryOp *doClone() const;
-	};
+    virtual void accept(Visitor &V);
+    string str();
 
-	class To : public UnaryOp {
-	public:
-		Type TypeCast;
+  private:
+    virtual UnaryOp *doClone() const;
+};
 
-		To(unique_ptr<Expression> Child, Type TypeCast, Location Loc);
+class To : public UnaryOp {
+  public:
+    Type TypeCast;
 
-		virtual void accept(Visitor &V);
-		string str();
-	private:
-		virtual UnaryOp *doClone() const;
-	};
+    To(unique_ptr<Expression> Child, Type TypeCast, Location Loc);
 
-	template<class T>
-	unique_ptr<Node> const cloneUnaryOp(UnaryOp& Op);
+    virtual void accept(Visitor &V);
+    string str();
+
+  private:
+    virtual UnaryOp *doClone() const;
+};
+
+template <class T> unique_ptr<Node> const cloneUnaryOp(UnaryOp &Op);
 }

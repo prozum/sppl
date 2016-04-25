@@ -1,14 +1,14 @@
 #pragma once
 
-#include "Driver.h"
 #include "CodeGenerator.h"
-#include "TypeChecker.h"
-#include "ScopeGenerator.h"
+#include "Driver.h"
 #include "GeneralOptimizer.h"
+#include "ScopeGenerator.h"
+#include "TypeChecker.h"
 
+#include <fstream>
 #include <iostream>
 #include <memory>
-#include <fstream>
 
 #ifdef CCPP
 #include "CppCodeGenerator.h"
@@ -27,34 +27,25 @@
 #include "LLVMCodeGenerator.h"
 #endif
 
-
 using namespace parser;
 using namespace common;
 
 namespace compiler {
 
-    enum Backend
-    {
-        CPP,
-        GNUASM,
-        HASKELL,
-        LLVM,
-        PPRINTER
-    };
+enum Backend { CPP, GNUASM, HASKELL, LLVM, PPRINTER };
 
-    class Compiler : public Driver {
-    public:
-        Compiler();
+class Compiler : public Driver {
+  public:
+    Compiler();
 
-        unique_ptr<CodeGenerator> CodeGen;
-        semantics::ScopeGenerator ScopeGen;
-        semantics::TypeChecker TypeChecker;
-        optimizer::GeneralOptimizer Optimizer;
+    unique_ptr<CodeGenerator> CodeGen;
+    semantics::ScopeGenerator ScopeGen;
+    semantics::TypeChecker TypeChecker;
+    optimizer::GeneralOptimizer Optimizer;
 
-        int compile(const string &Filename);
-        int compile(const vector<string> &Filenames);
+    int compile(const string &Filename);
+    int compile(const vector<string> &Filenames);
 
-        void setBackend(Backend B);
-    };
-
+    void setBackend(Backend B);
+};
 }

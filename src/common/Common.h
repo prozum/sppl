@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Node.h"
-#include "Expression.h"
-#include "UnaryOp.h"
 #include "BinaryOp.h"
+#include "Expression.h"
+#include "Node.h"
 #include "Pattern.h"
+#include "UnaryOp.h"

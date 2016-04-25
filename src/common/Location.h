@@ -1,37 +1,37 @@
 #pragma once
 
-#include <string>
-#include <ostream>
 #include <memory>
+#include <ostream>
+#include <string>
 
 using namespace std;
 
 namespace common {
 
-	struct Position {
-		Position() = default;
-		Position(unsigned Line, unsigned Column, string Src) :
-			Line(Line), Column(Column), Src(Src) { }
+struct Position {
+    Position() = default;
+    Position(unsigned Line, unsigned Column, string Src)
+        : Line(Line), Column(Column), Src(Src) {}
 
-		unsigned Line = 1;
-		unsigned Column = 1;
-		string Src;
-	};
+    unsigned Line = 1;
+    unsigned Column = 1;
+    string Src;
+};
 
-	class Location {
-	public:
-		Location();
-		Location(unsigned Line, unsigned Column, string Src);
-		Location(const Location &Other);
+class Location {
+  public:
+    Location();
+    Location(unsigned Line, unsigned Column, string Src);
+    Location(const Location &Other);
 
-		void step();
-		void columns(unsigned Count = 1);
-		void lines(unsigned Count = 1);
-		void sources(string Src);
+    void step();
+    void columns(unsigned Count = 1);
+    void lines(unsigned Count = 1);
+    void sources(string Src);
 
-		Position begin;
-		Position end;
-	};
+    Position begin;
+    Position end;
+};
 
-	ostream &operator<<(ostream &Out, const Location &Loc);
+ostream &operator<<(ostream &Out, const Location &Loc);
 }

@@ -4,9 +4,9 @@ using namespace llvm;
 using namespace codegen;
 
 LLVMCodeGenerator::LLVMCodeGenerator(parser::Driver &driver)
-        : CodeGenerator(driver),
-          Builder(getGlobalContext()),
-          Module(std::make_unique<llvm::Module>("SpplModule", getGlobalContext())) {}
+    : CodeGenerator(driver), Builder(getGlobalContext()),
+      Module(std::make_unique<llvm::Module>("SpplModule", getGlobalContext())) {
+}
 
 void LLVMCodeGenerator::visit(common::Program &node) {
     for (auto &func : node.Decls) {

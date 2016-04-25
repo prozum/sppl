@@ -5,12 +5,10 @@
 
 #ifndef YY_DECL
 
-#define YY_DECL                                        \
-    parser::Parser::token_type                         \
-    parser::Scanner::lex(                              \
-        parser::Parser::semantic_type* yylval,         \
-        parser::Parser::location_type* yylloc          \
-    )
+#define YY_DECL                                                                \
+    parser::Parser::token_type parser::Scanner::lex(                           \
+        parser::Parser::semantic_type *yylval,                                 \
+        parser::Parser::location_type *yylloc)
 #endif
 
 #ifndef __FLEX_LEXER_H
@@ -23,23 +21,21 @@
 
 namespace parser {
 
-    class Driver;
+class Driver;
 
-    class Scanner : public SpplFlexLexer
-    {
-    public:
-        bool NewSource;
-        Driver &Drv;
+class Scanner : public SpplFlexLexer {
+  public:
+    bool NewSource;
+    Driver &Drv;
 
-        Scanner(Driver &driver);
-        virtual ~Scanner();
+    Scanner(Driver &driver);
+    virtual ~Scanner();
 
-        virtual Parser::token_type lex(
-                Parser::semantic_type* yylval,
-                Parser::location_type* yylloc);
+    virtual Parser::token_type lex(Parser::semantic_type *yylval,
+                                   Parser::location_type *yylloc);
 
-        int yywrap();
+    int yywrap();
 
-        void set_debug(bool b);
-    };
+    void set_debug(bool b);
+};
 }

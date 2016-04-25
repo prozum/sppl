@@ -3,158 +3,172 @@
 #include "Node.h"
 
 namespace common {
-	class Pattern : public Node {
-	public:
-		Type RetTy;
-		Pattern(Type Ty, Location Loc);
+class Pattern : public Node {
+  public:
+    Type RetTy;
+    Pattern(Type Ty, Location Loc);
 
-		virtual void accept(Visitor &V) = 0;
-		unique_ptr<Pattern> clone() const;
-	private:
-		Pattern *doClone() const = 0;
-	};
+    virtual void accept(Visitor &V) = 0;
+    unique_ptr<Pattern> clone() const;
 
-	class IdPattern : public Pattern {
-	public:
-		string Val;
+  private:
+    Pattern *doClone() const = 0;
+};
 
-		IdPattern(string Val, Location Loc);
+class IdPattern : public Pattern {
+  public:
+    string Val;
 
-		virtual void accept(Visitor &V);
-		string str();
-	private:
-		Pattern *doClone() const;
-	};
+    IdPattern(string Val, Location Loc);
 
-	class IntPattern : public Pattern {
-	public:
-		long Val;
+    virtual void accept(Visitor &V);
+    string str();
 
-		IntPattern(long Val, Location Loc);
+  private:
+    Pattern *doClone() const;
+};
 
-		virtual void accept(Visitor &V);
-		string str();
-	private:
-		Pattern *doClone() const;
-	};
+class IntPattern : public Pattern {
+  public:
+    long Val;
 
-	class FloatPattern : public Pattern {
-	public:
-		double Val;
+    IntPattern(long Val, Location Loc);
 
-		FloatPattern(double Val, Location Loc);
+    virtual void accept(Visitor &V);
+    string str();
 
-		virtual void accept(Visitor &V);
-		string str();
-	private:
-		Pattern *doClone() const;
-	};
+  private:
+    Pattern *doClone() const;
+};
 
-	class CharPattern : public Pattern {
-	public:
-		char Val;
+class FloatPattern : public Pattern {
+  public:
+    double Val;
 
-		CharPattern(char Val, Location Loc);
+    FloatPattern(double Val, Location Loc);
 
-		virtual void accept(Visitor &V);
-		string str();
-	private:
-		Pattern *doClone() const;
-	};
+    virtual void accept(Visitor &V);
+    string str();
 
-	class BoolPattern : public Pattern {
-	public:
-		bool Val;
+  private:
+    Pattern *doClone() const;
+};
 
-		BoolPattern(bool Val, Location Loc);
+class CharPattern : public Pattern {
+  public:
+    char Val;
 
-		virtual void accept(Visitor &V);
-		string str();
-	private:
-		Pattern *doClone() const;
-	};
+    CharPattern(char Val, Location Loc);
 
-	class StringPattern : public Pattern {
-	public:
-		string Val;
+    virtual void accept(Visitor &V);
+    string str();
 
-		StringPattern(string Val, Location Loc);
+  private:
+    Pattern *doClone() const;
+};
 
-		virtual void accept(Visitor &V);
-		string str();
-	private:
-		Pattern *doClone() const;
-	};
+class BoolPattern : public Pattern {
+  public:
+    bool Val;
 
-	class ListPattern : public Pattern {
-	public:
-		vector<unique_ptr<Pattern>> Patterns;
+    BoolPattern(bool Val, Location Loc);
 
-		ListPattern(vector<unique_ptr<Pattern>> Patterns, Location Loc);
+    virtual void accept(Visitor &V);
+    string str();
 
-		virtual void accept(Visitor &V);
-		string str();
-	private:
-		Pattern *doClone() const;
-	};
+  private:
+    Pattern *doClone() const;
+};
 
-	class TuplePattern : public Pattern {
-	public:
-		vector<unique_ptr<Pattern>> Patterns;
+class StringPattern : public Pattern {
+  public:
+    string Val;
 
-		TuplePattern(vector<unique_ptr<Pattern>> Patterns, Location Loc);
+    StringPattern(string Val, Location Loc);
 
-		virtual void accept(Visitor &V);
-		string str();
-	private:
-		Pattern *doClone() const;
-	};
+    virtual void accept(Visitor &V);
+    string str();
 
-	class WildPattern : public Pattern {
-	public:
-		WildPattern(Location Loc);
+  private:
+    Pattern *doClone() const;
+};
 
-		virtual void accept(Visitor &V);
-		string str();
-	private:
-		Pattern *doClone() const;
-	};
+class ListPattern : public Pattern {
+  public:
+    vector<unique_ptr<Pattern>> Patterns;
 
-	class ListSplit : public Pattern {
-	public:
-		unique_ptr<Pattern> Left;
-		unique_ptr<Pattern> Right;
+    ListPattern(vector<unique_ptr<Pattern>> Patterns, Location Loc);
 
-		ListSplit(unique_ptr<Pattern>, unique_ptr<Pattern> Patterns, Location Loc);
+    virtual void accept(Visitor &V);
+    string str();
 
-		virtual void accept(Visitor &V);
-		string str();
-	private:
-		Pattern *doClone() const;
-	};
+  private:
+    Pattern *doClone() const;
+};
 
-	class AlgebraicPattern : public Pattern {
-	public:
-		string Constructor;
-		vector<unique_ptr<Pattern>> Patterns;
+class TuplePattern : public Pattern {
+  public:
+    vector<unique_ptr<Pattern>> Patterns;
 
-		AlgebraicPattern(string Constructor, vector<unique_ptr<Pattern>> Patterns, Location Loc);
+    TuplePattern(vector<unique_ptr<Pattern>> Patterns, Location Loc);
 
-		virtual void accept(Visitor &V);
-		string str();
-	private:
-		Pattern *doClone() const;
-	};
+    virtual void accept(Visitor &V);
+    string str();
 
-	class ParPattern : public Pattern {
-	public:
-		unique_ptr<Pattern> Pat;
+  private:
+    Pattern *doClone() const;
+};
 
-		ParPattern(unique_ptr<Pattern> Pat, Location Loc);
+class WildPattern : public Pattern {
+  public:
+    WildPattern(Location Loc);
 
-		virtual void accept(Visitor &V);
-		string str();
-	private:
-		Pattern *doClone() const;
-	};
+    virtual void accept(Visitor &V);
+    string str();
+
+  private:
+    Pattern *doClone() const;
+};
+
+class ListSplit : public Pattern {
+  public:
+    unique_ptr<Pattern> Left;
+    unique_ptr<Pattern> Right;
+
+    ListSplit(unique_ptr<Pattern>, unique_ptr<Pattern> Patterns, Location Loc);
+
+    virtual void accept(Visitor &V);
+    string str();
+
+  private:
+    Pattern *doClone() const;
+};
+
+class AlgebraicPattern : public Pattern {
+  public:
+    string Constructor;
+    vector<unique_ptr<Pattern>> Patterns;
+
+    AlgebraicPattern(string Constructor, vector<unique_ptr<Pattern>> Patterns,
+                     Location Loc);
+
+    virtual void accept(Visitor &V);
+    string str();
+
+  private:
+    Pattern *doClone() const;
+};
+
+class ParPattern : public Pattern {
+  public:
+    unique_ptr<Pattern> Pat;
+
+    ParPattern(unique_ptr<Pattern> Pat, Location Loc);
+
+    virtual void accept(Visitor &V);
+    string str();
+
+  private:
+    Pattern *doClone() const;
+};
 }
