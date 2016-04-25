@@ -39,21 +39,14 @@ void fun3 (task_t *t) {
     taskadd(task1);
     taskadd(task2);
 
-    printf("added tasks\n");
-
     taskyield(task);
 
     arg->res = arg1->res + arg2->res;
 
     printf("res: %d\n", arg->res);
 
-    /*
-    free(task->sub_tasks);
-    free(arg1);
-    free(arg2);
-    free(task1);
-    free(task2);
-    */
+    taskdealloc(task1);
+    taskdealloc(task2);
 
     taskexit(task);
 }
@@ -64,7 +57,9 @@ int main() {
 
     task_t *task = taskcreate((void *)&fun3, arg, 2);
 
-    rmain(2, task);
+    rmain(4, task);
+
+    taskdealloc(task);
 
     return 0;
 }

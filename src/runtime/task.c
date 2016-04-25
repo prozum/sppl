@@ -1,6 +1,6 @@
 #include "task.h"
 
-uint        placeholder_stack_size = 256 * 2048;
+uint placeholder_stack_size = 256 * 1024;
 
 task_t*
 taskalloc(void (*fn)(void*), void *arg, uint stack, uint sub_tasks)
@@ -10,7 +10,6 @@ taskalloc(void (*fn)(void*), void *arg, uint stack, uint sub_tasks)
     t = malloc(sizeof(*t));
 
 	t->stk = (uchar*)(t+1);
-	t->stksize = stack;
 	t->startfn = fn;
 	t->startarg = arg;
 	t->sub_task_len = sub_tasks;
@@ -24,6 +23,7 @@ taskalloc(void (*fn)(void*), void *arg, uint stack, uint sub_tasks)
 
     getcontext(&t->context.uc);
 
+    // allocate stack and all the shazzlebang for the task
     t->context.uc.uc_link = 0;
     t->context.uc.uc_stack.ss_sp = malloc(stack);
     t->context.uc.uc_stack.ss_size = stack;
@@ -32,6 +32,15 @@ taskalloc(void (*fn)(void*), void *arg, uint stack, uint sub_tasks)
 	makecontext(&t->context.uc, (void *)t->startfn, 1, t);
 
 	return t;
+}
+
+void
+taskdealloc(task_t *t)
+{
+	free(t->context.uc.uc_stack.ss_sp);
+    free(t->sub_tasks);
+	free(t->startarg);
+	free(t);
 }
 
 task_t *
