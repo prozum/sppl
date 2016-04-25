@@ -6,8 +6,7 @@
 
 using namespace std;
 using namespace common;
-
-namespace optimizer {
+using namespace optimizer;
 
 void GeneralOptimizer::visit(Program &Node) {
     for (auto &Func : Node.Decls) {
@@ -158,5 +157,4 @@ void GeneralOptimizer::visit(TupleExpr &Node) {
     for (auto &Element : Node.Elements) {
         Element->accept(*this);
     }
-}
 }

@@ -1,10 +1,11 @@
 #include "Error.h"
 
-namespace common {
+using namespace common;
+
 Error::Error(std::string Msg) : Msg(Msg), Loc() {}
 Error::Error(std::string Msg, common::Location Loc) : Msg(Msg), Loc(Loc) {}
 
-std::ostream &operator<<(ostream &Out, const Error &Err) {
+std::ostream &common::operator<<(ostream &Out, const Error &Err) {
     return (Out << Err.Loc << "|" << Err.Msg);
 }
 
@@ -34,5 +35,4 @@ Error Error::Unary(string Msg, common::UnaryOp &Op) {
     return Error("'" + Op.str() + "' " + Msg + ": Child: '" +
                      Op.Child->RetTy.str() + "'",
                  Op.Loc);
-}
 }

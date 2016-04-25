@@ -1,8 +1,7 @@
 #include "BinaryOp.h"
-#include "Expression.h"
 #include "Visitor.h"
 
-namespace common {
+using namespace common;
 
 void Add::accept(Visitor &V) { V.visit(*this); }
 void Sub::accept(Visitor &V) { V.visit(*this); }
@@ -154,9 +153,8 @@ BinaryOp *ProducerConsumer::doClone() const {
 
 BinaryOp *Concat::doClone() const { return cloneBinaryOp<Concat>(*this); }
 
-template <class T> T *cloneBinaryOp(const T &Op) {
+template <class T> T *common::cloneBinaryOp(const T &Op) {
     auto Left = Op.Left->clone();
     auto Right = Op.Right->clone();
     return new T(Op.Left->clone(), Op.Right->clone(), Op.Loc);
-}
 }

@@ -3,8 +3,7 @@
 #include <string>
 
 using namespace std;
-
-namespace codegen {
+using namespace codegen;
 
 HCodeGenerator::HCodeGenerator(parser::Driver &Drv)
     : parser::CodeGenerator::CodeGenerator(Drv) {}
@@ -275,5 +274,4 @@ void HCodeGenerator::visit(CallExpr &Node) {
         Node.Args.back()->accept(*this);
     }
     *Drv.Out << ")";
-}
 }

@@ -1,6 +1,7 @@
 #include "Compiler.h"
 
-namespace compiler {
+using namespace compiler;
+
 Compiler::Compiler()
     : ScopeGen(semantics::ScopeGenerator(&Global)),
       TypeChecker(semantics::TypeChecker(&Global)) {}
@@ -65,5 +66,4 @@ int Compiler::compile(const vector<string> &Filenames) {
     */
 
     return 0;
-}
 }

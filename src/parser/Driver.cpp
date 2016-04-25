@@ -2,7 +2,8 @@
 #include "Parser.h"
 #include "Scanner.h"
 
-namespace parser {
+using namespace parser;
+
 Driver::Driver(ostream *out, ostream *hout, ostream *mout)
     : Out(out), HOut(hout), MOut(mout), Scr(*this), Psr(*this),
       Global(new common::Scope()) {}
@@ -98,4 +99,3 @@ void Driver::error(const common::Location &Loc, const std::string &Msg) {
 void Driver::error(const std::string &Msg) { showError(Error(Msg)); }
 
 void Driver::showError(Error Err) { *MOut << Err << endl; }
-}

@@ -14,6 +14,7 @@ class BinaryOp : public Expression {
              Location Loc);
 
     virtual void accept(Visitor &V) = 0;
+
     unique_ptr<BinaryOp> clone() const;
 
   private:
@@ -26,6 +27,7 @@ class Add : public BinaryOp {
         Location Loc);
 
     virtual void accept(Visitor &V);
+
     string str();
 
   private:
@@ -38,6 +40,7 @@ class Sub : public BinaryOp {
         Location Loc);
 
     virtual void accept(Visitor &V);
+
     string str();
 
   private:
@@ -50,8 +53,8 @@ class Mul : public BinaryOp {
         Location Loc);
 
     virtual void accept(Visitor &V);
+
     string str();
-    unique_ptr<Node> const clone();
 
   private:
     virtual BinaryOp *doClone() const;
@@ -63,8 +66,8 @@ class Div : public BinaryOp {
         Location Loc);
 
     virtual void accept(Visitor &v);
+
     string str();
-    unique_ptr<Node> const clone();
 
   private:
     virtual BinaryOp *doClone() const;
@@ -76,8 +79,8 @@ class Mod : public BinaryOp {
         Location Loc);
 
     virtual void accept(Visitor &V);
+
     string str();
-    unique_ptr<Node> const clone();
 
   private:
     virtual BinaryOp *doClone() const;
@@ -89,8 +92,8 @@ class ListAdd : public BinaryOp {
             Location Loc);
 
     virtual void accept(Visitor &V);
+
     string str();
-    unique_ptr<Node> const clone();
 
   private:
     virtual BinaryOp *doClone() const;
@@ -101,8 +104,8 @@ class Or : public BinaryOp {
     Or(unique_ptr<Expression> Left, unique_ptr<Expression> Right, Location Loc);
 
     virtual void accept(Visitor &V);
+
     string str();
-    unique_ptr<Node> const clone();
 
   private:
     virtual BinaryOp *doClone() const;
@@ -114,8 +117,8 @@ class And : public BinaryOp {
         Location Loc);
 
     virtual void accept(Visitor &V);
+
     string str();
-    unique_ptr<Node> const clone();
 
   private:
     virtual BinaryOp *doClone() const;
@@ -127,8 +130,8 @@ class Equal : public BinaryOp {
           Location Loc);
 
     virtual void accept(Visitor &V);
+
     string str();
-    unique_ptr<Node> const clone();
 
   private:
     virtual BinaryOp *doClone() const;
@@ -140,8 +143,8 @@ class NotEqual : public BinaryOp {
              Location Loc);
 
     virtual void accept(Visitor &V);
+
     string str();
-    unique_ptr<Node> const clone();
 
   private:
     virtual BinaryOp *doClone() const;
@@ -153,8 +156,8 @@ class Lesser : public BinaryOp {
            Location Loc);
 
     virtual void accept(Visitor &V);
+
     string str();
-    unique_ptr<Node> const clone();
 
   private:
     virtual BinaryOp *doClone() const;
@@ -166,8 +169,8 @@ class Greater : public BinaryOp {
             Location Loc);
 
     virtual void accept(Visitor &V);
+
     string str();
-    unique_ptr<Node> const clone();
 
   private:
     virtual BinaryOp *doClone() const;
@@ -179,8 +182,8 @@ class LesserEq : public BinaryOp {
              Location Loc);
 
     virtual void accept(Visitor &V);
+
     string str();
-    unique_ptr<Node> const clone();
 
   private:
     virtual BinaryOp *doClone() const;
@@ -192,8 +195,8 @@ class GreaterEq : public BinaryOp {
               Location Loc);
 
     virtual void accept(Visitor &V);
+
     string str();
-    unique_ptr<Node> const clone();
 
   private:
     virtual BinaryOp *doClone() const;
@@ -205,8 +208,8 @@ class ProducerConsumer : public BinaryOp {
                      Location Loc);
 
     virtual void accept(Visitor &V);
+
     string str();
-    unique_ptr<Node> const clone();
 
   private:
     virtual BinaryOp *doClone() const;
@@ -218,8 +221,8 @@ class Concat : public BinaryOp {
            Location Loc);
 
     virtual void accept(Visitor &V);
+
     string str();
-    unique_ptr<Node> const clone();
 
   private:
     virtual BinaryOp *doClone() const;

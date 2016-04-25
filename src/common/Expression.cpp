@@ -1,7 +1,8 @@
 #include "Expression.h"
 #include "Visitor.h"
 
-namespace common {
+using namespace common;
+
 Expression::Expression(Location Loc) : Node(Loc), RetTy(TypeId::UNKNOWN) {}
 
 Expression::Expression(Type Ty, Location Loc) : Node(Loc), RetTy(Ty) {}
@@ -204,5 +205,4 @@ string AlgebraicExpr::str() {
     }
 
     return Str;
-}
 }

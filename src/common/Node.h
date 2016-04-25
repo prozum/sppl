@@ -15,60 +15,115 @@ namespace common {
 
 // Forward declarations
 class Node;
+
 class Expression;
+
 class Declaration;
+
 class BinaryOp;
+
 class UnaryOp;
+
 class Type;
+
 class Pattern;
+
 class Program;
+
 class Function;
+
 class AlgebraicDT;
+
 class Product;
+
 class Case;
+
 class LambdaArg;
+
 class Or;
+
 class And;
+
 class Equal;
+
 class NotEqual;
+
 class Lesser;
+
 class Greater;
+
 class LesserEq;
+
 class GreaterEq;
+
 class Add;
+
 class Sub;
+
 class Mul;
+
 class Div;
+
 class Mod;
+
 class ListAdd;
+
 class ParExpr;
+
 class Not;
+
 class Negative;
+
 class ProducerConsumer;
+
 class Concat;
+
 class LambdaFunction;
+
 class IntPattern;
+
 class FloatPattern;
+
 class CharPattern;
+
 class BoolPattern;
+
 class StringPattern;
+
 class ListPattern;
+
 class TuplePattern;
+
 class ListSplit;
+
 class WildPattern;
+
 class AlgebraicPattern;
+
 class ParPattern;
+
 class IntExpr;
+
 class FloatExpr;
+
 class CharExpr;
+
 class BoolExpr;
+
 class StringExpr;
+
 class ListExpr;
+
 class TupleExpr;
+
 class IdPattern;
+
 class CallExpr;
+
 class AlgebraicExpr;
+
 class Visitor;
+
 class Scope;
 
 // Abstract Nodes
@@ -77,12 +132,16 @@ class Node {
     Location Loc;
 
     Node(Location Loc);
+
     Node(const Node &Other);
+
     // virtual Node &operator=(const Node &Other) = 0;
     ~Node() = default;
+
     unique_ptr<Node> clone() const;
 
     virtual void accept(Visitor &V) = 0;
+
     virtual string str() = 0;
 
   private:
@@ -94,9 +153,11 @@ class Program : public Node {
     vector<unique_ptr<Declaration>> Decls;
 
     Program(vector<unique_ptr<Declaration>> Decls, Location Loc);
+
     Program(unique_ptr<Expression> AnonFunc, Location Loc);
 
     void accept(Visitor &V);
+
     string str();
 
     unique_ptr<Program> clone() const;
@@ -126,9 +187,11 @@ class Function : public Declaration {
     bool Anon = false;
 
     Function(unique_ptr<Expression> AnonFunc);
+
     Function(string Id, Type Ty, Location Loc);
 
     void accept(Visitor &V);
+
     string str();
 
   private:
@@ -145,7 +208,9 @@ class AlgebraicDT : public Declaration {
                 vector<unique_ptr<Product>> Sum, Location Loc);
 
     void accept(Visitor &V);
+
     string str();
+
     unique_ptr<AlgebraicDT> clone() const;
 
   private:
@@ -162,7 +227,9 @@ class Product : public Node {
     Product(string Constructor, vector<Type> Values, Location Loc);
 
     void accept(Visitor &V);
+
     string str();
+
     unique_ptr<Product> clone() const;
 
   private:
@@ -180,7 +247,9 @@ class Case : public Node {
          vector<unique_ptr<Pattern>> Patterns, Location Loc);
 
     void accept(Visitor &V);
+
     string str();
+
     unique_ptr<Case> clone() const;
 
   private:
@@ -195,7 +264,9 @@ class LambdaArg : public Node {
     LambdaArg(string Id, Location Loc);
 
     void accept(Visitor &V);
+
     string str();
+
     unique_ptr<LambdaArg> clone() const;
 
   private:

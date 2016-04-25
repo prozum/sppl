@@ -4,7 +4,7 @@
 
 using namespace std;
 
-namespace common {
+using namespace common;
 
 void Program::accept(Visitor &V) { V.visit(*this); }
 void Function::accept(Visitor &V) { V.visit(*this); }
@@ -168,7 +168,7 @@ string Product::str() {
     return Str;
 }
 
-template <class T> string strJoin(T &List, const std::string JoinStr) {
+template <class T> string common::strJoin(T &List, const std::string JoinStr) {
     string Str;
     for (size_t i = 0; i < List.size(); ++i) {
         Str += List[i]->str();
@@ -177,5 +177,4 @@ template <class T> string strJoin(T &List, const std::string JoinStr) {
     }
 
     return Str;
-}
 }

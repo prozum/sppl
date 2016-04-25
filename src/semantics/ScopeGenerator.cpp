@@ -2,7 +2,8 @@
 #include "ScopeGenerator.h"
 #include <iostream>
 
-namespace semantics {
+using namespace semantics;
+
 ScopeGenerator::ScopeGenerator(Scope *Scp) : CurScope(Scp) {}
 
 void ScopeGenerator::visit(Program &Node) {
@@ -133,5 +134,4 @@ void ScopeGenerator::visit(Product &Node) {
     } else {
         throw Error(Node.Constructor + " has already been declared", Node.Loc);
     }
-}
 }

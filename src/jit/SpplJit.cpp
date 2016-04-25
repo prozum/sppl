@@ -1,6 +1,6 @@
 #include "SpplJit.h"
 
-namespace jit {
+using namespace jit;
 
 SpplJit::SpplJit()
     : Machine(EngineBuilder().selectTarget()),
@@ -199,5 +199,4 @@ int SpplJit::eval(std::string Str) {
     }
 
     return 0;
-}
 }

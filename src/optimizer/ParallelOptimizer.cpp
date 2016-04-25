@@ -5,8 +5,7 @@
 
 using namespace std;
 using namespace common;
-
-namespace optimizer {
+using namespace optimizer;
 
 void ParallelOptimizer::visit(Program &Node) {
     for (auto &Func : Node.Decls) {
@@ -79,4 +78,3 @@ void ParallelOptimizer::visit(CallExpr &Node) {}
 void ParallelOptimizer::visit(Type &Node) {}
 
 void ParallelOptimizer::visit(TupleExpr &Node) {}
-}

@@ -1,7 +1,7 @@
 #include "Type.h"
 #include "Node.h"
 
-namespace common {
+using namespace common;
 
 Type::Type() {}
 
@@ -107,5 +107,4 @@ string Type::strJoin(const std::string JoinStr) {
     }
 
     return Str;
-}
 }

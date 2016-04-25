@@ -1,6 +1,6 @@
 #include "Location.h"
 
-namespace common {
+using namespace common;
 
 Location::Location() {}
 
@@ -25,10 +25,9 @@ Location::Location(const Location &Other) {
     end = Other.end;
 }
 
-ostream &operator<<(ostream &Out, const Location &Loc) {
+ostream &common::operator<<(ostream &Out, const Location &Loc) {
     if (Loc.begin.Src.empty())
         return Out << Loc.begin.Line << ":" << Loc.begin.Column;
     return Out << Loc.begin.Src << ":" << Loc.begin.Line << ":"
                << Loc.begin.Column;
-}
 }

@@ -6,8 +6,8 @@
 
 using namespace common;
 using namespace std;
+using namespace codegen;
 
-namespace codegen {
 CCodeGenerator::CCodeGenerator(Driver &Drv)
     : CodeGenerator(Drv), Output(Drv.Out), Header(Drv.HOut),
       ListOffsets(vector<int>({0})),
@@ -1300,5 +1300,4 @@ string CCodeGenerator::getEnvironment(Type &Ty) {
 
 void CCodeGenerator::outputBuffer() {
     *Output << Buffer.str(), Buffer.str(string());
-}
 }

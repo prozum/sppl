@@ -1,7 +1,7 @@
 #include "Pattern.h"
 #include "Visitor.h"
 
-namespace common {
+using namespace common;
 void IntPattern::accept(Visitor &V) { V.visit(*this); }
 void FloatPattern::accept(Visitor &V) { V.visit(*this); }
 void CharPattern::accept(Visitor &V) { V.visit(*this); }
@@ -151,4 +151,3 @@ string AlgebraicPattern::str() {
 }
 
 string ParPattern::str() { return "(" + Pat->str() + ")"; }
-}

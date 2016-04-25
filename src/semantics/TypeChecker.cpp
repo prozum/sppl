@@ -3,7 +3,8 @@
 #include "Scope.h"
 
 using namespace std;
-namespace semantics {
+using namespace semantics;
+
 TypeChecker::TypeChecker(Scope *Scp) : CurScope(Scp), GlobalScope(Scp) {}
 
 void TypeChecker::visit(Program &Node) {
@@ -595,4 +596,3 @@ void TypeChecker::visit(FloatExpr &Node) {}
 void TypeChecker::visit(StringExpr &Node) {}
 void TypeChecker::visit(CharExpr &Node) {}
 void TypeChecker::visit(BoolExpr &Node) {}
-}

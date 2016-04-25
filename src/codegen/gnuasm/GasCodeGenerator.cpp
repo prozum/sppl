@@ -5,8 +5,7 @@
 
 using namespace common;
 using namespace std;
-
-namespace codegen {
+using namespace codegen;
 
 GasCodeGenerator::GasCodeGenerator(parser::Driver &Drv)
     : parser::CodeGenerator(Drv) {}
@@ -291,5 +290,4 @@ string GasCodeGenerator::buildSource() {
         Source += Func;
     }
     return Source;
-}
 }

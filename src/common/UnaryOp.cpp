@@ -1,7 +1,7 @@
 #include "UnaryOp.h"
 #include "Visitor.h"
 
-namespace common {
+using namespace common;
 
 void ParExpr::accept(Visitor &V) { V.visit(*this); }
 void Not::accept(Visitor &V) { V.visit(*this); }
@@ -48,5 +48,4 @@ string To::str() {
 
 template <class T> T *const cloneUnaryOp(T &Op) {
     return new T(Op.Child->clone(), Op.Loc);
-}
 }

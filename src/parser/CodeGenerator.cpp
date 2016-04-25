@@ -1,5 +1,5 @@
 #include "CodeGenerator.h"
 
-namespace parser {
+using namespace parser;
+
 CodeGenerator::CodeGenerator(Driver &Drv) : Drv(Drv) {}
-}

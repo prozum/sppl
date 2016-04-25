@@ -20,7 +20,6 @@ using namespace parser;
 using namespace llvm;
 
 namespace codegen {
-
 class LLVMCodeGenerator : public CodeGenerator {
   public:
     LLVMCodeGenerator(parser::Driver &driver);
@@ -32,11 +31,6 @@ class LLVMCodeGenerator : public CodeGenerator {
     std::unordered_map<common::Type, llvm::StructType *> TupleTypes;
     std::unordered_map<common::Type, llvm::StructType *> ListTypes;
     std::unordered_map<common::Type, llvm::FunctionType *> FuncTypes;
-
-    /*
-    llvm::BasicBlock *CurPatternBlock;
-    llvm::BasicBlock *CurCaseBlock;
-    */
 
     llvm::Value *CurVal;
 

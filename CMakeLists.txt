@@ -6,6 +6,9 @@ set(CMAKE_CXX_COMPILER_FORCED TRUE)
 
 project(sppl)
 
+# Generate compile_commands.json
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 option(DEBUG "Debug mode" ON)
 option(STATIC "Compile with static libs" OFF)
 option(CCPP "C++ Compiler" OFF)

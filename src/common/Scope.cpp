@@ -1,6 +1,6 @@
 #include "Scope.h"
 
-namespace common {
+using namespace common;
 Scope::Scope(common::Scope *Scp) : Parent(Scp) {}
 
 bool Scope::tryGetDecl(std::string Id, Type &OutType) {
@@ -95,5 +95,4 @@ bool Scope::tryGetGenADT(string Id, AlgebraicDT *&OutADT) {
 
     OutADT = nullptr;
     return false;
-}
 }
