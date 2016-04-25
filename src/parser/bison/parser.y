@@ -141,7 +141,7 @@ program:	includes decls                                  { Drv.Prog = make_uniqu
     |       expr                                            { Drv.Prog = make_unique<Program>(unique_ptr<Expression>($1), @1); }
 includes: includes include                                  { /* Do nothing here :) */ }
     |                                                       { /* Do nothing here :) */ }
-include:    INCLUDE STRINGLITERAL                           { Drv.Filenames.push_back(* $2); }
+include:    INCLUDE STRINGLITERAL                           { Drv.Files.push_back(* $2); }
 decls:      decls decl                                      { $$ = $1; $$->push_back(unique_ptr<Declaration>($2)); }
     |                                                       { $$ = new vector<unique_ptr<Declaration>>(); }
 decl:       func                                            { $$ = $1; }
