@@ -45,10 +45,6 @@ namespace semantics
             }
         }
         // Visit stops here
-
-        // Set return type
-        if (!hasError())
-            Node.Ty = Node.Signature.Subtypes.back();
     }
 
     void TypeChecker::visit(Case &Node) {
