@@ -14,8 +14,8 @@ namespace codegen {
     void GasCodeGenerator::visit(Program &Node) {
         // Visit all functions
 
-        for (auto &Func : Node.Funcs) {
-            Func->accept(*this);
+        for (auto &Decl : Node.Decls) {
+            Decl->accept(*this);
         }
 
         string Source = buildSource();  // Build source.S file
@@ -200,7 +200,7 @@ namespace codegen {
         cout << "ListAddNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(Par &Node) {
+    void GasCodeGenerator::visit(ParExpr &Node) {
         cout << "ParNotImplemented" << endl;
     }
 
@@ -208,7 +208,7 @@ namespace codegen {
         cout << "NotNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(IntPattern &Node) {
+    void GasCodeGenerator::visit(IntExpr &Node) {
         Func += "movl $";
         Func += Node.str();
         Func += ", %eax\n";
@@ -220,23 +220,27 @@ namespace codegen {
         cout << "Got integer => " << Node.str() << endl;
     }
 
-    void GasCodeGenerator::visit(FloatPattern &Node) {
+    void GasCodeGenerator::visit(FloatExpr &Node) {
         cout << "FloatNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(BoolPattern &Node) {
+    void GasCodeGenerator::visit(BoolExpr &Node) {
         cout << "BoolNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(CharPattern &Node) {
+    void GasCodeGenerator::visit(CharExpr &Node) {
         cout << "CharNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(ListPattern &Node) {
+    void GasCodeGenerator::visit(StringExpr &Node) {
+        cout << "CharNotImplemented" << endl;
+    }
+
+    void GasCodeGenerator::visit(ListExpr &Node) {
         cout << "ListPatternNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(TuplePattern &Node) {
+    void GasCodeGenerator::visit(TupleExpr &Node) {
         cout << "TuplePatternNotImplemented" << endl;
     }
 
@@ -244,21 +248,13 @@ namespace codegen {
         cout << "ListSplitNotImplemented" << endl;
     }
 
-    void GasCodeGenerator::visit(ListExpression &Node) {
-        cout << "ListNotImplemented" << endl;
-    }
-
-    void GasCodeGenerator::visit(TupleExpression &Node) {
-        cout << "TupleNotImplemented" << endl;
-    }
-
-    void GasCodeGenerator::visit(IdPattern &Node) {
+    void GasCodeGenerator::visit(IdExpr &Node) {
         Hpr.TypeName = "Id";
         Hpr.TypeValue = FuncName + Node.Val;
         cout << "Got ID => " << Node.Val << endl;
     }
 
-    void GasCodeGenerator::visit(Call &Node) {
+    void GasCodeGenerator::visit(CallExpr &Node) {
         // TODO: Find way pu push arguments to stack.
         vector<string> Params;
         for (auto &Arg : Node.Args) {
