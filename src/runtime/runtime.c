@@ -1,7 +1,5 @@
 #include "task.h"
 
-const uint  start_stack_size = 256*1024;
-
 //runtime entry point
 void rmain(uint64_t os_thread_count, task_t *initial) {
     runtime.os_thread_count = os_thread_count;
@@ -13,8 +11,6 @@ void rmain(uint64_t os_thread_count, task_t *initial) {
 
     queue_head m;
     m.item = (void *)initial;
-
-    printf("Shit actually happens!\n");
 
     queue_add(&m, runtime.queue);
 
@@ -32,6 +28,7 @@ void rmain(uint64_t os_thread_count, task_t *initial) {
     free(runtime.scheduler_pool);
     free(runtime.thread_pool);
     free(runtime.scheduler_status);
+    free(runtime.queue);
 
     pthread_mutex_destroy(&runtime.scheduler_status_lock);
 }
@@ -57,11 +54,12 @@ void start_scheduler(void *sched_ptr) {
                 t->scheduler_id = (uint)scheduler->id;
                 contextswitch(scheduler->context, &t->context);
             } else if (t->state == WAITING && get_subtasks_done(t) != 0) {
-                printf("shit's working\n");
                 set_active_worker(scheduler->id, WORKING);
                 t->state = RUNNING;
                 t->scheduler_id = (uint)scheduler->id;
                 contextswitch(scheduler->context, &t->context);
+            } else {
+                queue_add(head, runtime.queue);
             }
         } else {
             set_active_worker(scheduler->id, SLACKING);
@@ -71,6 +69,8 @@ void start_scheduler(void *sched_ptr) {
             break;
         }
     } while (1);
+
+    free(scheduler->context);
 
     pthread_exit(NULL);
 }
@@ -106,8 +106,6 @@ int get_subtasks_done(task_t *t) {
             return 0;
         }
     }
-
-    printf("subtasks done\n");
 
     return 1;
 }
