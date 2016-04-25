@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.1)
 
 # Ignore CMake tests which are broken with clang + static compilation
 set(CMAKE_C_COMPILER_FORCED TRUE)
