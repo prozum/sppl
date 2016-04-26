@@ -9,8 +9,6 @@
 #include <vector>
 
 namespace codegen {
-enum class IdContext { PATTERN, EXPR };
-
 class CCodeGenerator : public parser::CodeGenerator {
   public:
     CCodeGenerator(parser::Driver &Drv);
@@ -66,9 +64,6 @@ class CCodeGenerator : public parser::CodeGenerator {
     void visit(common::CallExpr &Node);
     void visit(common::AlgebraicExpr &Node);
 
-
-
-
     const std::string GGenerated = "generated_";
     const std::string GUser = "user_";
     const std::string GAdd = "add_";
@@ -78,12 +73,12 @@ class CCodeGenerator : public parser::CodeGenerator {
     const std::string GPrint = "print_";
     const std::string GAt = "at_";
     const std::string GValueAt = "valueat_";
-    const std::string GToString = "tostd::string_";
+    const std::string GToString = "tostring_";
     const std::string GFloat = "double";
     const std::string GInt = "int64_t";
     const std::string GChar = "int";
     const std::string GBool = "int";
-    const std::string GString = "std::string";
+    const std::string GString = "string";
     const std::string GList = "list";
     const std::string GSignature = "signature";
     const std::string GTuple = "tuple";
@@ -114,7 +109,6 @@ class CCodeGenerator : public parser::CodeGenerator {
     std::vector<std::string> GetValueBuilder;
     std::vector<std::string> Assignments;
     std::vector<int> ListOffsets;
-    IdContext IdCtx;
     std::string LastPattern;
     std::string StringTypeName;
 

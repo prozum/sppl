@@ -59,6 +59,9 @@ void TypeChecker::visit(Case &Node) {
         Node.Patterns[i]->RetTy = CurFunc->Signature.Subtypes[i];
         Node.Patterns[i]->accept(*this);
     }
+    if (Node.When) {
+        Node.When->accept(*this);
+    }
     Node.Expr->accept(*this);
 
     // Set signature for anonymous function
@@ -83,15 +86,22 @@ void TypeChecker::visit(Case &Node) {
         }
     }
 
+    if (Node.When) {
+        if (Node.When->RetTy.Id != TypeId::BOOL) {
+            throw Error::Expected("Type mismatch in the when expression",
+                                  Type(TypeId::BOOL).str(),
+                                  Node.When->RetTy.str(), Node.When->Loc);
+        }
+    }
+
     if (containsEmptyList(Node.Expr->RetTy)) {
         resolveEmptyList(Node.Expr->RetTy, CurFunc->Signature.Subtypes.back());
     }
 
     if (CurFunc->Signature.Subtypes.back() != Node.Expr->RetTy) {
-
         throw Error::Expected("Wrong return type",
                               CurFunc->Signature.Subtypes.back().str(),
-                              Node.Expr->RetTy.str(), Node.Loc);
+                              Node.Expr->RetTy.str(), Node.Expr->Loc);
     }
 }
 
@@ -434,6 +444,7 @@ void TypeChecker::visit(ListAdd &Node) {
 
 void TypeChecker::visit(To &Node) {
     // TODO Implement To Type Checking
+    throw std::runtime_error("Not implemented");
 }
 
 void TypeChecker::visit(AlgebraicExpr &Node) {
@@ -445,6 +456,7 @@ void TypeChecker::visit(AlgebraicExpr &Node) {
 
     if (CurScope->tryGetCon(Node.Constructor, Out)) {
         // TODO Implement Checking if constructor was found
+        throw std::runtime_error("Not implemented");
     } else {
         throw Error(
             Node.Constructor +
@@ -455,15 +467,19 @@ void TypeChecker::visit(AlgebraicExpr &Node) {
 
 void TypeChecker::visit(LambdaFunction &Node) {
     // TODO Implement LambdaFunction Type Checking
+    throw std::runtime_error("Not implemented");
 }
 void TypeChecker::visit(LambdaArg &Node) {
     // TODO Implement LambdaArg Type Checking
+    throw std::runtime_error("Not implemented");
 }
 void TypeChecker::visit(ProducerConsumer &Node) {
     // TODO Implement ProducerConsumer Type Checking
+    throw std::runtime_error("Not implemented");
 }
 void TypeChecker::visit(Concat &Node) {
     // TODO Implement Concat Type Checking
+    throw std::runtime_error("Not implemented");
 }
 
 void TypeChecker::visit(ParExpr &Node) {

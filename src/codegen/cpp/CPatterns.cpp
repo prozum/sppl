@@ -145,120 +145,105 @@ void CCodeGenerator::visit(ListSplit &Node) {
 }
 
 void CCodeGenerator::visit(IntPattern &Node) {
-    // If pattern, then generate an expression for matching on this pattern
-    if (IdCtx == IdContext::PATTERN) {
-        string Val = "";
+    string Val = "";
 
-        for (auto &Str : GetValueBuilder) {
-            Val += Str;
-        }
-
-        LastPattern = Val + " == " + Node.str();
-
-        // Else, just output value
-    } else {
-        ExprStack.top() << "(" << Node.Val << ")";
+    for (auto &Str : GetValueBuilder) {
+        Val += Str;
     }
+
+    LastPattern = Val + " == " + Node.str();
 }
 
 void CCodeGenerator::visit(FloatPattern &Node) {
-    // If pattern, then generate an expression for matching on this pattern
-    if (IdCtx == IdContext::PATTERN) {
-        string Val = "";
+    string Val = "";
 
-        for (auto &Str : GetValueBuilder) {
-            Val += Str;
-        }
-
-        LastPattern = Val + " == " + Node.str();
-
-        // Else, just output value
-    } else {
-        ExprStack.top() << "(" << Node.str() << ")";
+    for (auto &Str : GetValueBuilder) {
+        Val += Str;
     }
+
+    LastPattern = Val + " == " + Node.str();
 }
 
 void CCodeGenerator::visit(CharPattern &Node) {
-    // If pattern, then generate an expression for matching on this pattern
-    if (IdCtx == IdContext::PATTERN) {
-        string Val = "";
+    string Val = "";
 
-        for (auto &Str : GetValueBuilder) {
-            Val += Str;
-        }
-
-        LastPattern = Val + " == " + Node.str();
-
-        // else, just output value
-    } else {
-        ExprStack.top() << Node.str();
+    for (auto &Str : GetValueBuilder) {
+        Val += Str;
     }
+
+    LastPattern = Val + " == " + Node.str();
+}
+
+void CCodeGenerator::visit(BoolPattern &Node) {
+    string Val = "";
+
+    for (auto &Str : GetValueBuilder) {
+        Val += Str;
+    }
+
+    LastPattern = Val + " == " + to_string(Node.Val);
 }
 
 void CCodeGenerator::visit(IdPattern &Node) {
     stringstream Assign;
     string Name = "";
 
-    if (IdCtx == IdContext::PATTERN) {
-        // Created name from get_value_builder
-        for (auto &Str : GetValueBuilder) {
-            Name += Str;
-        }
-
-        // Generate an assignment for the id, which should occur after the
-        // if-statement
-        Assign << getType(Node.RetTy) << " " << GUser << Node.Val << " = ";
-
-        if ((Node.RetTy.Id == TypeId::LIST ||
-             Node.RetTy.Id == TypeId::STRING) &&
-            ListOffsets.back() > 0) {
-            Assign << GGenerated << GAt << getList(Node.RetTy) << "(" << Name
-            << ", " << ListOffsets.back() << ");";
-        } else {
-            Assign << Name << ";";
-        }
-
-        // Save the assigment untill after the pattern has been generated
-        Assignments.push_back(Assign.str());
-
-        // Since and id, in a pattern is allways true, then last_pattern is just
-        // set to "1"
-        LastPattern = "1";
-    } else {
-        bool IsDeclared = false;
-
-        for (auto &Decl : Prog->Decls) {
-            if (typeid(*Decl.get()) == typeid(Function) &&
-                ((Function *)Decl.get())->Id == Node.Val) {
-                IsDeclared = true;
-                break;
-            }
-        }
-
-        if (IsDeclared) {
-            ExprStack.top() << "&" << GGlobal;
-        }
-
-        ExprStack.top() << GUser << Node.Val;
+    // Created name from get_value_builder
+    for (auto &Str : GetValueBuilder) {
+        Name += Str;
     }
+
+    // Generate an assignment for the id, which should occur after the
+    // if-statement
+    Assign << getType(Node.RetTy) << " " << GUser << Node.Val << " = ";
+
+    if ((Node.RetTy.Id == TypeId::LIST ||
+         Node.RetTy.Id == TypeId::STRING) &&
+         ListOffsets.back() > 0) {
+        Assign << GGenerated << GAt << getList(Node.RetTy) << "(" << Name
+               << ", " << ListOffsets.back() << ");";
+    } else {
+        Assign << Name << ";";
+    }
+
+    // Save the assigment untill after the pattern has been generated
+    Assignments.push_back(Assign.str());
+
+    // Since an id, in a pattern is always true, then last_pattern is just
+    // set to "1"
+    LastPattern = "1";
 }
 
 void CCodeGenerator::visit(WildPattern &Node) {
-
+    // Since a wildcard, in a pattern is always true, then last_pattern is just
+    // set to "1"
+    LastPattern = "1";
 }
 
 void CCodeGenerator::visit(AlgebraicPattern &Node) {
 
+    // TODO
+    throw std::runtime_error("Not implemented");
 }
 
 void CCodeGenerator::visit(ParPattern &Node) {
+    Node.Pat->accept(*this);
 
-}
-
-void CCodeGenerator::visit(BoolPattern &Node) {
-
+    if (LastPattern != "1") {
+        LastPattern = "(" + LastPattern + ")";
+    }
 }
 
 void CCodeGenerator::visit(StringPattern &Node) {
+    string Val = "";
 
+    for (auto &Str : GetValueBuilder) {
+        Val += Str;
+    }
+
+    // gcompare_string is generated by generate_std. it compares the custome
+    // string type, to a char*.
+    // It also takes an offset, for when list splits occur on strings
+    LastPattern = GGenerated + GCompare + GString + "(" + Val + ", " +
+                  Node.str() + ", " + to_string(ListOffsets.back()) + ")";
 }

@@ -42,7 +42,7 @@ AlgebraicExpr::AlgebraicExpr(string Constructor,
       Exprs(move(Exprs)) {}
 
 StringExpr::StringExpr(string Val, Location Loc)
-    : Expression(Type(TypeId::STRING, Val.size() + 1), Loc), Val(Val) {}
+    : Expression(Type(TypeId::STRING), Loc), Val(Val) {}
 
 void IdExpr::accept(Visitor &V) { V.visit(*this); }
 void IntExpr::accept(Visitor &V) { V.visit(*this); }

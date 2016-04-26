@@ -7,7 +7,7 @@ using namespace codegen;
 CCodeGenerator::CCodeGenerator(parser::Driver &Drv)
     : CodeGenerator(Drv), Output(Drv.Out), Header(Drv.HOut),
       ListOffsets(vector<int>({0})),
-      StringList(Type(TypeId::LIST, vector<Type>({Type(TypeId::CHAR)}))),
+      StringList(Type(TypeId::LIST, vector<Type>({Type(TypeId::STRING)}))),
       RealString(Type(TypeId::LIST, vector<Type>({Type(TypeId::CHAR)}))) {}
 
 void CCodeGenerator::visit(Program &Node) {
@@ -22,6 +22,7 @@ void CCodeGenerator::visit(Program &Node) {
         if (typeid(*Decl.get()) == typeid(Function) &&
             ((Function *)Decl.get())->Id == "main") {
             Main = (Function *)Decl.get();
+            break;
         }
     }
 
@@ -126,7 +127,6 @@ void CCodeGenerator::visit(Case &Node) {
     // Generate if-statement for matching
     Pattern << "    if (";
 
-    IdCtx = IdContext::PATTERN;
     for (size_t i = 0; i < Node.Patterns.size(); ++i) {
         // Push arg_name on get_value_builder. get_value_builder is used for
         // generate
@@ -167,8 +167,21 @@ void CCodeGenerator::visit(Case &Node) {
             *Output << endl;
     }
 
+    string ExtraTap;
+
+    if (Node.When) {
+        // Generate return expression
+        ExprStack.push(stringstream());
+
+        Node.When->accept(*this);
+        *Output << "        if (" << ExprStack.top().str() << ") \n"
+                   "        { \n";
+        ExprStack.pop();
+
+        ExtraTap = "    ";
+    }
+
     // Generate return expression
-    IdCtx = IdContext::EXPR;
     ExprStack.push(stringstream());
 
     if (Node.TailRec) {
@@ -176,7 +189,7 @@ void CCodeGenerator::visit(Case &Node) {
         for (size_t i = 0; i < CurFunc->Signature.Subtypes.size() - 1; ++i) {
             ExprStack.push(stringstream());
             C->Args[i]->accept(*this);
-            *Output << "        " << GGenerated << GArg << i << " = "
+            *Output << "        " << ExtraTap << GGenerated << GArg << i << " = "
                     << ExprStack.top().str() << "; \n";
             ExprStack.pop();
         }
@@ -188,10 +201,14 @@ void CCodeGenerator::visit(Case &Node) {
         ExprStack.push(stringstream());
 
         Node.Expr->accept(*this);
-        *Output << "        " << ResType << " res = " << ExprStack.top().str()
+        *Output << "        " << ExtraTap << ResType << " res = " << ExprStack.top().str()
                 << "; \n";
-        *Output << "        return res; \n";
+        *Output << "        " << ExtraTap << "return res; \n";
         ExprStack.pop();
+    }
+
+    if (Node.When) {
+        *Output << "        } \n";
     }
 
     *Output << "    } \n"
@@ -199,11 +216,11 @@ void CCodeGenerator::visit(Case &Node) {
 }
 
 void CCodeGenerator::visit(AlgebraicDT &Node) {
-
+    throw std::runtime_error("Not implemented");
 }
 
 void CCodeGenerator::visit(Product &Node) {
-
+    throw std::runtime_error("Not implemented");
 }
 
 string CCodeGenerator::getType(Type &Ty) {
