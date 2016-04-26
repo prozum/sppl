@@ -55,6 +55,7 @@ typedef struct task_s
     context_t	 context;   // the context of the task
     task_state_t state;     // which state the task is in (waiting, running, new, etc)
     uint 	scheduler_id;   // the id of the scheduler executing the task right now
+	uint 	sub_tasks_alloc;	// how many subtasks there are allocated for
     uint    sub_task_len;   // number of sub tasks
     struct  task_s  **sub_tasks; // array of subtask references
     uchar	*stk;                // legacy shit for checking if task is running out of stack
@@ -62,14 +63,15 @@ typedef struct task_s
     void	*startarg;           // arguments for the task's function
 } task_t;
 
-task_t* taskcreate(void (*fn)(void*), void *arg, uint sub_tasks);               // create task without giving stacksize
-task_t* taskalloc(void (*fn)(void*), void *arg, uint stack, uint sub_tasks);    // create task while giving stacksize
+task_t* taskcreate(void (*fn)(void*), void *arg);               // create task without giving stacksize
+task_t* taskalloc(void (*fn)(void*), void *arg, uint stack);    // create task while giving stacksize
 void	taskdealloc(task_t*);
 void	taskadd(task_t *t);     // add task to queue
 void	taskexit(task_t *t);    // exit task and mark it as done
 void	taskyield(task_t *t);   // give control back to scheduler
 void	needstack(task_t *t, int); // legacy
 void	taskswitch(task_t *t);     // switch context to scheduler
+void 	subtaskadd(task_t *parent, task_t *subtask); // add subtask to both queue and
 
 typedef enum scheduler_state_e {
     SLACKING,   // scheduler state if it's not working
