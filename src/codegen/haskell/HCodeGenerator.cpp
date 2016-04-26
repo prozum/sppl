@@ -3,6 +3,7 @@
 #include <string>
 
 using namespace std;
+using namespace common;
 using namespace codegen;
 
 HCodeGenerator::HCodeGenerator(parser::Driver &Drv)

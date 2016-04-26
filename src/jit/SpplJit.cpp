@@ -118,6 +118,10 @@ string SpplJit::getOutputTuple(intptr_t Addr, vector<common::Type> Subtypes) {
             Out += getOutput(Addr, Subtypes[i]);
             Addr += sizeof(double);
             break;
+        case common::TypeId::CHAR:
+            Out += getOutput(*(char *)Addr, Subtypes[i]);
+            Addr += sizeof(char);
+            break;
         case common::TypeId::STRING:
             Out += getOutput(*(intptr_t *)Addr, Subtypes[i]);
             Addr += sizeof(intptr_t *);

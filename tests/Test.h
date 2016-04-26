@@ -13,6 +13,8 @@
 #include <cstring>
 #include <iostream>
 
+using namespace std;
+
 class Test : public CppUnit::TestFixture{
     CPPUNIT_TEST_SUITE(Test);
     // AddTest.cpp
