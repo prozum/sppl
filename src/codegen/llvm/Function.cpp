@@ -6,6 +6,8 @@ using namespace codegen;
 
 void LLVMCodeGenerator::visit(common::Function &Node) {
     // Create function and entry block
+    auto type = getFuncType(Node.Signature);
+    auto ele = Node.Signature.Subtypes[0].subtypeCount();
     CurFunc = llvm::Function::Create(getFuncType(Node.Signature),
                                      llvm::Function::ExternalLinkage, Node.Id,
                                      Module.get());
@@ -91,6 +93,7 @@ void LLVMCodeGenerator::visit(common::Case &Node) {
         else
             FalseBlock = CurErrBlock;
 
+
         Builder.SetInsertPoint(*CurPatBlock);
         (*CurPat)->accept(*this);
 
@@ -98,21 +101,16 @@ void LLVMCodeGenerator::visit(common::Case &Node) {
         Builder.CreateCondBr(CurVal, TrueBlock, FalseBlock);
     }
 
-    if (Node.Patterns.size() == 0) {
-        // auto PatBlock = BasicBlock::Create(getGlobalContext(),
-        //                                     "case" + to_string(CurCaseId) +
-        //                                     "_pattern" + to_string(0),
-        //                                     CurFunc);
-        // Builder.SetInsertPoint(CurEntry);
-        // Builder.CreateBr(*CurCaseBlock);
-    }
-
     // Generate expression in case block
     Builder.SetInsertPoint(*CurCaseBlock);
     Node.Expr->accept(*this);
 
-    // auto Ty1 = CurPhiNode->getType();
-    // auto Ty2 = CurVal->getType();
+    auto Ty1 = CurPhiNode->getType();
+    auto Ty2 = CurVal->getType();
+
+    auto Arr1 = CurVal->getType()->getPointerElementType()->getArrayNumElements();
+    auto Arr2 = CurPhiNode->getType()->getPointerElementType()->getArrayNumElements();
+
 
     // Add return value to phi node
     CurPhiNode->addIncoming(CurVal, *CurCaseBlock);

@@ -6,10 +6,10 @@ using namespace llvm::orc;
 using namespace jit;
 
 SpplJit::SpplJit()
-    : Machine(EngineBuilder().selectTarget()),
-      Layout(Machine->createDataLayout()),
-      CompileLayer(ObjectLayer, SimpleCompiler(*Machine)), CodeGen(Drv),
+    : CodeGen(Drv),
+      CompileLayer(ObjectLayer, SimpleCompiler(*CodeGen.Machine)),
       ScopeGen(&Drv.Global), TypeChecker(&Drv.Global) {
+
     llvm::sys::DynamicLibrary::LoadLibraryPermanently(nullptr);
     createModule();
 
@@ -61,7 +61,7 @@ std::string SpplJit::mangle(const std::string &Name) {
     std::string MangledName;
     {
         raw_string_ostream MangledNameStream(MangledName);
-        Mangler::getNameWithPrefix(MangledNameStream, Name, Layout);
+        Mangler::getNameWithPrefix(MangledNameStream, Name, CodeGen.DataLayout);
     }
     return MangledName;
 }
@@ -70,7 +70,7 @@ void SpplJit::createModule() {
     // Open a new module
     CodeGen.Module =
         llvm::make_unique<llvm::Module>("SpplJit", getGlobalContext());
-    CodeGen.Module->setDataLayout(Machine->createDataLayout());
+    CodeGen.Module->setDataLayout(CodeGen.Machine->createDataLayout());
 
     // Create a new pass manager attached to it
     PassMgr =

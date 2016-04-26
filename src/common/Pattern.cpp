@@ -94,10 +94,10 @@ BoolPattern::BoolPattern(bool Val, Location Loc)
     : Pattern(Type(TypeId::CHAR), Loc), Val(Val) {}
 
 StringPattern::StringPattern(string Val, Location Loc)
-    : Pattern(Type(TypeId::CHAR), Loc), Val(Val) {}
+    : Pattern(Type(TypeId::CHAR, Val.size()), Loc), Val(Val) {}
 
 ListPattern::ListPattern(vector<unique_ptr<Pattern>> Patterns, Location Loc)
-    : Pattern(Type(TypeId::LIST), Loc), Patterns(move(Patterns)) {}
+    : Pattern(Type(TypeId::LIST, Patterns.size()), Loc), Patterns(move(Patterns)) {}
 
 TuplePattern::TuplePattern(vector<unique_ptr<Pattern>> Patterns, Location Loc)
     : Pattern(Type(TypeId::TUPLE), Loc), Patterns(move(Patterns)) {}

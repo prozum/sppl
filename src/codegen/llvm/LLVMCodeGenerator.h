@@ -12,20 +12,25 @@
 
 #include <llvm/Support/raw_os_ostream.h>
 
+#include <llvm/ExecutionEngine/ExecutionEngine.h>
+
 #include <iostream>
 #include <unordered_map>
 
 namespace codegen {
 class LLVMCodeGenerator : public parser::CodeGenerator {
   public:
-    LLVMCodeGenerator(parser::Driver &driver);
+    LLVMCodeGenerator(parser::Driver &Drv);
 
     llvm::IRBuilder<> Builder;
+    std::unique_ptr<llvm::TargetMachine> Machine;
+    const llvm::DataLayout DataLayout;
+
     std::unique_ptr<llvm::Module> Module;
     std::map<std::string, llvm::Value *> CtxVals;
 
     std::unordered_map<common::Type, llvm::StructType *> TupleTypes;
-    std::unordered_map<common::Type, llvm::StructType *> ListTypes;
+    std::unordered_map<common::Type, llvm::ArrayType *> ListTypes;
     std::unordered_map<common::Type, llvm::FunctionType *> FuncTypes;
 
     llvm::Value *CurVal;
@@ -61,6 +66,9 @@ class LLVMCodeGenerator : public parser::CodeGenerator {
     void visit(common::FloatPattern &Node);
     void visit(common::BoolPattern &Node);
     void visit(common::CharPattern &Node);
+    void visit(common::TuplePattern &Node);
+    void visit(common::ListPattern &Node);
+    void visit(common::ParPattern &Node);
 
     void visit(common::Add &Node);
     void visit(common::Sub &Node);
@@ -90,7 +98,7 @@ class LLVMCodeGenerator : public parser::CodeGenerator {
 
     llvm::Type *getType(common::Type Ty, bool Ptr = false);
     llvm::StructType *getTupleType(common::Type Ty);
-    llvm::StructType *getListType(common::Type Ty);
+    llvm::ArrayType *getListType(common::Type Ty);
     llvm::FunctionType *getFuncType(common::Type Ty);
 };
 }

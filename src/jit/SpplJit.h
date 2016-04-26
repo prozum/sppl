@@ -5,7 +5,6 @@
 #include "ScopeGenerator.h"
 #include "TypeChecker.h"
 
-#include <llvm/ExecutionEngine/ExecutionEngine.h>
 #include <llvm/ExecutionEngine/Orc/CompileUtils.h>
 #include <llvm/ExecutionEngine/Orc/IRCompileLayer.h>
 #include <llvm/ExecutionEngine/Orc/LambdaResolver.h>
@@ -53,8 +52,12 @@ class SpplJit {
     std::string getOutput(intptr_t Data, common::Type Type);
     std::string getOutputTuple(intptr_t Addr, std::vector<common::Type> Subtypes);
 
-    std::unique_ptr<llvm::TargetMachine> Machine;
-    const llvm::DataLayout Layout;
+    parser::Driver Drv;
+    codegen::LLVMCodeGenerator CodeGen;
+    semantics::ScopeGenerator ScopeGen;
+    semantics::TypeChecker TypeChecker;
+    optimizer::GeneralOptimizer Optimizer;
+
     ObjLayerT ObjectLayer;
     CompileLayerT CompileLayer;
 
@@ -62,11 +65,7 @@ class SpplJit {
     std::vector<ModuleHandleT> ModuleHandles;
     ModuleHandleT ModuleHandler;
 
-    parser::Driver Drv;
-    codegen::LLVMCodeGenerator CodeGen;
-    semantics::ScopeGenerator ScopeGen;
-    semantics::TypeChecker TypeChecker;
-    optimizer::GeneralOptimizer Optimizer;
+
 
     template <typename T> static std::vector<T> singletonSet(T Item) {
         std::vector<T> Vec;

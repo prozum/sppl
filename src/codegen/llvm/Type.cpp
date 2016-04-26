@@ -57,17 +57,13 @@ llvm::StructType *LLVMCodeGenerator::getTupleType(common::Type Ty) {
     return NewType;
 }
 
-llvm::StructType *LLVMCodeGenerator::getListType(common::Type Ty) {
+llvm::ArrayType *LLVMCodeGenerator::getListType(common::Type Ty) {
     auto OldType = ListTypes.find(Ty);
 
     if (OldType != ListTypes.end())
         return OldType->second;
 
-    vector<llvm::Type *> TmpVec = {getType(Ty.Subtypes[0], true),
-                                   llvm::Type::getInt64Ty(getGlobalContext())};
-    llvm::ArrayRef<llvm::Type *> Subtypes(TmpVec);
-
-    auto NewType = StructType::create(getGlobalContext(), Subtypes);
+    auto NewType = ArrayType::get(getType(Ty.Subtypes[0]), Ty.subtypeCount());
     ListTypes[Ty] = NewType;
 
     return NewType;

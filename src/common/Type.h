@@ -33,6 +33,7 @@ class Type {
     Type();
     ~Type();
     Type(TypeId Id);
+    Type(TypeId Id, size_t SubtypeCount);
     Type(TypeId Id, Location Loc);
     Type(TypeId Id, std::vector<Type> Subtypes);
     Type(TypeId Id, std::vector<Type> Subtypes, Location Loc);
@@ -47,6 +48,8 @@ class Type {
     std::string strJoin(std::string JoinStr);
 
     size_t subtypeCount();
+private:
+    size_t SubtypeCount = 0;
 };
 }
 

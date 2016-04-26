@@ -141,6 +141,7 @@ bool Test::executeLLVM(std::string args, std::string expectedOutput) {
     if(checkIfFileExists("out.ir") == false) {
         CPPUNIT_ASSERT_MESSAGE("file out.ir not found", false);
     }
+    int status = system("cc out.c -o prog");
 
     return false;
 }
