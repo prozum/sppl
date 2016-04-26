@@ -9,7 +9,8 @@ using namespace semantics;
 ScopeGenerator::ScopeGenerator(Scope *Scp) : CurScope(Scp) {}
 
 void ScopeGenerator::visit(Program &Node) {
-    // Visit children
+    /* This is code for getting all the generics out of the program.
+     * It is not in use, but don't delete it yet.
     for (size_t i = 0; i < Node.Decls.size();) {
         auto &Decl = Node.Decls[i];
 
@@ -59,6 +60,7 @@ void ScopeGenerator::visit(Program &Node) {
             i++;
         }
     }
+     */
 
     for (auto &Func : Node.Decls) {
         try {

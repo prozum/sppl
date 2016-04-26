@@ -46,14 +46,8 @@ int Compiler::compile(const vector<string> &Filenames) {
     if (!parseFiles(Filenames))
         return 1;
 
-    cout << Prog->str() << endl;
-
     if (!accept(ScopeGen))
         return 2;
-
-    cout << "--------------------------" << endl;
-
-    cout << Prog->str() << endl;
 
     if (!accept(TypeChecker))
         return 3;
