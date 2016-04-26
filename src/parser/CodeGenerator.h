@@ -1,21 +1,17 @@
 #pragma once
 
-#include "Visitor.h"
-#include "Node.h"
 #include "Driver.h"
+#include "Node.h"
+#include "Visitor.h"
 
 #include <ostream>
 #include <string>
 
-using namespace std;
-
 namespace parser {
+class CodeGenerator : public common::Visitor {
+  public:
+    Driver &Drv;
 
-    class CodeGenerator : public Visitor {
-    public:
-        Driver &Drv;
-
-        CodeGenerator(Driver &Drv);
-    };
-
+    CodeGenerator(Driver &Drv);
+};
 }

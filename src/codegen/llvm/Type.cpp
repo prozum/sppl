@@ -1,37 +1,37 @@
 #include "LLVMCodeGenerator.h"
 
-using namespace codegen;
+using namespace std;
 using namespace llvm;
+using namespace codegen;
 
-llvm::Type *LLVMCodeGenerator::getType(common::Type Ty, bool Ptr)
-{
+llvm::Type *LLVMCodeGenerator::getType(common::Type Ty, bool Ptr) {
     llvm::Type *new_type;
 
-    switch (Ty.Id)
-    {
-        case common::TypeId::FLOAT:
-            new_type = llvm::Type::getDoubleTy(getGlobalContext());
-            break;
-        case common::TypeId::INT:
-            new_type = llvm::Type::getInt64Ty(getGlobalContext());
-            break;
-        case common::TypeId::BOOL:
-            new_type = llvm::Type::getInt1Ty(getGlobalContext());
-            break;
-        case common::TypeId::CHAR:
-            new_type = llvm::Type::getInt8Ty(getGlobalContext());
-            break;
-        case common::TypeId::TUPLE:
-            return PointerType::getUnqual(getTupleType(Ty));
-        case common::TypeId::LIST:
-            return PointerType::getUnqual(getListType(Ty));
-        case common::TypeId::SIGNATURE:
-            return PointerType::getUnqual(getFuncType(Ty));
-        case common::TypeId::STRING:
-            //return llvm::Type::getInt8PtrTy(getGlobalContext());
-            return PointerType::getUnqual(ArrayType::get(llvm::Type::getInt8Ty(getGlobalContext()), Ty.NumSubtypes));
-        default:
-            throw runtime_error("This should not happen!");
+    switch (Ty.Id) {
+    case common::TypeId::FLOAT:
+        new_type = llvm::Type::getDoubleTy(getGlobalContext());
+        break;
+    case common::TypeId::INT:
+        new_type = llvm::Type::getInt64Ty(getGlobalContext());
+        break;
+    case common::TypeId::BOOL:
+        new_type = llvm::Type::getInt1Ty(getGlobalContext());
+        break;
+    case common::TypeId::CHAR:
+        new_type = llvm::Type::getInt8Ty(getGlobalContext());
+        break;
+    case common::TypeId::TUPLE:
+        return PointerType::getUnqual(getTupleType(Ty));
+    case common::TypeId::LIST:
+        return PointerType::getUnqual(getListType(Ty));
+    case common::TypeId::SIGNATURE:
+        return PointerType::getUnqual(getFuncType(Ty));
+    case common::TypeId::STRING:
+        // return llvm::Type::getInt8PtrTy(getGlobalContext());
+        return PointerType::getUnqual(ArrayType::get(
+            llvm::Type::getInt8Ty(getGlobalContext()), Ty.NumSubtypes));
+    default:
+        throw runtime_error("This should not happen!");
     }
 
     if (Ptr)
@@ -40,8 +40,7 @@ llvm::Type *LLVMCodeGenerator::getType(common::Type Ty, bool Ptr)
         return new_type;
 }
 
-llvm::StructType *LLVMCodeGenerator::getTupleType(common::Type Ty)
-{
+llvm::StructType *LLVMCodeGenerator::getTupleType(common::Type Ty) {
     auto OldType = TupleTypes.find(Ty);
 
     if (OldType != TupleTypes.end())
@@ -58,14 +57,14 @@ llvm::StructType *LLVMCodeGenerator::getTupleType(common::Type Ty)
     return NewType;
 }
 
-llvm::StructType *LLVMCodeGenerator::getListType(common::Type Ty)
-{
+llvm::StructType *LLVMCodeGenerator::getListType(common::Type Ty) {
     auto OldType = ListTypes.find(Ty);
 
     if (OldType != ListTypes.end())
         return OldType->second;
 
-    vector<llvm::Type *> TmpVec = {getType(Ty.Subtypes[0], true), llvm::Type::getInt64Ty(getGlobalContext()) };
+    vector<llvm::Type *> TmpVec = {getType(Ty.Subtypes[0], true),
+                                   llvm::Type::getInt64Ty(getGlobalContext())};
     llvm::ArrayRef<llvm::Type *> Subtypes(TmpVec);
 
     auto NewType = StructType::create(getGlobalContext(), Subtypes);
@@ -74,8 +73,7 @@ llvm::StructType *LLVMCodeGenerator::getListType(common::Type Ty)
     return NewType;
 }
 
-llvm::FunctionType *LLVMCodeGenerator::getFuncType(common::Type Ty)
-{
+llvm::FunctionType *LLVMCodeGenerator::getFuncType(common::Type Ty) {
     auto OldType = FuncTypes.find(Ty);
 
     if (OldType != FuncTypes.end())
@@ -92,4 +90,3 @@ llvm::FunctionType *LLVMCodeGenerator::getFuncType(common::Type Ty)
 
     return NewType;
 }
-

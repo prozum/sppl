@@ -1,7 +1,7 @@
 %name-prefix "parser"
 %define "parser_class_name" {Parser}
 %locations
-%define api.location.type {Location}
+%define api.location.type {common::Location}
 %initial-action {
     @$.begin.Src = @$.end.Src = Drv.Source;
 }
@@ -16,13 +16,14 @@
 #include <string>
 #include <vector>
 
-using namespace common;
-using namespace std;
 }
 
 // Parser.cpp
 %{
 #include "Driver.h"
+
+using namespace std;
+using namespace common;
 
 // Connect bison parser to flex scanner
 #undef yylex
@@ -35,24 +36,24 @@ using namespace std;
     long double                         LongDouble;
     bool                                Boolean;
 
-    string *                            Str;
+    std::string *                            Str;
 
-    Declaration *                       Decl;
-    Function *                          Func;
-    AlgebraicDT *                       ADT;
-    Product *                           Prod;
-    Type *                              Ty;
-    Case *                              Cse;
-    Pattern *                           Pat;
-    Expression *                        Expr;
+    common::Declaration *                       Decl;
+    common::Function *                          Func;
+    common::AlgebraicDT *                       ADT;
+    common::Product *                           Prod;
+    common::Type *                              Ty;
+    common::Case *                              Cse;
+    common::Pattern *                           Pat;
+    common::Expression *                        Expr;
 
-    vector<unique_ptr<Declaration>> *   DeclVec;
-    vector<Type> *                      TypeVec;
-    vector<unique_ptr<Case>> *          CaseVec;
-    vector<unique_ptr<Pattern>> *       PatternVec;
-    vector<unique_ptr<LambdaArg>> *     ArgVec;
-    vector<unique_ptr<Expression>> *    ExprVec;
-    vector<unique_ptr<Product>> *       ProdVec;
+    std::vector<std::unique_ptr<common::Declaration>> *   DeclVec;
+    std::vector<common::Type> *                           TypeVec;
+    std::vector<std::unique_ptr<common::Case>> *          CaseVec;
+    std::vector<std::unique_ptr<common::Pattern>> *       PatternVec;
+    std::vector<std::unique_ptr<common::LambdaArg>> *     ArgVec;
+    std::vector<std::unique_ptr<common::Expression>> *    ExprVec;
+    std::vector<std::unique_ptr<common::Product>> *       ProdVec;
 }
 
 %token END 0 "End"
@@ -141,7 +142,7 @@ program:	includes decls                                  { Drv.Prog = make_uniqu
     |       expr                                            { Drv.Prog = make_unique<Program>(unique_ptr<Expression>($1), @1); }
 includes: includes include                                  { /* Do nothing here :) */ }
     |                                                       { /* Do nothing here :) */ }
-include:    INCLUDE STRINGLITERAL                           { /* Drv.Filenames.push_back(* $2); */ }
+include:    INCLUDE STRINGLITERAL                           { Drv.Files.push_back(* $2); }
 decls:      decls decl                                      { $$ = $1; $$->push_back(unique_ptr<Declaration>($2)); }
     |                                                       { $$ = new vector<unique_ptr<Declaration>>(); }
 decl:       func                                            { $$ = $1; }
@@ -160,6 +161,7 @@ signature:	signature ARROR type                            { $$ = $1; $$->Subtyp
 type:	    INTTYPE                                         { $$ = new Type(TypeId::INT, @1); }
 	|	    FLOATTYPE                                       { $$ = new Type(TypeId::FLOAT, @1); }
 	|	    CHARTYPE                                        { $$ = new Type(TypeId::CHAR, @1); }
+	|	    STRINGTYPE                                      { $$ = new Type(TypeId::STRING, @1); }
 	|	    BOOLTYPE                                        { $$ = new Type(TypeId::BOOL, @1); }
 	|	    SQSTART type SQEND                              { $$ = new Type(TypeId::LIST, @1); $$->Subtypes.push_back(* $2); }
 	|	    PARSTART signature PAREND                       { $$ = $2; }
@@ -181,6 +183,7 @@ pattern:    INTLITERAL                                      { $$ = new IntPatter
     |	    FLOATLITERAL                                    { $$ = new FloatPattern($1, @1); }
     |	    SUB FLOATLITERAL                                { $$ = new FloatPattern(- $2, @1); }
 	|	    CHARLITERAL                                     { $$ = new CharPattern($1, @1); }
+	|	    BOOLLITERAL                                     { $$ = new BoolPattern($1, @1); }
 	|	    STRINGLITERAL                                   { $$ = new StringPattern(* $1, @1); delete $1; }
 	| 	    IDSMALL                                         { $$ = new IdPattern(* $1, @1); }
 	| 	    pattern COLON pattern                           { $$ = new ListSplit(unique_ptr<Pattern>($1), unique_ptr<Pattern>($3), @1);  }
@@ -196,6 +199,7 @@ patterns_comma_ne:  patterns_comma_ne COMMA pattern         { $$ = $1; $$->push_
 literal:	INTLITERAL                                      { $$ = new IntExpr($1, @1); }
 	|	FLOATLITERAL                                        { $$ = new FloatExpr($1, @1); }
 	|	CHARLITERAL                                         { $$ = new CharExpr($1, @1); }
+	|	BOOLLITERAL                                         { $$ = new BoolExpr($1, @1); }
 	|	STRINGLITERAL                                       { $$ = new StringExpr(* $1, @1); delete $1; }
 expr:	expr OR expr                                        { $$ = new Or(unique_ptr<Expression>($1), unique_ptr<Expression>($3), @1); }
 	|	expr AND expr                                       { $$ = new And(unique_ptr<Expression>($1), unique_ptr<Expression>($3), @1); }
@@ -216,7 +220,7 @@ expr:	expr OR expr                                        { $$ = new Or(unique_p
 	|   expr TO type                                        { $$ = new To(unique_ptr<Expression>($1), * $3, @1); delete $3; }
 	|	IDSMALL                                             { $$ = new IdExpr(* $1, @1); }
 	|	literal                                             { $$ = $1; }
-	|	SQSTART exprs_comma SQEND                           { $$ = new ListExpr(move(* $2), @1); delete $2; }
+	|	SQSTART exprs_comma SQEND                           { $$ = new ListExpr(move(* $2), @1); /* delete $2; */ }
 	| 	IDBIG exprs                                         { $$ = new AlgebraicExpr(* $1, move(* $2), @1); delete $1; delete $2; }
 	|   PARSTART exprs_comma_ne COMMA expr PAREND           { $2->push_back(unique_ptr<Expression>($4)); $$ = new TupleExpr(move(* $2), @1); delete $2; }
 	|	PARSTART expr PAREND                                { $$ = new ParExpr(unique_ptr<Expression>($2), @1); }

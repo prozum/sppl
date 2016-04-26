@@ -7,88 +7,90 @@
 #include <llvm/IR/Verifier.h>
 
 #include <llvm/IR/DerivedTypes.h>
-#include <llvm/IR/TypeFinder.h>
 #include <llvm/IR/TypeBuilder.h>
+#include <llvm/IR/TypeFinder.h>
 
 #include <llvm/Support/raw_os_ostream.h>
 
-#include <unordered_map>
 #include <iostream>
-
-
-using namespace std;
-using namespace parser;
+#include <unordered_map>
 
 namespace codegen {
+class LLVMCodeGenerator : public parser::CodeGenerator {
+  public:
+    LLVMCodeGenerator(parser::Driver &driver);
 
-    class LLVMCodeGenerator : public CodeGenerator {
-      public:
-        LLVMCodeGenerator(parser::Driver &driver);
+    llvm::IRBuilder<> Builder;
+    std::unique_ptr<llvm::Module> Module;
+    std::map<std::string, llvm::Value *> CtxVals;
 
-        void visit(common::Program &node);
+    std::unordered_map<common::Type, llvm::StructType *> TupleTypes;
+    std::unordered_map<common::Type, llvm::StructType *> ListTypes;
+    std::unordered_map<common::Type, llvm::FunctionType *> FuncTypes;
 
-        llvm::IRBuilder<> Builder;
-        unique_ptr<llvm::Module> Module;
-        std::map<std::string, llvm::Value *> ContextValues;
+    llvm::Value *CurVal;
 
+    llvm::Function *CurFunc;
+    llvm::BasicBlock *CurEntry;
+    llvm::BasicBlock *CurErrBlock;
+    llvm::BasicBlock *CurRetBlock;
+    llvm::PHINode *CurPhiNode;
 
-    	std::unordered_map<common::Type, llvm::StructType *> TupleTypes;
-    	std::unordered_map<common::Type, llvm::StructType *> ListTypes;
-        std::unordered_map<common::Type, llvm::FunctionType *> FuncTypes;
+    std::vector<llvm::Argument *> Args;
+    std::vector<llvm::Argument *>::const_iterator CurArg;
 
-        llvm::Function *CurFunc;
-        llvm::Value *CurVal;
-        llvm::BasicBlock *CurPatternBlock;
-        llvm::BasicBlock *CurCaseBlock;
-        llvm::BasicBlock *CurErrorBlock;
-        llvm::BasicBlock *CurRetBlock;
-        llvm::PHINode *CurPhiNode;
-        std::vector<llvm::Argument *> Arguments;
-        size_t CurCaseId;
-        size_t LastCaseId;
+    std::vector<std::unique_ptr<common::Case>>::const_iterator CurCase;
+    std::vector<llvm::BasicBlock *> CaseBlocks;
+    std::vector<llvm::BasicBlock *>::const_iterator CurCaseBlock;
+    std::vector<llvm::BasicBlock *>::const_iterator LastCaseBlock;
 
-		string ModuleString();
+    std::vector<std::unique_ptr<common::Pattern>>::const_iterator CurPat;
+    std::vector<std::vector<llvm::BasicBlock *>> PatVecBlocks;
+    std::vector<std::vector<llvm::BasicBlock *>>::const_iterator CurPatVecBlock;
+    std::vector<llvm::BasicBlock *>::const_iterator CurPatBlock;
+    std::vector<llvm::BasicBlock *>::const_iterator LastPatBlock;
 
-        void visit(common::Function &Node);
-        void visit(common::Case &Node);
+    std::string ModuleString();
 
-		void visit(common::IdPattern &Node);
-        void visit(common::IntPattern &Node);
-        void visit(common::FloatPattern &Node);
-        void visit(common::BoolPattern &Node);
-        void visit(common::CharPattern &Node);
+    void visit(common::Program &node);
+    void visit(common::Function &Node);
+    void visit(common::Case &Node);
 
-        void visit(common::Add &Node);
-        void visit(common::Sub &Node);
-        void visit(common::Mul &Node);
-        void visit(common::Div &Node);
-        void visit(common::Mod &Node);
+    void visit(common::IdPattern &Node);
+    void visit(common::IntPattern &Node);
+    void visit(common::FloatPattern &Node);
+    void visit(common::BoolPattern &Node);
+    void visit(common::CharPattern &Node);
 
-		void visit(common::And &Node);
-		void visit(common::Or &Node);
-    	void visit(common::Equal &Node);
-    	void visit(common::NotEqual &Node);
-    	void visit(common::Lesser &Node);
-    	void visit(common::Greater &Node);
-    	void visit(common::LesserEq &Node);
-    	void visit(common::GreaterEq &Node);
+    void visit(common::Add &Node);
+    void visit(common::Sub &Node);
+    void visit(common::Mul &Node);
+    void visit(common::Div &Node);
+    void visit(common::Mod &Node);
 
-		void visit(common::IdExpr &Node);
-        void visit(common::IntExpr &Node);
-        void visit(common::FloatExpr &Node);
-        void visit(common::BoolExpr &Node);
-        void visit(common::CharExpr &Node);
-		void visit(common::StringExpr &Node);
-    	void visit(common::TupleExpr &Node);
-    	void visit(common::ListExpr &Node);
-        void visit(common::CallExpr &Node);
-    	void visit(common::ParExpr &Node);
+    void visit(common::And &Node);
+    void visit(common::Or &Node);
+    void visit(common::Equal &Node);
+    void visit(common::NotEqual &Node);
+    void visit(common::Lesser &Node);
+    void visit(common::Greater &Node);
+    void visit(common::LesserEq &Node);
+    void visit(common::GreaterEq &Node);
 
-        llvm::Type *getType(common::Type Ty, bool Ptr = false);
-    	llvm::StructType *getTupleType(common::Type Ty);
-    	llvm::StructType *getListType(common::Type Ty);
-        llvm::FunctionType *getFuncType(common::Type Ty);
+    void visit(common::IdExpr &Node);
+    void visit(common::IntExpr &Node);
+    void visit(common::FloatExpr &Node);
+    void visit(common::BoolExpr &Node);
+    void visit(common::CharExpr &Node);
+    void visit(common::StringExpr &Node);
+    void visit(common::TupleExpr &Node);
+    void visit(common::ListExpr &Node);
+    void visit(common::CallExpr &Node);
+    void visit(common::ParExpr &Node);
 
-	    llvm::Value *compare(llvm::Value *Val1, llvm::Value *Val2);
-	};
+    llvm::Type *getType(common::Type Ty, bool Ptr = false);
+    llvm::StructType *getTupleType(common::Type Ty);
+    llvm::StructType *getListType(common::Type Ty);
+    llvm::FunctionType *getFuncType(common::Type Ty);
+};
 }

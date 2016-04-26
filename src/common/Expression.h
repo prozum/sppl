@@ -3,154 +3,168 @@
 #include "Node.h"
 
 namespace common {
-    class Expression : public Node {
-    public:
-        Type RetTy;
+class Expression : public Node {
+  public:
+    Type RetTy;
 
-        Expression(Location Loc);
-        Expression(Type Ty, Location Loc);
+    Expression(Location Loc);
+    Expression(Type Ty, Location Loc);
 
-        virtual void accept(Visitor &V) = 0;
+    virtual void accept(Visitor &V) = 0;
 
-        unique_ptr<Expression> clone() const;
-    private:
-        virtual Expression *doClone() const = 0;
-    };
+    std::unique_ptr<Expression> clone() const;
 
-    class IdExpr : public Expression {
-    public:
-        string Val;
-        Scope* Scp;
-    
-        IdExpr(string Val, Location Loc);
-    
-        virtual void accept(Visitor &V);
-        string str();
-    private:
-        virtual Expression *doClone() const;
-    };
-    
-    class IntExpr : public Expression {
-    public:
-        long Val;
-    
-        IntExpr(long Val, Location Loc);
-    
-        virtual void accept(Visitor &V);
-        string str();
-    private:
-        virtual Expression *doClone() const;
-    };
-    
-    class FloatExpr : public Expression {
-    public:
-        double Val;
-    
-        FloatExpr(double Val, Location Loc);
-    
-        virtual void accept(Visitor &V);
-        string str();
-    private:
-        virtual Expression *doClone() const;
-    };
-    
-    class CharExpr : public Expression {
-    public:
-        char Val;
-    
-        CharExpr(char Val, Location Loc);
-    
-        virtual void accept(Visitor &V);
-        string str();
-    private:
-        virtual Expression *doClone() const;
-    };
+  private:
+    virtual Expression *doClone() const = 0;
+};
 
-    class BoolExpr : public Expression {
-    public:
-        bool Val;
+class IdExpr : public Expression {
+  public:
+    std::string Val;
 
-        BoolExpr(bool Val, Location Loc);
+    IdExpr(std::string Val, Location Loc);
 
-        virtual void accept(Visitor &V);
-        string str();
-    private:
-        virtual Expression *doClone() const;
-    };
+    virtual void accept(Visitor &V);
+    std::string str();
 
-    class StringExpr : public Expression {
-    public:
-        string Val;
+  private:
+    virtual Expression *doClone() const;
+};
 
-        StringExpr(string Val, Location Loc);
+class IntExpr : public Expression {
+  public:
+    long Val;
 
-        virtual void accept(Visitor &V);
-        string str();
-    private:
-        virtual Expression *doClone() const;
-    };
+    IntExpr(long Val, Location Loc);
 
-    /* Other Expressions */
-    class ListExpr : public Expression {
-    public:
-        vector<unique_ptr<Expression>> Elements;
+    virtual void accept(Visitor &V);
+    std::string str();
 
-        ListExpr(vector<unique_ptr<Expression>> Elements, Location Loc);
+  private:
+    virtual Expression *doClone() const;
+};
 
-        virtual void accept(Visitor &V);
-        string str();
-    private:
-        virtual Expression *doClone() const;
-    };
+class FloatExpr : public Expression {
+  public:
+    double Val;
 
-    class TupleExpr : public Expression {
-    public:
-        vector<unique_ptr<Expression>> Elements;
+    FloatExpr(double Val, Location Loc);
 
-        TupleExpr(vector<unique_ptr<Expression>> Elements, Location Loc);
+    virtual void accept(Visitor &V);
+    std::string str();
 
-        virtual void accept(Visitor &V);
-        string str();
-    private:
-        virtual Expression *doClone() const;
-    };
+  private:
+    virtual Expression *doClone() const;
+};
 
-    class CallExpr : public Expression {
-    public:
-        unique_ptr<Expression> Callee;
-        vector<unique_ptr<Expression>> Args;
+class CharExpr : public Expression {
+  public:
+    char Val;
 
-        CallExpr(unique_ptr<Expression> Callee, vector<unique_ptr<Expression>> Args, Location Loc);
+    CharExpr(char Val, Location Loc);
 
-        virtual void accept(Visitor &V);
-        string str();
-    private:
-        virtual Expression *doClone() const;
-    };
+    virtual void accept(Visitor &V);
+    std::string str();
 
-    class LambdaFunction : public Expression {
-    public:
-        unique_ptr<Expression> Expr;
-        vector<unique_ptr<LambdaArg>> Args;
+  private:
+    virtual Expression *doClone() const;
+};
 
-        LambdaFunction(unique_ptr<Expression> Expr, vector<unique_ptr<LambdaArg>> Args, Location Loc);
+class BoolExpr : public Expression {
+  public:
+    bool Val;
 
-        virtual void accept(Visitor &V);
-        string str();
-    private:
-        virtual Expression *doClone() const;
-    };
+    BoolExpr(bool Val, Location Loc);
 
-    class AlgebraicExpr : public Expression {
-    public:
-        string Constructor;
-        vector<unique_ptr<Expression>> Exprs;
+    virtual void accept(Visitor &V);
+    std::string str();
 
-        AlgebraicExpr(string Constructor, vector<unique_ptr<Expression>> Exprs, Location Loc);
+  private:
+    virtual Expression *doClone() const;
+};
 
-        virtual void accept(Visitor &V);
-        string str();
-    private:
-        virtual Expression *doClone() const;
-    };
+class StringExpr : public Expression {
+  public:
+    std::string Val;
+
+    StringExpr(std::string Val, Location Loc);
+
+    virtual void accept(Visitor &V);
+    std::string str();
+
+  private:
+    virtual Expression *doClone() const;
+};
+
+/* Other Expressions */
+class ListExpr : public Expression {
+  public:
+    std::vector<std::unique_ptr<Expression>> Elements;
+
+    ListExpr(std::vector<std::unique_ptr<Expression>> Elements, Location Loc);
+
+    virtual void accept(Visitor &V);
+    std::string str();
+
+  private:
+    virtual Expression *doClone() const;
+};
+
+class TupleExpr : public Expression {
+  public:
+    std::vector<std::unique_ptr<Expression>> Elements;
+
+    TupleExpr(std::vector<std::unique_ptr<Expression>> Elements, Location Loc);
+
+    virtual void accept(Visitor &V);
+    std::string str();
+
+  private:
+    virtual Expression *doClone() const;
+};
+
+class CallExpr : public Expression {
+  public:
+    std::unique_ptr<Expression> Callee;
+    std::vector<std::unique_ptr<Expression>> Args;
+
+    CallExpr(std::unique_ptr<Expression> Callee, std::vector<std::unique_ptr<Expression>> Args,
+             Location Loc);
+
+    virtual void accept(Visitor &V);
+    std::string str();
+
+  private:
+    virtual Expression *doClone() const;
+};
+
+class LambdaFunction : public Expression {
+  public:
+    std::unique_ptr<Expression> Expr;
+    std::vector<std::unique_ptr<LambdaArg>> Args;
+
+    LambdaFunction(std::unique_ptr<Expression> Expr,
+                   std::vector<std::unique_ptr<LambdaArg>> Args, Location Loc);
+
+    virtual void accept(Visitor &V);
+    std::string str();
+
+  private:
+    virtual Expression *doClone() const;
+};
+
+class AlgebraicExpr : public Expression {
+  public:
+    std::string Constructor;
+    std::vector<std::unique_ptr<Expression>> Exprs;
+
+    AlgebraicExpr(std::string Constructor, std::vector<std::unique_ptr<Expression>> Exprs,
+                  Location Loc);
+
+    virtual void accept(Visitor &V);
+    std::string str();
+
+  private:
+    virtual Expression *doClone() const;
+};
 }

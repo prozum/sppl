@@ -1,69 +1,100 @@
 #include "Scope.h"
 
-namespace common {
-    Scope::Scope(common::Scope *Scp)
-            : Parent(Scp) { }
+using namespace std;
+using namespace common;
 
-    bool Scope::declExists(std::string Id) {
-        if (Decls.find(Id) != Decls.end())
+Scope::Scope(common::Scope *Scp) : Parent(Scp) {}
+
+bool Scope::tryGetDecl(std::string Id, Type &OutType) {
+    auto Got = Decls.find(Id);
+
+    if (Got != Decls.end()) {
+        OutType = Got->second;
+        return true;
+    }
+
+    if (Parent)
+        return Parent->tryGetDecl(Id, OutType);
+
+    return false;
+}
+
+bool Scope::tryGetADT(std::string Id, AlgebraicDT *&OutADT) {
+    auto Got = Types.find(Id);
+
+    if (Got != Types.end()) {
+        OutADT = &Got->second;
+        return true;
+    }
+
+    if (Parent)
+        return Parent->tryGetADT(Id, OutADT);
+
+    OutADT = nullptr;
+    return false;
+}
+
+bool Scope::tryGetCon(std::string Id, Product *&OutProduct) {
+    auto Got = Constructors.find(Id);
+
+    if (Got != Constructors.end()) {
+        OutProduct = &Got->second;
+        return true;
+    }
+
+    if (Parent)
+        return Parent->tryGetCon(Id, OutProduct);
+
+    OutProduct = nullptr;
+    return false;
+}
+
+bool Scope::tryGetGenerated(std::string Id, Type Ty, std::string *OutName) {
+    auto Got = GeneratedGenerics.find(Id);
+
+    if (Got != GeneratedGenerics.end()) {
+        auto Got2 = Got->second.find(Ty);
+
+        if (Got2 != Got->second.end()) {
+            OutName = &Got2->second;
             return true;
-
-        if (Parent)
-            return Parent->declExists(Id);
+        }
 
         return false;
     }
 
-    bool Scope::typeExists(std::string Id) {
-        if (Types.find(Id) != Types.end())
-            return true;
+    if (Parent)
+        return Parent->tryGetGenerated(Id, Ty, OutName);
 
-        if (Parent)
-            return Parent->typeExists(Id);
+    return false;
+}
 
-        return false;
+bool Scope::tryGetGenFunc(string Id, Function *&OutFunc) {
+    auto Got = GenericFuncs.find(Id);
+
+    if (Got != GenericFuncs.end()) {
+        OutFunc = Got->second.get();
+        return true;
     }
 
+    if (Parent)
+        return Parent->tryGetGenFunc(Id, OutFunc);
 
-    bool Scope::conExists(std::string Id) {
-        if (Constructors.find(Id) != Constructors.end())
-            return true;
+    OutFunc = nullptr;
+    return false;
+}
 
-        if (Parent)
-            return Parent->conExists(Id);
+bool Scope::tryGetGenADT(string Id, AlgebraicDT *&OutADT) {
+    auto Got = GenericADT.find(Id);
 
-        return false;
+    if (Got != GenericADT.end()) {
+        OutADT = Got->second.get();
+        return true;
     }
 
-    Type Scope::getDeclType(std::string Id) {
-        auto Got = Decls.find(Id);
+    if (Parent)
+        return Parent->tryGetGenADT(Id, OutADT);
 
-        if (Got == Decls.end()) {
-            return Parent->getDeclType(Id);
-        }
-
-        return Got->second;
-    }
-
-    AlgebraicDT& Scope::getADT(std::string Id) {
-        auto Got = Types.find(Id);
-
-        if (Got == Types.end()) {
-            return Parent->getADT(Id);
-        }
-
-        return Got->second;
-
-    }
-
-    Product& Scope::getCon(std::string Id) {
-        auto Got = Constructors.find(Id);
-
-        if (Got == Constructors.end()) {
-            return Parent->getCon(Id);
-        }
-
-        return Got->second;
-    }
-
+    OutADT = nullptr;
+    return false;
 }

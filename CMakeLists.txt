@@ -1,10 +1,13 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.1)
 
 # Ignore CMake tests which are broken with clang + static compilation
 set(CMAKE_C_COMPILER_FORCED TRUE)
 set(CMAKE_CXX_COMPILER_FORCED TRUE)
 
 project(sppl)
+
+# Generate compile_commands.json
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 option(DEBUG "Debug mode" ON)
 option(STATIC "Compile with static libs" OFF)
@@ -36,6 +39,7 @@ else()
 endif()
 
 if(DEBUG)
+    add_definitions(-DSPPLDEBUG)
     set(CMAKE_BUILD_TYPE Debug)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall -pedantic -Wno-unused-parameter")
 else()

@@ -1,5 +1,6 @@
 #include "LLVMCodeGenerator.h"
 
+using namespace std;
 using namespace codegen;
 using namespace llvm;
 
@@ -25,7 +26,7 @@ void LLVMCodeGenerator::visit(common::CharExpr &Node) {
 
 void LLVMCodeGenerator::visit(common::IdExpr &Node) {
     // Pattern value
-    CurVal = ContextValues[Node.Val];
+    CurVal = CtxVals[Node.Val];
     if (CurVal)
         return;
 
@@ -36,7 +37,9 @@ void LLVMCodeGenerator::visit(common::IdExpr &Node) {
 
     // External module
     if (Drv.Global.Decls.count(Node.Val))
-        CurVal = llvm::Function::Create(getFuncType(Drv.Global.Decls[Node.Val]), llvm::Function::ExternalLinkage, Node.Val, Module.get());
+        CurVal = llvm::Function::Create(getFuncType(Drv.Global.Decls[Node.Val]),
+                                        llvm::Function::ExternalLinkage,
+                                        Node.Val, Module.get());
     if (CurVal)
         return;
 
@@ -58,7 +61,8 @@ void LLVMCodeGenerator::visit(common::TupleExpr &Node) {
     ArrayRef<Constant *> TupleVal(TmpVec);
 
     auto ConstVal = ConstantStruct::get(getTupleType(Node.RetTy), TupleVal);
-    CurVal = new GlobalVariable(*Module.get(), ConstVal->getType(), true, GlobalVariable::ExternalLinkage, ConstVal);
+    CurVal = new GlobalVariable(*Module.get(), ConstVal->getType(), true,
+                                GlobalVariable::ExternalLinkage, ConstVal);
 }
 
 void LLVMCodeGenerator::visit(common::ListExpr &Node) {
@@ -74,7 +78,8 @@ void LLVMCodeGenerator::visit(common::ListExpr &Node) {
     auto ListType = ArrayType::get(getType(Node.RetTy), Node.Elements.size());
     auto ConstVal = ConstantArray::get(ListType, ListData);
 
-    CurVal = new GlobalVariable(*Module.get(), ConstVal->getType(), true, GlobalVariable::ExternalLinkage, ConstVal);
+    CurVal = new GlobalVariable(*Module.get(), ConstVal->getType(), true,
+                                GlobalVariable::ExternalLinkage, ConstVal);
 }
 
 void LLVMCodeGenerator::visit(common::CallExpr &Node) {

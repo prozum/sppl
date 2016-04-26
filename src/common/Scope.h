@@ -2,31 +2,31 @@
 
 #include "Node.h"
 
-#include <vector>
 #include <unordered_map>
 #include <unordered_set>
-
-using namespace std;
+#include <vector>
 
 namespace common {
-    class Scope {
-    public:
-        unordered_map<string, Type> Decls;
-        unordered_map<string, AlgebraicDT &> Types;
-        unordered_map<string, Product &> Constructors;
+class Scope {
+  public:
+    std::unordered_map<std::string, Type> Decls;
+    std::unordered_map<std::string, AlgebraicDT &> Types;
+    std::unordered_map<std::string, Product &> Constructors;
+    std::unordered_map<std::string, std::shared_ptr<AlgebraicDT>> GenericADT;
+    std::unordered_map<std::string, std::shared_ptr<Function>> GenericFuncs;
+    std::unordered_map<std::string, std::unordered_map<Type, std::string>> GeneratedGenerics;
 
-        Scope *Parent;
-        std::vector<unique_ptr<Scope>> Children;
+    Scope *Parent;
+    std::vector<std::unique_ptr<Scope>> Children;
 
-        Scope() : Scope(nullptr) { }
-        Scope(Scope *Scp);
+    Scope() : Scope(nullptr) {}
+    Scope(Scope *Scp);
 
-        bool declExists(std::string Id);
-        bool typeExists(std::string Id);
-        bool conExists(std::string Id);
-
-        Type getDeclType(std::string Id);
-        AlgebraicDT &getADT(std::string Id);
-        Product &getCon(std::string Id);
-    };
+    bool tryGetDecl(std::string Id, Type &OutType);
+    bool tryGetADT(std::string Id, AlgebraicDT *&OutADT);
+    bool tryGetCon(std::string Id, Product *&OutProduct);
+    bool tryGetGenFunc(std::string Id, Function *&OutFunc);
+    bool tryGetGenADT(std::string Id, AlgebraicDT *&OutADT);
+    bool tryGetGenerated(std::string Id, Type Ty, std::string *OutName);
+};
 }
