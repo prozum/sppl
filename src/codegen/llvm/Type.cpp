@@ -29,7 +29,7 @@ llvm::Type *LLVMCodeGenerator::getType(common::Type Ty, bool Ptr) {
     case common::TypeId::STRING:
         // return llvm::Type::getInt8PtrTy(getGlobalContext());
         return PointerType::getUnqual(ArrayType::get(
-            llvm::Type::getInt8Ty(getGlobalContext()), Ty.NumSubtypes));
+            llvm::Type::getInt8Ty(getGlobalContext()), Ty.subtypeCount()));
     default:
         throw runtime_error("This should not happen!");
     }
