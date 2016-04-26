@@ -1,5 +1,6 @@
 if(CCPP)
     add_subdirectory(cpp)
+    add_subdirectory(cpar)
 endif()
 if(CHASKELL)
     add_subdirectory(haskell)

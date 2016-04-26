@@ -68,6 +68,7 @@ include_directories(
         src/semantics
         src/parser
         src/codegen/cpp
+        src/codegen/cpar
         src/codegen/haskell
         src/codegen/gnuasm
         src/codegen/llvm
