@@ -2,15 +2,13 @@
 #include "ScopeGenerator.h"
 #include "TypeChecker.h"
 #include "CodeGenerator.h"
-#include "Node.h"
+#include "Parser.h"
 #include <sstream>
 #include <string>
 #include <unordered_map>
 #include <vector>
 
 namespace codegen {
-enum class IdContext { PATTERN, EXPR };
-
 class CCodeGenerator : public parser::CodeGenerator {
   public:
     CCodeGenerator(parser::Driver &Drv);
@@ -75,12 +73,12 @@ class CCodeGenerator : public parser::CodeGenerator {
     const std::string GPrint = "print_";
     const std::string GAt = "at_";
     const std::string GValueAt = "valueat_";
-    const std::string GToString = "tostd::string_";
+    const std::string GToString = "tostring_";
     const std::string GFloat = "double";
     const std::string GInt = "int64_t";
     const std::string GChar = "int";
     const std::string GBool = "int";
-    const std::string GString = "std::string";
+    const std::string GString = "string";
     const std::string GList = "list";
     const std::string GSignature = "signature";
     const std::string GTuple = "tuple";
@@ -111,7 +109,6 @@ class CCodeGenerator : public parser::CodeGenerator {
     std::vector<std::string> GetValueBuilder;
     std::vector<std::string> Assignments;
     std::vector<int> ListOffsets;
-    IdContext IdCtx;
     std::string LastPattern;
     std::string StringTypeName;
 

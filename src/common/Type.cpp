@@ -9,23 +9,21 @@ Type::Type() {}
 
 Type::~Type() {}
 
-Type::Type(TypeId Id) : Id(Id), NumSubtypes(0) {}
+Type::Type(TypeId Id) : Id(Id) {}
 
-Type::Type(TypeId Id, size_t NumSubtypes) : Id(Id), NumSubtypes(NumSubtypes) {}
-
-Type::Type(TypeId Id, Location Loc) : Id(Id), NumSubtypes(0), Loc(Loc) {}
+Type::Type(TypeId Id, Location Loc) : Id(Id), Loc(Loc) {}
 
 Type::Type(TypeId Id, vector<Type> Subtypes)
-    : Id(Id), Subtypes(Subtypes), NumSubtypes(Subtypes.size()) {}
+    : Id(Id), Subtypes(Subtypes) {}
 
 Type::Type(TypeId Id, vector<Type> Subtypes, Location Loc)
-    : Id(Id), Subtypes(Subtypes), NumSubtypes(Subtypes.size()), Loc(Loc) {}
+    : Id(Id), Subtypes(Subtypes), Loc(Loc) {}
 
 Type::Type(TypeId Id, vector<Type> Subtypes, string Name)
-    : Id(Id), Subtypes(Subtypes), NumSubtypes(Subtypes.size()), Name(Name) {}
+    : Id(Id), Subtypes(Subtypes), Name(Name) {}
 
 Type::Type(TypeId Id, vector<Type> Subtypes, string Name, Location Loc)
-    : Id(Id), Subtypes(Subtypes), NumSubtypes(Subtypes.size()), Name(Name),
+    : Id(Id), Subtypes(Subtypes), Name(Name),
       Loc(Loc) {}
 
 bool Type::operator==(const Type &Other) const {
@@ -92,6 +90,8 @@ std::string Type::str() {
         return Name;
     case TypeId::UNKNOWN:
         return "_Unknown_";
+    case TypeId::EMPTYLIST:
+        return "_EmptyList_";
     }
 }
 
@@ -109,4 +109,8 @@ string Type::strJoin(const std::string JoinStr) {
     }
 
     return Str;
+}
+
+size_t Type::subtypeCount() {
+    return Subtypes.size();
 }

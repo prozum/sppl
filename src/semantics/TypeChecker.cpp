@@ -13,9 +13,9 @@ void TypeChecker::visit(Program &Node) {
     for (auto &Decl : Node.Decls) {
         Decl->accept(*this);
     }
-    // Visit stops here
 }
 
+// Declarations
 void TypeChecker::visit(Function &Node) {
     CurFunc = &Node;
 
@@ -47,7 +47,6 @@ void TypeChecker::visit(Function &Node) {
 
         CurScope = CurScope->Parent;
     }
-    // Visit stops here
 }
 
 void TypeChecker::visit(AlgebraicDT &Node) {}
@@ -59,6 +58,9 @@ void TypeChecker::visit(Case &Node) {
     for (size_t i = 0; i < Node.Patterns.size(); ++i) {
         Node.Patterns[i]->RetTy = CurFunc->Signature.Subtypes[i];
         Node.Patterns[i]->accept(*this);
+    }
+    if (Node.When) {
+        Node.When->accept(*this);
     }
     Node.Expr->accept(*this);
 
@@ -84,10 +86,22 @@ void TypeChecker::visit(Case &Node) {
         }
     }
 
+    if (Node.When) {
+        if (Node.When->RetTy.Id != TypeId::BOOL) {
+            throw Error::Expected("Type mismatch in the when expression",
+                                  Type(TypeId::BOOL).str(),
+                                  Node.When->RetTy.str(), Node.When->Loc);
+        }
+    }
+
+    if (containsEmptyList(Node.Expr->RetTy)) {
+        resolveEmptyList(Node.Expr->RetTy, CurFunc->Signature.Subtypes.back());
+    }
+
     if (CurFunc->Signature.Subtypes.back() != Node.Expr->RetTy) {
         throw Error::Expected("Wrong return type",
                               CurFunc->Signature.Subtypes.back().str(),
-                              Node.Expr->RetTy.str(), Node.Loc);
+                              Node.Expr->RetTy.str(), Node.Expr->Loc);
     }
 }
 
@@ -118,6 +132,21 @@ void TypeChecker::visit(CharPattern &Node) {
         throw Error::Expected("Type mismatch", Node.RetTy.str(),
                               Type(TypeId::CHAR).str(), Node.Loc);
     }
+}
+
+void TypeChecker::visit(IdPattern &Node) {
+    Type Out;
+
+    if (CurScope->tryGetDecl(Node.Val, Out)) {
+        throw Error(Node.Val + " was already declared in the current scope.",
+                    Node.Loc);
+    }
+
+    CurScope->Decls.insert({Node.Val, Node.RetTy});
+}
+
+void TypeChecker::visit(WildPattern &Node) {
+    // Nothing should be checked in the wild pattern
 }
 
 void TypeChecker::visit(StringPattern &Node) {
@@ -176,19 +205,6 @@ void TypeChecker::visit(ListSplit &Node) {
     Node.Right->accept(*this);
 }
 
-void TypeChecker::visit(IdPattern &Node) {
-    Type Out;
-
-    if (CurScope->tryGetDecl(Node.Val, Out)) {
-        throw Error(Node.Val + " was already declared in the current scope.",
-                    Node.Loc);
-    }
-
-    CurScope->Decls.insert({Node.Val, Node.RetTy});
-}
-
-void TypeChecker::visit(WildPattern &Node) {}
-
 void TypeChecker::visit(AlgebraicPattern &Node) {
     auto Got = CurScope->Constructors.find(Node.Constructor);
 
@@ -234,7 +250,6 @@ void TypeChecker::visit(And &Node) {
     // Visit children
     Node.Left->accept(*this);
     Node.Right->accept(*this);
-    // Visit stops here
 
     if (Node.Left->RetTy.Id != TypeId::BOOL ||
         Node.Left->RetTy.Id != Node.Right->RetTy.Id) {
@@ -249,11 +264,10 @@ void TypeChecker::visit(Equal &Node) {
     // Visit children
     Node.Left->accept(*this);
     Node.Right->accept(*this);
-    // Visit stops here
 
     if ((Node.Left->RetTy.Id != TypeId::INT &&
          Node.Left->RetTy.Id != TypeId::FLOAT) ||
-        Node.Left->RetTy.Id != Node.Right->RetTy.Id) {
+         Node.Left->RetTy.Id != Node.Right->RetTy.Id) {
         throw Error::Binary(
             "Operator only operates on Int or FloatPattern children", Node);
     }
@@ -265,11 +279,10 @@ void TypeChecker::visit(NotEqual &Node) {
     // Visit children
     Node.Left->accept(*this);
     Node.Right->accept(*this);
-    // Visit stops here
 
     if ((Node.Left->RetTy.Id != TypeId::INT &&
          Node.Left->RetTy.Id != TypeId::FLOAT) ||
-        Node.Left->RetTy.Id != Node.Right->RetTy.Id) {
+         Node.Left->RetTy.Id != Node.Right->RetTy.Id) {
         throw Error::Binary(
             "Operator only operates on Int or FloatPattern children", Node);
     }
@@ -281,11 +294,10 @@ void TypeChecker::visit(Lesser &Node) {
     // Visit children
     Node.Left->accept(*this);
     Node.Right->accept(*this);
-    // Visit stops here
 
     if ((Node.Left->RetTy.Id != TypeId::INT &&
          Node.Left->RetTy.Id != TypeId::FLOAT) ||
-        Node.Left->RetTy.Id != Node.Right->RetTy.Id) {
+         Node.Left->RetTy.Id != Node.Right->RetTy.Id) {
         throw Error::Binary(
             "Operator only operates on Int or FloatPattern children", Node);
     }
@@ -297,11 +309,10 @@ void TypeChecker::visit(Greater &Node) {
     // Visit children
     Node.Left->accept(*this);
     Node.Right->accept(*this);
-    // Visit stops here
 
     if ((Node.Left->RetTy.Id != TypeId::INT &&
          Node.Left->RetTy.Id != TypeId::FLOAT) ||
-        Node.Left->RetTy.Id != Node.Right->RetTy.Id) {
+         Node.Left->RetTy.Id != Node.Right->RetTy.Id) {
         throw Error::Binary(
             "Operator only operates on Int or FloatPattern children", Node);
     }
@@ -313,11 +324,10 @@ void TypeChecker::visit(LesserEq &Node) {
     // Visit children
     Node.Left->accept(*this);
     Node.Right->accept(*this);
-    // Visit stops here
 
     if ((Node.Left->RetTy.Id != TypeId::INT &&
          Node.Left->RetTy.Id != TypeId::FLOAT) ||
-        Node.Left->RetTy.Id != Node.Right->RetTy.Id) {
+         Node.Left->RetTy.Id != Node.Right->RetTy.Id) {
         throw Error::Binary(
             "Operator only operates on Int or FloatPattern children", Node);
     }
@@ -329,11 +339,10 @@ void TypeChecker::visit(GreaterEq &Node) {
     // Visit children
     Node.Left->accept(*this);
     Node.Right->accept(*this);
-    // Visit stops here
 
     if ((Node.Left->RetTy.Id != TypeId::INT &&
          Node.Left->RetTy.Id != TypeId::FLOAT) ||
-        Node.Left->RetTy.Id != Node.Right->RetTy.Id) {
+         Node.Left->RetTy.Id != Node.Right->RetTy.Id) {
         throw Error::Binary(
             "Operator only operates on Int or FloatPattern children", Node);
     }
@@ -345,11 +354,10 @@ void TypeChecker::visit(Add &Node) {
     // Visit children
     Node.Left->accept(*this);
     Node.Right->accept(*this);
-    // Visit stops here
 
     if ((Node.Left->RetTy.Id != TypeId::INT &&
          Node.Left->RetTy.Id != TypeId::FLOAT) ||
-        Node.Left->RetTy.Id != Node.Right->RetTy.Id) {
+         Node.Left->RetTy.Id != Node.Right->RetTy.Id) {
         throw Error::Binary(
             "Operator only operates on Int or FloatPattern children", Node);
     }
@@ -361,11 +369,10 @@ void TypeChecker::visit(Sub &Node) {
     // Visit children
     Node.Left->accept(*this);
     Node.Right->accept(*this);
-    // Visit stops here
 
     if ((Node.Left->RetTy.Id != TypeId::INT &&
          Node.Left->RetTy.Id != TypeId::FLOAT) ||
-        Node.Left->RetTy.Id != Node.Right->RetTy.Id) {
+         Node.Left->RetTy.Id != Node.Right->RetTy.Id) {
         throw Error::Binary(
             "Operator only operates on Int or FloatPattern children", Node);
     }
@@ -377,11 +384,10 @@ void TypeChecker::visit(Mul &Node) {
     // Visit children
     Node.Left->accept(*this);
     Node.Right->accept(*this);
-    // Visit stops here
 
     if ((Node.Left->RetTy.Id != TypeId::INT &&
          Node.Left->RetTy.Id != TypeId::FLOAT) ||
-        Node.Left->RetTy.Id != Node.Right->RetTy.Id) {
+         Node.Left->RetTy.Id != Node.Right->RetTy.Id) {
         throw Error::Binary(
             "Operator only operates on Int or FloatPattern children", Node);
     }
@@ -393,11 +399,10 @@ void TypeChecker::visit(Div &Node) {
     // Visit children
     Node.Left->accept(*this);
     Node.Right->accept(*this);
-    // Visit stops here
 
     if ((Node.Left->RetTy.Id != TypeId::INT &&
          Node.Left->RetTy.Id != TypeId::FLOAT) ||
-        Node.Left->RetTy.Id != Node.Right->RetTy.Id) {
+         Node.Left->RetTy.Id != Node.Right->RetTy.Id) {
         throw Error::Binary(
             "Operator only operates on Int or FloatPattern children", Node);
     }
@@ -409,11 +414,10 @@ void TypeChecker::visit(Mod &Node) {
     // Visit children
     Node.Left->accept(*this);
     Node.Right->accept(*this);
-    // Visit stops here
 
     if ((Node.Left->RetTy.Id != TypeId::INT &&
          Node.Left->RetTy.Id != TypeId::FLOAT) ||
-        Node.Left->RetTy.Id != Node.Right->RetTy.Id) {
+         Node.Left->RetTy.Id != Node.Right->RetTy.Id) {
         throw Error::Binary(
             "Operator only operates on Int or FloatPattern children", Node);
     }
@@ -425,7 +429,6 @@ void TypeChecker::visit(ListAdd &Node) {
     // Visit children
     Node.Left->accept(*this);
     Node.Right->accept(*this);
-    // Visit stops here
 
     if (Node.Right->RetTy.Id != TypeId::LIST) {
         throw Error::Binary("Right must be a ListExpression", Node);
@@ -441,6 +444,7 @@ void TypeChecker::visit(ListAdd &Node) {
 
 void TypeChecker::visit(To &Node) {
     // TODO Implement To Type Checking
+    throw std::runtime_error("Not implemented");
 }
 
 void TypeChecker::visit(AlgebraicExpr &Node) {
@@ -451,7 +455,8 @@ void TypeChecker::visit(AlgebraicExpr &Node) {
     }
 
     if (CurScope->tryGetCon(Node.Constructor, Out)) {
-
+        // TODO Implement Checking if constructor was found
+        throw std::runtime_error("Not implemented");
     } else {
         throw Error(
             Node.Constructor +
@@ -462,23 +467,25 @@ void TypeChecker::visit(AlgebraicExpr &Node) {
 
 void TypeChecker::visit(LambdaFunction &Node) {
     // TODO Implement LambdaFunction Type Checking
+    throw std::runtime_error("Not implemented");
 }
 void TypeChecker::visit(LambdaArg &Node) {
     // TODO Implement LambdaArg Type Checking
+    throw std::runtime_error("Not implemented");
 }
 void TypeChecker::visit(ProducerConsumer &Node) {
     // TODO Implement ProducerConsumer Type Checking
+    throw std::runtime_error("Not implemented");
 }
 void TypeChecker::visit(Concat &Node) {
     // TODO Implement Concat Type Checking
+    throw std::runtime_error("Not implemented");
 }
 
 void TypeChecker::visit(ParExpr &Node) {
     // Visit children
     Node.Child->accept(*this);
-    // Visit stops here
 
-    // Code starts here
     Node.RetTy = Node.Child->RetTy;
 }
 void TypeChecker::visit(Negative &Node) {
@@ -497,7 +504,6 @@ void TypeChecker::visit(Negative &Node) {
 void TypeChecker::visit(Not &Node) {
     // Visit children
     Node.Child->accept(*this);
-    // Visit stops here
 
     if (Node.Child->RetTy.Id != TypeId::BOOL) {
         throw Error::Unary("Operator only operates on Bool typed children",
@@ -512,7 +518,6 @@ void TypeChecker::visit(ListExpr &Node) {
     for (auto &Element : Node.Elements) {
         Element->accept(*this);
     }
-    // Visit stops here
 
     if (Node.Elements.size() != 0) {
         for (size_t i = 0; i < Node.Elements.size() - 1; ++i) {
@@ -527,8 +532,7 @@ void TypeChecker::visit(ListExpr &Node) {
         Node.RetTy = Type(TypeId::LIST);
         Node.RetTy.Subtypes.push_back(Node.Elements[0]->RetTy);
     } else {
-        Node.RetTy = Type(TypeId::LIST);
-        Node.RetTy.Subtypes.push_back(Type(TypeId::GENERIC));
+        Node.RetTy = Type(TypeId::EMPTYLIST);
     }
 }
 
@@ -537,7 +541,6 @@ void TypeChecker::visit(TupleExpr &Node) {
     for (auto &Element : Node.Elements) {
         Element->accept(*this);
     }
-    // Visit stops here
 
     Node.RetTy = Type(TypeId::TUPLE);
 
@@ -564,7 +567,6 @@ void TypeChecker::visit(CallExpr &Node) {
     for (auto &Arg : Node.Args) {
         Arg->accept(*this);
     }
-    // Visit stops here
 
     if (Node.Callee->RetTy.Id != TypeId::SIGNATURE) {
         throw Error::Expected("Can't call a type that is not a Signature",
@@ -579,9 +581,11 @@ void TypeChecker::visit(CallExpr &Node) {
     }
 
     for (size_t i = 0; i < Node.Args.size(); ++i) {
-        if (false) {
-            // TODO Generic support here
-        } else if (Node.Args[i]->RetTy != Node.Callee->RetTy.Subtypes[i]) {
+        if (containsEmptyList(Node.Args[i]->RetTy)) {
+            resolveEmptyList(Node.Args[i]->RetTy, Node.Callee->RetTy.Subtypes[i]);
+        }
+
+        if (Node.Args[i]->RetTy != Node.Callee->RetTy.Subtypes[i]) {
             throw Error::Expected(
                 "Function was called with an invalid argument",
                 Node.Callee->RetTy.Subtypes[i].str(), Node.Args[i]->RetTy.str(),
@@ -592,8 +596,41 @@ void TypeChecker::visit(CallExpr &Node) {
     Node.RetTy = Node.Callee->RetTy.Subtypes.back();
 }
 
-void TypeChecker::visit(IntExpr &Node) {}
-void TypeChecker::visit(FloatExpr &Node) {}
-void TypeChecker::visit(StringExpr &Node) {}
-void TypeChecker::visit(CharExpr &Node) {}
-void TypeChecker::visit(BoolExpr &Node) {}
+void TypeChecker::visit(IntExpr &Node) { }
+void TypeChecker::visit(FloatExpr &Node) { }
+void TypeChecker::visit(StringExpr &Node) { }
+void TypeChecker::visit(CharExpr &Node) { }
+void TypeChecker::visit(BoolExpr &Node) { }
+
+bool TypeChecker::containsEmptyList(Type &Ty) {
+    switch (Ty.Id) {
+        case TypeId::EMPTYLIST:
+            return true;
+        case TypeId::LIST:
+        case TypeId::TUPLE:
+            for (auto &Tpe: Ty.Subtypes) {
+                if (containsEmptyList(Tpe))
+                    return true;
+            }
+        default:
+            return false;
+    }
+}
+
+void TypeChecker::resolveEmptyList(Type &Ty, Type &Resolver) {
+    switch (Ty.Id) {
+        case TypeId::EMPTYLIST:
+            if (Resolver.Id == TypeId::LIST) {
+                Ty = Resolver;
+            }
+            break;
+        case TypeId::LIST:
+        case TypeId::TUPLE:
+            for (size_t i = 0; i < Ty.Subtypes.size() && i < Resolver.Subtypes.size(); ++i) {
+                resolveEmptyList(Ty.Subtypes[i], Resolver.Subtypes[i]);
+            }
+            break;
+        default:
+            break;
+    }
+}

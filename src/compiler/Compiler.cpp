@@ -1,6 +1,7 @@
 #include "Compiler.h"
 
 using namespace compiler;
+using namespace std;
 
 Compiler::Compiler()
     : ScopeGen(semantics::ScopeGenerator(&Global)),
@@ -45,25 +46,17 @@ int Compiler::compile(const vector<string> &Filenames) {
     if (!parseFiles(Filenames))
         return 1;
 
-    cout << Prog->str() << endl;
-
     if (!accept(ScopeGen))
         return 2;
-
-    cout << "--------------------------" << endl;
-
-    cout << Prog->str() << endl;
 
     if (!accept(TypeChecker))
         return 3;
 
-    /*
     if (!accept(Optimizer))
         return 4;
 
     if (!accept(*CodeGen))
         return 5;
-    */
 
     return 0;
 }

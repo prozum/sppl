@@ -63,6 +63,9 @@ class TypeChecker : public common::Visitor {
     void visit(common::CallExpr &Node);
     void visit(common::AlgebraicExpr &Node);
 
+    bool containsEmptyList(common::Type &Ty);
+    void resolveEmptyList(common::Type &Ty, common::Type &Resolver);
+
     common::Scope *CurScope;
     common::Scope *GlobalScope;
     common::Function *CurFunc;
