@@ -164,6 +164,7 @@ void CCodeGenerator::visit(StringExpr &Node) {
 }
 
 void CCodeGenerator::visit(IdExpr &Node) {
+    /*
     bool IsDeclared = false;
 
     for (auto &Decl : Prog->Decls) {
@@ -177,6 +178,7 @@ void CCodeGenerator::visit(IdExpr &Node) {
     if (IsDeclared) {
         ExprStack.top() << "&" << GGlobal;
     }
+     */
 
     ExprStack.top() << GUser << Node.Val;
 }
@@ -233,6 +235,18 @@ void CCodeGenerator::visit(AlgebraicExpr &Node) {
 
 // Others
 void CCodeGenerator::visit(CallExpr &Node) {
+    Node.Callee->accept(*this);
+
+    ExprStack.top() << "(";
+    for (auto &Expr: Node.Args) {
+        Expr->accept(*this);
+
+        if (Expr != Node.Args.back())
+            ExprStack.top() << ", ";
+    }
+    ExprStack.top() << ")";
+
+    /*
     string Name = GGenerated + GClosure + to_string(EnvCount++);
     string Assignment =
             getEnvironment(Node.Callee->RetTy) + "* " + Name + " = ";
@@ -251,6 +265,7 @@ void CCodeGenerator::visit(CallExpr &Node) {
         Arg->accept(*this);
     }
     ExprStack.top() << ")";
+     */
 }
 
 void CCodeGenerator::visit(LambdaArg &Node) {
