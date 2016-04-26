@@ -19,6 +19,7 @@ enum class TypeId {
     TUPLE,
     SIGNATURE,
     GENERIC,
+    EMPTYLIST,
     CUSTOM
 };
 

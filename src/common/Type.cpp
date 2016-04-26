@@ -92,6 +92,8 @@ std::string Type::str() {
         return Name;
     case TypeId::UNKNOWN:
         return "_Unknown_";
+    case TypeId::EMPTYLIST:
+        return "_EmptyList_";
     }
 }
 
