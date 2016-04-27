@@ -168,8 +168,15 @@ void CParCodeGenerator::visit(Case &Node) {
         ExprStack.push(stringstream());
 
         Node.When->accept(*this);
+
+        for (size_t i = CallStack.size(); i > 0; i--) {
+            *Output << CallStack.back();
+            *Output << "        taskyield(t);\n";
+            CallStack.pop_back();
+        }
+
         *Output << "        if (" << ExprStack.top().str() << ") \n"
-                "        { \n";
+                   "        { \n";
         ExprStack.pop();
     }
 
@@ -181,8 +188,15 @@ void CParCodeGenerator::visit(Case &Node) {
         for (size_t i = 0; i < CurFunc->Signature.Subtypes.size() - 1; ++i) {
             ExprStack.push(stringstream());
             C->Args[i]->accept(*this);
+
+            for (size_t i = CallStack.size(); i > 0; i--) {
+                *Output << CallStack.back();
+                *Output << "        taskyield(t);\n";
+                CallStack.pop_back();
+            }
+
             *Output << "        " << GGenerated << GArg << i << " = "
-            << ExprStack.top().str() << "; \n";
+                                  << ExprStack.top().str() << "; \n";
             ExprStack.pop();
         }
 
@@ -193,6 +207,13 @@ void CParCodeGenerator::visit(Case &Node) {
         ExprStack.push(stringstream());
 
         Node.Expr->accept(*this);
+
+        for (size_t i = CallStack.size(); i > 0; i--) {
+            *Output << CallStack.back();
+            *Output << "        taskyield(t);\n";
+            CallStack.pop_back();
+        }
+
         *Output << "        ((" << CurrentArg << "*)t->startarg)->" << GGenerated << GRes << " = " << ExprStack.top().str() << "; \n";
         *Output << "        taskexit(t); \n";
         ExprStack.pop();
@@ -207,15 +228,25 @@ void CParCodeGenerator::visit(Case &Node) {
 }
 
 void CParCodeGenerator::visit(common::CallExpr &Node) {
+    stringstream GeneratedCall;
     string Name = GTask + to_string(TaskCount++);
     string Signature = getEnvironment(Node.Callee->RetTy);
 
-    *Output << "        " << Signature << GArg << "* " << Name << GArg << " = malloc(sizeof(" << Signature << GArg << "));\n";
+    CurrentTasks.push_back(Name);
+
+    if (CallStack.size() == CallDepth) {
+        CallStack.push_back(string());
+    }
+
+    CallDepth++;
+
+
+    GeneratedCall << "        " << Signature << GArg << "* " << Name << GArg << " = malloc(sizeof(" << Signature << GArg << "));\n";
     for (size_t i = 0; i < Node.Args.size(); ++i) {
         ExprStack.push(stringstream());
         Node.Args[i]->accept(*this);
 
-        *Output << "        " << Name << GArg << "->" << GGenerated << GArg << i << " = " << ExprStack.top().str() << "; \n";
+        GeneratedCall << "        " << Name << GArg << "->" << GGenerated << GArg << i << " = " << ExprStack.top().str() << "; \n";
 
         ExprStack.pop();
     }
@@ -223,13 +254,14 @@ void CParCodeGenerator::visit(common::CallExpr &Node) {
     ExprStack.push(stringstream());
     Node.Callee->accept(*this);
 
-    *Output << "        task_t *" << Name << " = taskcreate((void *)&" << ExprStack.top().str()
-                                          << ", (void *)" << Name << GArg << ");\n";
-    *Output << "        subtaskadd(t, " << Name << "); \n";
-    *Output << "        taskyield(t); \n";
+    GeneratedCall << "        task_t *" << Name << " = taskcreate((void *)&" << ExprStack.top().str()
+                                              << ", (void *)" << Name << GArg << ");\n";
+    GeneratedCall << "        subtaskadd(t, " << Name << "); \n";
 
     ExprStack.pop();
     ExprStack.top() << "((" << Signature << GArg << "*)" << Name << "->startarg" << ")->" << GGenerated << GRes;
+    CallDepth--;
+    CallStack[CallDepth] += GeneratedCall.str();
 }
 
 std::string CParCodeGenerator::generateEnvironment(common::Type &Ty) {

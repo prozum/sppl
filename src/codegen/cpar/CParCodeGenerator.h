@@ -20,6 +20,10 @@ class CParCodeGenerator : public CCodeGenerator {
 
         std::string CurrentArg;
 
+        std::vector<std::string> CallStack;
+        std::vector<std::string> CurrentTasks;
+
+        size_t CallDepth = 0;
         int TaskCount = 0;
         int SupTaskCount = 0;
 };
