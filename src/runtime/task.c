@@ -1,6 +1,6 @@
 #include "task.h"
 
-uint placeholder_stack_size = 256 * 2048;
+uint placeholder_stack_size = 1024; //2048;
 
 task_t*
 taskalloc(void (*fn)(void*), void *arg, uint stack)
@@ -85,7 +85,7 @@ subtaskadd(task_t *parent, task_t *subtask)
 void
 taskswitch(task_t *t)
 {
-    needstack(t, 0);
+    //needstack(t, 0);
 	contextswitch(&t->context, runtime.scheduler_pool[t->scheduler_id].context);
 }
 

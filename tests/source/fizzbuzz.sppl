@@ -1,48 +1,35 @@
 def main : [String] -> [Int]
-| (x : (par : rest)) = map(fizzbuzz, generate(parsestring(par), []))
+    | (x : (par : rest)) = map(fizzbuzz, generate(parsestring(par), []))
 
 def generate : Int -> [Int] -> [Int]
-| 0 list = list
-| n list = generate(n - 1, n : list)
+    | 0 list = list
+    | n list = generate(n - 1, n : list)
 
 def map : (Int -> Int) -> [Int] -> [Int]
-| f []         = []
-| f (x : rest) = f(x) : map(f, rest)
+    | f []         = []
+    | f (x : rest) = f(x) : map(f, rest)
 
 def fizzbuzz : Int -> Int
-| n = ifelse(n % 3 == 0 && n % 5 == 0,
-            -3
-            ,
-            ifelse(n % 5 == 0,
-                -2
-                ,
-                ifelse(n % 3 == 0,
-                    -1
-                    ,
-                    n
-                )
-            )
-        )
-
-def ifelse : Bool -> Int -> Int -> Int
-| True a b = a
-| False a b = b
+    | n when n % 3 == 0 && n % 5 == 0 = -3 #Fizzbuzz = -3
+    | n when n % 5 == 0               = -2 #Buzz = -2
+    | n when n % 3 == 0               = -1 #Fizz = -1
+    | n                               = n #if not fizz or buzz, then just return number
 
 def parsestring : String -> Int
-| x = parsestringacc(x, 0)
+    | x = parsestringacc(x, 0)
 
 def parsestringacc : String -> Int -> Int
-| "" acc       = acc
-| (x : xs) acc = parsestringacc(xs, (acc * 10) + parsechar(x))
+    | "" acc       = acc
+    | (x : xs) acc = parsestringacc(xs, (acc * 10) + parsechar(x))
 
 def parsechar : Char -> Int
-| '0' = 0
-| '1' = 1
-| '2' = 2
-| '3' = 3
-| '4' = 4
-| '5' = 5
-| '6' = 6
-| '7' = 7
-| '8' = 8
-| '9' = 9
+    | '0' = 0
+    | '1' = 1
+    | '2' = 2
+    | '3' = 3
+    | '4' = 4
+    | '5' = 5
+    | '6' = 6
+    | '7' = 7
+    | '8' = 8
+    | '9' = 9
