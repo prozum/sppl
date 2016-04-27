@@ -19,10 +19,9 @@ void GeneralOptimizer::visit(Function &Node) {
         auto Expr = Case->Expr.get();
 
         if (typeid(*Expr) == typeid(CallExpr) &&
-            typeid(static_cast<CallExpr *>(Expr)->Callee) ==
-                typeid(IdPattern) &&
-            (static_cast<IdExpr *>(static_cast<CallExpr *>(Expr)->Callee.get()))
-                    ->Val == Node.Id) {
+            typeid(*static_cast<CallExpr *>(Expr)->Callee.get()) == typeid(IdExpr) &&
+            static_cast<IdExpr *>(static_cast<CallExpr *>(Expr)->Callee.get())->Val == Node.Id)
+        {
             Case->TailRec = true;
         }
 
