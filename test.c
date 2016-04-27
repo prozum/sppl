@@ -289,7 +289,6 @@ Start:
         task0arg->generated_arg0 = 10; 
         task_t *task0 = taskcreate((void *)&user_f, (void *)task0arg);
         subtaskadd(t, task0); 
-        taskyield(t); 
         generated_signature2arg* task1arg = malloc(sizeof(generated_signature2arg));
         task1arg->generated_arg0 = 10; 
         task_t *task1 = taskcreate((void *)&user_g, (void *)task1arg);
