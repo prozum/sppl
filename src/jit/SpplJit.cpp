@@ -6,11 +6,10 @@ using namespace llvm::orc;
 using namespace jit;
 
 SpplJit::SpplJit()
-    : CodeGen(Drv),
-      CompileLayer(ObjectLayer, SimpleCompiler(*CodeGen.Machine)),
-      ScopeGen(&Drv.Global), TypeChecker(&Drv.Global) {
+    : CodeGen(Drv), ScopeGen(&Drv.Global), TypeChecker(&Drv.Global),
+      CompileLayer(ObjectLayer, SimpleCompiler(*CodeGen.Machine)) {
 
-    llvm::sys::DynamicLibrary::LoadLibraryPermanently(nullptr);
+    sys::DynamicLibrary::LoadLibraryPermanently(nullptr);
     createModule();
 
     // Time is short, mortal
@@ -18,18 +17,18 @@ SpplJit::SpplJit()
     Drv.setHeaderOutput("/dev/null");
 }
 
-SpplJit::ModuleHandleT SpplJit::addModule(std::unique_ptr<llvm::Module> M) {
+SpplJit::ModuleHandleT SpplJit::addModule(unique_ptr<Module> M) {
     auto Resolver = createLambdaResolver(
-        [&](const std::string &Name) {
+        [&](const string &Name) {
             if (auto Sym = findMangledSymbol(Name))
                 return RuntimeDyld::SymbolInfo(Sym.getAddress(),
                                                Sym.getFlags());
             return RuntimeDyld::SymbolInfo(nullptr);
         },
-        [](const std::string &S) { return nullptr; });
+        [](const string &S) { return nullptr; });
     auto Handler = CompileLayer.addModuleSet(
-        singletonSet(std::move(M)), std::make_unique<SectionMemoryManager>(),
-        std::move(Resolver));
+        singletonSet(move(M)), std::make_unique<SectionMemoryManager>(),
+        move(Resolver));
 
     ModuleHandles.push_back(Handler);
     return Handler;
@@ -37,15 +36,15 @@ SpplJit::ModuleHandleT SpplJit::addModule(std::unique_ptr<llvm::Module> M) {
 
 void SpplJit::removeModule(ModuleHandleT Handler) {
     ModuleHandles.erase(
-        std::find(ModuleHandles.begin(), ModuleHandles.end(), Handler));
+        find(ModuleHandles.begin(), ModuleHandles.end(), Handler));
     CompileLayer.removeModuleSet(Handler);
 }
 
-JITSymbol SpplJit::findSymbol(const std::string Name) {
+JITSymbol SpplJit::findSymbol(const string Name) {
     return findMangledSymbol(mangle(Name));
 }
 
-JITSymbol SpplJit::findMangledSymbol(const std::string &Name) {
+JITSymbol SpplJit::findMangledSymbol(const string &Name) {
     for (auto Handler :
          make_range(ModuleHandles.rbegin(), ModuleHandles.rend()))
         if (auto Sym = CompileLayer.findSymbolIn(Handler, Name, true))
@@ -57,8 +56,8 @@ JITSymbol SpplJit::findMangledSymbol(const std::string &Name) {
     return nullptr;
 }
 
-std::string SpplJit::mangle(const std::string &Name) {
-    std::string MangledName;
+string SpplJit::mangle(const string &Name) {
+    string MangledName;
     {
         raw_string_ostream MangledNameStream(MangledName);
         Mangler::getNameWithPrefix(MangledNameStream, Name, CodeGen.DataLayout);
@@ -69,12 +68,12 @@ std::string SpplJit::mangle(const std::string &Name) {
 void SpplJit::createModule() {
     // Open a new module
     CodeGen.Module =
-        llvm::make_unique<llvm::Module>("SpplJit", getGlobalContext());
+        std::make_unique<Module>("SpplJit", getGlobalContext());
     CodeGen.Module->setDataLayout(CodeGen.Machine->createDataLayout());
 
     // Create a new pass manager attached to it
     PassMgr =
-        llvm::make_unique<legacy::FunctionPassManager>(CodeGen.Module.get());
+        std::make_unique<legacy::FunctionPassManager>(CodeGen.Module.get());
 
     // Add optimization passes
     PassMgr->add(createInstructionCombiningPass());
@@ -141,7 +140,7 @@ string SpplJit::getOutputTuple(intptr_t Addr, vector<common::Type> Subtypes) {
     return Out + ")";
 }
 
-int SpplJit::eval(std::string Str) {
+int SpplJit::eval(string Str) {
     if (!Drv.parseString(Str))
         return 1;
 
@@ -186,7 +185,7 @@ int SpplJit::eval(std::string Str) {
 #endif
 
     // Store function in seperate module
-    ModuleHandler = addModule(std::move(CodeGen.Module));
+    ModuleHandler = addModule(move(CodeGen.Module));
     createModule();
 
     // Only run anonymous functions

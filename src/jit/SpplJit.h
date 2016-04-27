@@ -4,6 +4,7 @@
 #include "Driver.h"
 #include "ScopeGenerator.h"
 #include "TypeChecker.h"
+#include "LLVMCodeGenerator.h"
 
 #include <llvm/ExecutionEngine/Orc/CompileUtils.h>
 #include <llvm/ExecutionEngine/Orc/IRCompileLayer.h>
