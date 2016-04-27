@@ -30,14 +30,11 @@ void fun3 (task_t *t) {
     int_t *arg1 = malloc(sizeof(int_t));
     int_t *arg2 = malloc(sizeof(int_t));
 
-    task_t *task1 = taskcreate((void *)&fun1, (void *)arg1, 0);
-    task_t *task2 = taskcreate((void *)&fun2, (void *)arg2, 0);
+    task_t *task1 = taskcreate((void *)&fun1, (void *)arg1);
+    task_t *task2 = taskcreate((void *)&fun2, (void *)arg2);
 
-    task->sub_tasks[0] = task1;
-    task->sub_tasks[1] = task2;
-
-    taskadd(task1);
-    taskadd(task2);
+    subtaskadd(t, task1);
+    subtaskadd(t, task2);
 
     taskyield(task);
 
@@ -55,10 +52,10 @@ int main() {
 
     int_t *arg = malloc(sizeof(int_t));
 
-    task_t *task = taskcreate((void *)&fun3, arg, 2);
+    task_t *task = taskcreate((void *)&fun3, arg);
 
     rmain(4, task);
-
+    
     taskdealloc(task);
 
     return 0;

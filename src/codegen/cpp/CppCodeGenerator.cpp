@@ -49,12 +49,33 @@ void CCodeGenerator::visit(Program &Node) {
                                      " \n"
                                      "    "
             << GGenerated << GPrint << GString << "("
+            << ToStrings[Main->Signature.Subtypes.back()] << "(" << GUser << GMain << "(args))); \n"
+               "    return 0; \n"
+               "} \n"
+               " \n";
+
+    /*
+    *Output << "int main(int argc, char** argv) { \n"
+               "    "
+            << StrListName << " *args = " << GGenerated << GCreate
+            << StrListName << "(0); \n"
+                              "    int i; \n"
+                              " \n"
+                              "    for(i = argc - 1; i >= 0; i--) { \n"
+                              "        args = "
+            << GGenerated << GAdd << StrListName << "(args, " << GGenerated
+            << GCreate << GString << "(argv[i])); \n"
+                                     "    } \n"
+                                     " \n"
+                                     "    "
+            << GGenerated << GPrint << GString << "("
             << ToStrings[Main->Signature.Subtypes.back()] << "(" << GGlobal
             << GUser << GMain << ".call(&" << GGlobal << GUser << GMain
             << ", args))); \n"
                "    return 0; \n"
                "} \n"
                " \n";
+     */
 
     for (auto &Func : Node.Decls) {
         Func->accept(*this);
@@ -68,24 +89,25 @@ void CCodeGenerator::visit(Function &Node) {
     stringstream ArgName;
     string RetType = getType(Node.Signature.Subtypes.back());
     string ArgType;
-    string Signature = getEnvironment(Node.Signature);
+    //string Signature = getEnvironment(Node.Signature);
 
     CurFunc = &Node;
 
     // Generate function name and return type
-    Func << RetType << " " << GUser << Node.Id << "(" << Signature << " *"
-         << GGenerated << GSignature;
+    Func << RetType << " " << GUser << Node.Id << "(";
+    // << Signature << " *" << GGenerated << GSignature;
 
     // Generate function arguments
-    for (size_t i = 0; i < Node.Signature.Subtypes.size() - 1; ++i) {
-        Func << ", ";
-
+    for (size_t i = 0; i < Node.Signature.subtypeCount() - 1; ++i) {
         ArgType = getType(Node.Signature.Subtypes[i]);
         ArgName << GGenerated << GArg << i;
         ArgNames.push_back(ArgName.str());
         Func << ArgType << " " << ArgName.str();
 
         ArgName.str("");
+
+        if (i != Node.Signature.subtypeCount() - 2)
+            Func << ", ";
     }
 
     Func << ")";
@@ -93,8 +115,10 @@ void CCodeGenerator::visit(Function &Node) {
     // Generate function decleration in header
     *Header << Func.str() << "; \n \n";
 
+    /*
     *Header << Signature << " " << GGlobal << GUser << Node.Id << " = { "
             << GUser << Node.Id << " }; \n\n";
+            */
 
     // Generate function in *output
     *Output << Func.str() << " { \n"
@@ -238,7 +262,7 @@ string CCodeGenerator::getType(Type &Ty) {
     case TypeId::TUPLE:
         return getTuple(Ty);
     case TypeId::SIGNATURE:
-        return getEnvironment(Ty) + "*";
+        return getEnvironment(Ty);
     case TypeId::STRING:
         return StringTypeName + "*";
     case TypeId::LIST:
@@ -466,6 +490,25 @@ string CCodeGenerator::generateList(Type &Ty) {
 }
 
 string CCodeGenerator::generateEnvironment(Type &Ty) {
+    string Name = GGenerated + GSignature + to_string(++SigCount);
+    stringstream Res;
+
+    Res << "typedef " << getType(Ty.Subtypes.back()) << "(*" << Name << ")(";
+
+    for (size_t i = 0; i < Ty.subtypeCount() - 1; ++i) {
+        Res << getType(Ty.Subtypes[i]);
+
+        if (i != Ty.subtypeCount() - 2)
+            Res << ", ";
+    }
+    
+    Res << "); \n";
+
+    *Header << Res.str();
+
+    Closures[Ty] = Name;
+    return Name;
+/*
     // Result is needed, so we don't generate something inside the signature,
     // while generating other types
     stringstream Res;
@@ -508,6 +551,7 @@ string CCodeGenerator::generateEnvironment(Type &Ty) {
 
     // Return name of signature generated
     return Name;
+ */
 }
 
 string CCodeGenerator::generateTuple(Type &Ty) {
@@ -823,6 +867,7 @@ string CCodeGenerator::getTuple(Type &Ty) {
 }
 
 string CCodeGenerator::getEnvironment(Type &Ty) {
+
     auto Got = Closures.find(Ty);
 
     if (Got == Closures.end()) {
@@ -830,6 +875,7 @@ string CCodeGenerator::getEnvironment(Type &Ty) {
     } else {
         return Got->second;
     }
+
 }
 
 void CCodeGenerator::outputBuffer() {

@@ -12,7 +12,7 @@
 
 #ifdef CCPP
 #include "CppCodeGenerator.h"
-
+#include "CParCodeGenerator.h"
 #endif
 
 #ifdef CGNUASM
@@ -29,7 +29,7 @@
 
 namespace compiler {
 
-enum Backend { CPP, GNUASM, HASKELL, LLVM, PPRINTER };
+enum Backend { CPP, GNUASM, HASKELL, LLVM, PPRINTER, CPAR };
 
 class Compiler : public parser::Driver {
   public:

@@ -13,6 +13,9 @@ void Compiler::setBackend(Backend B) {
     case Backend::CPP:
         CodeGen = std::make_unique<codegen::CCodeGenerator>(*this);
         break;
+    case Backend::CPAR:
+        CodeGen = std::make_unique<codegen::CParCodeGenerator>(*this);
+        break;
 #endif
 #ifdef CGNUASM
     case Backend::GNUASM:

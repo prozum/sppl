@@ -3,7 +3,7 @@
 uint placeholder_stack_size = 256 * 1024;
 
 task_t*
-taskalloc(void (*fn)(void*), void *arg, uint stack, uint sub_tasks)
+taskalloc(void (*fn)(void*), void *arg, uint stack)
 {
 	task_t *t;
 
@@ -12,8 +12,9 @@ taskalloc(void (*fn)(void*), void *arg, uint stack, uint sub_tasks)
 	t->stk = (uchar*)(t+1);
 	t->startfn = fn;
 	t->startarg = arg;
-	t->sub_task_len = sub_tasks;
-    t->sub_tasks = malloc(sizeof(task_t *) * sub_tasks);
+	t->sub_task_len = 0;
+	t->sub_tasks_alloc = 0;
+    //t->sub_tasks = malloc(sizeof(task_t *) * sub_tasks);
     t->state = NEW;
 
 	if(getcontext(&t->context.uc) < 0){
@@ -38,15 +39,17 @@ void
 taskdealloc(task_t *t)
 {
 	free(t->context.uc.uc_stack.ss_sp);
-    free(t->sub_tasks);
+    if (t->sub_tasks_alloc) {
+        free(t->sub_tasks);
+    }
 	free(t->startarg);
 	free(t);
 }
 
 task_t *
-taskcreate(void (*fn)(void*), void *arg, uint sub_tasks)
+taskcreate(void (*fn)(void*), void *arg)
 {
-    return taskalloc(fn, arg, placeholder_stack_size, sub_tasks);
+    return taskalloc(fn, arg, placeholder_stack_size);
 }
 
 void
@@ -56,6 +59,27 @@ taskadd(task_t *t)
     head->item = (void *)t;
 
     queue_add(head, runtime.queue);
+}
+
+void
+subtaskadd(task_t *parent, task_t *subtask)
+{
+	if (parent->sub_task_len == 0) {
+		parent->sub_tasks = malloc(sizeof(task_t *));
+		parent->sub_task_len++;
+		parent->sub_tasks_alloc++;
+		parent->sub_tasks[0] = subtask;
+	} else if (parent->sub_task_len == parent->sub_tasks_alloc) {
+		parent->sub_tasks = realloc(parent->sub_tasks, sizeof(task_t *) * parent->sub_tasks_alloc * 2);
+		parent->sub_tasks[parent->sub_task_len] = subtask;
+		parent->sub_task_len++;
+		parent->sub_tasks_alloc *= 2;
+	} else {
+		parent->sub_tasks[parent->sub_task_len] = subtask;
+		parent->sub_task_len++;
+	}
+
+	taskadd(subtask);
 }
 
 void

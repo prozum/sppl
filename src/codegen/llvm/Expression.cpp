@@ -80,6 +80,11 @@ void LLVMCodeGenerator::visit(common::ListExpr &Node) {
 
     CurVal = new GlobalVariable(*Module.get(), ConstVal->getType(), true,
                                 GlobalVariable::ExternalLinkage, ConstVal);
+
+    auto Alloca = Builder.CreateAlloca(getType(Node.RetTy));
+    Builder.CreateMemCpy(Alloca, CurVal, DataLayout.getPointerTypeSize(CurVal->getType()->getPointerElementType()), 4);
+    //auto size = DataLayout.getPointerTypeSize(CurVal->getType()->getPointerElementType());
+    //Builder.CreateStore()
 }
 
 void LLVMCodeGenerator::visit(common::CallExpr &Node) {
