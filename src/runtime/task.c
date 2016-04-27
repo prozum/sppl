@@ -1,6 +1,6 @@
 #include "task.h"
 
-uint placeholder_stack_size = 256 * 1024;
+uint placeholder_stack_size = 1024; //2048;
 
 task_t*
 taskalloc(void (*fn)(void*), void *arg, uint stack)
@@ -70,7 +70,10 @@ subtaskadd(task_t *parent, task_t *subtask)
 		parent->sub_tasks_alloc++;
 		parent->sub_tasks[0] = subtask;
 	} else if (parent->sub_task_len == parent->sub_tasks_alloc) {
-		parent->sub_tasks = realloc(parent->sub_tasks, sizeof(task_t *) * parent->sub_tasks_alloc * 2);
+		print("sub - before: %d %d\n", parent->sub_task_len, parent->sub_tasks_alloc);
+		void *test = realloc(parent->sub_tasks, sizeof(task_t *) * parent->sub_tasks_alloc * 2);
+		print("sub - after malloc: %d %d\n", parent->sub_task_len, parent->sub_tasks_alloc);
+		parent->sub_tasks = test;
 		parent->sub_tasks[parent->sub_task_len] = subtask;
 		parent->sub_task_len++;
 		parent->sub_tasks_alloc *= 2;
@@ -85,7 +88,7 @@ subtaskadd(task_t *parent, task_t *subtask)
 void
 taskswitch(task_t *t)
 {
-    needstack(t, 0);
+    //needstack(t, 0);
 	contextswitch(&t->context, runtime.scheduler_pool[t->scheduler_id].context);
 }
 

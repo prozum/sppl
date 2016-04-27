@@ -46,7 +46,7 @@ void CParCodeGenerator::visit(Program &Node) {
             " \n"
             "    " << MainSig << GArg << "* main_args = malloc(sizeof(" << MainSig << GArg << ")); \n"
             "    main_args->" << GGenerated << GArg << "0 = args; \n"
-            "    task_t *main_task = taskcreate((void *)&" << GUser << GMain << ", (void *)main_args, 2); \n"
+            "    task_t *main_task = taskcreate((void *)&" << GUser << GMain << ", (void *)main_args); \n"
             "    rmain(4, main_task); \n"
             "\n"
             "    " << GGenerated << GPrint << GString << "("
@@ -224,9 +224,8 @@ void CParCodeGenerator::visit(common::CallExpr &Node) {
     Node.Callee->accept(*this);
 
     *Output << "        task_t *" << Name << " = taskcreate((void *)&" << ExprStack.top().str()
-                                          << ", (void *)" << Name << GArg << ", 2);\n";
-    *Output << "        t->sub_tasks[" << SupTaskCount++ << "] = " << Name << "; \n";
-    *Output << "        taskadd(" << Name << "); \n";
+                                          << ", (void *)" << Name << GArg << ");\n";
+    *Output << "        subtaskadd(t, " << Name << "); \n";
     *Output << "        taskyield(t); \n";
 
     ExprStack.pop();
