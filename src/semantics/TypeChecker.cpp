@@ -243,7 +243,7 @@ void TypeChecker::visit(Or &Node) {
                             Node);
     }
 
-    Node.RetTy = Node.Left->RetTy;
+    Node.RetTy.Id = TypeId::BOOL;
 }
 
 void TypeChecker::visit(And &Node) {
@@ -257,7 +257,7 @@ void TypeChecker::visit(And &Node) {
                             Node);
     }
 
-    Node.RetTy = Node.Left->RetTy;
+    Node.RetTy.Id = TypeId::BOOL;
 }
 
 void TypeChecker::visit(Equal &Node) {
@@ -272,7 +272,7 @@ void TypeChecker::visit(Equal &Node) {
             "Operator only operates on Int or FloatPattern children", Node);
     }
 
-    Node.RetTy = Type(TypeId::BOOL);
+    Node.RetTy.Id = TypeId::BOOL;
 }
 
 void TypeChecker::visit(NotEqual &Node) {
@@ -287,7 +287,7 @@ void TypeChecker::visit(NotEqual &Node) {
             "Operator only operates on Int or FloatPattern children", Node);
     }
 
-    Node.RetTy = Node.Left->RetTy;
+    Node.RetTy.Id = TypeId::BOOL;
 }
 
 void TypeChecker::visit(Lesser &Node) {
@@ -302,7 +302,7 @@ void TypeChecker::visit(Lesser &Node) {
             "Operator only operates on Int or FloatPattern children", Node);
     }
 
-    Node.RetTy = Node.Left->RetTy;
+    Node.RetTy.Id = TypeId::BOOL;
 }
 
 void TypeChecker::visit(Greater &Node) {
@@ -317,7 +317,7 @@ void TypeChecker::visit(Greater &Node) {
             "Operator only operates on Int or FloatPattern children", Node);
     }
 
-    Node.RetTy = Node.Left->RetTy;
+    Node.RetTy.Id = TypeId::BOOL;
 }
 
 void TypeChecker::visit(LesserEq &Node) {
@@ -332,7 +332,7 @@ void TypeChecker::visit(LesserEq &Node) {
             "Operator only operates on Int or FloatPattern children", Node);
     }
 
-    Node.RetTy = Node.Left->RetTy;
+    Node.RetTy.Id = TypeId::BOOL;
 }
 
 void TypeChecker::visit(GreaterEq &Node) {
@@ -347,7 +347,7 @@ void TypeChecker::visit(GreaterEq &Node) {
             "Operator only operates on Int or FloatPattern children", Node);
     }
 
-    Node.RetTy = Node.Left->RetTy;
+    Node.RetTy.Id = TypeId::BOOL;
 }
 
 void TypeChecker::visit(Add &Node) {
