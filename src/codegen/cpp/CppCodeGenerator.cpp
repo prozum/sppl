@@ -272,10 +272,8 @@ string CCodeGenerator::generateList(Type &Ty) {
 
     // Generate the data type itself
     *Header << " " << endl
-            << "typedef struct "
-            << Name << " { " << endl
-            << "    struct "
-            << Name << "* " << GNext << "; " << endl
+            << "typedef struct "<< Name << " { " << endl
+            << "    struct "<< Name << "* " << GNext << "; " << endl
             << "    " << ChildrenType << " " << GValue << "; " << endl
             << "    int " << GEmpty << "; " << endl
             << "    int " << GSize << "; " << endl
@@ -358,13 +356,15 @@ string CCodeGenerator::generateList(Type &Ty) {
 
     switch (Ty.Subtypes.front().Id) {
     case TypeId::LIST:
-        Buffer << "!" << GGenerated << GCompare << getList(Ty.Subtypes.front()) << "(list1->" << GValue << ", list2->" << GValue << ")";
+        Buffer << "!" << GGenerated << GCompare << getList(Ty.Subtypes.front())
+                      << "(list1->" << GValue << ", list2->" << GValue << ")";
         break;
     case TypeId::TUPLE:
-        Buffer << "!" << GGenerated << GCompare << getTuple(Ty.Subtypes.front()) << "(list1->" << GValue << ", list2->" << GValue << ")";
+        Buffer << "!" << GGenerated << GCompare << getTuple(Ty.Subtypes.front())
+                      << "(list1->" << GValue << ", list2->" << GValue << ")";
         break;
     default:
-        Buffer << "list1->" << GValue << "!= list2->" << GValue << "";
+        Buffer << "list1->" << GValue << "!= list2->" << GValue;
         break;
     }
 
@@ -379,8 +379,10 @@ string CCodeGenerator::generateList(Type &Ty) {
            << endl;
 
     // Generation of concat
-    *Header << Name << "* " << GGenerated << GConcat << Name << "(" << Name << "* list1, " << Name << "* list2); " << endl;
-    Buffer << Name << "* " << GGenerated << GConcat << Name << "(" << Name << "* list1, " << Name << "* list2) { " << endl
+    *Header << Name << "* " << GGenerated << GConcat << Name << "("
+                            << Name << "* list1, " << Name << "* list2); " << endl;
+    Buffer << Name << "* " << GGenerated << GConcat << Name << "("
+                           << Name << "* list1, " << Name << "* list2) { " << endl
            << "    int i; " << endl
            << "    " << Name << "** elements = malloc(sizeof(" << Name << "*) * list1->" << GSize << "); " << endl
            << endl
