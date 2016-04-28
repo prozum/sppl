@@ -3,4 +3,4 @@ def main : [String]->Int
 
 def func : Int->Int->Int
 | _ 2 = 2
-| a a = 1
+| a b = 1

@@ -1,4 +1,4 @@
-def main : [String]->Int
+def main : [String]->Bool
 | s = func(True)
 
 def func : Bool->Bool

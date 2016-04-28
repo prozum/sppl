@@ -1,2 +1,2 @@
-def main [String]->Int
+def main : [String]->Int
 | _ = 2

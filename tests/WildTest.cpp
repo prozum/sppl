@@ -10,7 +10,7 @@ void Test::wildInt() {
 void Test::wildFloat() {
     bool compStatus = compileChecker("wild/wildFloat.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus);
-    bool execStatus = executeChecker("2.0");
+    bool execStatus = executeChecker("2.000000");
     CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
 }
 
@@ -31,7 +31,7 @@ void Test::wildChar() {
 void Test::wildString() {
     bool compStatus = compileChecker("wild/wildString.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus);
-    bool execStatus = executeChecker("\"string\"");
+    bool execStatus = executeChecker("\"String\"");
     CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
 }
 

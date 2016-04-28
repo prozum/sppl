@@ -1,5 +1,5 @@
 def main : [String] -> Int
-| = func(1,2)
+| _ = func(1,2)
 
 def func : Int->Int->Int
 | _ _ = 2
