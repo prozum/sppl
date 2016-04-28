@@ -39,7 +39,7 @@ void Test::precMulAdd() {
 }
 
 void Test::precNegMul() {
-    bool compStatus = compileChecker("prec/precAndOr.sppl");
+    bool compStatus = compileChecker("prec/precNegMul.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus);
     bool execStatus = executeChecker("-4");
     CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);

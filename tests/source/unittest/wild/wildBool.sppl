@@ -1,0 +1,5 @@
+def main : [String]->Bool
+| s = func(True)
+
+def func : Bool->Bool
+| _ = True

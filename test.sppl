@@ -1,6 +1,0 @@
-def main : [String] -> Int
-    | n = superadd(1)
-
-def superadd : Int -> Int
-    | 0 = 1
-    | n = superadd(n - 1) + superadd(n - 1)

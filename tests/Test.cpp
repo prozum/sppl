@@ -24,7 +24,7 @@ int main(int argc, char* argv[]){
         cout << "Unsupported: C - Defaulting to Pretty Printer" << endl;
 #endif
     } else if (strcmp(argv[1], "p") == 0) {
-#ifdef CPAR
+#ifdef CCPP
         cout << "Backend: C Parallel" << endl;
         backend = compiler::Backend::CPAR;
 #else
@@ -145,8 +145,17 @@ bool Test::executeCPP(std::string args, std::string expectedOutput) {
         CPPUNIT_ASSERT_MESSAGE("file test.h not found", false);
     }
 
+    int status;
+
     // Compile program
-    int status = system("cc out.c -o prog");
+    if (backend == compiler::Backend::CPP) {
+        status = system("cc out.c -o prog");
+    } else if (backend == compiler::Backend::CPAR) {
+        status = system("cc out.c context.c print.c queue.c runtime.c task.c -o prog -lpthread");
+    } else{
+        CPPUNIT_ASSERT_MESSAGE("Unsupported backend detected wrong place", false);
+    }
+
 
     if (status != 0) {
         CPPUNIT_ASSERT_MESSAGE("C Compiler Error", false);
