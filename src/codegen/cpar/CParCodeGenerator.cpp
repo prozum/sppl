@@ -12,7 +12,7 @@ void CParCodeGenerator::visit(Program &Node) {
     Prog = &Node;
     Function *Main = nullptr;
 
-    *Header << "#include \"src/runtime/task.h\" \n";
+    *Header << "#include \"task.h\" \n";
 
     // Generate the standard functionality for every program
     generateStd();
