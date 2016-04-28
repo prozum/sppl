@@ -149,7 +149,11 @@ string SpplJit::getOutputList(intptr_t Addr, common::Type Type)
     string Out("[");
     auto Subtype = Type.Subtypes[0];
 
-    for (size_t i = 0; i < Type.subtypeCount(); ++i) {
+    auto Count = *(int32_t *)Addr;
+    Addr += sizeof(int64_t);
+    Addr = *(int64_t *)Addr;
+
+    for (int32_t i = 0; i < Count; ++i) {
         switch (Subtype.Id) {
         case common::TypeId::INT:
             Out += getOutput(*(int64_t *)Addr, Subtype);
@@ -175,7 +179,7 @@ string SpplJit::getOutputList(intptr_t Addr, common::Type Type)
             throw runtime_error("Cannot convert to C data: " +
                                 Subtype.str());
         }
-        if (i + 1 != Type.subtypeCount())
+        if (i + 1 != Count)
             Out += ", ";
     }
 
@@ -198,6 +202,7 @@ int SpplJit::eval(string Str) {
     if (!Drv.accept(CodeGen))
         return 5;
     auto FuncNode = static_cast<common::Function *>(Drv.Prog->Decls[0].get());
+    auto RetTy = FuncNode->Signature.Subtypes.back();
 
 // Optimize
 #if SPPLDEBUG
@@ -212,7 +217,9 @@ int SpplJit::eval(string Str) {
          << endl;
     cout << CodeGen.ModuleString();
 #endif
-    PassMgr->run(*CodeGen.Module->getFunction(FuncNode->Id));
+    auto FuncIR = CodeGen.Module->getFunction(FuncNode->Id);
+    assert(FuncIR && "Function generation failed.");
+    PassMgr->run(*FuncIR);
 #if SPPLDEBUG
     cout << "#-----------------------------------------------------------------"
             "-------------#"
@@ -235,11 +242,13 @@ int SpplJit::eval(string Str) {
         auto Func = findSymbol(FuncNode->Id);
         auto FuncJIT = (size_t(*)())Func.getAddress();
 
-        assert(FuncJIT != NULL);
-        string Output =
-            getOutput(FuncJIT(), FuncNode->Signature.Subtypes.back());
+        assert(FuncJIT);
+
+        auto Res = FuncJIT();
+        string Output = getOutput(Res, RetTy);
         cout << Output
-             << "\t\ttype: " << FuncNode->Signature.Subtypes.back().str()
+             << endl
+             << "type: " << RetTy.str()
              << endl;
 
         // Remove module

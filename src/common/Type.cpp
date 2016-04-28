@@ -10,7 +10,6 @@ Type::Type() {}
 Type::~Type() {}
 
 Type::Type(TypeId Id) : Id(Id) {}
-Type::Type(TypeId Id, size_t SubtypeCount) : Id(Id), SubtypeCount(SubtypeCount) {}
 
 Type::Type(TypeId Id, Location Loc) : Id(Id), Loc(Loc) {}
 
@@ -110,16 +109,4 @@ string Type::strJoin(const std::string JoinStr) {
     }
 
     return Str;
-}
-
-size_t Type::subtypeCount() {
-    switch (Id)
-    {
-        case TypeId::STRING:
-        case TypeId::LIST:
-            return SubtypeCount;
-        default:
-            return Subtypes.size();
-
-    }
 }

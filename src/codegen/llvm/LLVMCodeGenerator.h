@@ -30,7 +30,7 @@ class LLVMCodeGenerator : public parser::CodeGenerator {
     std::map<std::string, llvm::Value *> CtxVals;
 
     std::unordered_map<common::Type, llvm::StructType *> TupleTypes;
-    std::unordered_map<common::Type, llvm::ArrayType *> ListTypes;
+    std::unordered_map<common::Type, llvm::StructType *> ListTypes;
     std::unordered_map<common::Type, llvm::FunctionType *> FuncTypes;
 
     llvm::Value *CurVal;
@@ -96,9 +96,9 @@ class LLVMCodeGenerator : public parser::CodeGenerator {
     void visit(common::CallExpr &Node);
     void visit(common::ParExpr &Node);
 
-    llvm::Type *getType(common::Type Ty, bool Ptr = false);
+    llvm::Type *getType(common::Type Ty);
     llvm::StructType *getTupleType(common::Type Ty);
-    llvm::ArrayType *getListType(common::Type Ty);
+    llvm::StructType *getListType(common::Type Ty);
     llvm::FunctionType *getFuncType(common::Type Ty);
 };
 }

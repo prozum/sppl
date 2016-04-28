@@ -26,6 +26,11 @@
 
 
 namespace jit {
+    struct List {
+        uint32_t Size;
+        uintptr_t Ptr;
+    };
+
 class SpplJit {
   public:
     SpplJit();

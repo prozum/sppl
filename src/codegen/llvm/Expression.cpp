@@ -66,55 +66,74 @@ void LLVMCodeGenerator::visit(common::TupleExpr &Node) {
 }
 
 void LLVMCodeGenerator::visit(common::ListExpr &Node) {
-    std::vector<llvm::Constant *> TmpVec;
 
+    // Create Global List Constant
+    std::vector<llvm::Constant *> TmpVec;
     for (auto &Element : Node.Elements) {
         Element->accept(*this);
-        TmpVec.push_back(dynamic_cast<Constant *>(CurVal));
+        TmpVec.push_back(static_cast<Constant *>(CurVal));
     }
-
     ArrayRef<Constant *> ListData(TmpVec);
 
-    auto ListType = ArrayType::get(getType(Node.RetTy.Subtypes[0]), 0);
-    auto ConstVal = ConstantArray::get(ListType, ListData);
+    auto ListType = getListType(Node.RetTy);
+    auto ListPtrType = getType(Node.RetTy);
+    auto ArrayType = ArrayType::get(getType(Node.RetTy.Subtypes[0]), Node.Elements.size());
+    auto ConstVal = ConstantArray::get(ArrayType, ListData);
 
-    CurVal = new GlobalVariable(*Module.get(), ConstVal->getType(), true,
+    auto GlobalVal = new GlobalVariable(*Module.get(), ArrayType, true,
                                 GlobalVariable::ExternalLinkage, ConstVal);
 
-
-    //auto MemSize = ConstantExpr::getSizeOf(ListType);
-    //MemSize = ConstantExpr::getTruncOrBitCast(MemSize, ListType);
-
-    //auto Malloc = CallInst::CreateMalloc(*CurCaseBlock, PointerType::getUnqual(ListType), ListType,
-    //                                     IntegerType::getInt8Ty(getGlobalContext()),
-    //                                     ConstantInt::get(getGlobalContext(), APInt(64, Node.Elements.size())),
-    //                                     nullptr, "tmpmalloc");
-    //auto Malloc = CallInst::CreateMalloc(*CurCaseBlock,
-    //                                     IntegerType::getInt8Ty(getGlobalContext()),
-    //                                     IntegerType::getInt8Ty(getGlobalContext()),
-    //                                     ConstantExpr::getSizeOf(IntegerType::getInt8Ty(getGlobalContext())),
-    //                                     ConstantInt::get(getGlobalContext(), APInt(64, Node.Elements.size())),
-    //                                     nullptr, "malloccall");
-
+    // Malloc list data
     auto ITy = Type::getInt32Ty(getGlobalContext());
-    //auto AllocSize = ConstantExpr::getSizeOf(ListType);
-    auto AllocSize = ConstantInt::get(ITy, APInt(32, DataLayout.getPointerTypeSize(CurVal->getType()->getPointerElementType())));
-    AllocSize = ConstantExpr::getTruncOrBitCast(AllocSize, ITy);
-    auto Malloc = CallInst::CreateMalloc(*CurCaseBlock,
-                                         ITy, ListType, AllocSize,
+    auto Size = DataLayout.getPointerTypeSize(ArrayType);
+    auto AllocSize = ConstantInt::get(ITy, APInt(32, Size));
+    auto DataMalloc = CallInst::CreateMalloc(*CurCaseBlock,
+                                         ITy, ArrayType, AllocSize,
                                          nullptr, nullptr, "malloccall");
+    (*CurCaseBlock)->getInstList().push_back(DataMalloc);
 
-    (*CurCaseBlock)->getInstList().push_back(Malloc);
 
     //auto Cast = Builder.CreateBitCast(Malloc, PointerType::getUnqual(ListType), "casttmp");
+    // Memcpy
+    Builder.CreateMemCpy(DataMalloc, GlobalVal, Size, 1);
+    //Builder.CreateM
 
-    Builder.CreateMemCpy(Malloc, CurVal, DataLayout.getPointerTypeSize(CurVal->getType()->getPointerElementType()), 0);
+    //Builder.CreateStore(Malloc, Alloca);
+    //auto ListPtr = Builder.CreateLoad(PointerType::getUnqual(ListType), Alloca, "loadtmp");
 
-    auto Alloca = Builder.CreateAlloca(PointerType::getUnqual(ListType), nullptr, "allocatmp");
-    Builder.CreateStore(Malloc, Alloca);
-    CurVal = Builder.CreateLoad(PointerType::getUnqual(ListType), Alloca, "loadtmp");
+    //TmpVec.clear();
+    //TmpVec.push_back(ConstantInt::get(ITy, Size));
+    //TmpVec.push_back((Constant *)CurVal);
+    //ArrayRef<Constant *> ListVal(TmpVec);
 
-    //auto size = DataLayout.getPointerTypeSize(CurVal->getType()->getPointerElementType());
+    // Malloc list container
+    Size = DataLayout.getPointerTypeSize(ListType);
+    AllocSize = ConstantInt::get(ITy, APInt(32, Size));
+    //auto Alloca = Builder.CreateAlloca(ListType, nullptr, "allocatmp");
+    auto ListMalloc = CallInst::CreateMalloc(*CurCaseBlock, ITy, ListType, AllocSize, nullptr, nullptr, "malloccall");
+    (*CurCaseBlock)->getInstList().push_back(ListMalloc);
+
+    auto RetVal = Builder.CreateAlloca(ListPtrType, nullptr, "allocatmp");
+    Builder.CreateStore(ListMalloc, RetVal);
+
+    auto ListCast = Builder.CreateBitCast(ListMalloc, ListPtrType);
+
+    //auto test = cast<PointerType>(Cast->getType()->getScalarType())->getElementType();
+    //auto bo = ListPtrType == test;
+
+    // Set list length
+    CurVal = Builder.CreateStructGEP(ListType, ListCast, 0);
+    Builder.CreateStore(ConstantInt::get(ITy, Node.Elements.size()), CurVal);
+
+    // Set list data
+    CurVal = Builder.CreateStructGEP(ListType, ListCast, 1);
+    auto DataCast = Builder.CreateBitCast(DataMalloc, PointerType::getUnqual(ArrayType::get(getType(Node.RetTy.Subtypes[0]), 0)));
+    Builder.CreateStore(DataCast, CurVal);
+    //CurVal = Builder.CreateGEP(Alloca, ConstantInt::get(getGlobalContext(), APInt(32, 1)));
+    //Builder.CreateStore(ListPtr, CurVal);
+
+
+    CurVal = Builder.CreateLoad(ListPtrType, RetVal, "loadtmp");
 }
 
 void LLVMCodeGenerator::visit(common::CallExpr &Node) {

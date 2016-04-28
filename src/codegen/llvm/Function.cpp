@@ -7,7 +7,6 @@ using namespace codegen;
 void LLVMCodeGenerator::visit(common::Function &Node) {
     // Create function and entry block
     auto type = getFuncType(Node.Signature);
-    auto ele = Node.Signature.Subtypes[0].subtypeCount();
     CurFunc = llvm::Function::Create(getFuncType(Node.Signature),
                                      llvm::Function::ExternalLinkage, Node.Id,
                                      Module.get());

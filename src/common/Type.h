@@ -33,7 +33,6 @@ class Type {
     Type();
     ~Type();
     Type(TypeId Id);
-    Type(TypeId Id, size_t SubtypeCount);
     Type(TypeId Id, Location Loc);
     Type(TypeId Id, std::vector<Type> Subtypes);
     Type(TypeId Id, std::vector<Type> Subtypes, Location Loc);
@@ -47,9 +46,6 @@ class Type {
     std::string str();
     std::string strJoin(std::string JoinStr);
 
-    size_t subtypeCount();
-private:
-    size_t SubtypeCount = 0;
 };
 }
 
@@ -57,7 +53,6 @@ namespace std {
 template <> struct hash<common::Type> {
     std::size_t operator()(const common::Type &Ty) const {
         size_t Res = hash<int>()(static_cast<int>(Ty.Id));
-        Res ^= hash<size_t>()(Ty.Subtypes.size()) << 1;
 
         for (auto &Subtype : Ty.Subtypes) {
             Res ^= hash<common::Type>()(Subtype) << 1;

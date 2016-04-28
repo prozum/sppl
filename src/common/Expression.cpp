@@ -23,7 +23,7 @@ BoolExpr::BoolExpr(bool Val, Location Loc)
     : Expression(Type(TypeId::BOOL), Loc), Val(Val) {}
 
 ListExpr::ListExpr(vector<unique_ptr<Expression>> Elements, Location Loc)
-    : Expression(Type(TypeId::LIST, Elements.size()), Loc), Elements(move(Elements)) {}
+    : Expression(Type(TypeId::LIST), Loc), Elements(move(Elements)) {}
 
 TupleExpr::TupleExpr(vector<unique_ptr<Expression>> Elements, Location Loc)
     : Expression(Type(TypeId::TUPLE), Loc), Elements(move(Elements)) {}
@@ -42,7 +42,7 @@ AlgebraicExpr::AlgebraicExpr(string Constructor,
       Exprs(move(Exprs)) {}
 
 StringExpr::StringExpr(string Val, Location Loc)
-    : Expression(Type(TypeId::STRING, Val.size()), Loc), Val(Val) {}
+    : Expression(Type(TypeId::STRING), Loc), Val(Val) {}
 
 void IdExpr::accept(Visitor &V) { V.visit(*this); }
 void IntExpr::accept(Visitor &V) { V.visit(*this); }
