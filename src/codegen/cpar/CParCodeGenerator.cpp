@@ -66,7 +66,6 @@ void CParCodeGenerator::visit(Program &Node) {
 
 void CParCodeGenerator::visit(Function &Node) {
     stringstream Func;
-    stringstream ArgName;
     string ArgType;
     string Signature = getEnvironment(Node.Signature);
     CurrentArg = Signature + GArg;
@@ -83,14 +82,14 @@ void CParCodeGenerator::visit(Function &Node) {
     *Output << Func.str() << " { " << endl;
 
     for (size_t i = 0; i < Node.Signature.subtypeCount() - 1; ++i) {
-        ArgType = getType(Node.Signature.Subtypes[i]);
-        ArgName << GGenerated << GArg << i;
-        ArgNames.push_back(ArgName.str());
-        *Output << "    " << ArgType << " " << ArgName.str() << " = "
-                   "(" << ArgType << ")" << "(" << "(" << CurrentArg << "*)" << "t->startarg)->"
-                << ArgName.str() << ";" << endl;
+        string ArgName = GGenerated + GArg + to_string(i);
 
-        ArgName.str("");
+        ArgType = getType(Node.Signature.Subtypes[i]);
+        ArgNames.push_back(ArgName);
+
+        *Output << "    " << ArgType << " " << ArgName << " = "
+                    << "(" << ArgType << ")" << "(" << "(" << CurrentArg << "*)" << "t->startarg)->"
+                    << ArgName << ";" << endl;
     }
 
     *Output << "Start: " << endl
@@ -98,7 +97,6 @@ void CParCodeGenerator::visit(Function &Node) {
 
     // Generate cases
     for (auto &Case : Node.Cases) {
-        SupTaskCount = 0;
         Case->accept(*this);
         *Output << endl;
 
@@ -125,8 +123,7 @@ void CParCodeGenerator::visit(Case &Node) {
 
     for (size_t i = 0; i < Node.Patterns.size(); ++i) {
         // Push arg_name on get_value_builder. get_value_builder is used for
-        // generate
-        // Assignments in a case
+        // generate assignments in a case
         GetValueBuilder.push_back(ArgNames[i]);
 
         // Generate pattern
@@ -215,8 +212,8 @@ void CParCodeGenerator::visit(Case &Node) {
         }
 
         *Output << "        ((" << CurrentArg << "*)t->startarg)->" << GGenerated << GRes << " = "
-                                << ExprStack.top().str() << "; " << endl;
-        *Output << "        taskexit(t); " << endl;
+                                << ExprStack.top().str() << "; " << endl
+                << "        taskexit(t); " << endl;
         ExprStack.pop();
     }
 
@@ -244,6 +241,7 @@ void CParCodeGenerator::visit(common::CallExpr &Node) {
 
     GeneratedCall << "        " << Signature << GArg << "* " << Name << GArg << " = malloc(sizeof("
                                 << Signature << GArg << "));" << endl;
+
     for (size_t i = 0; i < Node.Args.size(); ++i) {
         ExprStack.push(stringstream());
         Node.Args[i]->accept(*this);
@@ -258,8 +256,8 @@ void CParCodeGenerator::visit(common::CallExpr &Node) {
     Node.Callee->accept(*this);
 
     GeneratedCall << "        task_t *" << Name << " = taskcreate((void (*)(void*))" << ExprStack.top().str()
-                                              << ", (void *)" << Name << GArg << ");" << endl;
-    GeneratedCall << "        subtaskadd(t, " << Name << "); " << endl;
+                                                    << ", (void *)" << Name << GArg << ");" << endl
+                  << "        subtaskadd(t, " << Name << "); " << endl;
 
     ExprStack.pop();
     ExprStack.top() << "((" << Signature << GArg << "*)" << Name << "->startarg" << ")->" << GGenerated << GRes;

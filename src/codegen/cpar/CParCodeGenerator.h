@@ -16,7 +16,6 @@ class CParCodeGenerator : public CCodeGenerator {
 
         const std::string GTask = "task";
         const std::string GRes = "res";
-        const std::string GFuncPointer = "task_func";
 
         std::string CurrentArg;
 
@@ -25,6 +24,5 @@ class CParCodeGenerator : public CCodeGenerator {
 
         size_t CallDepth = 0;
         int TaskCount = 0;
-        int SupTaskCount = 0;
 };
 }
