@@ -257,7 +257,7 @@ void CParCodeGenerator::visit(common::CallExpr &Node) {
     ExprStack.push(stringstream());
     Node.Callee->accept(*this);
 
-    GeneratedCall << "        task_t *" << Name << " = taskcreate((void *)&" << ExprStack.top().str()
+    GeneratedCall << "        task_t *" << Name << " = taskcreate((void (*)(void*))" << ExprStack.top().str()
                                               << ", (void *)" << Name << GArg << ");" << endl;
     GeneratedCall << "        subtaskadd(t, " << Name << "); " << endl;
 
