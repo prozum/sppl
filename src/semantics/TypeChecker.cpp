@@ -478,8 +478,30 @@ void TypeChecker::visit(ProducerConsumer &Node) {
     throw std::runtime_error("Not implemented");
 }
 void TypeChecker::visit(Concat &Node) {
-    // TODO Implement Concat Type Checking
-    throw std::runtime_error("Not implemented");
+    Node.Left->accept(*this);
+    Node.Right->accept(*this);
+
+    if (containsEmptyList(Node.Left->RetTy)) {
+        resolveEmptyList(Node.Left->RetTy, Node.Right->RetTy);
+    }
+
+    if (containsEmptyList(Node.Right->RetTy)) {
+        resolveEmptyList(Node.Right->RetTy, Node.Left->RetTy);
+    }
+
+    if (Node.Left->RetTy != Node.Right->RetTy) {
+        throw Error::Binary("Concat can only operate on children of the same type", Node);
+    }
+
+    if (Node.Right->RetTy.Id == TypeId::EMPTYLIST) {
+        throw Error::Binary("Concat cannot operate on two lists of unknown type", Node);
+    }
+
+    if (Node.Right->RetTy.Id != TypeId::LIST) {
+        throw Error::Binary("Concat can only operate on lists", Node);
+    }
+
+    Node.RetTy = Node.Left->RetTy;
 }
 
 void TypeChecker::visit(ParExpr &Node) {

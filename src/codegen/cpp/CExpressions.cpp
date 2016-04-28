@@ -22,7 +22,7 @@ void CCodeGenerator::visit(And &Node) {
 }
 
 void CCodeGenerator::visit(Equal &Node) {
-    outputEqual(Node.RetTy, *Node.Left.get(), *Node.Right.get());
+    outputEqual(Node.Left->RetTy, *Node.Left.get(), *Node.Right.get());
 }
 
 void CCodeGenerator::visit(NotEqual &Node) {
@@ -104,11 +104,11 @@ void CCodeGenerator::visit(Mod &Node) {
 }
 
 void CCodeGenerator::visit(ListAdd &Node) {
-    string Name = getList(Node.RetTy);
+    string ListName = getList(Node.RetTy);
 
     // Use pregenerated push function to push thing onto list
     // Look at generate_list(Type &type) for the generation of this function
-    ExprStack.top() << GGenerated << GAdd << Name << "(";
+    ExprStack.top() << GGenerated << GAdd << ListName << "(";
     Node.Right->accept(*this);
     ExprStack.top() << ", ";
     Node.Left->accept(*this);
@@ -121,8 +121,13 @@ void CCodeGenerator::visit(ProducerConsumer &Node) {
 }
 
 void CCodeGenerator::visit(Concat &Node) {
-    // TODO
-    throw std::runtime_error("Not implemented");
+    string ListName = getList(Node.Left->RetTy);
+
+    ExprStack.top() << GGenerated << GConcat << ListName << "(";
+    Node.Left->accept(*this);
+    ExprStack.top() << ", ";
+    Node.Right->accept(*this);
+    ExprStack.top() << ")";
 }
 
 
