@@ -1,20 +1,78 @@
 #include <algorithm>
+#include <iostream>
+#include <list>
+#include <cppunit/TestCase.h>
+#include <cppunit/ui/text/TextTestRunner.h>
+#include <cppunit/extensions/HelperMacros.h>
+#include <cppunit/TestResult.h>
+#include <cppunit/TestResultCollector.h>
+#include <cppunit/BriefTestProgressListener.h>
+#include <cppunit/CompilerOutputter.h>
 #include "Test.h"
+
+CPPUNIT_TEST_SUITE_REGISTRATION(Test);
+
+compiler::Backend backend = compiler::Backend::PPRINTER;
+
+int main(int argc, char* argv[]){
+
+    if (strcmp(argv[1], "c") == 0) {
+#ifdef CCPP
+        cout << "Backend: C" << endl;
+        backend = compiler::Backend::CPP;
+#else
+        cout << "Unsupported: C - Defaulting to Pretty Printer" << endl;
+#endif
+    } else if (strcmp(argv[1], "p") == 0) {
+#ifdef CPAR
+        cout << "Backend: C Parallel" << endl;
+        backend = compiler::Backend::CPAR;
+#else
+        cout << "Unsupported: C Parallel - Defaulting to Pretty Printer" << endl;
+#endif
+    } else if (strcmp(argv[1], "l") == 0) {
+#ifdef CLLVM
+        cout << "Backend: LLVM" << endl;
+        backend = compiler::Backend::LLVM;
+#else
+        cout << "Unsupported: LLVM - Defaulting to Pretty Printer" << endl;
+#endif
+    } else if (strcmp(argv[1], "h") == 0) {
+#ifdef CHASKELL
+        cout << "Backend: Haskell" << endl;
+        backend = compiler::Backend::HASKELL;
+#else
+        cout << "Unsupported: Haskell - Defaulting to Pretty Printer" << endl;
+#endif
+    } else if (strcmp(argv[1], "a") == 0) {
+#ifdef CGNUASM
+        cout << "Backend: Gnu Asm" << endl;
+        backend = compiler::Backend::GNUASM;
+#else
+        cout << "Unsupported: Gnu Asm - Defaulting to Pretty Printer" << endl;
+#endif
+    }
+
+    CPPUNIT_NS::TestResult test_result;
+
+    CPPUNIT_NS::TestResultCollector collector;
+    test_result.addListener(&collector);
+
+    CPPUNIT_NS::BriefTestProgressListener progress;
+    test_result.addListener (&progress);
+
+    CPPUNIT_NS::TestRunner testrunner;
+    testrunner.addTest (CPPUNIT_NS::TestFactoryRegistry::getRegistry().makeTest ());
+    testrunner.run(test_result);
+
+    CPPUNIT_NS::CompilerOutputter compileroutputter(&collector, std::cerr);
+    compileroutputter.write ();
+
+    return collector.wasSuccessful() ? 0 : 1;
+}
 
 void Test::setUp() {
     // First test setup
-
-#ifdef CCPP
-    backend = compiler::Backend::CPP;
-#elif CGNUASM
-    backend = compiler::Backend::GNUASM;
-#elif CHASKELL
-    backend = compiler::Backend::HASKELL;
-#elif CLLVM
-    backend = compiler::Backend::LLVM;
-#else
-    backend = compiler::Backend::PPRINTER;
-#endif
 }
 
 void Test::tearDown() {

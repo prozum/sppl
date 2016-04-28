@@ -364,7 +364,6 @@ class Test : public CppUnit::TestFixture{
 
     CPPUNIT_TEST_SUITE_END();
 public:
-    compiler::Backend backend;
     void setUp();
     void tearDown();
 protected:
