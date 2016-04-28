@@ -426,6 +426,10 @@ void TypeChecker::visit(ListAdd &Node) {
     Node.Left->accept(*this);
     Node.Right->accept(*this);
 
+    if (containsEmptyList(Node.Right->RetTy)) {
+        resolveEmptyList(Node.Right->RetTy, CurFunc->Signature.Subtypes.back());
+    }
+
     if (Node.Right->RetTy.Id != TypeId::LIST) {
         throw Error::Binary("Right must be a ListExpression", Node);
     }
