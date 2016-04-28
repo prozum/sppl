@@ -358,8 +358,10 @@ string CCodeGenerator::generateList(Type &Ty) {
 
     switch (Ty.Subtypes.front().Id) {
     case TypeId::LIST:
+        Buffer << "!" << GGenerated << GCompare << getList(Ty.Subtypes.front()) << "(list1->" << GValue << ", list2->" << GValue << ")";
+        break;
     case TypeId::TUPLE:
-        Buffer << "!" << GGenerated << GCompare << ChildrenType << "(list1->" << GValue << ", list2->" << GValue << ")";
+        Buffer << "!" << GGenerated << GCompare << getTuple(Ty.Subtypes.front()) << "(list1->" << GValue << ", list2->" << GValue << ")";
         break;
     default:
         Buffer << "list1->" << GValue << "!= list2->" << GValue << "";
