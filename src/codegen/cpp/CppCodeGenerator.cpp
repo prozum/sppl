@@ -704,6 +704,12 @@ void CCodeGenerator::generateStd() {
     ToStrings[Type(TypeId::FLOAT)] = GGenerated + GToString + "float";
     ToStrings[Type(TypeId::CHAR)] = GGenerated + GToString + "char";
     ToStrings[Type(TypeId::STRING)] = GGenerated + GToString + "string";
+    Print[Type(TypeId::INT)] = GGenerated + GPrint + "int";
+    Print[Type(TypeId::BOOL)] = GGenerated + GPrint + "bool";
+    Print[Type(TypeId::FLOAT)] = GGenerated + GPrint + "float";
+    Print[Type(TypeId::CHAR)] = GGenerated + GPrint + "char";
+    Print[Type(TypeId::STRING)] = GGenerated + GPrint + "string";
+
 
     StringTypeName = GGenerated + GList + to_string(ListCount);
     Lists[Type(TypeId::STRING)] = StringTypeName;
@@ -721,17 +727,16 @@ void CCodeGenerator::generateStd() {
                "    int i, str_length = strlen(values); \n"
                "    "
             << StringTypeName << "* res = " << GGenerated << GCreate
-            << StringTypeName
-            << "(0); \n"
+            << StringTypeName << "(0); \n"
                " \n"
                "    for (i = str_length - 1; i >= 0; i--) { \n"
                "        res = "
             << GGenerated << GAdd << StringTypeName << "(res, values[i]); \n"
-                                                       "    } \n"
-                                                       " \n"
-                                                       "    return res; \n"
-                                                       "} \n"
-                                                       " \n";
+               "    } \n"
+               " \n"
+               "    return res; \n"
+               "} \n"
+               " \n";
 
     // Generation of string compare
     *Header << "int " << GGenerated << GCompare << GString << "("
@@ -789,8 +794,8 @@ void CCodeGenerator::generateStd() {
                        "    sprintf(buffer, \"%\" PRId64 \"\", value); \n"
                        "    return "
             << GGenerated << GCreate << GString << "(buffer); \n"
-                                                   "} \n"
-                                                   " \n";
+                       "} \n"
+                       " \n";
 
     *Header << StringTypeName << "* " << ToStrings[Type(TypeId::BOOL)] << "("
             << GBool << " value); \n";
@@ -825,11 +830,11 @@ void CCodeGenerator::generateStd() {
             << "(\"\\'\"); \n"
                "    res = "
             << GGenerated << GAdd << StringTypeName << "(res, value); \n"
-                                                       "    res = "
+               "    res = "
             << GGenerated << GAdd << StringTypeName << "(res, '\\''); \n"
-                                                       "    return res; \n"
-                                                       "} \n"
-                                                       " \n";
+               "    return res; \n"
+               "} \n"
+               " \n";
 
     *Header << StringTypeName << "* " << ToStrings[Type(TypeId::STRING)] << "("
             << StringTypeName << "* value); \n";
@@ -842,8 +847,10 @@ void CCodeGenerator::generateStd() {
             << GGenerated << GConcat << StringTypeName << "(value, res); \n"
                                                           "    res = "
             << GGenerated << GAdd << StringTypeName << "(res, '\"'); \n"
-                                                       "} \n"
-                                                       " \n";
+               "} \n"
+               " \n";
+
+    // Generate default prints
 }
 
 string CCodeGenerator::getList(Type &Ty) {

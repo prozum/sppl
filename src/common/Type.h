@@ -44,7 +44,7 @@ class Type {
     bool operator!=(const Type &Other) const;
     Type operator[](const size_t Index);
 
-    std::string str();
+    std::string str(bool isTop = false);
     std::string strJoin(std::string JoinStr);
 
     size_t subtypeCount();
