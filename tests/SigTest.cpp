@@ -78,18 +78,18 @@ void Test::sigLengthTenInt() {
 }
 
 void Test::patLengthSameInt() { 
-    bool compStatus = compileChecker("patLengthSameInt.sppl");
+    bool compStatus = compileChecker("sig/patLengthSameInt.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus);
     bool execStatus = executeChecker("2");
     CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
 }
 
 void Test::patLengthLessInt() { 
-    bool compStatus = compileChecker("patLengthLessInt.sppl");
+    bool compStatus = compileChecker("sig/patLengthLessInt.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, !compStatus);
 }
 
 void Test::patLengthMoreInt() { 
-    bool compStatus = compileChecker("patLengthMoreInt.sppl");
+    bool compStatus = compileChecker("sig/patLengthMoreInt.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgSucc, !compStatus);
 }

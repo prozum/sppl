@@ -354,13 +354,25 @@ class Test : public CppUnit::TestFixture{
         CPPUNIT_TEST(dotDotNum);
         CPPUNIT_TEST(dotMultiDot);
 
-    // Precedence.cpp
+    // PrecedenceTest.cpp
         CPPUNIT_TEST(precAndOr);
         CPPUNIT_TEST(precEqualAnd);
         CPPUNIT_TEST(precLessEqual);
         CPPUNIT_TEST(precAddLess);
         CPPUNIT_TEST(precMulAdd);
         CPPUNIT_TEST(precNegMul);
+
+    // WildTtest.cpp
+        CPPUNIT_TEST(wildInt);
+        CPPUNIT_TEST(wildFloat);
+        CPPUNIT_TEST(wildBool);
+        CPPUNIT_TEST(wildChar);
+        CPPUNIT_TEST(wildString);
+        CPPUNIT_TEST(wildDouble);
+        CPPUNIT_TEST(wildTwoIntFirst);
+        CPPUNIT_TEST(wildTwoIntSecond);
+        CPPUNIT_TEST(wildMain);
+        CPPUNIT_TEST(wildWrong);
 
     CPPUNIT_TEST_SUITE_END();
 public:
@@ -715,6 +727,18 @@ protected:
     void precAddLess();
     void precMulAdd();
     void precNegMul();
+
+    // WildTest.cpp
+    void wildInt();
+    void wildFloat();
+    void wildBool();
+    void wildChar();
+    void wildString();
+    void wildMain();
+    void wildDouble();
+    void wildTwoIntFirst();
+    void wildTwoIntSecond();
+    void wildWrong();
 
     // Test.cpp
     bool compileChecker(std::string name);

@@ -3,4 +3,3 @@ def main : [String]->Int
 
 def func : Int->Int
 |  a = 2
-| arg0  = 2
