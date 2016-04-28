@@ -9,6 +9,8 @@ SpplJit::SpplJit()
     : CodeGen(Drv), ScopeGen(&Drv.Global), TypeChecker(&Drv.Global),
       CompileLayer(ObjectLayer, SimpleCompiler(*CodeGen.Machine)) {
 
+    //CodeGen.Module->getOrInsertFunction("getchar", IntegerType::getInt32Ty(C), NULL);
+
     sys::DynamicLibrary::LoadLibraryPermanently(nullptr);
     createModule();
 
@@ -98,6 +100,8 @@ string SpplJit::getOutput(intptr_t Data, common::Type Type) {
         return to_string((bool)Data);
     case common::TypeId::TUPLE:
         return getOutputTuple(Data, Type.Subtypes);
+    case common::TypeId::LIST:
+        return getOutputList(Data, Type);
     case common::TypeId::SIGNATURE:
         return Type.str();
     default:
@@ -138,6 +142,44 @@ string SpplJit::getOutputTuple(intptr_t Addr, vector<common::Type> Subtypes) {
     }
 
     return Out + ")";
+}
+
+string SpplJit::getOutputList(intptr_t Addr, common::Type Type)
+{
+    string Out("[");
+    auto Subtype = Type.Subtypes[0];
+
+    for (size_t i = 0; i < Type.subtypeCount(); ++i) {
+        switch (Subtype.Id) {
+        case common::TypeId::INT:
+            Out += getOutput(*(int64_t *)Addr, Subtype);
+            Addr += sizeof(int64_t);
+            break;
+        case common::TypeId::FLOAT:
+            Out += getOutput(Addr, Subtype);
+            Addr += sizeof(double);
+            break;
+        case common::TypeId::CHAR:
+            Out += getOutput(*(char *)Addr, Subtype);
+            Addr += sizeof(char);
+            break;
+        case common::TypeId::STRING:
+            Out += getOutput(*(intptr_t *)Addr, Subtype);
+            Addr += sizeof(intptr_t *);
+            break;
+        case common::TypeId::TUPLE:
+            Out += getOutputTuple(*(intptr_t *)Addr, Subtype.Subtypes);
+            Addr += sizeof(intptr_t *);
+            break;
+        default:
+            throw runtime_error("Cannot convert to C data: " +
+                                Subtype.str());
+        }
+        if (i + 1 != Type.subtypeCount())
+            Out += ", ";
+    }
+
+    return Out + "]";
 }
 
 int SpplJit::eval(string Str) {

@@ -529,7 +529,6 @@ void TypeChecker::visit(ListExpr &Node) {
             }
         }
 
-        Node.RetTy = Type(TypeId::LIST);
         Node.RetTy.Subtypes.push_back(Node.Elements[0]->RetTy);
     } else {
         Node.RetTy = Type(TypeId::EMPTYLIST);

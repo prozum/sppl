@@ -73,5 +73,7 @@ class SpplJit {
         Vec.push_back(std::move(Item));
         return Vec;
     }
+
+    std::string getOutputList(intptr_t Addr, common::Type);
 };
 }

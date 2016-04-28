@@ -108,8 +108,8 @@ void LLVMCodeGenerator::visit(common::Case &Node) {
     auto Ty1 = CurPhiNode->getType();
     auto Ty2 = CurVal->getType();
 
-    auto Arr1 = CurVal->getType()->getPointerElementType()->getArrayNumElements();
-    auto Arr2 = CurPhiNode->getType()->getPointerElementType()->getArrayNumElements();
+    //auto Arr1 = CurVal->getType()->getPointerElementType()->getArrayNumElements();
+    //auto Arr2 = CurPhiNode->getType()->getPointerElementType()->getArrayNumElements();
 
 
     // Add return value to phi node
