@@ -64,7 +64,7 @@ class CCodeGenerator : public parser::CodeGenerator {
     virtual void visit(common::CallExpr &Node);
     virtual void visit(common::AlgebraicExpr &Node);
 
-    const std::string GGenerated = "__";
+    const std::string GGenerated = "g_";
     const std::string GUser = "u_";
     const std::string GAdd = "add_";
     const std::string GCreate = "crt_";
@@ -105,7 +105,7 @@ class CCodeGenerator : public parser::CodeGenerator {
     std::unordered_map<common::Type, std::string> Lists;
     std::unordered_map<common::Type, std::string> Closures;
     std::unordered_map<common::Type, std::string> ToStrings;
-    std::unordered_map<common::Type, std::string> Print;
+    std::unordered_map<common::Type, std::string> Prints;
     std::vector<std::string> ArgNames;
     std::vector<std::string> GetValueBuilder;
     std::vector<std::string> Assignments;

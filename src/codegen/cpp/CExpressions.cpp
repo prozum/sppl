@@ -159,8 +159,7 @@ void CCodeGenerator::visit(BoolExpr &Node) {
 void CCodeGenerator::visit(StringExpr &Node) {
     // gcreate_string is generate by generate_std. It creates string base on
     // a char*
-    ExprStack.top() << GGenerated << GCreate << GString << "(" << Node.str()
-                    << ")";
+    ExprStack.top() << GGenerated << GCreate << GString << "(" << Node.str() << ")";
 }
 
 void CCodeGenerator::visit(IdExpr &Node) {
@@ -200,7 +199,6 @@ void CCodeGenerator::visit(CharExpr &Node) {
 void CCodeGenerator::visit(TupleExpr &Node) {
     string Name = getTuple(Node.RetTy);
 
-    // Create tuple
     ExprStack.top() << GGenerated << GCreate << Name << "(";
     for (auto &Element : Node.Elements) {
         Element->accept(*this);
@@ -214,7 +212,6 @@ void CCodeGenerator::visit(TupleExpr &Node) {
 void CCodeGenerator::visit(ListExpr &Node) {
     string Name = getList(Node.RetTy);
 
-    // Create list
     ExprStack.top() << GGenerated << GCreate << Name << "("
     << Node.Elements.size();
     for (size_t i = Node.Elements.size(); i > 0; --i) {
@@ -227,7 +224,6 @@ void CCodeGenerator::visit(ListExpr &Node) {
 }
 
 void CCodeGenerator::visit(AlgebraicExpr &Node) {
-
     // TODO
     throw std::runtime_error("Not implemented");
 }
@@ -280,13 +276,10 @@ void CCodeGenerator::visit(LambdaFunction &Node) {
     throw std::runtime_error("Not implemented");
 }
 
-void CCodeGenerator::outputEqual(Type &Ty, Expression &Left,
-                                 Expression &Right) {
-    string Name;
-
+void CCodeGenerator::outputEqual(Type &Ty, Expression &Left, Expression &Right) {
     switch (Ty.Id) {
-        case TypeId::TUPLE:
-            Name = getTuple(Left.RetTy);
+        case TypeId::TUPLE: {
+            string Name = getTuple(Left.RetTy);
 
             ExprStack.top() << GGenerated << GCompare << Name << "(";
             Left.accept(*this);
@@ -294,9 +287,10 @@ void CCodeGenerator::outputEqual(Type &Ty, Expression &Left,
             Right.accept(*this);
             ExprStack.top() << ")";
             break;
+        }
         case TypeId::LIST:
-        case TypeId::STRING:
-            Name = getList(Left.RetTy);
+        case TypeId::STRING: {
+            string Name = getList(Left.RetTy);
 
             ExprStack.top() << GGenerated << GCompare << Name << "(";
             Left.accept(*this);
@@ -304,6 +298,7 @@ void CCodeGenerator::outputEqual(Type &Ty, Expression &Left,
             Right.accept(*this);
             ExprStack.top() << ")";
             break;
+        }
         default:
             ExprStack.top() << "(";
             Left.accept(*this);
