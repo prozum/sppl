@@ -790,7 +790,7 @@ void CCodeGenerator::generateStd() {
             << "    } " << endl
             << endl
             << "    buffer[i] = '\\0'; " << endl
-            << "    printf(\"%s\", buffer); " << endl
+            << "    printf(\"\\\"%s\\\"\", buffer); " << endl
             << "    free(buffer); " << endl
             << "} " << endl
             << endl;
