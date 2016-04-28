@@ -115,7 +115,7 @@ using namespace common;
 %left CONCAT
 %right COLON
 %left TO
-%precedence EXMARK
+%precedence EXMARK NEGATIVE
 
 %type <DeclVec> decls
 %type <Decl> decl
@@ -225,9 +225,9 @@ expr:	expr OR expr                                        { $$ = new Or(unique_p
 	|   PARSTART exprs_comma_ne COMMA expr PAREND           { $2->push_back(unique_ptr<Expression>($4)); $$ = new TupleExpr(move(* $2), @1); delete $2; }
 	|	PARSTART expr PAREND                                { $$ = new ParExpr(unique_ptr<Expression>($2), @1); }
 	|	expr PARSTART exprs_comma PAREND                    { $$ = new CallExpr(unique_ptr<Expression>($1), move(* $3), @1); delete $3; }
-	|	EXMARK expr                                         { $$ = new Not(unique_ptr<Expression>($2), @1); }
-    |	SUB expr                                            { $$ = new Negative(unique_ptr<Expression>($2), @1); }
     |   BACKSLASH args LAMBARROW expr                       { $$ = new LambdaFunction(unique_ptr<Expression>($4), move(* $2), @1); delete $2; }
+    |   EXMARK expr                                         { $$ = new Not(unique_ptr<Expression>($2), @1); }
+    |	SUB expr %prec NEGATIVE                             { $$ = new Negative(unique_ptr<Expression>($2), @1); }
 args:    args IDSMALL                                       { $$ = $1; $$->push_back(unique_ptr<LambdaArg>(new LambdaArg(* $2, @1))); }
     |                                                       { $$ = new vector<unique_ptr<LambdaArg>>();  }
 exprs: exprs expr                                           { $$ = $1; $$->push_back(unique_ptr<Expression>($2)); }

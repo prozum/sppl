@@ -43,6 +43,8 @@ bool Type::operator==(const Type &Other) const {
                     return false;
                 }
             }
+
+            return true;
         } else {
             return false;
         }

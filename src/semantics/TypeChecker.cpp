@@ -265,11 +265,9 @@ void TypeChecker::visit(Equal &Node) {
     Node.Left->accept(*this);
     Node.Right->accept(*this);
 
-    if ((Node.Left->RetTy.Id != TypeId::INT &&
-         Node.Left->RetTy.Id != TypeId::FLOAT) ||
-         Node.Left->RetTy.Id != Node.Right->RetTy.Id) {
+    if (Node.Left->RetTy != Node.Right->RetTy) {
         throw Error::Binary(
-            "Operator only operates on Int or FloatPattern children", Node);
+                "Operator only operates on children of the same type", Node);
     }
 
     Node.RetTy.Id = TypeId::BOOL;
@@ -280,11 +278,9 @@ void TypeChecker::visit(NotEqual &Node) {
     Node.Left->accept(*this);
     Node.Right->accept(*this);
 
-    if ((Node.Left->RetTy.Id != TypeId::INT &&
-         Node.Left->RetTy.Id != TypeId::FLOAT) ||
-         Node.Left->RetTy.Id != Node.Right->RetTy.Id) {
+    if (Node.Left->RetTy != Node.Right->RetTy) {
         throw Error::Binary(
-            "Operator only operates on Int or FloatPattern children", Node);
+            "Operator only operates on children of the same type", Node);
     }
 
     Node.RetTy.Id = TypeId::BOOL;
