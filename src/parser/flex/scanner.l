@@ -106,7 +106,6 @@ using namespace std;
 }
 
 "'"[^']"'" {
-
     yylval->Chr = yytext[1];
     return token::CHARLITERAL;
 }

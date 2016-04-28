@@ -1,6 +1,6 @@
 #include "task.h"
 
-uint placeholder_stack_size = 64 * 1024;
+uint placeholder_stack_size = 64 * 1024/*254 * 2024*/;
 
 task_t*
 taskalloc(void (*fn)(void*), void *arg, uint stack)

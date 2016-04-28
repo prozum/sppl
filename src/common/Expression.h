@@ -125,6 +125,8 @@ class TupleExpr : public Expression {
 
 class CallExpr : public Expression {
   public:
+    bool DoParallel = true;
+
     std::unique_ptr<Expression> Callee;
     std::vector<std::unique_ptr<Expression>> Args;
 

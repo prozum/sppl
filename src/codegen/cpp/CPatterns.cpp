@@ -11,35 +11,30 @@ void CCodeGenerator::visit(ListPattern &Node) {
     string ValGotten;
     string TypeName = getList(Node.RetTy);
 
-    // Generate the gotten value from get_value_builder
+    // Get the actual list from the function arguments, but putting together
+    // everything that is in GetValueBuilder
     for (auto Str : GetValueBuilder) {
         ValGotten += Str;
     }
 
-    Res << "(" << ValGotten << "->" << GSize << " - " << ListOffsets.back()
-    << " == " << Node.Patterns.size() << ")";
+    Res << "(" << ValGotten << "->" << GSize << " - " << ListOffsets.back() << " == " << Node.Patterns.size() << ")";
 
     for (size_t i = 0; i < Node.Patterns.size(); ++i) {
-        // Add "gat_"name"(" and ", i + offset)" to get_value_builder
-        GetValueBuilder.insert(GetValueBuilder.begin(),
-                               GGenerated + GValueAt + TypeName + "(");
-        GetValueBuilder.push_back(", " + to_string(i + ListOffsets.back()) +
-                                  ")");
+        // Insert the way in which the current item of the list should be dereferenced so that later
+        // patterns can match based on it
+        GetValueBuilder.insert(GetValueBuilder.begin(), GGenerated + GValueAt + TypeName + "(");
+        GetValueBuilder.push_back(", " + to_string(i + ListOffsets.back()) + ")");
 
-        // Push new offset
-        // Lists accesed later down in pattern should not be offseted by the
-        // same as current list
+        // Push a new offset on a stack. Offsets are used when ListSplits occure so that we don't need to make a
+        // copy of the lists tail when list splits occure
         ListOffsets.push_back(0);
 
-        // Generate pattern
         Node.Patterns[i]->accept(*this);
 
-        // Cleanup
         ListOffsets.pop_back();
         GetValueBuilder.pop_back();
         GetValueBuilder.erase(GetValueBuilder.begin());
 
-        // Don't add pattern, if pattern is "1"
         if (LastPattern != "1") {
             Res << " && " << LastPattern;
         }
@@ -52,21 +47,17 @@ void CCodeGenerator::visit(TuplePattern &Node) {
     // Result is needed, so we don't start generating something in a signature
     // in the header file
     stringstream Res;
-    string TypeName = getTuple(Node.RetTy);
     bool Empty = true;
 
-    // Iterate through all items in tuple
     for (size_t i = 0; i < Node.Patterns.size(); ++i) {
-        // Add ".gi"i"" to get_value_builder
+        // Insert the way in which the current item of the tuple should be dereferenced so that later
+        // patterns can match based on it
         GetValueBuilder.push_back("." + GGenerated + GItem + to_string(i));
 
-        // Generate pattern
         Node.Patterns[i]->accept(*this);
 
-        // Cleanup
         GetValueBuilder.pop_back();
 
-        // Don't add pattern, if pattern is "1"
         if (LastPattern != "1") {
             if (!Empty)
                 Res << " && ";
@@ -76,7 +67,7 @@ void CCodeGenerator::visit(TuplePattern &Node) {
         }
     }
 
-    // If empty, then let last_pattern be "1"
+    // If empty, then let LastPattern be "1"
     if (Empty) {
         LastPattern = "1";
     } else {
@@ -89,45 +80,30 @@ void CCodeGenerator::visit(ListSplit &Node) {
     string TypeName = getList(Node.RetTy);
     bool Empty = true;
 
-    // Add "gat_"name"(" and ", offset)" to get_value_builder.
-    // This is done, so that patterns on the left of node, will use
-    // the first + offset item in the list
-    GetValueBuilder.insert(GetValueBuilder.begin(),
-                           GGenerated + GValueAt + TypeName + "(");
+    // Insert the way in which the first item of the list should be dereferenced so that later
+    // patterns can match based on it
+    GetValueBuilder.insert(GetValueBuilder.begin(), GGenerated + GValueAt + TypeName + "(");
     GetValueBuilder.push_back(", " + to_string(ListOffsets.back()) + ")");
-
-    // Push new offset.
-    // Lists accesed later down in pattern should not be offseted by the same as
-    // current list.
     ListOffsets.push_back(0);
 
-    // Generate pattern
     Node.Left->accept(*this);
 
-    // Cleanup
     ListOffsets.pop_back();
     GetValueBuilder.pop_back();
     GetValueBuilder.erase(GetValueBuilder.begin());
 
-    // Don't add pattern, if pattern is "1"
     if (LastPattern != "1") {
         Empty = false;
         Res << LastPattern;
     }
 
-    // Right side of a list split, will be the list, but with the first + offset
-    // elements missing.
-    // This is why we track an offset, so that we don't clone a list, unless we
-    // have to.
+    // All the patterns that occure on the right side of a ListSplit is offset by one
     ListOffsets[ListOffsets.size() - 1]++;
 
-    // Generate pattern
     Node.Right->accept(*this);
 
-    // Reverse offset back to what it was
     ListOffsets[ListOffsets.size() - 1]--;
 
-    // Don't add pattern, if pattern is "1"
     if (LastPattern != "1") {
         if (!Empty)
             Res << " && ";
@@ -136,7 +112,7 @@ void CCodeGenerator::visit(ListSplit &Node) {
         Res << LastPattern;
     }
 
-    // If empty, then let last_pattern be "1"
+    // If empty, then let LastPattern be "1"
     if (Empty) {
         LastPattern = "1";
     } else {
@@ -145,7 +121,7 @@ void CCodeGenerator::visit(ListSplit &Node) {
 }
 
 void CCodeGenerator::visit(IntPattern &Node) {
-    string Val = "";
+    string Val;
 
     for (auto &Str : GetValueBuilder) {
         Val += Str;
@@ -155,7 +131,7 @@ void CCodeGenerator::visit(IntPattern &Node) {
 }
 
 void CCodeGenerator::visit(FloatPattern &Node) {
-    string Val = "";
+    string Val;
 
     for (auto &Str : GetValueBuilder) {
         Val += Str;
@@ -165,7 +141,7 @@ void CCodeGenerator::visit(FloatPattern &Node) {
 }
 
 void CCodeGenerator::visit(CharPattern &Node) {
-    string Val = "";
+    string Val;
 
     for (auto &Str : GetValueBuilder) {
         Val += Str;
@@ -175,7 +151,7 @@ void CCodeGenerator::visit(CharPattern &Node) {
 }
 
 void CCodeGenerator::visit(BoolPattern &Node) {
-    string Val = "";
+    string Val;
 
     for (auto &Str : GetValueBuilder) {
         Val += Str;
@@ -186,9 +162,8 @@ void CCodeGenerator::visit(BoolPattern &Node) {
 
 void CCodeGenerator::visit(IdPattern &Node) {
     stringstream Assign;
-    string Name = "";
+    string Name;
 
-    // Created name from get_value_builder
     for (auto &Str : GetValueBuilder) {
         Name += Str;
     }
@@ -206,22 +181,21 @@ void CCodeGenerator::visit(IdPattern &Node) {
         Assign << Name << ";";
     }
 
-    // Save the assigment untill after the pattern has been generated
+    // Save the assigment until after the pattern has been generated
     Assignments.push_back(Assign.str());
 
-    // Since an id, in a pattern is always true, then last_pattern is just
+    // Since an id, in a pattern is always true, then LastPattern is just
     // set to "1"
     LastPattern = "1";
 }
 
 void CCodeGenerator::visit(WildPattern &Node) {
-    // Since a wildcard, in a pattern is always true, then last_pattern is just
+    // Since a wildcard, in a pattern is always true, then LastPattern is just
     // set to "1"
     LastPattern = "1";
 }
 
 void CCodeGenerator::visit(AlgebraicPattern &Node) {
-
     // TODO
     throw std::runtime_error("Not implemented");
 }
@@ -235,13 +209,13 @@ void CCodeGenerator::visit(ParPattern &Node) {
 }
 
 void CCodeGenerator::visit(StringPattern &Node) {
-    string Val = "";
+    string Val;
 
     for (auto &Str : GetValueBuilder) {
         Val += Str;
     }
 
-    // gcompare_string is generated by generate_std. it compares the custome
+    // GCompare GString is generated by generate_std. it compares the custome
     // string type, to a char*.
     // It also takes an offset, for when list splits occur on strings
     LastPattern = GGenerated + GCompare + GString + "(" + Val + ", " +

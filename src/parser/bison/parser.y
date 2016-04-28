@@ -115,7 +115,7 @@ using namespace common;
 %left CONCAT
 %right COLON
 %left TO
-%precedence EXMARK
+%precedence EXMARK NEGATIVE
 
 %type <DeclVec> decls
 %type <Decl> decl
@@ -168,7 +168,6 @@ type:	    INTTYPE                                         { $$ = new Type(TypeId
 	|	    PARSTART tupletype COMMA type PAREND            { $$ = $2; $$->Loc = @1; $$->Subtypes.push_back(* $4); }
     |       generic                                         { $$ = $1; }
 	|       IDBIG types                                     { $$ = new Type(TypeId::CUSTOM, * $2, @1); $$->Name = * $1; delete $1; delete $2; }
-	|       PARSTART type PAREND                            { $$ = $2; }
 generic:    IDSMALL                                         { $$ = new Type(TypeId::GENERIC, @1); $$->Name = * $1; delete $1; }
 tupletype:  tupletype COMMA type                            { $$ = $1; $$->Subtypes.push_back(* $3); }
 	|	    type                                            { $$ = new Type(TypeId::TUPLE); $$->Subtypes.push_back(* $1); }
@@ -225,9 +224,9 @@ expr:	expr OR expr                                        { $$ = new Or(unique_p
 	|   PARSTART exprs_comma_ne COMMA expr PAREND           { $2->push_back(unique_ptr<Expression>($4)); $$ = new TupleExpr(move(* $2), @1); delete $2; }
 	|	PARSTART expr PAREND                                { $$ = new ParExpr(unique_ptr<Expression>($2), @1); }
 	|	expr PARSTART exprs_comma PAREND                    { $$ = new CallExpr(unique_ptr<Expression>($1), move(* $3), @1); delete $3; }
-	|	EXMARK expr                                         { $$ = new Not(unique_ptr<Expression>($2), @1); }
-    |	SUB expr                                            { $$ = new Negative(unique_ptr<Expression>($2), @1); }
     |   BACKSLASH args LAMBARROW expr                       { $$ = new LambdaFunction(unique_ptr<Expression>($4), move(* $2), @1); delete $2; }
+    |   EXMARK expr                                         { $$ = new Not(unique_ptr<Expression>($2), @1); }
+    |	SUB expr %prec NEGATIVE                             { $$ = new Negative(unique_ptr<Expression>($2), @1); }
 args:    args IDSMALL                                       { $$ = $1; $$->push_back(unique_ptr<LambdaArg>(new LambdaArg(* $2, @1))); }
     |                                                       { $$ = new vector<unique_ptr<LambdaArg>>();  }
 exprs: exprs expr                                           { $$ = $1; $$->push_back(unique_ptr<Expression>($2)); }

@@ -2,5 +2,4 @@ def main : [String]->Int
 | s = func(1)
 
 def func : Int->Int
-|  a = 2
-| arg0  = 2
+| a = 2

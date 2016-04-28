@@ -42,6 +42,8 @@ bool Type::operator==(const Type &Other) const {
                     return false;
                 }
             }
+
+            return true;
         } else {
             return false;
         }
@@ -66,7 +68,7 @@ bool Type::operator!=(const Type &Other) const { return !(*this == Other); }
 
 Type Type::operator[](const size_t Index) { return Subtypes[Index]; }
 
-std::string Type::str() {
+std::string Type::str(bool isTop) {
     switch (Id) {
     case TypeId::INT:
         return "Int";
@@ -83,7 +85,10 @@ std::string Type::str() {
     case TypeId::TUPLE:
         return strJoin(", ");
     case TypeId::SIGNATURE:
-        return strJoin(" -> ");
+        if (isTop)
+            return strJoin(" -> ");
+        else
+            return "(" + strJoin(" -> ") + ")";
     case TypeId::CUSTOM:
         return Name + " " + strJoin(" ");
     case TypeId::GENERIC:
@@ -98,11 +103,7 @@ std::string Type::str() {
 string Type::strJoin(const std::string JoinStr) {
     string Str;
     for (size_t i = 0; i < Subtypes.size(); ++i) {
-        if (Subtypes[i].Id == TypeId::SIGNATURE ||
-            Subtypes[i].Id == TypeId::CUSTOM)
-            Str += "(" + Subtypes[i].str() + ")";
-        else
-            Str += Subtypes[i].str();
+        Str += Subtypes[i].str();
 
         if (i + 1 != Subtypes.size())
             Str += JoinStr;
