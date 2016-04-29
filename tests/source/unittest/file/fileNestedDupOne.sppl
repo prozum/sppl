@@ -1,0 +1,4 @@
+include "file/fileNestedDupTwo.sppl"
+
+def func1 : Int -> Int
+| n = func2(n)

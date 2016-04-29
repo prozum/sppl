@@ -1,0 +1,6 @@
+def main : [String]->Bool
+| s = func(2,2,True)
+
+def func : Int->Int->Bool->Bool
+| m n b when m == n && b = True
+| m n b = False

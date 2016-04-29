@@ -16,6 +16,7 @@ compiler::Backend backend = compiler::Backend::PPRINTER;
 
 int main(int argc, char* argv[]){
 
+    // Set the target compiler
     if (strcmp(argv[1], "c") == 0) {
 #ifdef CCPP
         cout << "Backend: C" << endl;
@@ -53,6 +54,7 @@ int main(int argc, char* argv[]){
 #endif
     }
 
+    // CPPUNIT stuff
     CPPUNIT_NS::TestResult test_result;
 
     CPPUNIT_NS::TestResultCollector collector;
@@ -80,17 +82,27 @@ void Test::tearDown() {
 }
 
 bool Test::compileChecker(std::string name) {
-    int compStatus;
-
-    if (!checkIfFileExists(name)) {
-        CPPUNIT_ASSERT_MESSAGE("File \"" + name + "\" not found!", false);
-    }
+    int compStatus;     // Stores the return code from the compiler
 
     try {
         compiler::Compiler compiler;
 
         std::vector<std::string> in;
-        in.push_back(name);
+        string file = "";
+
+        for (char c : name) {
+            if (c == ' ') {
+                in.push_back(file);
+                file.clear();
+            } else {
+                file += c;
+                file = file;
+            }
+        }
+
+        if (file.length() > 0) {
+            in.push_back(file);
+        }
 
         compiler.setOutput("out.c");
         compiler.setHeaderOutput("test.h");
@@ -111,40 +123,20 @@ bool Test::compileChecker(std::string name) {
 }
 
 bool Test::executeChecker(std::string args, std::string expectedOutput) {
-
-#ifdef CCPP
-    return executeCPP(args, expectedOutput);
-#elif CLLVM
-    return executeLLVM(args, expectedOutput);
-#endif
-    return true;
+    if (backend == compiler::Backend::CPP || backend == compiler::Backend::CPAR) {
+        return executeCPP(args, expectedOutput);
+    } else if (backend == compiler::Backend::LLVM) {
+        return executeLLVM(args, expectedOutput);
+    } else {
+        return false;
+    }
 }
 
 bool Test::executeChecker(std::string expectedOutput) {
     return executeChecker("", expectedOutput);
 }
 
-bool Test::checkIfFileExists(std::string file) {
-    std::ifstream f(file);
-    if (f.bad()) {
-        f.close();
-        return false;
-    } else {
-        f.close();
-        return true;
-    }
-}
-
 bool Test::executeCPP(std::string args, std::string expectedOutput) {
-    // Check if files exist
-    if(checkIfFileExists("out.c") == false) {
-        CPPUNIT_ASSERT_MESSAGE("file out.c not found", false);
-    }
-
-    if(checkIfFileExists("test.h") == false) {
-        CPPUNIT_ASSERT_MESSAGE("file test.h not found", false);
-    }
-
     int status;
 
     // Compile program
@@ -206,10 +198,4 @@ bool Test::executeCPP(std::string args, std::string expectedOutput) {
 
 bool Test::executeLLVM(std::string args, std::string expectedOutput) {
     return true; // TODO: DONT DO THIS
-    if(checkIfFileExists("out.ir") == false) {
-        CPPUNIT_ASSERT_MESSAGE("file out.ir not found", false);
-    }
-    int status = system("cc out.c -o prog");
-
-    return false;
 }
