@@ -1,0 +1,3 @@
+def main : [String] -> Bool
+| s when when = True
+| s = False

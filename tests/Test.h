@@ -18,7 +18,7 @@ using namespace std;
 
 class Test : public CppUnit::TestFixture{
     CPPUNIT_TEST_SUITE(Test);
-/*
+
     // AddTest.cpp
     CPPUNIT_TEST(addIntPosPos);
     CPPUNIT_TEST(addIntZeroZero);
@@ -386,7 +386,7 @@ class Test : public CppUnit::TestFixture{
     CPPUNIT_TEST(fileMainInOther);
     CPPUNIT_TEST(fileImpNested);
     CPPUNIT_TEST(fileImpNestedDup);
-*/
+
     // WhenTest.sppl
     CPPUNIT_TEST(whenTrue);
     CPPUNIT_TEST(whenFalse);

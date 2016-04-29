@@ -1,0 +1,4 @@
+include "nope.sppl"
+
+def main : [String] -> Int
+| s = 2
