@@ -19,6 +19,11 @@ SpplJit::SpplJit()
                                                      common::Type(TypeId::FLOAT),
                                                      common::Type(TypeId::VOID)
                                              }));
+    Drv.addExternFunc("printii", common::Type(TypeId::SIGNATURE,
+                                         vector<common::Type> {
+                                                 common::Type(TypeId::INT),
+                                                 common::Type(TypeId::VOID)
+                                         }));
 
     // Time is short, mortal
     Drv.setOutput("/dev/null");
@@ -196,6 +201,10 @@ string SpplJit::getOutputList(intptr_t Addr, common::Type Type)
 
 extern "C" void printff(double Float) {
     fprintf(stderr, "%f", Float);
+}
+
+extern "C" void printii(long Int) {
+    fprintf(stderr, "%li", Int);
 }
 
 int SpplJit::eval(string Str) {
