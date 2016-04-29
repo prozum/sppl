@@ -43,20 +43,18 @@ void LLVMCodeGenerator::visit(common::Function &Node) {
     // Setup case and pattern blocks
     CaseBlocks.clear();
     PatVecBlocks.clear();
-    int PatId, CaseId = 0;
-    for (auto &Case : Node.Cases) {
-        PatId = 0;
+    for (size_t i = 0; i < Node.Cases.size(); ++i) {
         auto PatVecBlock = vector<BasicBlock *>();
-        for (auto &Pattern : Case->Patterns) {
+        for (size_t j = 0; j < Node.Cases[i]->Patterns.size(); ++j) {
             PatVecBlock.push_back(BasicBlock::Create(
                 Ctx,
-                "case" + to_string(CaseId) + "_pattern" + to_string(PatId++),
+                "case" + to_string(i) + "_pattern" + to_string(j),
                 CurFunc));
         }
         PatVecBlocks.push_back(PatVecBlock);
 
         CaseBlocks.push_back(BasicBlock::Create(
-            Ctx, "case" + to_string(CaseId++), CurFunc));
+            Ctx, "case" + to_string(i), CurFunc));
     }
 
     // Visit cases
