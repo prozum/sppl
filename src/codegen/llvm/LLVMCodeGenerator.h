@@ -100,6 +100,8 @@ class LLVMCodeGenerator : public parser::CodeGenerator {
     void visit(common::CallExpr &Node);
     void visit(common::ParExpr &Node);
 
+    llvm::Instruction *CreateMalloc(llvm::Type *Type,llvm::BasicBlock * Block);
+
     llvm::Type *getType(common::Type Ty);
     llvm::StructType *getTupleType(common::Type Ty);
     llvm::StructType *getListType(common::Type Ty);
