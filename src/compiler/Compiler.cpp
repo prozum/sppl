@@ -55,8 +55,10 @@ int Compiler::compile(const vector<string> &Filenames) {
     if (!accept(TypeChecker))
         return 3;
 
+#if OPTIMIZER
     if (!accept(Optimizer))
         return 4;
+#endif
 
     if (!accept(*CodeGen))
         return 5;

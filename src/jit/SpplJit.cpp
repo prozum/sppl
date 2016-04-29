@@ -227,8 +227,10 @@ int SpplJit::eval(string Str) {
     if (!Drv.accept(TypeChecker))
         return 3;
 
-    // if (!Drv.accept(Optimizer))
-    //    return 4;
+#if OPTIMIZER
+    if (!Drv.accept(Optimizer))
+        return 4;
+#endif
 
     if (!Drv.accept(CodeGen))
         return 5;

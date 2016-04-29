@@ -61,7 +61,9 @@ class SpplJit {
     codegen::LLVMCodeGenerator CodeGen;
     semantics::ScopeGenerator ScopeGen;
     semantics::TypeChecker TypeChecker;
+#if OPTIMIZER
     optimizer::GeneralOptimizer Optimizer;
+#endif
 
     ObjLayerT ObjectLayer;
     CompileLayerT CompileLayer;
