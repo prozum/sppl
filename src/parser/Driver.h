@@ -60,7 +60,7 @@ class Driver {
 
     bool parseStream(std::istream &In, const std::string &Src = "stream");
     bool parseString(const std::string &Input,
-                     const std::string &Src = "std::string");
+                     const std::string &Src = "string");
     bool parseFile(const std::string &Filename);
     bool parseFiles(const std::vector<std::string> &Filenames);
 

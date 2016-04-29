@@ -112,7 +112,7 @@ string SpplJit::getOutput(intptr_t Data, common::Type Type) {
     case TypeId::BOOL:
         return to_string((bool)Data);
     case TypeId::TUPLE:
-        return getOutputTuple(Data, Type.Subtypes);
+        return getOutputTuple(Data, Type);
     case TypeId::LIST:
         return getOutputList(Data, Type);
     case TypeId::SIGNATURE:
@@ -124,15 +124,20 @@ string SpplJit::getOutput(intptr_t Data, common::Type Type) {
     }
 }
 
-string SpplJit::getOutputTuple(intptr_t Addr, vector<common::Type> Subtypes) {
+string SpplJit::getOutputTuple(intptr_t Addr, common::Type Type) {
+    auto Alignment = CodeGen.DataLayout.getPrefTypeAlignment(CodeGen.getTupleType(Type));
+    auto Subtypes = Type.Subtypes;
     string Out("(");
     for (size_t i = 0; i < Subtypes.size(); ++i) {
+        auto Offset = Alignment - (Alignment % 8);
         switch (Subtypes[i].Id) {
         case TypeId::INT:
+            Addr += Offset;
             Out += getOutput(*(int64_t *)Addr, Subtypes[i]);
             Addr += sizeof(int64_t);
             break;
         case TypeId::FLOAT:
+            Addr += Offset;
             Out += getOutput(Addr, Subtypes[i]);
             Addr += sizeof(double);
             break;
@@ -145,11 +150,13 @@ string SpplJit::getOutputTuple(intptr_t Addr, vector<common::Type> Subtypes) {
             Addr += sizeof(bool);
             break;
         case TypeId::STRING:
+            Addr += Offset;
             Out += getOutput(*(intptr_t *)Addr, Subtypes[i]);
             Addr += sizeof(intptr_t *);
             break;
         case TypeId::TUPLE:
-            Out += getOutputTuple(*(intptr_t *)Addr, Subtypes[i].Subtypes);
+            Addr += Offset;
+            Out += getOutputTuple(*(intptr_t *)Addr, Subtypes[i]);
             Addr += sizeof(intptr_t *);
             break;
         default:
@@ -195,7 +202,7 @@ string SpplJit::getOutputList(intptr_t Addr, common::Type Type)
             Addr += sizeof(intptr_t *);
             break;
         case TypeId::TUPLE:
-            Out += getOutputTuple(*(intptr_t *)Addr, Subtype.Subtypes);
+            Out += getOutputTuple(*(intptr_t *)Addr, Subtype);
             Addr += sizeof(intptr_t *);
             break;
         default:

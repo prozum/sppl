@@ -24,11 +24,6 @@
 #include <llvm/Support/TargetSelect.h>
 #include <llvm/Transforms/Scalar.h>
 
-//extern "C" double printd(double X) {
-//    fprintf(stderr, "%f\n", X);
-//    return 0;
-//}
-
 namespace jit {
 class SpplJit {
   public:
@@ -55,7 +50,7 @@ class SpplJit {
     std::string mangle(const std::string &Name);
 
     std::string getOutput(intptr_t Data, common::Type Type);
-    std::string getOutputTuple(intptr_t Addr, std::vector<common::Type> Subtypes);
+    std::string getOutputTuple(intptr_t Addr, common::Type Type);
 
     parser::Driver Drv;
     codegen::LLVMCodeGenerator CodeGen;
