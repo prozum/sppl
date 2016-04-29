@@ -16,11 +16,17 @@ class CParCodeGenerator : public CCodeGenerator {
 
         const std::string GTask = "task";
         const std::string GRes = "res";
+        const std::string GParallel = "par_";
+        const std::string GSequential = "seq_";
 
         std::string CurrentArg;
+        std::string SequentialCall;
 
         std::vector<std::string> CallStack;
+        std::vector<int> CallStackCount;
         std::vector<std::string> CurrentTasks;
+
+        bool GenerateParallel;
 
         size_t CallDepth = 0;
         int TaskCount = 0;

@@ -428,16 +428,16 @@ string CCodeGenerator::generateList(Type &Ty) {
 
     *Header << "void " << Prints[Ty] << "(" << Name << "* value); " << endl;
     Buffer << "void " << Prints[Ty] << "(" << Name << "* value) { " << endl
-    << "    printf(\"[\"); \n" << endl
-    << "    while (!value->" << GEmpty << ") {" << endl
-    << "        " << Prints[Ty.Subtypes.front()] << "(value->" << GValue << ");" << endl
-    << "        value = value->" << GNext << ";" << endl
-    << "        if (!value->" << GEmpty << ")" << endl
-    << "            printf(\", \"); \n" << endl
-    << "    }" << endl
-    << "    printf(\"]\"); \n" << endl
-    << "} " << endl
-    << endl;
+            << "    printf(\"[\"); \n" << endl
+            << "    while (!value->" << GEmpty << ") {" << endl
+            << "        " << Prints[Ty.Subtypes.front()] << "(value->" << GValue << ");" << endl
+            << "        value = value->" << GNext << ";" << endl
+            << "        if (!value->" << GEmpty << ")" << endl
+            << "            printf(\", \"); \n" << endl
+            << "    }" << endl
+            << "    printf(\"]\"); \n" << endl
+            << "} " << endl
+            << endl;
 
     Lists[Ty] = Name;
 
