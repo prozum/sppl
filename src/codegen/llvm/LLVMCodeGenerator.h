@@ -86,6 +86,9 @@ class LLVMCodeGenerator : public parser::CodeGenerator {
     void visit(common::LesserEq &Node);
     void visit(common::GreaterEq &Node);
 
+    void visit(common::Negative &Node);
+    void visit(common::Not &Node);
+
     void visit(common::IdExpr &Node);
     void visit(common::IntExpr &Node);
     void visit(common::FloatExpr &Node);
