@@ -84,7 +84,6 @@ void LLVMCodeGenerator::visit(common::ListExpr &Node) {
                                 GlobalVariable::ExternalLinkage, ConstVal);
 
     // Malloc list data
-    auto ITy = Type::getInt32Ty(getGlobalContext());
     auto DataMalloc = CreateMalloc(ArrayType, *CurCaseBlock);
 
     // Memcpy
@@ -97,7 +96,7 @@ void LLVMCodeGenerator::visit(common::ListExpr &Node) {
 
     // Set list length
     CurVal = Builder.CreateStructGEP(ListType, ListCast, 0);
-    Builder.CreateStore(ConstantInt::get(ITy, Node.Elements.size()), CurVal);
+    Builder.CreateStore(ConstantInt::get(Int32, Node.Elements.size()), CurVal);
 
     // Set list data
     CurVal = Builder.CreateStructGEP(ListType, ListCast, 1);
@@ -125,11 +124,11 @@ void LLVMCodeGenerator::visit(common::CallExpr &Node) {
 
 Instruction *LLVMCodeGenerator::CreateMalloc(llvm::Type *Type, BasicBlock *Block)
 {
-    auto ITy = Type::getInt32Ty(getGlobalContext());
+    //auto ITy = Type::getInt32Ty(getGlobalContext());
     auto Size = DataLayout.getPointerTypeSize(Type);
-    auto AllocSize = ConstantInt::get(ITy, APInt(32, Size));
+    auto AllocSize = ConstantInt::get(Int32, APInt(32, Size));
     auto Malloc = CallInst::CreateMalloc(Block,
-                                         ITy, Type, AllocSize,
+                                         Int32, Type, AllocSize,
                                          nullptr, nullptr, "malloccall");
     Block->getInstList().push_back(Malloc);
 

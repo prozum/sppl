@@ -7,13 +7,13 @@ using namespace codegen;
 llvm::Type *LLVMCodeGenerator::getType(common::Type Ty) {
     switch (Ty.Id) {
     case common::TypeId::FLOAT:
-        return llvm::Type::getDoubleTy(getGlobalContext());
+        return Double;
     case common::TypeId::INT:
-        return llvm::Type::getInt64Ty(getGlobalContext());
+        return Int64;
     case common::TypeId::BOOL:
-        return llvm::Type::getInt1Ty(getGlobalContext());
+        return Int1;
     case common::TypeId::CHAR:
-        return llvm::Type::getInt8Ty(getGlobalContext());
+        return Int8;
     case common::TypeId::TUPLE:
         return PointerType::getUnqual(getTupleType(Ty));
     case common::TypeId::LIST:
@@ -22,8 +22,6 @@ llvm::Type *LLVMCodeGenerator::getType(common::Type Ty) {
         return PointerType::getUnqual(getFuncType(Ty));
     case common::TypeId::STRING:
         return getListType(common::Type(common::TypeId::LIST, vector<common::Type> {common::Type(common::TypeId::CHAR)}));
-        //return PointerType::getUnqual(ArrayType::get(
-        //    llvm::Type::getInt8Ty(getGlobalContext()), Ty.subtypeCount()));
     case common::TypeId::VOID:
         return llvm::Type::getVoidTy(getGlobalContext());
     default:
@@ -51,10 +49,9 @@ llvm::StructType *LLVMCodeGenerator::getListType(common::Type Ty) {
     if (CacheTy != ListTypes.end())
         return CacheTy->second;
 
-    std::vector<llvm::Type *> TmpVec;
-    TmpVec.push_back(IntegerType::get(getGlobalContext(), 32));
-    TmpVec.push_back(PointerType::getUnqual(ArrayType::get(getType(Ty.Subtypes[0]), 0)));
-    llvm::ArrayRef<llvm::Type *> Subtypes(TmpVec);
+    std::vector<llvm::Type *> Subtypes;
+    Subtypes.push_back(IntegerType::get(getGlobalContext(), 32));
+    Subtypes.push_back(PointerType::getUnqual(ArrayType::get(getType(Ty.Subtypes[0]), 0)));
 
     return ListTypes[Ty] = StructType::create(getGlobalContext(), Subtypes, "list");
 }

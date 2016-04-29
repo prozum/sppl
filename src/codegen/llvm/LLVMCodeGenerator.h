@@ -33,8 +33,15 @@ class LLVMCodeGenerator : public parser::CodeGenerator {
     std::unordered_map<common::Type, llvm::StructType *> ListTypes;
     std::unordered_map<common::Type, llvm::FunctionType *> FuncTypes;
 
-    llvm::Value *CurVal;
+    // Constants
+    llvm::LLVMContext &Ctx;
+    llvm::Type *Int1;
+    llvm::Type *Int8;
+    llvm::Type *Int32;
+    llvm::Type *Int64;
+    llvm::Type *Double;
 
+    llvm::Value *CurVal;
     llvm::Function *CurFunc;
     llvm::BasicBlock *CurEntry;
     llvm::BasicBlock *CurErrBlock;
