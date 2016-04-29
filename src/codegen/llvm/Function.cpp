@@ -6,7 +6,6 @@ using namespace codegen;
 
 void LLVMCodeGenerator::visit(common::Function &Node) {
     // Create function and entry block
-    auto Ty = getFuncType(Node.Signature);
     CurFunc = llvm::Function::Create(getFuncType(Node.Signature),
                                      llvm::Function::ExternalLinkage, Node.Id,
                                      Module.get());
@@ -21,23 +20,19 @@ void LLVMCodeGenerator::visit(common::Function &Node) {
     CurRetBlock = BasicBlock::Create(Ctx, "ret", CurFunc);
     Builder.SetInsertPoint(CurRetBlock);
 
-
+    // Create ret instruction
     if (CurFunc->getReturnType()->getTypeID() != llvm::Type::TypeID::VoidTyID) {
         CurPhiNode = Builder.CreatePHI(CurFunc->getReturnType(),
                                        (unsigned) Node.Cases.size(), "rettmp");
-
-        // Create ret instruction
         Builder.CreateRet(CurPhiNode);
     } else {
         Builder.CreateRetVoid();
     }
 
-
     // Setup names for arguments
     auto ArgId = 0;
     for (auto &Arg : CurFunc->args()) {
         Arg.setName("_arg" + to_string(ArgId++));
-        Args.push_back(&Arg);
     }
 
     // Setup case and pattern blocks
@@ -69,10 +64,10 @@ void LLVMCodeGenerator::visit(common::Function &Node) {
     // Make entry point to first block
     Builder.SetInsertPoint(CurEntry);
     BasicBlock *FirstBlock;
-    if (PatVecBlocks[0].empty())
-        FirstBlock = CaseBlocks[0];
+    if (PatVecBlocks.front().empty())
+        FirstBlock = CaseBlocks.front();
     else
-        FirstBlock = PatVecBlocks[0][0];
+        FirstBlock = PatVecBlocks.front().front();
     Builder.CreateBr(FirstBlock);
 
     verifyFunction(*CurFunc);
@@ -84,7 +79,7 @@ void LLVMCodeGenerator::visit(common::Case &Node) {
     BasicBlock *FalseBlock;
 
     CtxVals.clear();
-    for (CurPat = Node.Patterns.cbegin(), CurArg = Args.cbegin(),
+    for (CurPat = Node.Patterns.cbegin(), CurArg = CurFunc->arg_begin(),
         CurPatBlock = CurPatVecBlock->cbegin(),
         LastPatBlock = CurPatVecBlock->cend();
          CurPat != Node.Patterns.cend(); ++CurPat, ++CurArg, ++CurPatBlock) {
@@ -95,7 +90,7 @@ void LLVMCodeGenerator::visit(common::Case &Node) {
             TrueBlock = *CurCaseBlock;
 
         if (next(CurCaseBlock) != LastCaseBlock)
-            FalseBlock = (*next(CurPatVecBlock))[0];
+            FalseBlock = (*next(CurPatVecBlock)).front();
         else
             FalseBlock = CurErrBlock;
 

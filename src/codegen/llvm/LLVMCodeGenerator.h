@@ -48,8 +48,9 @@ class LLVMCodeGenerator : public parser::CodeGenerator {
     llvm::BasicBlock *CurRetBlock;
     llvm::PHINode *CurPhiNode;
 
-    std::vector<llvm::Argument *> Args;
-    std::vector<llvm::Argument *>::const_iterator CurArg;
+    //std::vector<llvm::Argument *> Args;
+    //std::vector<llvm::Argument *>::const_iterator CurArg;
+    llvm::Function::arg_iterator CurArg;
 
     std::vector<std::unique_ptr<common::Case>>::const_iterator CurCase;
     std::vector<llvm::BasicBlock *> CaseBlocks;
