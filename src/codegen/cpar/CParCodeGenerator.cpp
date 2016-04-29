@@ -81,7 +81,7 @@ void CParCodeGenerator::visit(Function &Node) {
     // Generate function in *output
     *Output << Func.str() << " { " << endl;
 
-    for (size_t i = 0; i < Node.Signature.subtypeCount() - 1; ++i) {
+    for (size_t i = 0; i < Node.Signature.Subtypes.size() - 1; ++i) {
         string ArgName = GGenerated + GArg + to_string(i);
 
         ArgType = getType(Node.Signature.Subtypes[i]);
@@ -271,7 +271,7 @@ std::string CParCodeGenerator::generateEnvironment(common::Type &Ty) {
 
     Res << "typedef struct " << Name << GArg << " {" << endl;
 
-    for (size_t i = 0; i < Ty.subtypeCount() - 1; ++i) {
+    for (size_t i = 0; i < Ty.Subtypes.size()  - 1; ++i) {
         Res << "    " << getType(Ty.Subtypes[i]) << " " << GGenerated << GArg << i << ";" << endl;
     }
 
