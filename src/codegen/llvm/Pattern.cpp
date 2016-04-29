@@ -10,10 +10,6 @@ void LLVMCodeGenerator::visit(common::FloatPattern &Node) {
 
 void LLVMCodeGenerator::visit(common::IntPattern &Node) {
     auto PatVal = ConstantInt::get(getType(Node.RetTy), (uint64_t)Node.Val);
-
-    auto Ty1 = (*CurArg)->getType();
-    auto Ty2 = PatVal->getType();
-
     CurVal = Builder.CreateICmpEQ(PatVal, *CurArg, "cmptmp");
 }
 

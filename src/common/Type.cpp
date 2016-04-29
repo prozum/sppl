@@ -83,7 +83,7 @@ std::string Type::str(bool isTop) {
     case TypeId::LIST:
         return "[" + Subtypes[0].str() + "]";
     case TypeId::TUPLE:
-        return strJoin(", ");
+        return "(" + strJoin(", ") + ")";
     case TypeId::SIGNATURE:
         if (isTop)
             return strJoin(" -> ");
