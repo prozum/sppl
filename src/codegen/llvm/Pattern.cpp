@@ -32,6 +32,10 @@ void LLVMCodeGenerator::visit(common::IdPattern &Node) {
     CurVal = ConstantInt::get(llvm::Type::getInt1Ty(getGlobalContext()), 1);
 }
 
+void LLVMCodeGenerator::visit(common::WildPattern &Node) {
+    CurVal = ConstantInt::get(llvm::Type::getInt1Ty(getGlobalContext()), 1);
+}
+
 void LLVMCodeGenerator::visit(common::TuplePattern &Node) {
     std::vector<llvm::Constant *> TmpVec;
 
