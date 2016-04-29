@@ -10,15 +10,15 @@ void LLVMCodeGenerator::visit(common::Function &Node) {
     CurFunc = llvm::Function::Create(getFuncType(Node.Signature),
                                      llvm::Function::ExternalLinkage, Node.Id,
                                      Module.get());
-    CurEntry = BasicBlock::Create(getGlobalContext(), "entry", CurFunc);
+    CurEntry = BasicBlock::Create(Ctx, "entry", CurFunc);
 
     // Create error block
-    CurErrBlock = BasicBlock::Create(getGlobalContext(), "error", CurFunc);
+    CurErrBlock = BasicBlock::Create(Ctx, "error", CurFunc);
     Builder.SetInsertPoint(CurErrBlock);
     Builder.CreateRet(UndefValue::get(CurFunc->getReturnType()));
 
     // Setup return block and phi node
-    CurRetBlock = BasicBlock::Create(getGlobalContext(), "ret", CurFunc);
+    CurRetBlock = BasicBlock::Create(Ctx, "ret", CurFunc);
     Builder.SetInsertPoint(CurRetBlock);
 
 
@@ -49,14 +49,14 @@ void LLVMCodeGenerator::visit(common::Function &Node) {
         auto PatVecBlock = vector<BasicBlock *>();
         for (auto &Pattern : Case->Patterns) {
             PatVecBlock.push_back(BasicBlock::Create(
-                getGlobalContext(),
+                Ctx,
                 "case" + to_string(CaseId) + "_pattern" + to_string(PatId++),
                 CurFunc));
         }
         PatVecBlocks.push_back(PatVecBlock);
 
         CaseBlocks.push_back(BasicBlock::Create(
-            getGlobalContext(), "case" + to_string(CaseId++), CurFunc));
+            Ctx, "case" + to_string(CaseId++), CurFunc));
     }
 
     // Visit cases

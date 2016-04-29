@@ -14,6 +14,8 @@ SpplJit::SpplJit()
 
     sys::DynamicLibrary::LoadLibraryPermanently(nullptr);
     createModule();
+
+    // Build-in functions
     Drv.addExternFunc("printff", common::Type(TypeId::SIGNATURE,
                                              vector<common::Type> {
                                                      common::Type(TypeId::FLOAT),
@@ -81,7 +83,7 @@ string SpplJit::mangle(const string &Name) {
 void SpplJit::createModule() {
     // Open a new module
     CodeGen.Module =
-        std::make_unique<Module>("SpplJit", getGlobalContext());
+        std::make_unique<Module>("SpplJit", CodeGen.Ctx);
     CodeGen.Module->setDataLayout(CodeGen.Machine->createDataLayout());
 
     // Create a new pass manager attached to it

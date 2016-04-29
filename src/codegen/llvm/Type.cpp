@@ -23,7 +23,7 @@ llvm::Type *LLVMCodeGenerator::getType(common::Type Ty) {
     case common::TypeId::STRING:
         return getListType(common::Type(common::TypeId::LIST, vector<common::Type> {common::Type(common::TypeId::CHAR)}));
     case common::TypeId::VOID:
-        return llvm::Type::getVoidTy(getGlobalContext());
+        return llvm::Type::getVoidTy(Ctx);
     default:
         throw runtime_error("This should not happen!");
     }
@@ -39,7 +39,7 @@ llvm::StructType *LLVMCodeGenerator::getTupleType(common::Type Ty) {
     for (auto &Subtype : Ty.Subtypes)
         Subtypes.push_back(getType(Subtype));
 
-    return TupleTypes[Ty] = StructType::create(getGlobalContext(), Subtypes, "tuple");
+    return TupleTypes[Ty] = StructType::create(Ctx, Subtypes, "tuple");
 }
 
 llvm::StructType *LLVMCodeGenerator::getListType(common::Type Ty) {
@@ -49,10 +49,10 @@ llvm::StructType *LLVMCodeGenerator::getListType(common::Type Ty) {
         return CacheTy->second;
 
     std::vector<llvm::Type *> Subtypes;
-    Subtypes.push_back(IntegerType::get(getGlobalContext(), 32));
+    Subtypes.push_back(IntegerType::get(Ctx, 32));
     Subtypes.push_back(PointerType::getUnqual(ArrayType::get(getType(Ty.Subtypes[0]), 0)));
 
-    return ListTypes[Ty] = StructType::create(getGlobalContext(), Subtypes, "list");
+    return ListTypes[Ty] = StructType::create(Ctx, Subtypes, "list");
 }
 
 llvm::FunctionType *LLVMCodeGenerator::getFuncType(common::Type Ty) {

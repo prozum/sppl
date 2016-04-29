@@ -22,11 +22,12 @@ class LLVMCodeGenerator : public parser::CodeGenerator {
   public:
     LLVMCodeGenerator(parser::Driver &Drv);
 
+    llvm::LLVMContext &Ctx;
     llvm::IRBuilder<> Builder;
     std::unique_ptr<llvm::TargetMachine> Machine;
     const llvm::DataLayout DataLayout;
-
     std::unique_ptr<llvm::Module> Module;
+
     std::map<std::string, llvm::Value *> CtxVals;
 
     std::unordered_map<common::Type, llvm::StructType *> TupleTypes;
@@ -34,7 +35,6 @@ class LLVMCodeGenerator : public parser::CodeGenerator {
     std::unordered_map<common::Type, llvm::FunctionType *> FuncTypes;
 
     // Constants
-    llvm::LLVMContext &Ctx;
     llvm::Type *Int1;
     llvm::Type *Int8;
     llvm::Type *Int32;

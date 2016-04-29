@@ -6,11 +6,11 @@ using namespace codegen;
 
 LLVMCodeGenerator::LLVMCodeGenerator(parser::Driver &Drv)
         : CodeGenerator(Drv),
-          Builder(getGlobalContext()),
+          Ctx(getGlobalContext()),
+          Builder(Ctx),
           Machine(EngineBuilder().selectTarget()),
           DataLayout(Machine->createDataLayout()),
-          Module(std::make_unique<llvm::Module>("SpplModule", getGlobalContext())),
-          Ctx(getGlobalContext()){
+          Module(std::make_unique<llvm::Module>("SpplModule", Ctx)) {
 
     Int1 = llvm::Type::getInt1Ty(Ctx);
     Int8 = llvm::Type::getInt8Ty(Ctx);
