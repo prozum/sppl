@@ -47,6 +47,13 @@ class GeneralOptimizer : public common::Visitor {
     void visit(common::Negative &Node);
     void visit(common::LambdaFunction &Node);
 
-    common::CallExpr* LastCall = nullptr;
+    common::CallExpr* LastRecCall = nullptr;
+    common::CallExpr* LastOtherCall = nullptr;
+    common::Function* CurrFunc = nullptr;
+
+    int RecCalls = 0;
+    int Calls = 0;
+
+    void determingParallelism();
 };
 }

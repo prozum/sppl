@@ -12,7 +12,7 @@ void CParCodeGenerator::visit(Program &Node) {
     Prog = &Node;
     Function *Main = nullptr;
 
-    *Header << "#include \"task.h\" " << endl;
+    *Header << "#include \"src/runtime/task.h\" " << endl;
 
     // Generate the standard functionality for every program
     generateStd();
@@ -46,9 +46,10 @@ void CParCodeGenerator::visit(Program &Node) {
             << " " << endl
             << "    " << MainSig << GArg << "* main_args = malloc(sizeof(" << MainSig << GArg << ")); " << endl
             << "    main_args->" << GGenerated << GArg << "0 = args; " << endl
-            << "    task_t *main_task = taskcreate((void *)&" << GUser << GMain << ", (void *)main_args); " << endl
+            << "    task_t *main_task = taskcreate((void (*)(void*))" << GUser << GMain << "."
+                                    << GParallel << ", (void *)main_args); " << endl
             << "    rmain(4, main_task); " << endl
-            << "" << endl
+            << endl
             << "    " << Prints[Main->Signature.Subtypes.back()] << "(main_args->" << GGenerated << GRes << "); " << endl
             << "    printf(\"\\n\");" << endl
             << "    taskdealloc(main_task); " << endl
@@ -75,14 +76,17 @@ void CParCodeGenerator::visit(Function &Node) {
     CurFunc = &Node;
 
     ParFunc = "void " + GUser + GParallel + Node.Id + "(task_t *t)";
-    SeqFunc = getType(Node.Signature.Subtypes.back()) + " " + GUser + GSequential + Node.Id + "(task_t *t";
+    SeqFunc = getType(Node.Signature.Subtypes.back()) + " " + GUser + GSequential + Node.Id + "(";
     for (size_t i = 0; i < Node.Signature.Subtypes.size() - 1; ++i) {
         string ArgName = GGenerated + GArg + to_string(i);
 
         ArgType = getType(Node.Signature.Subtypes[i]);
         ArgNames.push_back(ArgName);
 
-        SeqFunc += ", " + ArgType + " " + ArgName;
+        SeqFunc += ArgType + " " + ArgName;
+
+        if (i < Node.Signature.Subtypes.size() - 2)
+            SeqFunc += ", ";
     }
 
     SeqFunc += ")";
@@ -207,20 +211,7 @@ void CParCodeGenerator::visit(Case &Node) {
         Node.When->accept(*this);
 
         if (GenerateParallel) {
-            for (size_t i = CallStack.size(); i > 0; i--) {
-                *Output << CallStack.back();
-
-                if (i == 1)
-                    *Output << SequentialCall;
-
-                if (CallStackCount.back() != 0)
-                    *Output << "        taskyield(t);" << endl;
-
-                CallStack.pop_back();
-                CallStackCount.pop_back();
-            }
-
-            CallDepth = 0;
+            outputParallelCode();
         }
 
         *Output << "        if (" << ExprStack.top().str() << ") " << endl
@@ -238,20 +229,7 @@ void CParCodeGenerator::visit(Case &Node) {
             C->Args[i]->accept(*this);
 
             if (GenerateParallel) {
-                for (size_t i = CallStack.size(); i > 0; i--) {
-                    *Output << CallStack.back();
-
-                    if (i == 1)
-                        *Output << SequentialCall;
-
-                    if (CallStackCount.back() != 0)
-                        *Output << "        taskyield(t);" << endl;
-
-                    CallStack.pop_back();
-                    CallStackCount.pop_back();
-                }
-
-                CallDepth = 0;
+                outputParallelCode();
             }
 
             *Output << "        " << GGenerated << GArg << i << " = "
@@ -267,20 +245,7 @@ void CParCodeGenerator::visit(Case &Node) {
         Node.Expr->accept(*this);
 
         if (GenerateParallel) {
-            for (size_t i = CallStack.size(); i > 0; i--) {
-                *Output << CallStack.back();
-
-                if (i == 1)
-                    *Output << SequentialCall;
-
-                if (CallStackCount.back() != 0)
-                    *Output << "        taskyield(t);" << endl;
-
-                CallStack.pop_back();
-                CallStackCount.pop_back();
-            }
-
-            CallDepth = 0;
+            outputParallelCode();
 
             *Output << "        ((" << CurrentArg << "*)t->startarg)->" << GGenerated << GRes << " = "
                                     << ExprStack.top().str() << "; " << endl
@@ -324,7 +289,7 @@ void CParCodeGenerator::visit(common::CallExpr &Node) {
                 Node.Args[i]->accept(*this);
 
                 GeneratedCall << "        " << Name << GArg << "->" << GGenerated << GArg << i << " = "
-                << ExprStack.top().str() << "; " << endl;
+                                            << ExprStack.top().str() << "; " << endl;
 
                 ExprStack.pop();
             }
@@ -333,8 +298,8 @@ void CParCodeGenerator::visit(common::CallExpr &Node) {
             Node.Callee->accept(*this);
 
             GeneratedCall << "        task_t *" << Name << " = taskcreate((void (*)(void*))" << ExprStack.top().str()
-            << "." << GParallel << ", (void *)" << Name << GArg << ");" << endl
-            << "        subtaskadd(t, " << Name << "); " << endl;
+                                                << "." << GParallel << ", (void *)" << Name << GArg << ");" << endl
+                                                << "        subtaskadd(t, " << Name << "); " << endl;
 
             ExprStack.pop();
             ExprStack.top() << "((" << Signature << GArg << "*)" << Name << "->startarg" << ")->" << GGenerated << GRes;
@@ -366,11 +331,12 @@ void CParCodeGenerator::visit(common::CallExpr &Node) {
 
             ExprStack.top() << Name << GRes;
             SequentialCall = GeneratedCall.str();
+            SequentialLevel = --CallDepth;
         }
     } else {
         Node.Callee->accept(*this);
 
-        ExprStack.top() << ".seq(";
+        ExprStack.top() << "." << GSequential << "(";
         for (auto &Expr: Node.Args) {
             Expr->accept(*this);
 
@@ -416,3 +382,25 @@ std::string CParCodeGenerator::generateEnvironment(common::Type &Ty) {
     Closures[Ty] = Name;
     return Name;
 }
+
+void CParCodeGenerator::outputParallelCode() {
+    for (size_t i = CallStack.size(); i > 0; i--) {
+        *Output << CallStack.back();
+
+        if (i - 1 == SequentialLevel) {
+            if (CallStackCount.back() == 0 && SequentialLevel > 0)
+                SequentialLevel--;
+            else
+                *Output << SequentialCall;
+        }
+
+        if (CallStackCount.back() != 0)
+            *Output << "        taskyield(t);" << endl;
+
+        CallStack.pop_back();
+        CallStackCount.pop_back();
+    }
+
+    CallDepth = 0;
+}
+

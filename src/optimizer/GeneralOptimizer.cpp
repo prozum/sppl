@@ -15,6 +15,8 @@ void GeneralOptimizer::visit(Program &Node) {
 }
 
 void GeneralOptimizer::visit(Function &Node) {
+    CurrFunc = &Node;
+
     for (auto &Case : Node.Cases) {
         auto Expr = Case->Expr.get();
 
@@ -26,16 +28,17 @@ void GeneralOptimizer::visit(Function &Node) {
         }
 
         Case->accept(*this);
-
-        if (LastCall) {
-            LastCall->DoParallel = false;
-            LastCall = nullptr;
-        }
     }
 }
 
 void GeneralOptimizer::visit(common::Case &Node) {
+    if (Node.When) {
+        Node.When->accept(*this);
+        determingParallelism();
+    }
+
     Node.Expr->accept(*this);
+    determingParallelism();
 }
 
 void GeneralOptimizer::visit(common::IdExpr &Node) {
@@ -81,7 +84,15 @@ void GeneralOptimizer::visit(common::CallExpr &Node) {
         Expr->accept(*this);
     }
 
-    LastCall = &Node;
+    if (typeid(*Node.Callee.get()) == typeid(IdExpr) &&
+        static_cast<IdExpr*>(Node.Callee.get())->Val == CurrFunc->Id) {
+        LastRecCall = &Node;
+        RecCalls++;
+    } else {
+        LastOtherCall = &Node;
+    }
+
+    Calls++;
 }
 
 void GeneralOptimizer::visit(common::AlgebraicExpr &Node) {
@@ -189,4 +200,21 @@ void GeneralOptimizer::visit(common::Negative &Node) {
 void GeneralOptimizer::visit(common::LambdaFunction &Node) {
     Node.Expr->accept(*this);
 }
+
+void GeneralOptimizer::determingParallelism() {
+    if (Calls == 1 && LastRecCall) {
+        LastRecCall->DoParallel = false;
+    } else if (Calls > 1) {
+        if (LastOtherCall)
+            LastOtherCall->DoParallel = false;
+        else if (LastRecCall)
+            LastRecCall->DoParallel = false;
+    }
+
+    LastRecCall = nullptr;
+    LastOtherCall = nullptr;
+    Calls = 0;
+}
+
+
 
