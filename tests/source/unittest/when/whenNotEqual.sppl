@@ -1,0 +1,6 @@
+def main : [String]->Bool
+| s = func(True,False)
+
+def func : Bool->Bool->Bool
+| a b when a != b = True
+| a b = False

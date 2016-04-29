@@ -163,6 +163,7 @@ type:	    INTTYPE                                         { $$ = new Type(TypeId
 	|	    CHARTYPE                                        { $$ = new Type(TypeId::CHAR, @1); }
 	|	    STRINGTYPE                                      { $$ = new Type(TypeId::STRING, @1); }
 	|	    BOOLTYPE                                        { $$ = new Type(TypeId::BOOL, @1); }
+    |	    PARSTART PAREND                                 { $$ = new Type(TypeId::VOID, @1); }
 	|	    SQSTART type SQEND                              { $$ = new Type(TypeId::LIST, @1); $$->Subtypes.push_back(* $2); }
 	|	    PARSTART signature PAREND                       { $$ = $2; }
 	|	    PARSTART tupletype COMMA type PAREND            { $$ = $2; $$->Loc = @1; $$->Subtypes.push_back(* $4); }

@@ -98,7 +98,8 @@ void TypeChecker::visit(Case &Node) {
         resolveEmptyList(Node.Expr->RetTy, CurFunc->Signature.Subtypes.back());
     }
 
-    if (CurFunc->Signature.Subtypes.back() != Node.Expr->RetTy) {
+    if (CurFunc->Signature.Subtypes.back() != Node.Expr->RetTy &&
+        CurFunc->Signature.Subtypes.back() != TypeId::VOID) {
         throw Error::Expected("Wrong return type",
                               CurFunc->Signature.Subtypes.back().str(),
                               Node.Expr->RetTy.str(), Node.Expr->Loc);

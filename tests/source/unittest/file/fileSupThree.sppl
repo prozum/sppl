@@ -1,0 +1,2 @@
+def func3 : Int->Int
+| n = 2*n

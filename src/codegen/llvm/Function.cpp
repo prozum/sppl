@@ -6,7 +6,7 @@ using namespace codegen;
 
 void LLVMCodeGenerator::visit(common::Function &Node) {
     // Create function and entry block
-    auto type = getFuncType(Node.Signature);
+    auto Ty = getFuncType(Node.Signature);
     CurFunc = llvm::Function::Create(getFuncType(Node.Signature),
                                      llvm::Function::ExternalLinkage, Node.Id,
                                      Module.get());
@@ -20,9 +20,18 @@ void LLVMCodeGenerator::visit(common::Function &Node) {
     // Setup return block and phi node
     CurRetBlock = BasicBlock::Create(getGlobalContext(), "ret", CurFunc);
     Builder.SetInsertPoint(CurRetBlock);
-    CurPhiNode = Builder.CreatePHI(CurFunc->getReturnType(),
-                                   (unsigned)Node.Cases.size(), "rettmp");
-    Builder.CreateRet(CurPhiNode);
+
+
+    if (CurFunc->getReturnType()->getTypeID() != llvm::Type::TypeID::VoidTyID) {
+        CurPhiNode = Builder.CreatePHI(CurFunc->getReturnType(),
+                                       (unsigned) Node.Cases.size(), "rettmp");
+
+        // Create ret instruction
+        Builder.CreateRet(CurPhiNode);
+    } else {
+        Builder.CreateRetVoid();
+    }
+
 
     // Setup names for arguments
     auto ArgId = 0;
@@ -104,14 +113,17 @@ void LLVMCodeGenerator::visit(common::Case &Node) {
     Builder.SetInsertPoint(*CurCaseBlock);
     Node.Expr->accept(*this);
 
-    auto Ty1 = CurPhiNode->getType();
-    auto Ty2 = CurVal->getType();
+    //auto Ty1 = CurPhiNode->getType();
+    //auto Ty2 = CurVal->getType();
 
     //auto Arr1 = CurVal->getType()->getPointerElementType()->getArrayNumElements();
     //auto Arr2 = CurPhiNode->getType()->getPointerElementType()->getArrayNumElements();
 
 
+    // Ignore expression type if function is void
+    if (CurFunc->getReturnType()->getTypeID() != llvm::Type::TypeID::VoidTyID)
+        CurPhiNode->addIncoming(CurVal, *CurCaseBlock);
+
     // Add return value to phi node
-    CurPhiNode->addIncoming(CurVal, *CurCaseBlock);
     Builder.CreateBr(CurRetBlock);
 }
