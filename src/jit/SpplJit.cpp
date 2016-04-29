@@ -100,24 +100,24 @@ void SpplJit::createModule() {
 
 string SpplJit::getOutput(intptr_t Data, common::Type Type) {
     switch (Type.Id) {
-    case common::TypeId::INT:
+    case TypeId::INT:
         return to_string((int64_t)Data);
-    case common::TypeId::FLOAT:
+    case TypeId::FLOAT:
         // WTF is double type a pointer
         return to_string(*(double *)Data);
-    case common::TypeId::CHAR:
+    case TypeId::CHAR:
         return "'" + string(1, (char)Data) + "'";
-    case common::TypeId::STRING:
+    case TypeId::STRING:
         return "\"" + string((char *)Data) + "\"";
-    case common::TypeId::BOOL:
+    case TypeId::BOOL:
         return to_string((bool)Data);
-    case common::TypeId::TUPLE:
+    case TypeId::TUPLE:
         return getOutputTuple(Data, Type.Subtypes);
-    case common::TypeId::LIST:
+    case TypeId::LIST:
         return getOutputList(Data, Type);
-    case common::TypeId::SIGNATURE:
+    case TypeId::SIGNATURE:
         return Type.str();
-    case common::TypeId::VOID:
+    case TypeId::VOID:
         return "";
     default:
         throw runtime_error("Cannot convert to C data: " + Type.str());
@@ -128,27 +128,27 @@ string SpplJit::getOutputTuple(intptr_t Addr, vector<common::Type> Subtypes) {
     string Out("(");
     for (size_t i = 0; i < Subtypes.size(); ++i) {
         switch (Subtypes[i].Id) {
-        case common::TypeId::INT:
+        case TypeId::INT:
             Out += getOutput(*(int64_t *)Addr, Subtypes[i]);
             Addr += sizeof(int64_t);
             break;
-        case common::TypeId::FLOAT:
+        case TypeId::FLOAT:
             Out += getOutput(Addr, Subtypes[i]);
             Addr += sizeof(double);
             break;
-        case common::TypeId::CHAR:
+        case TypeId::CHAR:
             Out += getOutput(*(char *)Addr, Subtypes[i]);
             Addr += sizeof(char);
             break;
-        case common::TypeId::BOOL:
+        case TypeId::BOOL:
             Out += getOutput(*(bool *)Addr, Subtypes[i]);
             Addr += sizeof(bool);
             break;
-        case common::TypeId::STRING:
+        case TypeId::STRING:
             Out += getOutput(*(intptr_t *)Addr, Subtypes[i]);
             Addr += sizeof(intptr_t *);
             break;
-        case common::TypeId::TUPLE:
+        case TypeId::TUPLE:
             Out += getOutputTuple(*(intptr_t *)Addr, Subtypes[i].Subtypes);
             Addr += sizeof(intptr_t *);
             break;
@@ -174,27 +174,27 @@ string SpplJit::getOutputList(intptr_t Addr, common::Type Type)
 
     for (int32_t i = 0; i < Count; ++i) {
         switch (Subtype.Id) {
-        case common::TypeId::INT:
+        case TypeId::INT:
             Out += getOutput(*(int64_t *)Addr, Subtype);
             Addr += sizeof(int64_t);
             break;
-        case common::TypeId::FLOAT:
+        case TypeId::FLOAT:
             Out += getOutput(Addr, Subtype);
             Addr += sizeof(double);
             break;
-        case common::TypeId::CHAR:
+        case TypeId::CHAR:
             Out += getOutput(*(char *)Addr, Subtype);
             Addr += sizeof(char);
             break;
-        case common::TypeId::BOOL:
+        case TypeId::BOOL:
             Out += getOutput(*(bool *)Addr, Subtype);
             Addr += sizeof(bool);
             break;
-        case common::TypeId::STRING:
+        case TypeId::STRING:
             Out += getOutput(*(intptr_t *)Addr, Subtype);
             Addr += sizeof(intptr_t *);
             break;
-        case common::TypeId::TUPLE:
+        case TypeId::TUPLE:
             Out += getOutputTuple(*(intptr_t *)Addr, Subtype.Subtypes);
             Addr += sizeof(intptr_t *);
             break;
