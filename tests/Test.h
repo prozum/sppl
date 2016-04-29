@@ -375,7 +375,7 @@ class Test : public CppUnit::TestFixture{
     CPPUNIT_TEST(wildTwoIntSecond);
     CPPUNIT_TEST(wildMain);
     CPPUNIT_TEST(wildWrong);
-*/
+
     // FileTest.cppl
     CPPUNIT_TEST(fileImpOne);
     CPPUNIT_TEST(fileImpTwo);
@@ -386,6 +386,24 @@ class Test : public CppUnit::TestFixture{
     CPPUNIT_TEST(fileMainInOther);
     CPPUNIT_TEST(fileImpNested);
     CPPUNIT_TEST(fileImpNestedDup);
+*/
+    // WhenTest.sppl
+    CPPUNIT_TEST(whenTrue);
+    CPPUNIT_TEST(whenFalse);
+    CPPUNIT_TEST(whenAnd);
+    CPPUNIT_TEST(whenOr);
+    CPPUNIT_TEST(whenEqual);
+    CPPUNIT_TEST(whenNotEqual);
+    CPPUNIT_TEST(whenLessEqual);
+    CPPUNIT_TEST(whenGreatEqual);
+    CPPUNIT_TEST(whenLess);
+    CPPUNIT_TEST(whenGreat);
+    CPPUNIT_TEST(whenMultiple);
+    CPPUNIT_TEST(whenNotScope);
+    CPPUNIT_TEST(whenEmpty);
+    CPPUNIT_TEST(whenWhen);
+    CPPUNIT_TEST(whenFuncBool);
+    CPPUNIT_TEST(whenFuncNotBool);
 
     CPPUNIT_TEST_SUITE_END();
 public:
@@ -763,6 +781,24 @@ protected:
     void fileMainInOther();
     void fileImpNested();
     void fileImpNestedDup();
+
+    // WhenTest.cpp
+    void whenTrue();
+    void whenFalse();
+    void whenAnd();
+    void whenOr();
+    void whenEqual();
+    void whenNotEqual();
+    void whenLessEqual();
+    void whenGreatEqual();
+    void whenLess();
+    void whenGreat();
+    void whenMultiple();
+    void whenNotScope();
+    void whenEmpty();
+    void whenWhen();
+    void whenFuncBool();
+    void whenFuncNotBool();
 
     // Test.cpp
     bool compileChecker(std::string name);
