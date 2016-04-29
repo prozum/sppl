@@ -75,14 +75,14 @@ void CCodeGenerator::visit(Function &Node) {
     // << Signature << " *" << GGenerated << GSignature;
 
     // Generate function arguments
-    for (size_t i = 0; i < Node.Signature.subtypeCount() - 1; ++i) {
+    for (size_t i = 0; i < Node.Signature.Subtypes.size() - 1; ++i) {
         string ArgName = GGenerated + GArg + to_string(i);
 
         // Add the argument to a list for later use in the pattern generation
         ArgNames.push_back(ArgName);
         Func << getType(Node.Signature.Subtypes[i]) << " " << ArgName;
 
-        if (i != Node.Signature.subtypeCount() - 2)
+        if (i != Node.Signature.Subtypes.size() - 2)
             Func << ", ";
     }
 
@@ -452,10 +452,10 @@ string CCodeGenerator::generateEnvironment(Type &Ty) {
 
     Res << "typedef " << getType(Ty.Subtypes.back()) << "(*" << Name << ")(";
 
-    for (size_t i = 0; i < Ty.subtypeCount() - 1; ++i) {
+    for (size_t i = 0; i < Ty.Subtypes.size() - 1; ++i) {
         Res << getType(Ty.Subtypes[i]);
 
-        if (i != Ty.subtypeCount() - 2)
+        if (i != Ty.Subtypes.size() - 2)
             Res << ", ";
     }
     

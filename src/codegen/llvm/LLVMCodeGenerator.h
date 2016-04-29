@@ -69,6 +69,7 @@ class LLVMCodeGenerator : public parser::CodeGenerator {
     void visit(common::TuplePattern &Node);
     void visit(common::ListPattern &Node);
     void visit(common::ParPattern &Node);
+    void visit(common::WildPattern &Node);
 
     void visit(common::Add &Node);
     void visit(common::Sub &Node);
@@ -84,6 +85,9 @@ class LLVMCodeGenerator : public parser::CodeGenerator {
     void visit(common::Greater &Node);
     void visit(common::LesserEq &Node);
     void visit(common::GreaterEq &Node);
+
+    void visit(common::Negative &Node);
+    void visit(common::Not &Node);
 
     void visit(common::IdExpr &Node);
     void visit(common::IntExpr &Node);
