@@ -24,13 +24,12 @@
 #include <llvm/Support/TargetSelect.h>
 #include <llvm/Transforms/Scalar.h>
 
+//extern "C" double printd(double X) {
+//    fprintf(stderr, "%f\n", X);
+//    return 0;
+//}
 
 namespace jit {
-    struct List {
-        uint32_t Size;
-        uintptr_t Ptr;
-    };
-
 class SpplJit {
   public:
     SpplJit();
