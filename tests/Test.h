@@ -405,6 +405,25 @@ class Test : public CppUnit::TestFixture{
     CPPUNIT_TEST(whenFuncBool);
     CPPUNIT_TEST(whenFuncNotBool);
 
+    // ConTest.cpp
+    CPPUNIT_TEST(conIntList);
+    CPPUNIT_TEST(conFloatList);
+    CPPUNIT_TEST(conBoolList);
+    CPPUNIT_TEST(conCharList);
+    CPPUNIT_TEST(conStringList);
+    CPPUNIT_TEST(conNestedList);
+    CPPUNIT_TEST(conTupleList);
+    CPPUNIT_TEST(conTuple);
+    CPPUNIT_TEST(conInt);
+    CPPUNIT_TEST(conFloat);
+    CPPUNIT_TEST(conBool);
+    CPPUNIT_TEST(conChar);
+    CPPUNIT_TEST(conString);
+    CPPUNIT_TEST(conMix);
+    CPPUNIT_TEST(conFuncResOne);
+    CPPUNIT_TEST(conFuncResTwo);
+    CPPUNIT_TEST(conEmpty);
+
     CPPUNIT_TEST_SUITE_END();
 public:
     void setUp();
@@ -799,6 +818,25 @@ protected:
     void whenWhen();
     void whenFuncBool();
     void whenFuncNotBool();
+
+    // ConTest.cpp
+    void conIntList();
+    void conFloatList();
+    void conBoolList();
+    void conCharList();
+    void conStringList();
+    void conNestedList();
+    void conTupleList();
+    void conTuple();
+    void conInt();
+    void conFloat();
+    void conBool();
+    void conChar();
+    void conString();
+    void conMix();
+    void conFuncResOne();
+    void conFuncResTwo();
+    void conEmpty();
 
     // Test.cpp
     bool compileChecker(std::string name);
