@@ -20,7 +20,8 @@ enum class TypeId {
     SIGNATURE,
     GENERIC,
     EMPTYLIST,
-    CUSTOM
+    CUSTOM,
+    VOID
 };
 
 class Type {

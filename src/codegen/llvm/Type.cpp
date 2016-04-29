@@ -24,6 +24,8 @@ llvm::Type *LLVMCodeGenerator::getType(common::Type Ty) {
         return getListType(common::Type(common::TypeId::LIST, vector<common::Type> {common::Type(common::TypeId::CHAR)}));
         //return PointerType::getUnqual(ArrayType::get(
         //    llvm::Type::getInt8Ty(getGlobalContext()), Ty.subtypeCount()));
+    case common::TypeId::VOID:
+        return llvm::Type::getVoidTy(getGlobalContext());
     default:
         throw runtime_error("This should not happen!");
     }
