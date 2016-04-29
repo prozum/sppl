@@ -54,6 +54,7 @@ class Driver {
     std::vector<std::string> Files;
     size_t CurFile = 0;
 
+
     void setOutput(std::string Filename);
     void setHeaderOutput(std::string Filename);
 
@@ -68,5 +69,7 @@ class Driver {
     void error(const common::Location &Loc, const std::string &Msg);
     void error(const std::string &Msg);
     void showError(common::Error Err);
+
+    void addExternFunc(std::string Name, common::Type Signature);
 };
 }

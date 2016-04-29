@@ -4,6 +4,7 @@ using namespace std;
 using namespace llvm;
 using namespace llvm::orc;
 using namespace jit;
+using namespace common;
 
 SpplJit::SpplJit()
     : CodeGen(Drv), ScopeGen(&Drv.Global), TypeChecker(&Drv.Global),
@@ -13,6 +14,11 @@ SpplJit::SpplJit()
 
     sys::DynamicLibrary::LoadLibraryPermanently(nullptr);
     createModule();
+    Drv.addExternFunc("printff", common::Type(TypeId::SIGNATURE,
+                                             vector<common::Type> {
+                                                     common::Type(TypeId::FLOAT),
+                                                     common::Type(TypeId::VOID)
+                                             }));
 
     // Time is short, mortal
     Drv.setOutput("/dev/null");
@@ -104,6 +110,8 @@ string SpplJit::getOutput(intptr_t Data, common::Type Type) {
         return getOutputList(Data, Type);
     case common::TypeId::SIGNATURE:
         return Type.str();
+    case common::TypeId::VOID:
+        return "";
     default:
         throw runtime_error("Cannot convert to C data: " + Type.str());
     }
@@ -184,6 +192,10 @@ string SpplJit::getOutputList(intptr_t Addr, common::Type Type)
     }
 
     return Out + "]";
+}
+
+extern "C" void printff(double Float) {
+    fprintf(stderr, "%f", Float);
 }
 
 int SpplJit::eval(string Str) {
