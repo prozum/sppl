@@ -3,72 +3,82 @@
 using namespace codegen;
 
 void LLVMCodeGenerator::visit(common::Add &Node) {
-    Node.Left->accept(*this);
-    auto left = CurVal;
-    Node.Right->accept(*this);
-    auto right = CurVal;
+    assert((Node.Left->RetTy.Id == common::TypeId::FLOAT && Node.Right->RetTy.Id == common::TypeId::FLOAT) ||
+           (Node.Left->RetTy.Id == common::TypeId::INT && Node.Right->RetTy.Id == common::TypeId::INT));
 
-    if (Node.Left->RetTy.Id == common::TypeId::FLOAT &&
-        Node.Right->RetTy.Id == common::TypeId::FLOAT) {
-        CurVal = Builder.CreateFAdd(left, right, "addtmp");
+    Node.Left->accept(*this);
+    auto Left = CurVal;
+    Node.Right->accept(*this);
+    auto Right = CurVal;
+
+    if (Node.Left->RetTy.Id == common::TypeId::FLOAT) {
+        CurVal = Builder.CreateFAdd(Left, Right, "addtmp");
     } else {
-        CurVal = Builder.CreateAdd(left, right, "addtmp");
+        CurVal = Builder.CreateAdd(Left, Right, "addtmp");
     }
 }
 
 void LLVMCodeGenerator::visit(common::Sub &Node) {
-    Node.Left->accept(*this);
-    auto left = CurVal;
-    Node.Right->accept(*this);
-    auto right = CurVal;
+    assert((Node.Left->RetTy.Id == common::TypeId::FLOAT && Node.Right->RetTy.Id == common::TypeId::FLOAT) ||
+           (Node.Left->RetTy.Id == common::TypeId::INT && Node.Right->RetTy.Id == common::TypeId::INT));
 
-    if (Node.Left->RetTy.Id == common::TypeId::FLOAT &&
-        Node.Right->RetTy.Id == common::TypeId::FLOAT) {
-        CurVal = Builder.CreateFSub(left, right, "subtmp");
+    Node.Left->accept(*this);
+    auto Left = CurVal;
+    Node.Right->accept(*this);
+    auto Right = CurVal;
+
+    if (Node.Right->RetTy.Id == common::TypeId::FLOAT) {
+        CurVal = Builder.CreateFSub(Left, Right, "subtmp");
     } else {
-        CurVal = Builder.CreateSub(left, right, "subtmp");
+        CurVal = Builder.CreateSub(Left, Right, "subtmp");
     }
 }
 
 void LLVMCodeGenerator::visit(common::Mul &Node) {
-    Node.Left->accept(*this);
-    auto left = CurVal;
-    Node.Right->accept(*this);
-    auto right = CurVal;
+    assert((Node.Left->RetTy.Id == common::TypeId::FLOAT && Node.Right->RetTy.Id == common::TypeId::FLOAT) ||
+           (Node.Left->RetTy.Id == common::TypeId::INT && Node.Right->RetTy.Id == common::TypeId::INT));
 
-    if (Node.Left->RetTy.Id == common::TypeId::FLOAT &&
-        Node.Right->RetTy.Id == common::TypeId::FLOAT) {
-        CurVal = Builder.CreateFMul(left, right, "multmp");
+    Node.Left->accept(*this);
+    auto Left = CurVal;
+    Node.Right->accept(*this);
+    auto Right = CurVal;
+
+    if (Node.Right->RetTy.Id == common::TypeId::FLOAT) {
+        CurVal = Builder.CreateFMul(Left, Right, "multmp");
     } else {
-        CurVal = Builder.CreateMul(left, right, "multmp");
+        CurVal = Builder.CreateMul(Left, Right, "multmp");
     }
 }
 
 void LLVMCodeGenerator::visit(common::Div &Node) {
-    Node.Left->accept(*this);
-    auto left = CurVal;
-    Node.Right->accept(*this);
-    auto right = CurVal;
+    assert((Node.Left->RetTy.Id == common::TypeId::FLOAT && Node.Right->RetTy.Id == common::TypeId::FLOAT) ||
+           (Node.Left->RetTy.Id == common::TypeId::INT && Node.Right->RetTy.Id == common::TypeId::INT));
 
-    if (Node.Left->RetTy.Id == common::TypeId::FLOAT &&
-        Node.Right->RetTy.Id == common::TypeId::FLOAT) {
-        CurVal = Builder.CreateFDiv(left, right, "divtmp");
+    Node.Left->accept(*this);
+    auto Left = CurVal;
+    Node.Right->accept(*this);
+    auto Right = CurVal;
+
+    if (Node.Right->RetTy.Id == common::TypeId::FLOAT) {
+        CurVal = Builder.CreateFDiv(Left, Right, "divtmp");
     } else {
-        CurVal = Builder.CreateSDiv(left, right, "divtmp");
+        CurVal = Builder.CreateSDiv(Left, Right, "divtmp");
     }
 }
 
 void LLVMCodeGenerator::visit(common::Mod &Node) {
-    Node.Left->accept(*this);
-    auto left = CurVal;
-    Node.Right->accept(*this);
-    auto right = CurVal;
+    assert((Node.Left->RetTy.Id == common::TypeId::FLOAT && Node.Right->RetTy.Id == common::TypeId::FLOAT) ||
+           (Node.Left->RetTy.Id == common::TypeId::INT && Node.Right->RetTy.Id == common::TypeId::INT));
 
-    if (Node.Left->RetTy.Id == common::TypeId::FLOAT &&
-        Node.Right->RetTy.Id == common::TypeId::FLOAT) {
-        CurVal = Builder.CreateFRem(left, right, "modtmp");
+    Node.Left->accept(*this);
+    auto Left = CurVal;
+    Node.Right->accept(*this);
+    auto Right = CurVal;
+
+    if (Node.Right->RetTy.Id == common::TypeId::FLOAT) {
+        CurVal = Builder.CreateFRem(Left, Right, "modtmp");
     } else {
-        CurVal = Builder.CreateSRem(left, right, "modtmp");
+        CurVal = Builder.CreateSRem(Left, Right, "modtmp");
     }
 }
 
@@ -97,85 +107,97 @@ void LLVMCodeGenerator::visit(common::Or &Node) {
 }
 
 void LLVMCodeGenerator::visit(common::Equal &Node) {
-    Node.Left->accept(*this);
-    auto left = CurVal;
-    Node.Right->accept(*this);
-    auto right = CurVal;
+    assert((Node.Left->RetTy.Id == common::TypeId::FLOAT && Node.Right->RetTy.Id == common::TypeId::FLOAT) ||
+           (Node.Left->RetTy.Id == common::TypeId::INT && Node.Right->RetTy.Id == common::TypeId::INT));
 
-    if (Node.Left->RetTy.Id == common::TypeId::FLOAT &&
-        Node.Right->RetTy.Id == common::TypeId::FLOAT) {
-        CurVal = Builder.CreateFCmpOEQ(left, right, "eqtmp");
+    Node.Left->accept(*this);
+    auto Left = CurVal;
+    Node.Right->accept(*this);
+    auto Right = CurVal;
+
+    if (Node.Right->RetTy.Id == common::TypeId::FLOAT) {
+        CurVal = Builder.CreateFCmpOEQ(Left, Right, "eqtmp");
     } else {
-        CurVal = Builder.CreateICmpEQ(left, right, "eqtmp");
+        CurVal = Builder.CreateICmpEQ(Left, Right, "eqtmp");
     }
 }
 
 void LLVMCodeGenerator::visit(common::NotEqual &Node) {
-    Node.Left->accept(*this);
-    auto left = CurVal;
-    Node.Right->accept(*this);
-    auto right = CurVal;
+    assert((Node.Left->RetTy.Id == common::TypeId::FLOAT && Node.Right->RetTy.Id == common::TypeId::FLOAT) ||
+           (Node.Left->RetTy.Id == common::TypeId::INT && Node.Right->RetTy.Id == common::TypeId::INT));
 
-    if (Node.Left->RetTy.Id == common::TypeId::FLOAT &&
-        Node.Right->RetTy.Id == common::TypeId::FLOAT) {
-        CurVal = Builder.CreateFCmpONE(left, right, "neqtmp");
+    Node.Left->accept(*this);
+    auto Left = CurVal;
+    Node.Right->accept(*this);
+    auto Right = CurVal;
+
+    if (Node.Right->RetTy.Id == common::TypeId::FLOAT) {
+        CurVal = Builder.CreateFCmpONE(Left, Right, "neqtmp");
     } else {
-        CurVal = Builder.CreateICmpNE(left, right, "neqtmp");
+        CurVal = Builder.CreateICmpNE(Left, Right, "neqtmp");
     }
 }
 
 void LLVMCodeGenerator::visit(common::Lesser &Node) {
-    Node.Left->accept(*this);
-    auto left = CurVal;
-    Node.Right->accept(*this);
-    auto right = CurVal;
+    assert((Node.Left->RetTy.Id == common::TypeId::FLOAT && Node.Right->RetTy.Id == common::TypeId::FLOAT) ||
+           (Node.Left->RetTy.Id == common::TypeId::INT && Node.Right->RetTy.Id == common::TypeId::INT));
 
-    if (Node.Left->RetTy.Id == common::TypeId::FLOAT &&
-        Node.Right->RetTy.Id == common::TypeId::FLOAT) {
-        CurVal = Builder.CreateFCmpOLT(left, right, "lttmp");
+    Node.Left->accept(*this);
+    auto Left = CurVal;
+    Node.Right->accept(*this);
+    auto Right = CurVal;
+
+    if (Node.Right->RetTy.Id == common::TypeId::FLOAT) {
+        CurVal = Builder.CreateFCmpOLT(Left, Right, "lttmp");
     } else {
-        CurVal = Builder.CreateICmpSLT(left, right, "lttmp");
+        CurVal = Builder.CreateICmpSLT(Left, Right, "lttmp");
     }
 }
 
 void LLVMCodeGenerator::visit(common::Greater &Node) {
-    Node.Left->accept(*this);
-    auto left = CurVal;
-    Node.Right->accept(*this);
-    auto right = CurVal;
+    assert((Node.Left->RetTy.Id == common::TypeId::FLOAT && Node.Right->RetTy.Id == common::TypeId::FLOAT) ||
+           (Node.Left->RetTy.Id == common::TypeId::INT && Node.Right->RetTy.Id == common::TypeId::INT));
 
-    if (Node.Left->RetTy.Id == common::TypeId::FLOAT &&
-        Node.Right->RetTy.Id == common::TypeId::FLOAT) {
-        CurVal = Builder.CreateFCmpOGT(left, right, "lttmp");
+    Node.Left->accept(*this);
+    auto Left = CurVal;
+    Node.Right->accept(*this);
+    auto Right = CurVal;
+
+    if (Node.Right->RetTy.Id == common::TypeId::FLOAT) {
+        CurVal = Builder.CreateFCmpOGT(Left, Right, "lttmp");
     } else {
-        CurVal = Builder.CreateICmpSGT(left, right, "lttmp");
+        CurVal = Builder.CreateICmpSGT(Left, Right, "lttmp");
     }
 }
 
 void LLVMCodeGenerator::visit(common::LesserEq &Node) {
-    Node.Left->accept(*this);
-    auto left = CurVal;
-    Node.Right->accept(*this);
-    auto right = CurVal;
+    assert((Node.Left->RetTy.Id == common::TypeId::FLOAT && Node.Right->RetTy.Id == common::TypeId::FLOAT) ||
+           (Node.Left->RetTy.Id == common::TypeId::INT && Node.Right->RetTy.Id == common::TypeId::INT));
 
-    if (Node.Left->RetTy.Id == common::TypeId::FLOAT &&
-        Node.Right->RetTy.Id == common::TypeId::FLOAT) {
-        CurVal = Builder.CreateFCmpOLE(left, right, "lttmp");
+    Node.Left->accept(*this);
+    auto Left = CurVal;
+    Node.Right->accept(*this);
+    auto Right = CurVal;
+
+    if (Node.Right->RetTy.Id == common::TypeId::FLOAT) {
+        CurVal = Builder.CreateFCmpOLE(Left, Right, "lttmp");
     } else {
-        CurVal = Builder.CreateICmpSLE(left, right, "lttmp");
+        CurVal = Builder.CreateICmpSLE(Left, Right, "lttmp");
     }
 }
 
 void LLVMCodeGenerator::visit(common::GreaterEq &Node) {
-    Node.Left->accept(*this);
-    auto left = CurVal;
-    Node.Right->accept(*this);
-    auto right = CurVal;
+    assert((Node.Left->RetTy.Id == common::TypeId::FLOAT && Node.Right->RetTy.Id == common::TypeId::FLOAT) ||
+           (Node.Left->RetTy.Id == common::TypeId::INT && Node.Right->RetTy.Id == common::TypeId::INT));
 
-    if (Node.Left->RetTy.Id == common::TypeId::FLOAT &&
-        Node.Right->RetTy.Id == common::TypeId::FLOAT) {
-        CurVal = Builder.CreateFCmpOGE(left, right, "lttmp");
+    Node.Left->accept(*this);
+    auto Left = CurVal;
+    Node.Right->accept(*this);
+    auto Right = CurVal;
+
+    if (Node.Right->RetTy.Id == common::TypeId::FLOAT) {
+        CurVal = Builder.CreateFCmpOGE(Left, Right, "lttmp");
     } else {
-        CurVal = Builder.CreateICmpSGE(left, right, "lttmp");
+        CurVal = Builder.CreateICmpSGE(Left, Right, "lttmp");
     }
 }

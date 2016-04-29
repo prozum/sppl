@@ -35,10 +35,9 @@ llvm::StructType *LLVMCodeGenerator::getTupleType(common::Type Ty) {
     if (CacheTy != TupleTypes.end())
         return CacheTy->second;
 
-    std::vector<llvm::Type *> TmpVec;
+    std::vector<llvm::Type *> Subtypes;
     for (auto &Subtype : Ty.Subtypes)
-        TmpVec.push_back(getType(Subtype));
-    llvm::ArrayRef<llvm::Type *> Subtypes(TmpVec);
+        Subtypes.push_back(getType(Subtype));
 
     return TupleTypes[Ty] = StructType::create(getGlobalContext(), Subtypes, "tuple");
 }

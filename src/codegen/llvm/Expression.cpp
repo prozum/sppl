@@ -72,15 +72,13 @@ void LLVMCodeGenerator::visit(common::ListExpr &Node) {
     auto ArrayType = ArrayType::get(getType(Node.RetTy.Subtypes[0]), Node.Elements.size());
 
     // Create global list constant
-    std::vector<llvm::Constant *> TmpVec;
+    std::vector<llvm::Constant *> ListData;
     for (auto &Element : Node.Elements) {
         Element->accept(*this);
-        TmpVec.push_back(static_cast<Constant *>(CurVal));
+        ListData.push_back(static_cast<Constant *>(CurVal));
     }
-    ArrayRef<Constant *> ListData(TmpVec);
-
     auto ConstVal = ConstantArray::get(ArrayType, ListData);
-    auto GlobalVal = new GlobalVariable(*Module.get(), ArrayType, true,
+    auto GlobalVal = new GlobalVariable(*Module, ArrayType, true,
                                 GlobalVariable::ExternalLinkage, ConstVal);
 
     // Malloc list data
@@ -124,7 +122,6 @@ void LLVMCodeGenerator::visit(common::CallExpr &Node) {
 
 Instruction *LLVMCodeGenerator::CreateMalloc(llvm::Type *Type, BasicBlock *Block)
 {
-    //auto ITy = Type::getInt32Ty(getGlobalContext());
     auto Size = DataLayout.getPointerTypeSize(Type);
     auto AllocSize = ConstantInt::get(Int32, APInt(32, Size));
     auto Malloc = CallInst::CreateMalloc(Block,
