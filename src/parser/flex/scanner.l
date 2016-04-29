@@ -75,8 +75,12 @@ using namespace std;
     return token::CHARTYPE;
 }
 
-"String"	{
+"String" {
     return token::STRINGTYPE;
+}
+
+"Void"	{
+    return token::VOIDTYPE;
 }
 
 "Bool"	{
