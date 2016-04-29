@@ -34,14 +34,14 @@ install:
   - docker exec xenial /bin/sh -c "mkdir /root/source/build && cd /root/source/build"
   - docker exec xenial /bin/sh -c "cd /root/source/build && cmake .. -DDEBUG=1 -DCCPP=1 -DCLLVM=1 -DCHASKELL=0 -DCGNUASM=0 -DJIT=1"
   - #Test C
-  - #docker exec xenial /bin/sh -c "mkdir /root/source/test-c && cd /root/source/test-c"
-  - #docker exec xenial /bin/sh -c "cd /root/source/test-c && cmake .. -DDEBUG=1 -DCCPP=1 -DCLLVM=0 -DCHASKELL=0 -DCGNUASM=0 -DJIT=0 -DTESTS=1"
+  - docker exec xenial /bin/sh -c "mkdir /root/source/test-c && cd /root/source/test-c"
+  - docker exec xenial /bin/sh -c "cd /root/source/test-c && cmake .. -DDEBUG=1 -DCCPP=1 -DCLLVM=0 -DCHASKELL=0 -DCGNUASM=0 -DJIT=0 -DTESTS=1"
 script:
   - docker exec xenial /bin/sh -c "cd /root/source/build && make -j 8"
   - docker exec xenial /bin/sh -c "cd /root/source/build && make install"
   - #Test C
-  - #docker exec xenial /bin/sh -c "cd /root/source/test-c && make tests -j 8"
-  - #docker exec xenial /bin/sh -c "cd /root/source/test-c && make install"
+  - docker exec xenial /bin/sh -c "cd /root/source/test-c && make tests -j 8"
+  - docker exec xenial /bin/sh -c "cd /root/source/test-c && make install"
 
 after_script:
   - pwd
