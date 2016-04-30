@@ -25,7 +25,7 @@ class Driver;
 
 class Scanner : public SpplFlexLexer {
   public:
-    bool NewSource;
+    bool NewSource = false;
     Driver &Drv;
 
     Scanner(Driver &driver);
