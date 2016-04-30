@@ -24,7 +24,7 @@ option(JIT "LLVM JIT Compiler" OFF)
 option(TESTS "Tests" OFF)
 
 # Enable C++14 and toggle use of static libraries
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -fPIE")
 if(STATIC)
     set(BUILD_SHARED_LIBS Off)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static")
@@ -36,7 +36,7 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
     message("Compiling with LLVM/Clang")
     # Fix compilation with Clang
     if(STATIC)
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -fPIE")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS")
         set(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "")
         set(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "")
     endif()
