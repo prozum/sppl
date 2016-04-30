@@ -23,14 +23,13 @@ option(INTERPRETER "JIT interpreter using LLVM" OFF)
 option(JIT "LLVM JIT Compiler" OFF)
 option(TESTS "Tests" OFF)
 
-# Enable C++14 and use of static libraries
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -fPIE")
+# Enable C++14 and toggle use of static libraries
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
 if(STATIC)
     set(BUILD_SHARED_LIBS Off)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static")
 else()
     set(BUILD_SHARED_LIBS On)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -rdynamic")
 endif()
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
