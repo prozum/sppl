@@ -11,6 +11,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 option(DEBUG "Debug mode" ON)
 option(STATIC "Compile with static libs" OFF)
+option(LINE "Lines support in bison and flex" ON)
 option(CCPP "C++ Compiler" ON)
 option(CHASKELL "Haskell Compiler" OFF)
 option(CGNUASM "GNU Assembly Compiler" OFF)
@@ -23,7 +24,7 @@ option(JIT "LLVM JIT Compiler" OFF)
 option(TESTS "Tests" OFF)
 
 # Enable C++14 and use of static libraries
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -fPIE")
 if(STATIC)
     set(BUILD_SHARED_LIBS Off)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static")
