@@ -120,7 +120,7 @@ string SpplJit::getOutput(intptr_t Data, common::Type Type) {
     case TypeId::VOID:
         return "";
     default:
-        throw runtime_error("Cannot convert to C data: " + Type.str());
+        assert(0 && "Type not supported");
     }
 }
 
@@ -160,8 +160,7 @@ string SpplJit::getOutputTuple(intptr_t Addr, common::Type Type) {
             Addr += sizeof(intptr_t *);
             break;
         default:
-            throw runtime_error("Cannot convert to C data: " +
-                                Subtypes[i].str());
+            assert(0 && "Type not supported");
         }
         if (i + 1 != Subtypes.size())
             Out += ", ";
@@ -206,8 +205,7 @@ string SpplJit::getOutputList(intptr_t Addr, common::Type Type)
             Addr += sizeof(intptr_t *);
             break;
         default:
-            throw runtime_error("Cannot convert to C data: " +
-                                Subtype.str());
+            assert(0 && "Type not supported");
         }
         if (i + 1 != Count)
             Out += ", ";

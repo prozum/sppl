@@ -43,7 +43,7 @@ void LLVMCodeGenerator::visit(common::IdExpr &Node) {
     if (CurVal)
         return;
 
-    throw runtime_error("This should not happen");
+    assert(0 && "Something went wrong in the TypeChecker");
 }
 
 void LLVMCodeGenerator::visit(common::ParExpr &Node) {

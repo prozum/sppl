@@ -11,159 +11,165 @@ class Visitor {
     friend class Node;
 
   public:
-    std::vector<Error> Errors;
     void addError(Error Err);
-    bool hasError();
+    void clearErrors();
+    bool checkErrors();
+    size_t countErrors();
+    std::vector<Error> getErrors();
 
     virtual void visit(Program &Node) {
-        throw std::runtime_error("Not implemented");
+        addError(Error::NotImplemented(Node.Loc));
     }
     virtual void visit(Function &Node) {
-        throw std::runtime_error("Not implemented");
+        addError(Error::NotImplemented(Node.Loc));
     }
     virtual void visit(AlgebraicDT &Node) {
-        throw std::runtime_error("Not implemented");
+        addError(Error::NotImplemented(Node.Loc));
     }
     virtual void visit(Product &Node) {
-        throw std::runtime_error("Not implemented");
+        addError(Error::NotImplemented(Node.Loc));
     }
     virtual void visit(Case &Node) {
-        throw std::runtime_error("Not implemented");
+        addError(Error::NotImplemented(Node.Loc));
     }
     virtual void visit(LambdaArg &Node) {
-        throw std::runtime_error("Not implemented");
+        addError(Error::NotImplemented(Node.Loc));
     }
     virtual void visit(Or &Node) {
-        throw std::runtime_error("Not implemented");
+        addError(Error::NotImplemented(Node.Loc));
     }
     virtual void visit(And &Node) {
-        throw std::runtime_error("Not implemented");
+        addError(Error::NotImplemented(Node.Loc));
     }
     virtual void visit(Equal &Node) {
-        throw std::runtime_error("Not implemented");
+        addError(Error::NotImplemented(Node.Loc));
     }
     virtual void visit(NotEqual &Node) {
-        throw std::runtime_error("Not implemented");
+        addError(Error::NotImplemented(Node.Loc));
     }
     virtual void visit(Lesser &Node) {
-        throw std::runtime_error("Not implemented");
+        addError(Error::NotImplemented(Node.Loc));
     }
     virtual void visit(Greater &Node) {
-        throw std::runtime_error("Not implemented");
+        addError(Error::NotImplemented(Node.Loc));
     }
     virtual void visit(LesserEq &Node) {
-        throw std::runtime_error("Not implemented");
+        addError(Error::NotImplemented(Node.Loc));
     }
     virtual void visit(GreaterEq &Node) {
-        throw std::runtime_error("Not implemented");
+        addError(Error::NotImplemented(Node.Loc));
     }
     virtual void visit(Add &Node) {
-        throw std::runtime_error("Not implemented");
+        addError(Error::NotImplemented(Node.Loc));
     }
     virtual void visit(Sub &Node) {
-        throw std::runtime_error("Not implemented");
+        addError(Error::NotImplemented(Node.Loc));
     }
     virtual void visit(Mul &Node) {
-        throw std::runtime_error("Not implemented");
+        addError(Error::NotImplemented(Node.Loc));
     }
     virtual void visit(Div &Node) {
-        throw std::runtime_error("Not implemented");
+        addError(Error::NotImplemented(Node.Loc));
     }
     virtual void visit(Mod &Node) {
-        throw std::runtime_error("Not implemented");
+        addError(Error::NotImplemented(Node.Loc));
     }
     virtual void visit(ListAdd &Node) {
-        throw std::runtime_error("Not implemented");
+        addError(Error::NotImplemented(Node.Loc));
     }
     virtual void visit(ProducerConsumer &Node) {
-        throw std::runtime_error("Not implemented");
+        addError(Error::NotImplemented(Node.Loc));
     }
     virtual void visit(Concat &Node) {
-        throw std::runtime_error("Not implemented");
+        addError(Error::NotImplemented(Node.Loc));
     }
     virtual void visit(To &Node) {
-        throw std::runtime_error("Not implemented");
+        addError(Error::NotImplemented(Node.Loc));
     }
     virtual void visit(ParExpr &Node) {
-        throw std::runtime_error("Not implemented");
+        addError(Error::NotImplemented(Node.Loc));
     }
     virtual void visit(Not &Node) {
-        throw std::runtime_error("Not implemented");
+        addError(Error::NotImplemented(Node.Loc));
     }
     virtual void visit(Negative &Node) {
-        throw std::runtime_error("Not implemented");
+        addError(Error::NotImplemented(Node.Loc));
     }
     virtual void visit(LambdaFunction &Node) {
-        throw std::runtime_error("Not implemented");
+        addError(Error::NotImplemented(Node.Loc));
     }
     virtual void visit(IdPattern &Node) {
-        throw std::runtime_error("Not implemented");
+        addError(Error::NotImplemented(Node.Loc));
     }
     virtual void visit(IntPattern &Node) {
-        throw std::runtime_error("Not implemented");
+        addError(Error::NotImplemented(Node.Loc));
     }
     virtual void visit(FloatPattern &Node) {
-        throw std::runtime_error("Not implemented");
+        addError(Error::NotImplemented(Node.Loc));
     }
     virtual void visit(CharPattern &Node) {
-        throw std::runtime_error("Not implemented");
+        addError(Error::NotImplemented(Node.Loc));
     }
     virtual void visit(BoolPattern &Node) {
-        throw std::runtime_error("Not implemented");
+        addError(Error::NotImplemented(Node.Loc));
     }
     virtual void visit(StringPattern &Node) {
-        throw std::runtime_error("Not implemented");
+        addError(Error::NotImplemented(Node.Loc));
     }
     virtual void visit(ListPattern &Node) {
-        throw std::runtime_error("Not implemented");
+        addError(Error::NotImplemented(Node.Loc));
     }
     virtual void visit(TuplePattern &Node) {
-        throw std::runtime_error("Not implemented");
+        addError(Error::NotImplemented(Node.Loc));
     }
     virtual void visit(ListSplit &Node) {
-        throw std::runtime_error("Not implemented");
+        addError(Error::NotImplemented(Node.Loc));
     }
     virtual void visit(WildPattern &Node) {
-        throw std::runtime_error("Not implemented");
+        addError(Error::NotImplemented(Node.Loc));
     }
     virtual void visit(AlgebraicPattern &Node) {
-        throw std::runtime_error("Not implemented");
+        addError(Error::NotImplemented(Node.Loc));
     }
     virtual void visit(ParPattern &Node) {
-        throw std::runtime_error("Not implemented");
+        addError(Error::NotImplemented(Node.Loc));
     }
     virtual void visit(IdExpr &Node) {
-        throw std::runtime_error("Not implemented");
+        addError(Error::NotImplemented(Node.Loc));
     }
     virtual void visit(IntExpr &Node) {
-        throw std::runtime_error("Not implemented");
+        addError(Error::NotImplemented(Node.Loc));
     }
     virtual void visit(FloatExpr &Node) {
-        throw std::runtime_error("Not implemented");
+        addError(Error::NotImplemented(Node.Loc));
     }
     virtual void visit(CharExpr &Node) {
-        throw std::runtime_error("Not implemented");
+        addError(Error::NotImplemented(Node.Loc));
     }
     virtual void visit(BoolExpr &Node) {
-        throw std::runtime_error("Not implemented");
+        addError(Error::NotImplemented(Node.Loc));
     }
     virtual void visit(StringExpr &Node) {
-        throw std::runtime_error("Not implemented");
+        addError(Error::NotImplemented(Node.Loc));
     }
     virtual void visit(ListExpr &Node) {
-        throw std::runtime_error("Not implemented");
+        addError(Error::NotImplemented(Node.Loc));
     }
     virtual void visit(TupleExpr &Node) {
-        throw std::runtime_error("Not implemented");
+        addError(Error::NotImplemented(Node.Loc));
     }
     virtual void visit(CallExpr &Node) {
-        throw std::runtime_error("Not implemented");
+        addError(Error::NotImplemented(Node.Loc));
     }
     virtual void visit(Type &Node) {
-        throw std::runtime_error("Not implemented");
+        addError(Error::NotImplemented(Node.Loc));
     }
     virtual void visit(AlgebraicExpr &Node) {
-        throw std::runtime_error("Not implemented");
+        addError(Error::NotImplemented(Node.Loc));
     }
+
+private:
+    std::vector<Error> Errors;
+    size_t ExpectedErrors = 0;
 };
 }

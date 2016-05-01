@@ -15,7 +15,7 @@ class Error {
 
     Error(const Error &Other);
 
-    static Error NotImplemented(std::string Msg);
+    static Error NotImplemented(Location Loc);
     static Error Expected(std::string Msg, std::string Expected, std::string Actual,
                           Location Loc);
     static Error Binary(std::string Msg, common::BinaryOp &Op);

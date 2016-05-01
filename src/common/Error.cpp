@@ -15,8 +15,8 @@ Error::Error(const Error &Other) {
     Loc = Other.Loc;
 }
 
-Error Error::NotImplemented(string Msg) {
-    return Error("NotImplemented: " + Msg);
+Error Error::NotImplemented(Location Loc) {
+    return Error("Not implemented", Loc);
 }
 
 Error Error::Expected(string Msg, string Expected, string Actual,

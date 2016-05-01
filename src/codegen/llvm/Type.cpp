@@ -25,7 +25,7 @@ llvm::Type *LLVMCodeGenerator::getType(common::Type Ty) {
     case common::TypeId::VOID:
         return llvm::Type::getVoidTy(Ctx);
     default:
-        throw runtime_error("This should not happen!");
+        assert(0 && "Type not supported");
     }
 }
 

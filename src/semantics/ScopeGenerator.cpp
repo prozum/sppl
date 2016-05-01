@@ -63,11 +63,7 @@ void ScopeGenerator::visit(Program &Node) {
      */
 
     for (auto &Func : Node.Decls) {
-        try {
-            Func->accept(*this);
-        } catch (Error err) {
-            Errors.push_back(err);
-        }
+        Func->accept(*this);
     }
 }
 
@@ -109,7 +105,8 @@ void ScopeGenerator::visit(Function &Node) {
     if (!CurScope->tryGetDecl(Node.Id, Out) || Node.Anon) {
         CurScope->Decls.insert({Node.Id, Node.Signature});
     } else {
-        throw Error(Node.Id + " has already been declared", Node.Loc);
+        addError(Error(Node.Id + " has already been declared", Node.Loc));
+        return;
     }
 }
 
@@ -124,7 +121,8 @@ void ScopeGenerator::visit(AlgebraicDT &Node) {
             Product->accept(*this);
         }
     } else {
-        throw Error(Node.Name + " has already been declared", Node.Loc);
+        addError(Error(Node.Name + " has already been declared", Node.Loc));
+        return;
     }
 }
 
@@ -136,6 +134,7 @@ void ScopeGenerator::visit(Product &Node) {
     if (!CurScope->tryGetCon(Node.Constructor, Out)) {
         CurScope->Constructors.insert({Node.Constructor, Node});
     } else {
-        throw Error(Node.Constructor + " has already been declared", Node.Loc);
+        addError(Error(Node.Constructor + " has already been declared", Node.Loc));
+        return;
     }
 }

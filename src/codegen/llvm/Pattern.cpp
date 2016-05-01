@@ -49,7 +49,7 @@ void LLVMCodeGenerator::visit(common::ListPattern &Node) {
 
     for (auto &Element : Node.Patterns) {
         Element->accept(*this);
-        ListData.push_back(dynamic_cast<Constant *>(CurVal));
+        ListData.push_back(static_cast<Constant *>(CurVal));
     }
 
     auto ListType = ArrayType::get(getType(Node.RetTy), Node.Patterns.size());

@@ -79,19 +79,15 @@ bool Driver::parseString(const std::string &Input, const std::string &Src) {
 }
 
 bool Driver::accept(common::Visitor &V) {
-    V.Errors.clear();
+    V.clearErrors();
 
-    try {
-        Prog->accept(V);
-    } catch (Error Err) {
-        V.Errors.push_back(Err);
-    }
+    Prog->accept(V);
 
-    for (auto &Err : V.Errors) {
+    for (auto &Err : V.getErrors()) {
         showError(Err);
     }
 
-    return !V.hasError();
+    return !V.countErrors();
 }
 
 void Driver::error(const common::Location &Loc, const std::string &Msg) {
