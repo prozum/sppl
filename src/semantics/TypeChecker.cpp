@@ -180,7 +180,7 @@ void TypeChecker::visit(ListPattern &Node) {
 }
 
 void TypeChecker::visit(TuplePattern &Node) {
-    if (Node.RetTy.Id != TypeId::LIST) {
+    if (Node.RetTy.Id != TypeId::TUPLE) {
         addError(Error::Expected("Type mismatch", Node.RetTy.str(), "Tuple",
                               Node.Loc));
         return;
@@ -679,6 +679,7 @@ bool TypeChecker::containsEmptyList(Type &Ty) {
     }
 }
 
+// TODO Can't resolve empty list in tuple
 void TypeChecker::resolveEmptyList(Type &Ty, Type &Resolver) {
     switch (Ty.Id) {
         case TypeId::EMPTYLIST:

@@ -48,11 +48,13 @@ class GeneralOptimizer : public common::Visitor {
     void visit(common::Negative &Node);
     void visit(common::LambdaFunction &Node);
 
-    std::stack<common::CallExpr*> LastRecCall;
-    std::stack<common::CallExpr*> LastOtherCall;
+    std::vector<common::CallExpr*> LastRecCall;
+    std::vector<common::CallExpr*> LastOtherCall;
     common::Function* CurrFunc = nullptr;
 
-    std::stack<int> Calls;
+    std::vector<size_t> Calls;
+
+    size_t CallDepth = 0;
 
     void determingParallelism();
 };

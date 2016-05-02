@@ -33,9 +33,9 @@ void GeneralOptimizer::visit(Function &Node) {
 
 void GeneralOptimizer::visit(common::Case &Node) {
     if (Node.When) {
-        Calls.push(0);
-        LastRecCall.push(nullptr);
-        LastOtherCall.push(nullptr);
+        Calls.push_back(0);
+        LastRecCall.push_back(nullptr);
+        LastOtherCall.push_back(nullptr);
 
         Node.When->accept(*this);
 
@@ -43,9 +43,9 @@ void GeneralOptimizer::visit(common::Case &Node) {
     }
 
 
-    Calls.push(0);
-    LastRecCall.push(nullptr);
-    LastOtherCall.push(nullptr);
+    Calls.push_back(0);
+    LastRecCall.push_back(nullptr);
+    LastOtherCall.push_back(nullptr);
 
     Node.Expr->accept(*this);
 
@@ -91,24 +91,28 @@ void GeneralOptimizer::visit(common::TupleExpr &Node) {
 void GeneralOptimizer::visit(common::CallExpr &Node) {
     Node.Callee->accept(*this);
 
-    Calls.push(0);
-    LastRecCall.push(nullptr);
-    LastOtherCall.push(nullptr);
+    if (LastOtherCall.size() == CallDepth) {
+        Calls.push_back(0);
+        LastRecCall.push_back(nullptr);
+        LastOtherCall.push_back(nullptr);
+    }
+
+    CallDepth++;
 
     for (auto &Expr: Node.Args) {
         Expr->accept(*this);
     }
-
-    determingParallelism();
+    Node.Callee->accept(*this);
+    CallDepth--;
 
     if (typeid(*Node.Callee.get()) == typeid(IdExpr) &&
         static_cast<IdExpr*>(Node.Callee.get())->Val == CurrFunc->Id) {
-        LastRecCall.top() = &Node;
+        LastRecCall[CallDepth] = &Node;
     } else {
-        LastOtherCall.top() = &Node;
+        LastOtherCall[CallDepth] = &Node;
     }
 
-    Calls.top()++;
+    Calls[CallDepth]++;
 }
 
 void GeneralOptimizer::visit(common::AlgebraicExpr &Node) {
@@ -218,18 +222,22 @@ void GeneralOptimizer::visit(common::LambdaFunction &Node) {
 }
 
 void GeneralOptimizer::determingParallelism() {
-    if (Calls.top() == 1 && LastRecCall.top()) {
-        LastRecCall.top()->DoParallel = false;
-    } else if (Calls.top() > 1) {
-        if (LastOtherCall.top())
-            LastOtherCall.top()->DoParallel = false;
-        else if (LastRecCall.top())
-            LastRecCall.top()->DoParallel = false;
+    while (!Calls.empty()) {
+        if (Calls.back() == 1 && LastRecCall.back()) {
+            LastRecCall.back()->DoParallel = false;
+        } else if (Calls.back() > 1) {
+            if (LastOtherCall.back())
+                LastOtherCall.back()->DoParallel = false;
+            else if (LastRecCall.back())
+                LastRecCall.back()->DoParallel = false;
+        }
+
+        LastRecCall.pop_back();
+        LastOtherCall.pop_back();
+        Calls.pop_back();
     }
 
-    LastRecCall.pop();
-    LastOtherCall.pop();
-    Calls.pop();
+    CallDepth = 0;
 }
 
 

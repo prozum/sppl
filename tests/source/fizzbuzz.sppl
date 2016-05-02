@@ -5,15 +5,22 @@ def generate : Int -> [Int] -> [Int]
     | 0 list = list
     | n list = generate(n - 1, n : list)
 
+# Map preforms much in parallel when we chunk up the data
 def map : (Int -> Int) -> [Int] -> [Int]
-    | f []         = []
-    | f (x : rest) = f(x) : map(f, rest)
+    | f []                                  = []
+    | f (a : [])                            = f(a) : []
+    | f (a : b : [])                        = f(a) : f(b) : []
+    | f (a : b : c : [])                    = f(a) : f(b) : f(c) : []
+    | f (a : b : c : d : [])                = f(a) : f(b) : f(c) : f(d) : []
+    | f (a : b : c : d : e : [])            = f(a) : f(b) : f(c) : f(d) : f(e) : []
+    | f (a : b : c : d : e : g : [])        = f(a) : f(b) : f(c) : f(d) : f(e) : f(g) : []
+    | f (a : b : c : d : e : g : h : rest)  = f(a) : f(b) : f(c) : f(d) : f(e) : f(g) : f(h) : map(f, rest)
 
 def fizzbuzz : Int -> Int
     | n when n % 3 == 0 && n % 5 == 0 = -3 #Fizzbuzz = -3
     | n when n % 5 == 0               = -2 #Buzz = -2
     | n when n % 3 == 0               = -1 #Fizz = -1
-    | n                               = n #if not fizz or buzz, then just return number
+    | n                               = n  #if not fizz or buzz, then just return number
 
 def parsestring : String -> Int
     | x = parsestringacc(x, 0)
