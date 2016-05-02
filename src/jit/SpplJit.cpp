@@ -113,7 +113,7 @@ string SpplJit::getOutput(intptr_t Data, common::Type Type) {
         Data = *(int64_t *)Data;
         return "\"" + string((char *)Data) + "\"";
     case TypeId::BOOL:
-        return to_string((bool)Data);
+        return ((bool)Data) ? "True" : "False";
     case TypeId::TUPLE:
         return getOutputTuple(Data, Type);
     case TypeId::LIST:
