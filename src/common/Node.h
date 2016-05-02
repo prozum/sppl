@@ -130,16 +130,12 @@ class Node {
     Location Loc;
 
     Node(Location Loc);
-
     Node(const Node &Other);
-
-    // virtual Node &operator=(const Node &Other) = 0;
     ~Node() = default;
 
     std::unique_ptr<Node> clone() const;
 
     virtual void accept(Visitor &V) = 0;
-
     virtual std::string str() = 0;
 
   private:
@@ -151,13 +147,10 @@ class Program : public Node {
     std::vector<std::unique_ptr<Declaration>> Decls;
 
     Program(std::vector<std::unique_ptr<Declaration>> Decls, Location Loc);
-
     Program(std::unique_ptr<Expression> AnonFunc, Location Loc);
 
     void accept(Visitor &V);
-
     std::string str();
-
     std::unique_ptr<Program> clone() const;
 
   private:
@@ -181,15 +174,12 @@ class Function : public Declaration {
     std::string Id;
     Type Signature;
     std::vector<std::unique_ptr<Case>> Cases;
-    Scope *Scp;
     bool Anon = false;
 
     Function(std::unique_ptr<Expression> AnonFunc);
-
     Function(std::string Id, Type Ty, Location Loc);
 
     void accept(Visitor &V);
-
     std::string str();
 
   private:
@@ -206,9 +196,7 @@ class AlgebraicDT : public Declaration {
                 std::vector<std::unique_ptr<Product>> Sum, Location Loc);
 
     void accept(Visitor &V);
-
     std::string str();
-
     std::unique_ptr<AlgebraicDT> clone() const;
 
   private:
@@ -225,9 +213,7 @@ class Product : public Node {
     Product(std::string Constructor, std::vector<Type> Values, Location Loc);
 
     void accept(Visitor &V);
-
     std::string str();
-
     std::unique_ptr<Product> clone() const;
 
   private:
@@ -245,9 +231,7 @@ class Case : public Node {
          std::vector<std::unique_ptr<Pattern>> Patterns, Location Loc);
 
     void accept(Visitor &V);
-
     std::string str();
-
     std::unique_ptr<Case> clone() const;
 
   private:
@@ -262,9 +246,7 @@ class LambdaArg : public Node {
     LambdaArg(std::string Id, Location Loc);
 
     void accept(Visitor &V);
-
     std::string str();
-
     std::unique_ptr<LambdaArg> clone() const;
 
   private:
