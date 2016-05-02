@@ -17,6 +17,12 @@ LLVMCodeGenerator::LLVMCodeGenerator(parser::Driver &Drv)
     Int32 = llvm::Type::getInt32Ty(Ctx);
     Int64 = llvm::Type::getInt64Ty(Ctx);
     Double = llvm::Type::getDoubleTy(Ctx);
+    MainType = FunctionType::get(Int32,
+                                 vector<Type *> {
+                                         Int32,
+                                         PointerType::getUnqual(PointerType::getUnqual(Int8))
+                                 },
+                                 false);
 }
 
 void LLVMCodeGenerator::visit(common::Program &node) {

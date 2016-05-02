@@ -40,6 +40,7 @@ class LLVMCodeGenerator : public parser::CodeGenerator {
     llvm::Type *Int32;
     llvm::Type *Int64;
     llvm::Type *Double;
+    llvm::FunctionType *MainType;
 
     llvm::Value *CurVal = nullptr;
     llvm::Function *CurFunc = nullptr;
