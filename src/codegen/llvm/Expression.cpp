@@ -17,7 +17,9 @@ void LLVMCodeGenerator::visit(common::BoolExpr &Node) {
 }
 
 void LLVMCodeGenerator::visit(common::StringExpr &Node) {
-    CurVal = Builder.CreateGlobalString(Node.Val, CurFunc->getName() + ".str");
+    auto GlobalVar = Builder.CreateGlobalString(Node.Val, CurFunc->getName() + ".str");
+
+    CurVal = CreateList(Node.RetTy, GlobalVar, Node.Val.size());
 }
 
 void LLVMCodeGenerator::visit(common::CharExpr &Node) {

@@ -108,6 +108,9 @@ string SpplJit::getOutput(intptr_t Data, common::Type Type) {
     case TypeId::CHAR:
         return "'" + string(1, (char)Data) + "'";
     case TypeId::STRING:
+        // Ignore list container
+        Data += sizeof(int64_t);
+        Data = *(int64_t *)Data;
         return "\"" + string((char *)Data) + "\"";
     case TypeId::BOOL:
         return to_string((bool)Data);
@@ -174,9 +177,9 @@ string SpplJit::getOutputList(intptr_t Addr, common::Type Type)
     string Out("[");
     auto Subtype = Type.Subtypes[0];
 
-    auto Count = *(int32_t *)Addr;
-    Addr += sizeof(int64_t);
-    Addr = *(int64_t *)Addr;
+    auto Count = *(int64_t *)Addr;
+    Addr += sizeof(intptr_t);
+    Addr = *(intptr_t *)Addr;
 
     for (int32_t i = 0; i < Count; ++i) {
         switch (Subtype.Id) {
