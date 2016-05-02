@@ -1,2 +1,2 @@
-add_library(cgnuasm GasCodeGenerator.cpp GasCodeGenerator.h)
-target_link_libraries(cgnuasm common parser compiler)
+add_library(cgnuasm GasCodeGen.cpp GasCodeGen.h)
+target_link_libraries(cgnuasm common parser)

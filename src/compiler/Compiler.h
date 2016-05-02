@@ -11,20 +11,20 @@
 #include <memory>
 
 #ifdef CCPP
-#include "CppCodeGenerator.h"
-#include "CParCodeGenerator.h"
+#include "CCodeGen.h"
+#include "CParCodeGen.h"
 #endif
 
 #ifdef CGNUASM
-#include "GasCodeGenerator.h"
+#include "GasCodeGen.h"
 #endif
 
 #ifdef CHASKELL
-#include "HCodeGenerator.h"
+#include "HCodeGen.h"
 #endif
 
 #ifdef CLLVM
-#include "LLVMCodeGenerator.h"
+#include "LLVMCodeGen.h"
 #endif
 
 namespace compiler {

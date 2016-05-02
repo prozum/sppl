@@ -1,10 +1,10 @@
-#include "LLVMCodeGenerator.h"
+#include "LLVMCodeGen.h"
 
 using namespace std;
 using namespace llvm;
 using namespace codegen;
 
-LLVMCodeGenerator::LLVMCodeGenerator(parser::Driver &Drv)
+LLVMCodeGen::LLVMCodeGen(parser::Driver &Drv)
         : CodeGenerator(Drv),
           Ctx(getGlobalContext()),
           Builder(Ctx),
@@ -25,7 +25,7 @@ LLVMCodeGenerator::LLVMCodeGenerator(parser::Driver &Drv)
                                  false);
 }
 
-void LLVMCodeGenerator::visit(common::Program &node) {
+void LLVMCodeGen::visit(common::Program &node) {
     for (auto &func : node.Decls) {
         func->accept(*this);
     }
@@ -33,7 +33,7 @@ void LLVMCodeGenerator::visit(common::Program &node) {
     *Drv.Out << ModuleString();
 }
 
-string LLVMCodeGenerator::ModuleString() {
+string LLVMCodeGen::ModuleString() {
     string ModuleStr;
     raw_string_ostream out(ModuleStr);
     out << *Module.get();

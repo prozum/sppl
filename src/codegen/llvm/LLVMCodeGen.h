@@ -18,9 +18,9 @@
 #include <unordered_map>
 
 namespace codegen {
-class LLVMCodeGenerator : public parser::CodeGenerator {
+class LLVMCodeGen : public parser::CodeGenerator {
   public:
-    LLVMCodeGenerator(parser::Driver &Drv);
+    LLVMCodeGen(parser::Driver &Drv);
 
     llvm::LLVMContext &Ctx;
     llvm::IRBuilder<> Builder;

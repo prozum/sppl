@@ -1,16 +1,16 @@
-#include "CppCodeGenerator.h"
+#include "CCodeGen.h"
 
 using namespace common;
 using namespace std;
 using namespace codegen;
 
-CCodeGenerator::CCodeGenerator(parser::Driver &Drv)
+CCodeGen::CCodeGen(parser::Driver &Drv)
     : CodeGenerator(Drv), Output(Drv.Out), Header(Drv.HOut),
       ListOffsets(vector<int>({0})),
       StringList(Type(TypeId::LIST, vector<Type>({Type(TypeId::STRING)}))),
       RealString(Type(TypeId::LIST, vector<Type>({Type(TypeId::CHAR)}))) {}
 
-void CCodeGenerator::visit(Program &Node) {
+void CCodeGen::visit(Program &Node) {
     Prog = &Node;
     Function *Main = nullptr;
 
@@ -62,7 +62,7 @@ void CCodeGenerator::visit(Program &Node) {
     }
 }
 
-void CCodeGenerator::visit(Function &Node) {
+void CCodeGen::visit(Function &Node) {
     stringstream Func;
     string RetType = getType(Node.Signature.Subtypes.back());
     string ArgType;
@@ -122,7 +122,7 @@ void CCodeGenerator::visit(Function &Node) {
     ArgNames.clear();
 }
 
-void CCodeGenerator::visit(Case &Node) {
+void CCodeGen::visit(Case &Node) {
     stringstream Pattern;
     string ExtraTap = "   ";
     bool Empty = true;
@@ -231,15 +231,15 @@ void CCodeGenerator::visit(Case &Node) {
             << endl;
 }
 
-void CCodeGenerator::visit(AlgebraicDT &Node) {
+void CCodeGen::visit(AlgebraicDT &Node) {
     throw std::runtime_error("Not implemented");
 }
 
-void CCodeGenerator::visit(Product &Node) {
+void CCodeGen::visit(Product &Node) {
     throw std::runtime_error("Not implemented");
 }
 
-string CCodeGenerator::getType(Type &Ty) {
+string CCodeGen::getType(Type &Ty) {
     // Generate the correct c type, based on sppl's types
     switch (Ty.Id) {
     case TypeId::FLOAT:
@@ -266,7 +266,7 @@ string CCodeGenerator::getType(Type &Ty) {
     }
 }
 
-string CCodeGenerator::generateList(Type &Ty) {
+string CCodeGen::generateList(Type &Ty) {
     string Name = GGenerated + GList + to_string(ListCount++);
     string ChildrenType = getType(Ty.Subtypes.front());
 
@@ -445,7 +445,7 @@ string CCodeGenerator::generateList(Type &Ty) {
     return Name;
 }
 
-string CCodeGenerator::generateEnvironment(Type &Ty) {
+string CCodeGen::generateEnvironment(Type &Ty) {
     // Result is needed, so we don't start generating something inside the signature
     stringstream Res;
     string Name = GGenerated + GSignature + to_string(SigCount++);
@@ -529,7 +529,7 @@ string CCodeGenerator::generateEnvironment(Type &Ty) {
  */
 }
 
-string CCodeGenerator::generateTuple(Type &Ty) {
+string CCodeGen::generateTuple(Type &Ty) {
     // Result is needed, so we don't start generating something inside the tuple
     stringstream Res;
     string Name = GGenerated + GTuple + to_string(TupleCount++);
@@ -654,7 +654,7 @@ string CCodeGenerator::generateTuple(Type &Ty) {
     return Name;
 }
 
-void CCodeGenerator::generateStd() {
+void CCodeGen::generateStd() {
     *Output << "#include \"test.h\" \n " << endl;
 
     *Header << "#include <stdarg.h> " << endl
@@ -800,7 +800,7 @@ void CCodeGenerator::generateStd() {
             << endl;
 }
 
-string CCodeGenerator::getList(Type &Ty) {
+string CCodeGen::getList(Type &Ty) {
     auto Got = Lists.find(Ty);
 
     if (Got == Lists.end()) {
@@ -810,7 +810,7 @@ string CCodeGenerator::getList(Type &Ty) {
     }
 }
 
-string CCodeGenerator::getTuple(Type &Ty) {
+string CCodeGen::getTuple(Type &Ty) {
     auto Got = Tuples.find(Ty);
 
     if (Got == Tuples.end()) {
@@ -820,7 +820,7 @@ string CCodeGenerator::getTuple(Type &Ty) {
     }
 }
 
-string CCodeGenerator::getEnvironment(Type &Ty) {
+string CCodeGen::getEnvironment(Type &Ty) {
 
     auto Got = Closures.find(Ty);
 
@@ -832,6 +832,6 @@ string CCodeGenerator::getEnvironment(Type &Ty) {
 
 }
 
-void CCodeGenerator::outputBuffer() {
+void CCodeGen::outputBuffer() {
     *Output << Buffer.str(), Buffer.str(string());
 }

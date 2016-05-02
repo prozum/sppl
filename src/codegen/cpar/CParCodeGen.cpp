@@ -1,15 +1,15 @@
 #include <assert.h>
-#include "CParCodeGenerator.h"
+#include "CParCodeGen.h"
 
 using namespace common;
 using namespace std;
 using namespace codegen;
 
-CParCodeGenerator::CParCodeGenerator(parser::Driver &Drv)
-    : CCodeGenerator(Drv) {}
+CParCodeGen::CParCodeGen(parser::Driver &Drv)
+    : CCodeGen(Drv) {}
 
 
-void CParCodeGenerator::visit(Program &Node) {
+void CParCodeGen::visit(Program &Node) {
     Prog = &Node;
     Function *Main = nullptr;
 
@@ -66,7 +66,7 @@ void CParCodeGenerator::visit(Program &Node) {
     }
 }
 
-void CParCodeGenerator::visit(Function &Node) {
+void CParCodeGen::visit(Function &Node) {
     string ParFunc;
     string SeqFunc;
     string ArgType;
@@ -159,7 +159,7 @@ void CParCodeGenerator::visit(Function &Node) {
     ArgNames.clear();
 }
 
-void CParCodeGenerator::visit(Case &Node) {
+void CParCodeGen::visit(Case &Node) {
     stringstream Pattern;
     bool Empty = true;
 
@@ -266,7 +266,7 @@ void CParCodeGenerator::visit(Case &Node) {
             << endl;
 }
 
-void CParCodeGenerator::visit(common::CallExpr &Node) {
+void CParCodeGen::visit(common::CallExpr &Node) {
     if (GenerateParallel) {
         stringstream GeneratedCall;
         string Name = GTask + to_string(TaskCount++);
@@ -350,7 +350,7 @@ void CParCodeGenerator::visit(common::CallExpr &Node) {
     }
 }
 
-std::string CParCodeGenerator::generateEnvironment(common::Type &Ty) {
+std::string CParCodeGen::generateEnvironment(common::Type &Ty) {
     string Name = GGenerated + GSignature + to_string(++SigCount);
     stringstream Res;
 
@@ -386,7 +386,7 @@ std::string CParCodeGenerator::generateEnvironment(common::Type &Ty) {
     return Name;
 }
 
-void CParCodeGenerator::outputParallelCode() {
+void CParCodeGen::outputParallelCode() {
     for (size_t i = CallStack.size(); i > 0; i--) {
         *Output << CallStack.back();
 

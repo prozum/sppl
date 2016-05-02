@@ -1,10 +1,10 @@
 #pragma once
-#include "CppCodeGenerator.h"
+#include "CCodeGen.h"
 
 namespace codegen {
-class CParCodeGenerator : public CCodeGenerator {
+class CParCodeGen : public CCodeGen {
     public:
-        CParCodeGenerator(parser::Driver &Drv);
+        CParCodeGen(parser::Driver &Drv);
         void visit(common::Program &Node);
 
     private:

@@ -1,10 +1,10 @@
-#include "LLVMCodeGenerator.h"
+#include "LLVMCodeGen.h"
 
 using namespace std;
 using namespace llvm;
 using namespace codegen;
 
-void LLVMCodeGenerator::visit(common::Function &Node) {
+void LLVMCodeGen::visit(common::Function &Node) {
     // Create function and entry block
     CurFunc = llvm::Function::Create(getFuncType(Node.Signature),
                                      llvm::Function::ExternalLinkage, Node.Id,
@@ -73,7 +73,7 @@ void LLVMCodeGenerator::visit(common::Function &Node) {
     verifyFunction(*CurFunc);
 }
 
-void LLVMCodeGenerator::visit(common::Case &Node) {
+void LLVMCodeGen::visit(common::Case &Node) {
 
     BasicBlock *TrueBlock;
     BasicBlock *FalseBlock;

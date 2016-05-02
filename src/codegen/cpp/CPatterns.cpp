@@ -1,10 +1,10 @@
-#include "CppCodeGenerator.h"
+#include "CCodeGen.h"
 
 using namespace common;
 using namespace std;
 using namespace codegen;
 
-void CCodeGenerator::visit(ListPattern &Node) {
+void CCodeGen::visit(ListPattern &Node) {
     // Result is needed, so we don't generate something else, while the
     // ListPattern is being generated
     stringstream Res;
@@ -43,7 +43,7 @@ void CCodeGenerator::visit(ListPattern &Node) {
     LastPattern = "(" + Res.str() + ")";
 }
 
-void CCodeGenerator::visit(TuplePattern &Node) {
+void CCodeGen::visit(TuplePattern &Node) {
     // Result is needed, so we don't start generating something in a signature
     // in the header file
     stringstream Res;
@@ -75,7 +75,7 @@ void CCodeGenerator::visit(TuplePattern &Node) {
     }
 }
 
-void CCodeGenerator::visit(ListSplit &Node) {
+void CCodeGen::visit(ListSplit &Node) {
     stringstream Res;
     string TypeName = getList(Node.RetTy);
     bool Empty = true;
@@ -120,7 +120,7 @@ void CCodeGenerator::visit(ListSplit &Node) {
     }
 }
 
-void CCodeGenerator::visit(IntPattern &Node) {
+void CCodeGen::visit(IntPattern &Node) {
     string Val;
 
     for (auto &Str : GetValueBuilder) {
@@ -130,7 +130,7 @@ void CCodeGenerator::visit(IntPattern &Node) {
     LastPattern = Val + " == " + Node.str();
 }
 
-void CCodeGenerator::visit(FloatPattern &Node) {
+void CCodeGen::visit(FloatPattern &Node) {
     string Val;
 
     for (auto &Str : GetValueBuilder) {
@@ -140,7 +140,7 @@ void CCodeGenerator::visit(FloatPattern &Node) {
     LastPattern = Val + " == " + Node.str();
 }
 
-void CCodeGenerator::visit(CharPattern &Node) {
+void CCodeGen::visit(CharPattern &Node) {
     string Val;
 
     for (auto &Str : GetValueBuilder) {
@@ -150,7 +150,7 @@ void CCodeGenerator::visit(CharPattern &Node) {
     LastPattern = Val + " == " + Node.str();
 }
 
-void CCodeGenerator::visit(BoolPattern &Node) {
+void CCodeGen::visit(BoolPattern &Node) {
     string Val;
 
     for (auto &Str : GetValueBuilder) {
@@ -160,7 +160,7 @@ void CCodeGenerator::visit(BoolPattern &Node) {
     LastPattern = Val + " == " + to_string(Node.Val);
 }
 
-void CCodeGenerator::visit(IdPattern &Node) {
+void CCodeGen::visit(IdPattern &Node) {
     stringstream Assign;
     string Name;
 
@@ -189,18 +189,18 @@ void CCodeGenerator::visit(IdPattern &Node) {
     LastPattern = "1";
 }
 
-void CCodeGenerator::visit(WildPattern &Node) {
+void CCodeGen::visit(WildPattern &Node) {
     // Since a wildcard, in a pattern is always true, then LastPattern is just
     // set to "1"
     LastPattern = "1";
 }
 
-void CCodeGenerator::visit(AlgebraicPattern &Node) {
+void CCodeGen::visit(AlgebraicPattern &Node) {
     // TODO
     throw std::runtime_error("Not implemented");
 }
 
-void CCodeGenerator::visit(ParPattern &Node) {
+void CCodeGen::visit(ParPattern &Node) {
     Node.Pat->accept(*this);
 
     if (LastPattern != "1") {
@@ -208,7 +208,7 @@ void CCodeGenerator::visit(ParPattern &Node) {
     }
 }
 
-void CCodeGenerator::visit(StringPattern &Node) {
+void CCodeGen::visit(StringPattern &Node) {
     string Val;
 
     for (auto &Str : GetValueBuilder) {

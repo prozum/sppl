@@ -1,10 +1,10 @@
-#include "LLVMCodeGenerator.h"
+#include "LLVMCodeGen.h"
 
 using namespace std;
 using namespace llvm;
 using namespace codegen;
 
-llvm::Type *LLVMCodeGenerator::getType(common::Type Ty) {
+llvm::Type *LLVMCodeGen::getType(common::Type Ty) {
     switch (Ty.Id) {
     case common::TypeId::FLOAT:
         return Double;
@@ -29,7 +29,7 @@ llvm::Type *LLVMCodeGenerator::getType(common::Type Ty) {
     }
 }
 
-llvm::StructType *LLVMCodeGenerator::getTupleType(common::Type Ty) {
+llvm::StructType *LLVMCodeGen::getTupleType(common::Type Ty) {
     auto CacheTy = TupleTypes.find(Ty);
 
     if (CacheTy != TupleTypes.end())
@@ -42,7 +42,7 @@ llvm::StructType *LLVMCodeGenerator::getTupleType(common::Type Ty) {
     return TupleTypes[Ty] = StructType::create(Ctx, Subtypes, "tuple");
 }
 
-llvm::StructType *LLVMCodeGenerator::getListType(common::Type Ty) {
+llvm::StructType *LLVMCodeGen::getListType(common::Type Ty) {
     auto CacheTy = ListTypes.find(Ty);
 
     if (CacheTy != ListTypes.end())
@@ -55,7 +55,7 @@ llvm::StructType *LLVMCodeGenerator::getListType(common::Type Ty) {
     return ListTypes[Ty] = StructType::create(Ctx, Subtypes, "list");
 }
 
-llvm::FunctionType *LLVMCodeGenerator::getFuncType(common::Type Ty) {
+llvm::FunctionType *LLVMCodeGen::getFuncType(common::Type Ty) {
     auto CacheType = FuncTypes.find(Ty);
 
     if (CacheType != FuncTypes.end())

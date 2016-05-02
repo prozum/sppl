@@ -1,4 +1,4 @@
-#include "HCodeGenerator.h"
+#include "HCodeGen.h"
 #include <iostream>
 #include <string>
 
@@ -6,10 +6,10 @@ using namespace std;
 using namespace common;
 using namespace codegen;
 
-HCodeGenerator::HCodeGenerator(parser::Driver &Drv)
+HCodeGen::HCodeGen(parser::Driver &Drv)
     : parser::CodeGenerator::CodeGenerator(Drv) {}
 
-void HCodeGenerator::visit(Program &Node) {
+void HCodeGen::visit(Program &Node) {
     // os << "module PlaceHolder where" << endl;
 
     for (auto &Decl : Node.Decls) {
@@ -17,7 +17,7 @@ void HCodeGenerator::visit(Program &Node) {
     }
 }
 
-void HCodeGenerator::visit(Function &Node) {
+void HCodeGen::visit(Function &Node) {
     CurFunc = &Node;
 
     if (Node.Id == "main")
@@ -44,7 +44,7 @@ void HCodeGenerator::visit(Function &Node) {
     *Drv.Out << endl;
 }
 
-void HCodeGenerator::visit(Case &Node) {
+void HCodeGen::visit(Case &Node) {
     *Drv.Out << CurFunc->Id << " ";
 
     for (auto &Pattern : Node.Patterns) {
@@ -59,7 +59,7 @@ void HCodeGenerator::visit(Case &Node) {
     *Drv.Out << endl;
 }
 
-void HCodeGenerator::visit(Or &Node) {
+void HCodeGen::visit(Or &Node) {
     *Drv.Out << "((||) ";
     Node.Left->accept(*this);
     *Drv.Out << " ";
@@ -67,7 +67,7 @@ void HCodeGenerator::visit(Or &Node) {
     *Drv.Out << ")";
 }
 
-void HCodeGenerator::visit(And &Node) {
+void HCodeGen::visit(And &Node) {
     *Drv.Out << "((&&) ";
     Node.Left->accept(*this);
     *Drv.Out << " ";
@@ -75,7 +75,7 @@ void HCodeGenerator::visit(And &Node) {
     *Drv.Out << ")";
 }
 
-void HCodeGenerator::visit(Equal &Node) {
+void HCodeGen::visit(Equal &Node) {
     *Drv.Out << "((==) ";
     Node.Left->accept(*this);
     *Drv.Out << " ";
@@ -83,7 +83,7 @@ void HCodeGenerator::visit(Equal &Node) {
     *Drv.Out << ")";
 }
 
-void HCodeGenerator::visit(NotEqual &Node) {
+void HCodeGen::visit(NotEqual &Node) {
     *Drv.Out << "((/=) ";
     Node.Left->accept(*this);
     *Drv.Out << " ";
@@ -91,7 +91,7 @@ void HCodeGenerator::visit(NotEqual &Node) {
     *Drv.Out << ")";
 }
 
-void HCodeGenerator::visit(Lesser &Node) {
+void HCodeGen::visit(Lesser &Node) {
     *Drv.Out << "((<) ";
     Node.Left->accept(*this);
     *Drv.Out << " ";
@@ -99,7 +99,7 @@ void HCodeGenerator::visit(Lesser &Node) {
     *Drv.Out << ")";
 }
 
-void HCodeGenerator::visit(LesserEq &Node) {
+void HCodeGen::visit(LesserEq &Node) {
     *Drv.Out << "((<=) ";
     Node.Left->accept(*this);
     *Drv.Out << " ";
@@ -107,7 +107,7 @@ void HCodeGenerator::visit(LesserEq &Node) {
     *Drv.Out << ")";
 }
 
-void HCodeGenerator::visit(Greater &Node) {
+void HCodeGen::visit(Greater &Node) {
     *Drv.Out << "((>) ";
     Node.Left->accept(*this);
     *Drv.Out << " ";
@@ -115,7 +115,7 @@ void HCodeGenerator::visit(Greater &Node) {
     *Drv.Out << ")";
 }
 
-void HCodeGenerator::visit(GreaterEq &Node) {
+void HCodeGen::visit(GreaterEq &Node) {
     *Drv.Out << "((>=) ";
     Node.Left->accept(*this);
     *Drv.Out << " ";
@@ -123,7 +123,7 @@ void HCodeGenerator::visit(GreaterEq &Node) {
     *Drv.Out << ")";
 }
 
-void HCodeGenerator::visit(Add &Node) {
+void HCodeGen::visit(Add &Node) {
     *Drv.Out << "((+) ";
     Node.Left->accept(*this);
     *Drv.Out << " ";
@@ -131,7 +131,7 @@ void HCodeGenerator::visit(Add &Node) {
     *Drv.Out << ")";
 }
 
-void HCodeGenerator::visit(Sub &Node) {
+void HCodeGen::visit(Sub &Node) {
     *Drv.Out << "((-) ";
     Node.Left->accept(*this);
     *Drv.Out << " ";
@@ -139,7 +139,7 @@ void HCodeGenerator::visit(Sub &Node) {
     *Drv.Out << ")";
 }
 
-void HCodeGenerator::visit(Mul &Node) {
+void HCodeGen::visit(Mul &Node) {
     *Drv.Out << "((*) ";
     Node.Left->accept(*this);
     *Drv.Out << " ";
@@ -147,7 +147,7 @@ void HCodeGenerator::visit(Mul &Node) {
     *Drv.Out << ")";
 }
 
-void HCodeGenerator::visit(Div &Node) {
+void HCodeGen::visit(Div &Node) {
     *Drv.Out << "((/) ";
     Node.Left->accept(*this);
     *Drv.Out << " ";
@@ -155,7 +155,7 @@ void HCodeGenerator::visit(Div &Node) {
     *Drv.Out << ")";
 }
 
-void HCodeGenerator::visit(Mod &Node) {
+void HCodeGen::visit(Mod &Node) {
     *Drv.Out << "(rem ";
     Node.Left->accept(*this);
     *Drv.Out << " ";
@@ -163,24 +163,24 @@ void HCodeGenerator::visit(Mod &Node) {
     *Drv.Out << ")";
 }
 
-void HCodeGenerator::visit(ListAdd &Node) {
+void HCodeGen::visit(ListAdd &Node) {
     Node.Left->accept(*this);
     *Drv.Out << ":";
     Node.Right->accept(*this);
 }
 
-void HCodeGenerator::visit(ParExpr &Node) {
+void HCodeGen::visit(ParExpr &Node) {
     *Drv.Out << "(";
     Node.Child->accept(*this);
     *Drv.Out << ")";
 }
 
-void HCodeGenerator::visit(Not &Node) {
+void HCodeGen::visit(Not &Node) {
     *Drv.Out << "not ";
     Node.Child->accept(*this);
 }
 
-void HCodeGenerator::visit(ListPattern &Node) {
+void HCodeGen::visit(ListPattern &Node) {
     *Drv.Out << "[";
 
     if (Node.Patterns.size() != 0) {
@@ -195,7 +195,7 @@ void HCodeGenerator::visit(ListPattern &Node) {
     *Drv.Out << "]";
 }
 
-void HCodeGenerator::visit(TuplePattern &Node) {
+void HCodeGen::visit(TuplePattern &Node) {
     *Drv.Out << "(";
 
     if (Node.Patterns.size() != 0) {
@@ -210,7 +210,7 @@ void HCodeGenerator::visit(TuplePattern &Node) {
     *Drv.Out << ")";
 }
 
-void HCodeGenerator::visit(ListSplit &Node) {
+void HCodeGen::visit(ListSplit &Node) {
     *Drv.Out << "(";
     Node.Left->accept(*this);
     *Drv.Out << ":";
@@ -218,17 +218,17 @@ void HCodeGenerator::visit(ListSplit &Node) {
     *Drv.Out << ")";
 }
 
-void HCodeGenerator::visit(IntExpr &Node) { *Drv.Out << Node.Val; }
+void HCodeGen::visit(IntExpr &Node) { *Drv.Out << Node.Val; }
 
-void HCodeGenerator::visit(FloatExpr &Node) { *Drv.Out << Node.Val; }
+void HCodeGen::visit(FloatExpr &Node) { *Drv.Out << Node.Val; }
 
-void HCodeGenerator::visit(BoolExpr &Node) { *Drv.Out << Node.Val; }
+void HCodeGen::visit(BoolExpr &Node) { *Drv.Out << Node.Val; }
 
-void HCodeGenerator::visit(CharExpr &Node) { *Drv.Out << Node.Val; }
+void HCodeGen::visit(CharExpr &Node) { *Drv.Out << Node.Val; }
 
-void HCodeGenerator::visit(StringExpr &Node) { *Drv.Out << Node.Val; }
+void HCodeGen::visit(StringExpr &Node) { *Drv.Out << Node.Val; }
 
-void HCodeGenerator::visit(ListExpr &Node) {
+void HCodeGen::visit(ListExpr &Node) {
     *Drv.Out << "[";
 
     if (Node.Elements.size() != 0) {
@@ -243,7 +243,7 @@ void HCodeGenerator::visit(ListExpr &Node) {
     *Drv.Out << "]";
 }
 
-void HCodeGenerator::visit(TupleExpr &Node) {
+void HCodeGen::visit(TupleExpr &Node) {
     *Drv.Out << "(";
 
     if (Node.Elements.size() != 0) {
@@ -258,9 +258,9 @@ void HCodeGenerator::visit(TupleExpr &Node) {
     *Drv.Out << ")";
 }
 
-void HCodeGenerator::visit(IdExpr &Node) { *Drv.Out << Node.Val; }
+void HCodeGen::visit(IdExpr &Node) { *Drv.Out << Node.Val; }
 
-void HCodeGenerator::visit(CallExpr &Node) {
+void HCodeGen::visit(CallExpr &Node) {
     *Drv.Out << "(";
     Node.Callee->accept(*this);
 
