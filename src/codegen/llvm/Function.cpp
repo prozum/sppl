@@ -106,13 +106,6 @@ void LLVMCodeGenerator::visit(common::Case &Node) {
     Builder.SetInsertPoint(*CurCaseBlock);
     Node.Expr->accept(*this);
 
-    //auto Ty1 = CurPhiNode->getType();
-    //auto Ty2 = CurVal->getType();
-
-    //auto Arr1 = CurVal->getType()->getPointerElementType()->getArrayNumElements();
-    //auto Arr2 = CurPhiNode->getType()->getPointerElementType()->getArrayNumElements();
-
-
     // Ignore expression type if function is void
     if (CurFunc->getReturnType()->getTypeID() != llvm::Type::TypeID::VoidTyID)
         CurPhiNode->addIncoming(CurVal, *CurCaseBlock);

@@ -34,7 +34,7 @@ class LLVMCodeGenerator : public parser::CodeGenerator {
     std::unordered_map<common::Type, llvm::StructType *> ListTypes;
     std::unordered_map<common::Type, llvm::FunctionType *> FuncTypes;
 
-    // Constants
+    // Type Constants
     llvm::Type *Int1;
     llvm::Type *Int8;
     llvm::Type *Int32;
@@ -108,7 +108,8 @@ class LLVMCodeGenerator : public parser::CodeGenerator {
     void visit(common::CallExpr &Node);
     void visit(common::ParExpr &Node);
 
-    llvm::Instruction *CreateMalloc(llvm::Type *Type,llvm::BasicBlock * Block);
+    llvm::Value *CreateList(common::Type Type, llvm::Value *Data, size_t Size);
+    llvm::Instruction *CreateMalloc(llvm::Type *Type, llvm::BasicBlock * Block);
 
     llvm::Type *getType(common::Type Ty);
     llvm::StructType *getTupleType(common::Type Ty);
