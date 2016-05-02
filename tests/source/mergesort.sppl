@@ -1,3 +1,5 @@
+include "stringlib.sppl"
+
 def main : [String] -> [Int]
     | path : input : rest = mergesort(generate(0, parsestring(input), []))
 
@@ -34,22 +36,3 @@ def merge : [Int] -> [Int] -> [Int]
 def generate : Int -> Int -> [Int] -> [Int]
     | n m list when n == m = list
     | n m list when n < m = generate(n + 1, m, ((n % 4 + n % 3 + n % 2 + n % 1) * n) : list)
-
-def parsestring : String -> Int
-    | x = parsestringacc(x, 0)
-
-def parsestringacc : String -> Int -> Int
-    | "" acc       = acc
-    | (x : xs) acc = parsestringacc(xs, (acc * 10) + parsechar(x))
-
-def parsechar : Char -> Int
-    | '0' = 0
-    | '1' = 1
-    | '2' = 2
-    | '3' = 3
-    | '4' = 4
-    | '5' = 5
-    | '6' = 6
-    | '7' = 7
-    | '8' = 8
-    | '9' = 9

@@ -6,7 +6,7 @@ def floatliteral : Int -> FloatPattern
 	| 0 = 0.1
 	| n = -0.1
 
-def charliteral : Int -> CharPattern
+def charliteral : Int -> Char
 	| 0 = 'a'
 	| 1 = '\n'
 	| 2 = '0'

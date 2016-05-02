@@ -5,7 +5,7 @@ def generate : Int -> [Int] -> [Int]
     | 0 list = list
     | n list = generate(n - 1, n : list)
 
-# Map preforms much in parallel when we chunk up the data
+# Map preforms much better in parallel when we chunk up the data
 def map : (Int -> Int) -> [Int] -> [Int]
     | f []                                  = []
     | f (a : [])                            = f(a) : []
