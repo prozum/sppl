@@ -19,7 +19,7 @@ void LLVMCodeGen::visit(common::BoolExpr &Node) {
 void LLVMCodeGen::visit(common::StringExpr &Node) {
     auto GlobalVar = Builder.CreateGlobalString(Node.Val, CurFunc->getName() + ".str");
 
-    CurVal = CreateList(Node.RetTy, GlobalVar, Node.Val.size());
+    CurVal = CreateList(Node.RetTy, GlobalVar, ConstantInt::get(Int32, Node.Val.size()), *CurCaseBlock);
 }
 
 void LLVMCodeGen::visit(common::CharExpr &Node) {
@@ -103,7 +103,7 @@ void LLVMCodeGen::visit(common::ListExpr &Node) {
     auto DataCast = Builder.CreateBitCast(DataMalloc, PointerType::getUnqual(ArrayType::get(getType(Node.RetTy.Subtypes[0]), 0)));
     Builder.CreateStore(DataCast, CurVal);
     */
-    auto List = CreateList(Node.RetTy, DataCast, Node.Elements.size());
+    auto List = CreateList(Node.RetTy, DataCast, ConstantInt::get(Int32, Node.Elements.size()), *CurCaseBlock);
 
     // Set return value
     auto ListPtrType = getType(Node.RetTy);
@@ -112,18 +112,18 @@ void LLVMCodeGen::visit(common::ListExpr &Node) {
     CurVal = Builder.CreateLoad(ListPtrType, RetVal, "loadtmp");
 }
 
-Value *LLVMCodeGen::CreateList(common::Type Type, Value *Data, size_t Size)
+Value *LLVMCodeGen::CreateList(common::Type Type, Value *Data, Value *Size, BasicBlock *Block)
 {
     auto ListType = getListType(Type);
     auto ListPtrType = getType(Type);
 
     // Malloc list container
-    auto ListMalloc = CreateMalloc(ListType, *CurCaseBlock);
+    auto ListMalloc = CreateMalloc(ListType, Block);
     auto ListCast = Builder.CreateBitCast(ListMalloc, ListPtrType);
 
     // Set list length
     CurVal = Builder.CreateStructGEP(ListType, ListCast, 0);
-    Builder.CreateStore(ConstantInt::get(Int32, Size), CurVal);
+    Builder.CreateStore(Size, CurVal);
 
     // Set list data
     CurVal = Builder.CreateStructGEP(ListType, ListCast, 1);

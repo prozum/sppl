@@ -3,12 +3,26 @@
 using namespace std;
 using namespace llvm;
 using namespace codegen;
+using namespace common;
 
 void LLVMCodeGen::visit(common::Function &Node) {
     // Create function and entry block
-    CurFunc = llvm::Function::Create(getFuncType(Node.Signature),
-                                     llvm::Function::ExternalLinkage, Node.Id,
-                                     Module.get());
+    if (Node.Id == string("main")) {
+        CurFunc = CreateMain();
+    }
+    else {
+        CurFunc = llvm::Function::Create(getFuncType(Node.Signature),
+                                         llvm::Function::ExternalLinkage, Node.Id,
+                                         Module.get());
+        // Setup names for arguments
+        Args.clear();
+        auto ArgId = 0;
+        for (auto &Arg : CurFunc->args()) {
+            Arg.setName("_arg" + to_string(ArgId++));
+            Args.push_back(&Arg);
+        }
+    }
+
     CurEntry = BasicBlock::Create(Ctx, "entry", CurFunc);
 
     // Create error block
@@ -29,11 +43,7 @@ void LLVMCodeGen::visit(common::Function &Node) {
         Builder.CreateRetVoid();
     }
 
-    // Setup names for arguments
-    auto ArgId = 0;
-    for (auto &Arg : CurFunc->args()) {
-        Arg.setName("_arg" + to_string(ArgId++));
-    }
+
 
     // Setup case and pattern blocks
     CaseBlocks.clear();
@@ -79,7 +89,7 @@ void LLVMCodeGen::visit(common::Case &Node) {
     BasicBlock *FalseBlock;
 
     CtxVals.clear();
-    for (CurPat = Node.Patterns.cbegin(), CurArg = CurFunc->arg_begin(),
+    for (CurPat = Node.Patterns.cbegin(), CurArg = Args.begin(),
         CurPatBlock = CurPatVecBlock->cbegin(),
         LastPatBlock = CurPatVecBlock->cend();
          CurPat != Node.Patterns.cend(); ++CurPat, ++CurArg, ++CurPatBlock) {
@@ -112,4 +122,26 @@ void LLVMCodeGen::visit(common::Case &Node) {
 
     // Add return value to phi node
     Builder.CreateBr(CurRetBlock);
+}
+
+llvm::Function *LLVMCodeGen::CreateMain()
+{
+    auto Func = llvm::Function::Create(MainType,
+                                       llvm::Function::ExternalLinkage, "main",
+                                       Module.get());
+    CurEntry = BasicBlock::Create(Ctx, "entry", Func);
+
+    auto Iter = Func->args().begin();
+    Argument *Argc = &*(Iter++);
+    Argument *Argv = &*Iter;
+
+    auto Data = Argv;
+
+    auto MainArgs = CreateList(common::Type(TypeId::STRING, vector<common::Type> { common::Type(TypeId::CHAR)}),
+                               Data,
+                               Argc,
+                               CurEntry);
+
+
+    return Func;
 }

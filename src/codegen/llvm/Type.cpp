@@ -21,7 +21,6 @@ llvm::Type *LLVMCodeGen::getType(common::Type Ty) {
         return PointerType::getUnqual(getListType(Ty));
     case common::TypeId::SIGNATURE:
         return PointerType::getUnqual(getFuncType(Ty));
-        //return getListType(common::Type(common::TypeId::LIST, vector<common::Type> {common::Type(common::TypeId::CHAR)}));
     case common::TypeId::VOID:
         return llvm::Type::getVoidTy(Ctx);
     default:
@@ -49,7 +48,7 @@ llvm::StructType *LLVMCodeGen::getListType(common::Type Ty) {
         return CacheTy->second;
 
     std::vector<llvm::Type *> Subtypes;
-    Subtypes.push_back(IntegerType::get(Ctx, 32));
+    Subtypes.push_back(Int32);
     Subtypes.push_back(PointerType::getUnqual(ArrayType::get(getType(Ty.Subtypes.front()), 0)));
 
     return ListTypes[Ty] = StructType::create(Ctx, Subtypes, "list");
