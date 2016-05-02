@@ -112,26 +112,7 @@ void LLVMCodeGen::visit(common::ListExpr &Node) {
     CurVal = Builder.CreateLoad(ListPtrType, RetVal, "loadtmp");
 }
 
-Value *LLVMCodeGen::CreateList(common::Type Type, Value *Data, Value *Size, BasicBlock *Block)
-{
-    auto ListType = getListType(Type);
-    auto ListPtrType = getType(Type);
 
-    // Malloc list container
-    auto ListMalloc = CreateMalloc(ListType, Block);
-    auto ListCast = Builder.CreateBitCast(ListMalloc, ListPtrType);
-
-    // Set list length
-    CurVal = Builder.CreateStructGEP(ListType, ListCast, 0);
-    Builder.CreateStore(Size, CurVal);
-
-    // Set list data
-    CurVal = Builder.CreateStructGEP(ListType, ListCast, 1);
-    auto DataCast = Builder.CreateBitCast(Data, PointerType::getUnqual(ArrayType::get(getType(Type.Subtypes.front()), 0)));
-    Builder.CreateStore(DataCast, CurVal);
-
-    return ListMalloc;
-}
 
 void LLVMCodeGen::visit(common::CallExpr &Node) {
     Node.Callee->accept(*this);
@@ -146,14 +127,4 @@ void LLVMCodeGen::visit(common::CallExpr &Node) {
     CurVal = Builder.CreateCall(Callee, Args, "calltmp");
 }
 
-Instruction *LLVMCodeGen::CreateMalloc(llvm::Type *Type, BasicBlock *Block)
-{
-    auto Size = DataLayout.getPointerTypeSize(Type);
-    auto AllocSize = ConstantInt::get(Int32, APInt(32, Size));
-    auto Malloc = CallInst::CreateMalloc(Block,
-                                         Int32, Type, AllocSize,
-                                         nullptr, nullptr, "malloccall");
-    Block->getInstList().push_back(Malloc);
 
-    return Malloc;
-}

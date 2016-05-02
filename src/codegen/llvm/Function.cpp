@@ -7,6 +7,7 @@ using namespace common;
 
 void LLVMCodeGen::visit(common::Function &Node) {
     // Create function and entry block
+    Args.clear();
     if (Node.Id == string("main")) {
         CurFunc = CreateMain();
     }
@@ -15,15 +16,14 @@ void LLVMCodeGen::visit(common::Function &Node) {
                                          llvm::Function::ExternalLinkage, Node.Id,
                                          Module.get());
         // Setup names for arguments
-        Args.clear();
         auto ArgId = 0;
         for (auto &Arg : CurFunc->args()) {
             Arg.setName("_arg" + to_string(ArgId++));
             Args.push_back(&Arg);
         }
-    }
 
-    CurEntry = BasicBlock::Create(Ctx, "entry", CurFunc);
+        CurEntry = BasicBlock::Create(Ctx, "entry", CurFunc);
+    }
 
     // Create error block
     CurErrBlock = BasicBlock::Create(Ctx, "error", CurFunc);
@@ -42,8 +42,6 @@ void LLVMCodeGen::visit(common::Function &Node) {
     } else {
         Builder.CreateRetVoid();
     }
-
-
 
     // Setup case and pattern blocks
     CaseBlocks.clear();
@@ -126,22 +124,61 @@ void LLVMCodeGen::visit(common::Case &Node) {
 
 llvm::Function *LLVMCodeGen::CreateMain()
 {
+    // Input Type
+    auto Type = common::Type(TypeId::STRING, vector<common::Type> { common::Type(TypeId::CHAR)});
+
+    // Create Function
     auto Func = llvm::Function::Create(MainType,
                                        llvm::Function::ExternalLinkage, "main",
                                        Module.get());
+
+    // System arguments
+    auto ArgIter = Func->args().begin();
+    Argument *Argc = &*(ArgIter++);
+    Argument *Argv = &*(ArgIter);
+
+    // Create blocks
     CurEntry = BasicBlock::Create(Ctx, "entry", Func);
+    auto CheckBlock = BasicBlock::Create(Ctx, "check", Func);
+    auto UpdateBlock = BasicBlock::Create(Ctx, "update", Func);
+    auto LoopBlock = BasicBlock::Create(Ctx, "loop", Func);
+    auto EndBlock = BasicBlock::Create(Ctx, "end", Func);
 
-    auto Iter = Func->args().begin();
-    Argument *Argc = &*(Iter++);
-    Argument *Argv = &*Iter;
+    // Init in entry block
+    Builder.SetInsertPoint(CurEntry);
+    auto Iter = Builder.CreateAlloca(Int32);
+    Builder.CreateStore(ConstantInt::get(Int32, APInt(32, 0)), Iter);
 
-    auto Data = Argv;
+    // Data
+    CurVal = ConstantInt::get(Int32, APInt(32, DataLayout.getPointerSize()));
+    CurVal = Builder.CreateMul(Argc, CurVal);
+    auto Data = CreateMalloc(CurVal, CurEntry);
 
-    auto MainArgs = CreateList(common::Type(TypeId::STRING, vector<common::Type> { common::Type(TypeId::CHAR)}),
-                               Data,
-                               Argc,
-                               CurEntry);
+    // List
+    auto List = CreateList(Type, Data, Argc, CurEntry);
+    Builder.CreateBr(CheckBlock);
 
+    // Check block
+    Builder.SetInsertPoint(CheckBlock);
+    CurVal = Builder.CreateLoad(Int32, Iter, "loadtmp");
+    CurVal = Builder.CreateICmpULT(CurVal, Argc, "cmptmp");
+    Builder.CreateCondBr(CurVal, LoopBlock, EndBlock);
+
+    // Update block
+    Builder.SetInsertPoint(UpdateBlock);
+    CurVal = Builder.CreateLoad(Int32, Iter, "loadtmp");
+    CurVal = Builder.CreateAdd(CurVal, ConstantInt::get(Int32, APInt(32, 1)), "addtmp");
+    Builder.CreateStore(CurVal, Iter);
+    Builder.CreateBr(CheckBlock);
+
+    // Loop block
+    //CreateMalloc()
+
+
+    // End block
+    // TODO
+
+    Args.push_back(List);
 
     return Func;
 }

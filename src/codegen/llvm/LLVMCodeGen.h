@@ -49,9 +49,8 @@ class LLVMCodeGen : public parser::CodeGenerator {
     llvm::BasicBlock *CurRetBlock = nullptr;
     llvm::PHINode *CurPhiNode = nullptr;
 
-    std::vector<llvm::Argument *> Args;
-    //std::vector<llvm::Argument *>::const_iterator CurArg;
-    std::vector<llvm::Argument *>::iterator CurArg;
+    std::vector<llvm::Value *> Args;
+    std::vector<llvm::Value *>::iterator CurArg;
 
     std::vector<std::unique_ptr<common::Case>>::const_iterator CurCase;
     std::vector<llvm::BasicBlock *> CaseBlocks;
@@ -111,6 +110,7 @@ class LLVMCodeGen : public parser::CodeGenerator {
 
     llvm::Value *CreateList(common::Type Type, llvm::Value *Data, llvm::Value *Size, llvm::BasicBlock *Block);
     llvm::Instruction *CreateMalloc(llvm::Type *Type, llvm::BasicBlock *Block);
+    llvm::Instruction *CreateMalloc(llvm::Value *Size, llvm::BasicBlock *Block);
     llvm::Function *CreateMain();
 
     llvm::Type *getType(common::Type Ty);
