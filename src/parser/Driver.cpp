@@ -8,7 +8,7 @@ using namespace parser;
 
 Driver::Driver(ostream *out, ostream *hout, ostream *mout)
     : Out(out), HOut(hout), MOut(mout), Scr(*this), Psr(*this),
-      Global(new common::Scope()) {}
+      Global(new Scope()) {}
 
 bool Driver::nextInput() {
     if (SrcType != SourceType::FILES)

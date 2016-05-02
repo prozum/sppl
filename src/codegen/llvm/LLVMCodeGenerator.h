@@ -41,12 +41,12 @@ class LLVMCodeGenerator : public parser::CodeGenerator {
     llvm::Type *Int64;
     llvm::Type *Double;
 
-    llvm::Value *CurVal;
-    llvm::Function *CurFunc;
-    llvm::BasicBlock *CurEntry;
-    llvm::BasicBlock *CurErrBlock;
-    llvm::BasicBlock *CurRetBlock;
-    llvm::PHINode *CurPhiNode;
+    llvm::Value *CurVal = nullptr;
+    llvm::Function *CurFunc = nullptr;
+    llvm::BasicBlock *CurEntry = nullptr;
+    llvm::BasicBlock *CurErrBlock = nullptr;
+    llvm::BasicBlock *CurRetBlock = nullptr;
+    llvm::PHINode *CurPhiNode = nullptr;
 
     //std::vector<llvm::Argument *> Args;
     //std::vector<llvm::Argument *>::const_iterator CurArg;

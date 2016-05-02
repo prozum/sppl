@@ -100,8 +100,6 @@ bool ScopeGenerator::isGeneric(Type &Ty) {
 void ScopeGenerator::visit(Function &Node) {
     Type Out;
 
-    Node.Scp = CurScope;
-
     if (!CurScope->tryGetDecl(Node.Id, Out) || Node.Anon) {
         CurScope->Decls.insert({Node.Id, Node.Signature});
     } else {

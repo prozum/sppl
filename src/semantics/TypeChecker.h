@@ -68,6 +68,6 @@ class TypeChecker : public common::Visitor {
 
     common::Scope *CurScope;
     common::Scope *GlobalScope;
-    common::Function *CurFunc;
+    common::Function *CurFunc = nullptr;
 };
 }

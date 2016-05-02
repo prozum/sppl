@@ -5,7 +5,9 @@ using namespace std;
 using namespace common;
 
 
-Type::Type() {}
+Type::Type() {
+    Id = TypeId::UNKNOWN;
+}
 
 Type::~Type() {}
 

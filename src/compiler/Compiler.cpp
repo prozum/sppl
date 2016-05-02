@@ -36,7 +36,7 @@ void Compiler::setBackend(Backend B) {
         CodeGen = std::make_unique<codegen::Printer>(*this);
         break;
     default:
-        throw runtime_error("Not a valid backend!");
+        cerr << "Not a valid backend!" << endl;
     }
 }
 
