@@ -177,8 +177,8 @@ string SpplJit::getOutputList(intptr_t Addr, common::Type Type)
     string Out("[");
     auto Subtype = Type.Subtypes[0];
 
-    auto Count = *(int64_t *)Addr;
-    Addr += sizeof(intptr_t);
+    auto Count = *(int32_t *)Addr;
+    Addr += sizeof(intptr_t *);
     Addr = *(intptr_t *)Addr;
 
     for (int32_t i = 0; i < Count; ++i) {
@@ -205,6 +205,10 @@ string SpplJit::getOutputList(intptr_t Addr, common::Type Type)
             break;
         case TypeId::TUPLE:
             Out += getOutputTuple(*(intptr_t *)Addr, Subtype);
+            Addr += sizeof(intptr_t *);
+            break;
+        case TypeId::LIST:
+            Out += getOutputList(*(intptr_t *)Addr, Subtype);
             Addr += sizeof(intptr_t *);
             break;
         default:

@@ -69,18 +69,18 @@ void LLVMCodeGenerator::visit(common::TupleExpr &Node) {
 
 void LLVMCodeGenerator::visit(common::ListExpr &Node) {
     // Create types
-    //auto ListType = getListType(Node.RetTy);
     auto ArrayType = ArrayType::get(getType(Node.RetTy.Subtypes.front()), Node.Elements.size());
 
+    // Malloc list data
+    auto DataMalloc = CreateMalloc(ArrayType, *CurCaseBlock);
+    auto DataCast = Builder.CreateBitCast(DataMalloc, PointerType::getUnqual(ArrayType));
+
     // Create global list constant
-    std::vector<llvm::Constant *> ListData;
-    for (auto &Element : Node.Elements) {
-        Element->accept(*this);
-        ListData.push_back(static_cast<Constant *>(CurVal));
+    for (size_t i = 0; i < Node.Elements.size(); ++i) {
+        Node.Elements[i]->accept(*this);
+        auto GEP = Builder.CreateStructGEP(ArrayType, DataCast, i);
+        Builder.CreateStore(CurVal, GEP);
     }
-    auto ConstVal = ConstantArray::get(ArrayType, ListData);
-    auto GlobalVal = new GlobalVariable(*Module, ArrayType, true,
-                                GlobalVariable::ExternalLinkage, ConstVal);
 
     /*
     // Malloc list data
@@ -103,7 +103,7 @@ void LLVMCodeGenerator::visit(common::ListExpr &Node) {
     auto DataCast = Builder.CreateBitCast(DataMalloc, PointerType::getUnqual(ArrayType::get(getType(Node.RetTy.Subtypes[0]), 0)));
     Builder.CreateStore(DataCast, CurVal);
     */
-    auto List = CreateList(Node.RetTy, GlobalVal, Node.Elements.size());
+    auto List = CreateList(Node.RetTy, DataCast, Node.Elements.size());
 
     // Set return value
     auto ListPtrType = getType(Node.RetTy);
