@@ -119,7 +119,7 @@ using namespace common;
 %precedence EXMARK NEGATIVE
 
 %type <DeclVec> decls
-%type <Decl> decl
+%type <Decl> decl include
 %type <Func> func
 %type <ADT> adt
 %type <Prod> product
@@ -139,15 +139,14 @@ using namespace common;
 
 %%
 
-program:	includes decls                                  { Drv.Prog = make_unique<Program>(move(* $2), @1); delete $2; }
+program:	decls                                           { Drv.Prog = make_unique<Program>(move(* $1), @1); delete $1; }
     |       expr                                            { Drv.Prog = make_unique<Program>(unique_ptr<Expression>($1), @1); }
-includes: includes include                                  { /* Do nothing here :) */ }
-    |                                                       { /* Do nothing here :) */ }
-include:    INCLUDE STRINGLITERAL                           { Drv.Files.push_back(* $2); }
-decls:      decls decl                                      { $$ = $1; $$->push_back(unique_ptr<Declaration>($2)); }
+decls:      decls decl                                      { $$ = $1; if ($2) $$->push_back(unique_ptr<Declaration>($2)); }
     |                                                       { $$ = new vector<unique_ptr<Declaration>>(); }
 decl:       func                                            { $$ = $1; }
     |       adt                                             { $$ = $1; }
+    |       include                                         { $$ = $1; }
+include:    INCLUDE STRINGLITERAL                           { $$ = nullptr; Drv.Files.push_back(* $2); }
 func:		DEF IDSMALL COLON signature cases_ne            { $$ = new Function(* $2, * $4, @1); $$->Cases = move(* $5); delete $2; }
 adt:        TYPE IDBIG generics ASSIGN sum                  { $$ = new AlgebraicDT(* $2, move(* $3), move(* $5), @1); delete $2; }
 sum:        sum PIPE product                                { $$ = $1; $$->push_back(unique_ptr<Product>($3)); }

@@ -565,7 +565,7 @@ void TypeChecker::visit(Concat &Node) {
         return;
     }
 
-    if (Node.Right->RetTy.Id != TypeId::LIST) {
+    if (Node.Right->RetTy.Id != TypeId::LIST && Node.Right->RetTy.Id != TypeId::STRING) {
         addError(Error::Binary("Concat can only operate on lists", Node));
         return;
     }
@@ -723,7 +723,7 @@ bool TypeChecker::containsEmptyList(Type &Ty) {
 void TypeChecker::resolveEmptyList(Type &Ty, Type &Resolver) {
     switch (Ty.Id) {
         case TypeId::EMPTYLIST:
-            if (Resolver.Id == TypeId::LIST) {
+            if (Resolver.Id == TypeId::LIST || Resolver.Id == TypeId::STRING) {
                 Ty = Resolver;
             }
             break;
