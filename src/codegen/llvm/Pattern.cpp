@@ -36,7 +36,7 @@ void LLVMCodeGen::visit(common::TuplePattern &Node) {
     std::vector<llvm::Constant *> TupleVal;
     for (auto &Element : Node.Patterns) {
         Element->accept(*this);
-        TupleVal.push_back((Constant *)CurVal);
+        TupleVal.push_back(static_cast<Constant *>(CurVal));
     }
 
     auto ConstVal = ConstantStruct::get(getTupleType(Node.RetTy), TupleVal);
