@@ -1,2 +1,2 @@
-def mai: Int -> Int
+def main: Int -> Int
 	| n = 100

@@ -1,26 +1,15 @@
-def main : [String] -> String
-| (path : [])                                             = "Invalid"
-| (path : ( option : []))                                 = "Invalid"
-| (path : ( "--parse" : (in1 : xs)))                      = IntToString(ParseString(in1))
-| (path : ( "--length" : (in1 : xs)))                     = IntToString(StringLength(in1))
-| (path : ( "--toupper" : (in1 : xs)))                    = StrMap(ToUpper, in1)
-| (path : ( option : ( in1 : [] )))                       = "Invalid"
-| (path : ( "--contains" : ( in1 : ( in2 : xs ))))        = BoolToString(StringContains(in1, in2))
-| (path : ( "--concat" : ( in1 : ( in2 : xs ))))          = StringConcat(in1, in2)
-| args                                                    = "Invalid"
-
-def BoolToInt : Bool -> Int
+def booltoint : Bool -> Int
 | True  = 1
 | False = 0
 
-def ParseString : String -> Int
-| x = ParseStringAcc(x, 0)
+def parsestring : String -> Int
+| x = parsestringacc(x, 0)
 
-def ParseStringAcc : String -> Int -> Int
+def parsestringacc : String -> Int -> Int
 | "" acc       = acc
-| (x : xs) acc = ParseStringAcc(xs, (acc * 10) + ParseChar(x))
+| (x : xs) acc = parsestringacc(xs, (acc * 10) + parsechar(x))
 
-def ParseChar : CharPattern -> Int
+def parsechar : Char -> Int
 | '0' = 0
 | '1' = 1
 | '2' = 2
@@ -32,53 +21,39 @@ def ParseChar : CharPattern -> Int
 | '8' = 8
 | '9' = 9
 
-def StringLength : String -> Int
-| input = StringLengthAcc(input, 0)
+def stringlength : String -> Int
+| input = stringlengthacc(input, 0)
 
-def StringLengthAcc : String -> Int -> Int
+def stringlengthacc : String -> Int -> Int
 | "" acc       = acc
-| (x : xs) acc = StringLengthAcc(xs, acc + 1)
+| (x : xs) acc = stringlengthacc(xs, acc + 1)
 
-def StringConcat : String -> String -> String
-| "" ""            = ""
-| "" (x : back)    = x : StringConcat("", back)
-| (x : front) back = x : StringConcat(front, back)
+def stringcontains : String -> String -> Bool
+    | "" "" = True
+    | "" find = False
+    | input find when stringstartswith(input, find) = True
+    | x : xs find = stringcontains(xs, find)
 
-def StringContains : String -> String -> Bool
-| input find = StringContainsHelper(input, find, False)
+def stringstartswith : String -> String -> Bool
+| input ""                          = True
+| "" find                           = False
+| (x : in) (y : find) when x == y   = stringstartswith(in, find)
+| _ _                               = False
 
-def StringContainsHelper : String -> String -> Bool -> Bool
-| "" "" bool         = bool
-| "" find bool       = False
-| input find True    = True
-| (x : xs) find bool = StringContainsHelper(xs, find, StringStartsWith(xs, find))
-
-def StringStartsWith : String -> String -> Bool
-| input find = StringStartsWithHelper(input, find, True)
-
-def StringStartsWithHelper : String -> String -> Bool -> Bool
-| input "" bool            = bool
-| "" find bool             = False
-| input find False         = False
-| (x : in) (y : find) bool = StringStartsWithHelper(in, find, x == y)
-
-def IntToString : Int -> String
+def inttostring : Int -> String
 | 0 = "0"
-| n = IfElse(n < 0, '-' : IntToStringAcc(n, ""), IntToStringAcc(n, ""))
+| n when n < 0 = '-' : inttostringacc(n, "")
+| n = inttostringacc(n, "")
 
-def IntToStringAcc : Int -> String -> String
+def inttostringacc : Int -> String -> String
 | 0 res = res
-| n res = IntToStringAcc((n - (n % 10)) / 10, IntToChar(n % 10) : res)
+| n res = inttostringacc((n - (n % 10)) / 10, inttochar(n % 10) : res)
 
-def BoolToString : Bool -> String
+def booltostring : Bool -> String
 | True = "True"
 | False = "False"
 
-def IfElse : Bool -> String -> String -> String
-| True a b = a
-| False a b = b
-
-def IntToChar : Int -> CharPattern
+def inttochar : Int -> Char
 | 0 = '0'
 | 1 = '1'
 | 2 = '2'
@@ -90,11 +65,11 @@ def IntToChar : Int -> CharPattern
 | 8 = '8'
 | 9 = '9'
 
-def StrMap : (CharPattern -> CharPattern) -> String -> String
+def strmap : (Char -> Char) -> String -> String
 | f "" = ""
-| f (x : xs) = f(x) : StrMap(f, xs)
+| f (x : xs) = f(x) : strmap(f, xs)
 
-def ToUpper : CharPattern -> CharPattern
+def toupper : Char -> Char
 | 'q' = 'Q'
 | 'w' = 'W'
 | 'e' = 'E'

@@ -491,16 +491,23 @@ void TypeChecker::visit(ListAdd &Node) {
         resolveEmptyList(Node.Right->RetTy, CurFunc->Signature.Subtypes.back());
     }
 
-    if (Node.Right->RetTy.Id != TypeId::LIST) {
+    if (Node.Right->RetTy.Id == TypeId::LIST) {
+        if (Node.Left->RetTy != Node.Right->RetTy.Subtypes.front()) {
+            addError(Error::Binary(
+                    "Left type must be same type of right List", Node));
+            return;
+        }
+    } else if (Node.Right->RetTy.Id == TypeId::STRING) {
+        if (Node.Left->RetTy.Id != TypeId::CHAR) {
+            addError(Error::Binary(
+                    "Left type must be a Char, when adding to a String", Node));
+            return;
+        }
+    } else {
         addError(Error::Binary("Right must be a List", Node));
         return;
     }
 
-    if (Node.Left->RetTy != Node.Right->RetTy.Subtypes.front()) {
-        addError(Error::Binary(
-            "Left type must be same type of right List", Node));
-        return;
-    }
 
     Node.RetTy = Node.Right->RetTy;
 }

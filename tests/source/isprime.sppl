@@ -1,6 +1,11 @@
-def isPrime : Int -> Bool
-| n = isprimehelper(n, n - 1)
+include "stringlib.sppl"
 
-def isPrimeHelper : Int -> Int -> Bool
-	| n 1 = True
-	| n d =  n % d > 0 && isPrimeHelper(n, d - 1)
+def main : [String] -> Bool
+    | path : input : _ = isprime(parsestring(input))
+
+def isprime : Int -> Bool
+    | n = isprimehelper(n, n - 1)
+
+def isprimehelper : Int -> Int -> Bool
+	| n 0 = True
+	| n d = n % d > 0 && isprimehelper(n, d - 1)
