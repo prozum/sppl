@@ -3,21 +3,25 @@
 using namespace std;
 using namespace common;
 
-void Visitor::addError(Error Err) { Errors.push_back(Err); }
-void Visitor::clearErrors() {
-    ExpectedErrors = 0;
-    Errors.clear();
+void Visitor::addError(Error Err) {
+    Safe = false;
+    Errors.push_back(Err);
 }
-bool Visitor::checkErrors() {
-    if (Errors.size() > ExpectedErrors) {
-        ExpectedErrors = Errors.size();
-        return true;
-    }
-    return false;
+void Visitor::clearErrors() {
+    Safe = true;
+    Errors.clear();
 }
 
 size_t Visitor::countErrors() {
     return Errors.size();
+}
+
+bool Visitor::checkNotSafe() {
+    return !Safe;
+}
+
+void Visitor::setSafe() {
+    Safe = true;
 }
 
 std::vector<Error> Visitor::getErrors() {

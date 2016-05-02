@@ -12,6 +12,7 @@ void TypeChecker::visit(Program &Node) {
     // Visit children
     for (auto &Decl : Node.Decls) {
         Decl->accept(*this);
+        setSafe();
     }
 }
 
@@ -42,6 +43,7 @@ void TypeChecker::visit(Function &Node) {
         CurScope = CaseScope;
 
         Case->accept(*this);
+        setSafe();
 
         CurScope = CurScope->Parent;
     }
@@ -57,10 +59,13 @@ void TypeChecker::visit(Case &Node) {
         Node.Patterns[i]->RetTy = CurFunc->Signature.Subtypes[i];
         Node.Patterns[i]->accept(*this);
     }
+
     if (Node.When) {
         Node.When->accept(*this);
     }
     Node.Expr->accept(*this);
+    if (checkNotSafe())
+        return;
 
     // Set signature for anonymous function
     if (CurFunc->Anon) {
@@ -251,6 +256,8 @@ void TypeChecker::visit(Or &Node) {
     // Visit children
     Node.Left->accept(*this);
     Node.Right->accept(*this);
+    if (checkNotSafe())
+        return;
 
     if (Node.Left->RetTy.Id != TypeId::BOOL ||
         Node.Left->RetTy.Id != Node.Right->RetTy.Id) {
@@ -266,6 +273,8 @@ void TypeChecker::visit(And &Node) {
     // Visit children
     Node.Left->accept(*this);
     Node.Right->accept(*this);
+    if (checkNotSafe())
+        return;
 
     if (Node.Left->RetTy.Id != TypeId::BOOL ||
         Node.Left->RetTy.Id != Node.Right->RetTy.Id) {
@@ -281,6 +290,8 @@ void TypeChecker::visit(Equal &Node) {
     // Visit children
     Node.Left->accept(*this);
     Node.Right->accept(*this);
+    if (checkNotSafe())
+        return;
 
     if (Node.Left->RetTy != Node.Right->RetTy) {
         addError(Error::Binary(
@@ -295,6 +306,8 @@ void TypeChecker::visit(NotEqual &Node) {
     // Visit children
     Node.Left->accept(*this);
     Node.Right->accept(*this);
+    if (checkNotSafe())
+        return;
 
     if (Node.Left->RetTy != Node.Right->RetTy) {
         addError(Error::Binary(
@@ -309,6 +322,8 @@ void TypeChecker::visit(Lesser &Node) {
     // Visit children
     Node.Left->accept(*this);
     Node.Right->accept(*this);
+    if (checkNotSafe())
+        return;
 
     if ((Node.Left->RetTy.Id != TypeId::INT &&
          Node.Left->RetTy.Id != TypeId::FLOAT) ||
@@ -325,6 +340,8 @@ void TypeChecker::visit(Greater &Node) {
     // Visit children
     Node.Left->accept(*this);
     Node.Right->accept(*this);
+    if (checkNotSafe())
+        return;
 
     if ((Node.Left->RetTy.Id != TypeId::INT &&
          Node.Left->RetTy.Id != TypeId::FLOAT) ||
@@ -341,6 +358,8 @@ void TypeChecker::visit(LesserEq &Node) {
     // Visit children
     Node.Left->accept(*this);
     Node.Right->accept(*this);
+    if (checkNotSafe())
+        return;
 
     if ((Node.Left->RetTy.Id != TypeId::INT &&
          Node.Left->RetTy.Id != TypeId::FLOAT) ||
@@ -357,6 +376,8 @@ void TypeChecker::visit(GreaterEq &Node) {
     // Visit children
     Node.Left->accept(*this);
     Node.Right->accept(*this);
+    if (checkNotSafe())
+        return;
 
     if ((Node.Left->RetTy.Id != TypeId::INT &&
          Node.Left->RetTy.Id != TypeId::FLOAT) ||
@@ -373,6 +394,8 @@ void TypeChecker::visit(Add &Node) {
     // Visit children
     Node.Left->accept(*this);
     Node.Right->accept(*this);
+    if (checkNotSafe())
+        return;
 
     if ((Node.Left->RetTy.Id != TypeId::INT &&
          Node.Left->RetTy.Id != TypeId::FLOAT) ||
@@ -389,6 +412,8 @@ void TypeChecker::visit(Sub &Node) {
     // Visit children
     Node.Left->accept(*this);
     Node.Right->accept(*this);
+    if (checkNotSafe())
+        return;
 
     if ((Node.Left->RetTy.Id != TypeId::INT &&
          Node.Left->RetTy.Id != TypeId::FLOAT) ||
@@ -405,6 +430,8 @@ void TypeChecker::visit(Mul &Node) {
     // Visit children
     Node.Left->accept(*this);
     Node.Right->accept(*this);
+    if (checkNotSafe())
+        return;
 
     if ((Node.Left->RetTy.Id != TypeId::INT &&
          Node.Left->RetTy.Id != TypeId::FLOAT) ||
@@ -421,6 +448,8 @@ void TypeChecker::visit(Div &Node) {
     // Visit children
     Node.Left->accept(*this);
     Node.Right->accept(*this);
+    if (checkNotSafe())
+        return;
 
     if ((Node.Left->RetTy.Id != TypeId::INT &&
          Node.Left->RetTy.Id != TypeId::FLOAT) ||
@@ -437,6 +466,8 @@ void TypeChecker::visit(Mod &Node) {
     // Visit children
     Node.Left->accept(*this);
     Node.Right->accept(*this);
+    if (checkNotSafe())
+        return;
 
     if ((Node.Left->RetTy.Id != TypeId::INT &&
          Node.Left->RetTy.Id != TypeId::FLOAT) ||
@@ -453,6 +484,8 @@ void TypeChecker::visit(ListAdd &Node) {
     // Visit children
     Node.Left->accept(*this);
     Node.Right->accept(*this);
+    if (checkNotSafe())
+        return;
 
     if (containsEmptyList(Node.Right->RetTy)) {
         resolveEmptyList(Node.Right->RetTy, CurFunc->Signature.Subtypes.back());
@@ -511,6 +544,8 @@ void TypeChecker::visit(ProducerConsumer &Node) {
 void TypeChecker::visit(Concat &Node) {
     Node.Left->accept(*this);
     Node.Right->accept(*this);
+    if (checkNotSafe())
+        return;
 
     if (containsEmptyList(Node.Left->RetTy)) {
         resolveEmptyList(Node.Left->RetTy, Node.Right->RetTy);
@@ -547,6 +582,8 @@ void TypeChecker::visit(ParExpr &Node) {
 void TypeChecker::visit(Negative &Node) {
     // visit children
     Node.Child->accept(*this);
+    if (checkNotSafe())
+        return;
 
     if (Node.Child->RetTy.Id != TypeId::INT &&
         Node.Child->RetTy.Id != TypeId::FLOAT) {
@@ -561,6 +598,8 @@ void TypeChecker::visit(Negative &Node) {
 void TypeChecker::visit(Not &Node) {
     // Visit children
     Node.Child->accept(*this);
+    if (checkNotSafe())
+        return;
 
     if (Node.Child->RetTy.Id != TypeId::BOOL) {
         addError(Error::Unary("Operator only operates on Bool typed children",
@@ -578,11 +617,12 @@ void TypeChecker::visit(ListExpr &Node) {
     }
 
     if (Node.Elements.size() != 0) {
+        auto ListType = Node.Elements.front()->RetTy;
         for (size_t i = 0; i < Node.Elements.size() - 1; ++i) {
-            if (Node.Elements[i]->RetTy != Node.Elements[i + 1]->RetTy) {
+            if (ListType != Node.Elements[i + 1]->RetTy) {
                 addError(Error::Expected(
                     "All items in a List must be same type",
-                    Node.Elements[i]->str(), Node.Elements[i + 1]->str(),
+                    ListType.str(), Node.Elements[i + 1]->RetTy.str(),
                     Node.Elements[i + 1]->Loc));
                 return;
             }

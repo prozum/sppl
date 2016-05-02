@@ -13,7 +13,8 @@ class Visitor {
   public:
     void addError(Error Err);
     void clearErrors();
-    bool checkErrors();
+    bool checkNotSafe();
+    void setSafe();
     size_t countErrors();
     std::vector<Error> getErrors();
 
@@ -170,6 +171,6 @@ class Visitor {
 
 private:
     std::vector<Error> Errors;
-    size_t ExpectedErrors = 0;
+    bool Safe = true;
 };
 }
