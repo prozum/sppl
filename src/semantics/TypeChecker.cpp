@@ -129,7 +129,7 @@ void TypeChecker::visit(BoolPattern &Node) {
     if (Node.RetTy.Id != TypeId::BOOL) {
         addError(Error::Expected("Type mismatch", Node.RetTy.str(),
                               Type(TypeId::BOOL).str(), Node.Loc));
-        re    void clearErrors();turn;
+        return;
     }
 }
 

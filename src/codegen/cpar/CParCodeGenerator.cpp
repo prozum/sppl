@@ -1,3 +1,4 @@
+#include <assert.h>
 #include "CParCodeGenerator.h"
 
 using namespace common;
@@ -274,6 +275,7 @@ void CParCodeGenerator::visit(common::CallExpr &Node) {
         CurrentTasks.push_back(Name);
 
         if (CallStack.size() == CallDepth) {
+            SequentialCall.push_back(string());
             CallStack.push_back(string());
             CallStackCount.push_back(0);
         }
@@ -308,6 +310,7 @@ void CParCodeGenerator::visit(common::CallExpr &Node) {
             CallStack[CallDepth] += GeneratedCall.str();
             CallStackCount[CallDepth]++;
         } else {
+
             ExprStack.push(stringstream());
             Node.Callee->accept(*this);
 
@@ -330,8 +333,8 @@ void CParCodeGenerator::visit(common::CallExpr &Node) {
             GeneratedCall << ");" << endl;
 
             ExprStack.top() << Name << GRes;
-            SequentialCall = GeneratedCall.str();
-            SequentialLevel = --CallDepth;
+            assert(SequentialCall[--CallDepth].empty());
+            SequentialCall[CallDepth] = GeneratedCall.str();
         }
     } else {
         Node.Callee->accept(*this);
@@ -387,16 +390,13 @@ void CParCodeGenerator::outputParallelCode() {
     for (size_t i = CallStack.size(); i > 0; i--) {
         *Output << CallStack.back();
 
-        if (i - 1 == SequentialLevel) {
-            if (CallStackCount.back() == 0 && SequentialLevel > 0)
-                SequentialLevel--;
-            else
-                *Output << SequentialCall;
-        }
+        if (!SequentialCall.back().empty())
+            *Output << SequentialCall.back();
 
         if (CallStackCount.back() != 0)
             *Output << "        taskyield(t);" << endl;
 
+        SequentialCall.pop_back();
         CallStack.pop_back();
         CallStackCount.pop_back();
     }

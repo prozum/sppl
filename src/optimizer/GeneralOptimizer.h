@@ -5,6 +5,7 @@
 
 #include <ostream>
 #include <string>
+#include <stack>
 
 namespace optimizer {
 
@@ -47,12 +48,11 @@ class GeneralOptimizer : public common::Visitor {
     void visit(common::Negative &Node);
     void visit(common::LambdaFunction &Node);
 
-    common::CallExpr* LastRecCall = nullptr;
-    common::CallExpr* LastOtherCall = nullptr;
+    std::stack<common::CallExpr*> LastRecCall;
+    std::stack<common::CallExpr*> LastOtherCall;
     common::Function* CurrFunc = nullptr;
 
-    int RecCalls = 0;
-    int Calls = 0;
+    std::stack<int> Calls;
 
     void determingParallelism();
 };

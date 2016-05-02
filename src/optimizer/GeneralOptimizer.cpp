@@ -33,11 +33,22 @@ void GeneralOptimizer::visit(Function &Node) {
 
 void GeneralOptimizer::visit(common::Case &Node) {
     if (Node.When) {
+        Calls.push(0);
+        LastRecCall.push(nullptr);
+        LastOtherCall.push(nullptr);
+
         Node.When->accept(*this);
+
         determingParallelism();
     }
 
+
+    Calls.push(0);
+    LastRecCall.push(nullptr);
+    LastOtherCall.push(nullptr);
+
     Node.Expr->accept(*this);
+
     determingParallelism();
 }
 
@@ -80,19 +91,24 @@ void GeneralOptimizer::visit(common::TupleExpr &Node) {
 void GeneralOptimizer::visit(common::CallExpr &Node) {
     Node.Callee->accept(*this);
 
+    Calls.push(0);
+    LastRecCall.push(nullptr);
+    LastOtherCall.push(nullptr);
+
     for (auto &Expr: Node.Args) {
         Expr->accept(*this);
     }
 
+    determingParallelism();
+
     if (typeid(*Node.Callee.get()) == typeid(IdExpr) &&
         static_cast<IdExpr*>(Node.Callee.get())->Val == CurrFunc->Id) {
-        LastRecCall = &Node;
-        RecCalls++;
+        LastRecCall.top() = &Node;
     } else {
-        LastOtherCall = &Node;
+        LastOtherCall.top() = &Node;
     }
 
-    Calls++;
+    Calls.top()++;
 }
 
 void GeneralOptimizer::visit(common::AlgebraicExpr &Node) {
@@ -202,18 +218,18 @@ void GeneralOptimizer::visit(common::LambdaFunction &Node) {
 }
 
 void GeneralOptimizer::determingParallelism() {
-    if (Calls == 1 && LastRecCall) {
-        LastRecCall->DoParallel = false;
-    } else if (Calls > 1) {
-        if (LastOtherCall)
-            LastOtherCall->DoParallel = false;
-        else if (LastRecCall)
-            LastRecCall->DoParallel = false;
+    if (Calls.top() == 1 && LastRecCall.top()) {
+        LastRecCall.top()->DoParallel = false;
+    } else if (Calls.top() > 1) {
+        if (LastOtherCall.top())
+            LastOtherCall.top()->DoParallel = false;
+        else if (LastRecCall.top())
+            LastRecCall.top()->DoParallel = false;
     }
 
-    LastRecCall = nullptr;
-    LastOtherCall = nullptr;
-    Calls = 0;
+    LastRecCall.pop();
+    LastOtherCall.pop();
+    Calls.pop();
 }
 
 
