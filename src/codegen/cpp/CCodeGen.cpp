@@ -526,7 +526,7 @@ string CCodeGen::generateTuple(Type &Ty) {
         << "typedef struct " << Name << " {" << endl;
 
     for (size_t i = 0; i < Ty.Subtypes.size(); ++i) {
-        Res << "    " << getType(Ty.Subtypes[i]) << " " << GGenerated << GItem << i << ";" << endl;
+        Res << "    " << getType(Ty.Subtypes[i]) << " " << GItem << i << ";" << endl;
     }
     Res << "} " << Name << "; " << endl;
 
@@ -537,7 +537,7 @@ string CCodeGen::generateTuple(Type &Ty) {
     Res << Name << " " << GGenerated << GCreate << Name << "(";
 
     for (size_t i = 0; i < Ty.Subtypes.size(); ++i) {
-        Res << getType(Ty.Subtypes[i]) << " " << GGenerated << GItem << i;
+        Res << getType(Ty.Subtypes[i]) << " " << GItem << i;
 
         if (i < Ty.Subtypes.size() - 1)
             Res << ", ";
@@ -551,7 +551,7 @@ string CCodeGen::generateTuple(Type &Ty) {
 
     // For each item in res, assign values
     for (size_t i = 0; i < Ty.Subtypes.size(); ++i) {
-        Buffer << "    res." << GGenerated << GItem << i << " = " << GGenerated << GItem << i << "; " << endl;
+        Buffer << "    res." << GItem << i << " = " << GItem << i << "; " << endl;
     }
 
     Buffer << endl
@@ -570,17 +570,17 @@ string CCodeGen::generateTuple(Type &Ty) {
         case TypeId::STRING:
         case TypeId::LIST:
             Buffer << "!" << GGenerated << GCompare << Lists[Ty.Subtypes[i]] << "(tuple1."
-                          << GGenerated << GItem << i << ", tuple2."
-                          << GGenerated << GItem << i << ")";
+                          << GItem << i << ", tuple2."
+                          << GItem << i << ")";
             break;
         case TypeId::TUPLE:
             Buffer << "!" << GGenerated << GCompare << Tuples[Ty.Subtypes[i]] << "(tuple1."
-                          << GGenerated << GItem << i << ", tuple2."
-                          << GGenerated << GItem << i << ")";
+                          << GItem << i << ", tuple2."
+                          << GItem << i << ")";
             break;
         default:
-            Buffer << "(tuple1." << GGenerated << GItem << i << " != tuple2."
-                                 << GGenerated << GItem << i << ")";
+            Buffer << "(tuple1." << GItem << i << " != tuple2."
+                                 << GItem << i << ")";
             break;
         }
 
@@ -604,12 +604,12 @@ string CCodeGen::generateTuple(Type &Ty) {
 
     for (size_t i = Ty.Subtypes.size() - 1; i != 0; --i) {
         Buffer << "    res = " << GGenerated << GConcat << StringTypeName << "(" << ToStrings[Ty.Subtypes[i]]
-                               << "(value." << GGenerated << GItem << i << ")" << ", res); " << endl
+                               << "(value." << GItem << i << ")" << ", res); " << endl
                << "    res = " << GGenerated << GConcat << StringTypeName << "(comma, res); " << endl;
     }
 
     Buffer << "    res = " << GGenerated << GConcat << StringTypeName << "(" << ToStrings[Ty.Subtypes[0]]
-                           << "(value." << GGenerated << GItem << "0), res); " << endl
+                           << "(value." << GItem << "0), res); " << endl
            << "    res = " << GGenerated << GAdd << StringTypeName << "(res, '('); " << endl
            << endl
            << "    return res; " << endl
@@ -624,7 +624,7 @@ string CCodeGen::generateTuple(Type &Ty) {
            << "    printf(\"(\");" << endl;
 
     for (size_t i = 0; i < Ty.Subtypes.size(); i++) {
-        Buffer << "    " << Prints[Ty.Subtypes[i]] << "(value." << GGenerated << GItem << i << ");" << endl;
+        Buffer << "    " << Prints[Ty.Subtypes[i]] << "(value." << GItem << i << ");" << endl;
 
         if (i < Ty.Subtypes.size() - 1)
             Buffer << "    printf(\", \");" << endl;

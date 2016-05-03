@@ -52,7 +52,7 @@ void CCodeGen::visit(TuplePattern &Node) {
     for (size_t i = 0; i < Node.Patterns.size(); ++i) {
         // Insert the way in which the current item of the tuple should be dereferenced so that later
         // patterns can match based on it
-        GetValueBuilder.push_back("." + GGenerated + GItem + to_string(i));
+        GetValueBuilder.push_back("." + GItem + to_string(i));
 
         Node.Patterns[i]->accept(*this);
 
