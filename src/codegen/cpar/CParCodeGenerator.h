@@ -21,6 +21,8 @@ class CParCodeGenerator : public CCodeGenerator {
 
         std::string CurrentArg;
 
+        std::vector<std::string> TaskDeallocs;
+
         std::vector<std::string> SequentialCall;
         std::vector<std::string> CallStack;
         std::vector<size_t> CallStackCount;

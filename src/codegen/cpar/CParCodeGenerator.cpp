@@ -124,7 +124,7 @@ void CParCodeGenerator::visit(Function &Node) {
     }
 
     // Generate error, for when program doesn't realize a case
-    *Output << "    printf(\"No cases realized!\\n\"); " << endl
+    *Output << "    printf(\"No cases realized in " << CurFunc->Id << " \\n\"); " << endl
             << "    exit(1); " << endl
             << "} " << endl
             << endl;
@@ -150,7 +150,7 @@ void CParCodeGenerator::visit(Function &Node) {
     }
 
     // Generate error, for when program doesn't realize a case
-    *Output << "    printf(\"No cases realized!\\n\"); " << endl
+    *Output << "    printf(\"No cases realized in " << CurFunc->Id << " \\n\"); " << endl
             << "    exit(1); " << endl
             << "} " << endl
             << endl;
@@ -161,6 +161,7 @@ void CParCodeGenerator::visit(Function &Node) {
 
 void CParCodeGenerator::visit(Case &Node) {
     stringstream Pattern;
+    string WhenDealloc;
     bool Empty = true;
 
     // Generate if-statement for matching
@@ -213,10 +214,17 @@ void CParCodeGenerator::visit(Case &Node) {
 
         if (GenerateParallel) {
             outputParallelCode();
+
+            for (auto &Dealloc: TaskDeallocs){
+                WhenDealloc += "        " + Dealloc + "\n";
+            }
+
+            TaskDeallocs.clear();
         }
 
         *Output << "        if (" << ExprStack.top().str() << ") " << endl
-                << "        { " << endl;
+                << "        { " << endl
+                << WhenDealloc << endl;
         ExprStack.pop();
     }
 
@@ -224,13 +232,21 @@ void CParCodeGenerator::visit(Case &Node) {
     ExprStack.push(stringstream());
 
     if (Node.TailRec) {
+        string Deallocs;
         auto C = (CallExpr *)Node.Expr.get();
+
         for (size_t i = 0; i < CurFunc->Signature.Subtypes.size() - 1; ++i) {
             ExprStack.push(stringstream());
             C->Args[i]->accept(*this);
 
             if (GenerateParallel) {
                 outputParallelCode();
+
+                for (auto &Dealloc: TaskDeallocs){
+                    Deallocs += "        " + Dealloc + "\n";
+                }
+
+                TaskDeallocs.clear();
             }
 
             *Output << "        " << GGenerated << GArg << i << " = "
@@ -239,8 +255,11 @@ void CParCodeGenerator::visit(Case &Node) {
         }
 
         *Output << endl
+                << Deallocs << endl
+                << endl
                 << "        goto Start; " << endl;
     } else {
+        string Deallocs;
         ExprStack.push(stringstream());
 
         Node.Expr->accept(*this);
@@ -248,8 +267,17 @@ void CParCodeGenerator::visit(Case &Node) {
         if (GenerateParallel) {
             outputParallelCode();
 
+            for (auto &Dealloc: TaskDeallocs){
+                Deallocs += "        " + Dealloc + "\n";
+            }
+
+            TaskDeallocs.clear();
+
             *Output << "        ((" << CurrentArg << "*)t->startarg)->" << GGenerated << GRes << " = "
                                     << ExprStack.top().str() << "; " << endl
+                                    << endl
+                                    << Deallocs << endl
+                                    << endl
                                     << "        taskexit(t); " << endl;
         } else {
             *Output << "        return " << ExprStack.top().str() << ";" << endl;
@@ -260,6 +288,7 @@ void CParCodeGenerator::visit(Case &Node) {
 
     if (Node.When) {
         *Output << "        } " << endl;
+        *Output << WhenDealloc;
     }
 
     *Output << "    } " << endl
@@ -301,10 +330,13 @@ void CParCodeGenerator::visit(common::CallExpr &Node) {
 
             GeneratedCall << "        task_t *" << Name << " = taskcreate((void (*)(void*))" << ExprStack.top().str()
                                                 << "." << GParallel << ", (void *)" << Name << GArg << ");" << endl
-                                                << "        subtaskadd(t, " << Name << "); " << endl;
+                                                << "        subtaskadd(t, " << Name << "); " << endl
+                                                << endl;
 
             ExprStack.pop();
             ExprStack.top() << "((" << Signature << GArg << "*)" << Name << "->startarg" << ")->" << GGenerated << GRes;
+
+            TaskDeallocs.push_back("taskdealloc(" + Name + ");");
 
             CallDepth--;
             CallStack[CallDepth] += GeneratedCall.str();
@@ -315,7 +347,7 @@ void CParCodeGenerator::visit(common::CallExpr &Node) {
             Node.Callee->accept(*this);
 
             GeneratedCall << "        " << getType(Node.RetTy) << " " << Name << GRes << " = " << ExprStack.top().str()
-            << "." << GSequential << "(";
+                                        << "." << GSequential << "(";
             ExprStack.pop();
 
             for (size_t i = 0; i < Node.Args.size(); ++i) {
@@ -330,11 +362,11 @@ void CParCodeGenerator::visit(common::CallExpr &Node) {
                 ExprStack.pop();
             }
 
-            GeneratedCall << ");" << endl;
+            GeneratedCall << ");" << endl
+                          << endl;
 
             ExprStack.top() << Name << GRes;
-            assert(SequentialCall[--CallDepth].empty());
-            SequentialCall[CallDepth] = GeneratedCall.str();
+            SequentialCall[--CallDepth] = GeneratedCall.str();
         }
     } else {
         Node.Callee->accept(*this);
@@ -394,7 +426,8 @@ void CParCodeGenerator::outputParallelCode() {
             *Output << SequentialCall.back();
 
         if (CallStackCount.back() != 0)
-            *Output << "        taskyield(t);" << endl;
+            *Output << "        taskyield(t);" << endl
+                    << endl;
 
         SequentialCall.pop_back();
         CallStack.pop_back();

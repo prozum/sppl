@@ -113,7 +113,7 @@ void CCodeGenerator::visit(Function &Node) {
     // If a case is not realised in a function, a runtime error should occure.
     // There should be some checks earlier in the compiler phase that prevents
     // this error though.
-    *Output << "    printf(\"No cases realized!\\n\"); " << endl
+    *Output << "    printf(\"No cases realized in " << CurFunc->Id << " \\n\"); " << endl
             << "    exit(1); " << endl
             << "} " << endl
             << endl;
