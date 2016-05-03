@@ -22,8 +22,8 @@ void CCodeGen::visit(ListPattern &Node) {
     for (size_t i = 0; i < Node.Patterns.size(); ++i) {
         // Insert the way in which the current item of the list should be dereferenced so that later
         // patterns can match based on it
-        GetValueBuilder.insert(GetValueBuilder.begin(), GGenerated + GValueAt + TypeName + "(");
-        GetValueBuilder.push_back(", " + to_string(i + ListOffsets.back()) + ")");
+        GetValueBuilder.insert(GetValueBuilder.begin(), GGenerated + GAt + TypeName + "(");
+        GetValueBuilder.push_back(", " + to_string(i + ListOffsets.back()) + ")->" + GValue);
 
         // Push a new offset on a stack. Offsets are used when ListSplits occure so that we don't need to make a
         // copy of the lists tail when list splits occure
@@ -82,8 +82,8 @@ void CCodeGen::visit(ListSplit &Node) {
 
     // Insert the way in which the first item of the list should be dereferenced so that later
     // patterns can match based on it
-    GetValueBuilder.insert(GetValueBuilder.begin(), GGenerated + GValueAt + TypeName + "(");
-    GetValueBuilder.push_back(", " + to_string(ListOffsets.back()) + ")");
+    GetValueBuilder.insert(GetValueBuilder.begin(), GGenerated + GAt + TypeName + "(");
+    GetValueBuilder.push_back(", " + to_string(ListOffsets.back()) + ")->" + GValue);
     ListOffsets.push_back(0);
 
     Node.Left->accept(*this);

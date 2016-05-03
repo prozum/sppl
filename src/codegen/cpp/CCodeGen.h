@@ -72,7 +72,6 @@ class CCodeGen : public parser::CodeGenerator {
     const std::string GConcat = "con_";
     const std::string GPrint = "print_";
     const std::string GAt = "at_";
-    const std::string GValueAt = "valat_";
     const std::string GToString = "tostr_";
     const std::string GFloat = "double";
     const std::string GInt = "int64_t";

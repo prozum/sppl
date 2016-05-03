@@ -331,13 +331,6 @@ string CCodeGen::generateList(Type &Ty) {
            << "} " << endl
            << endl;
 
-    // Generate valueat function for list
-    *Header << ChildrenType << " " << GGenerated << GValueAt << Name << "(" << Name << "* current, int index); " << endl;
-    Buffer << ChildrenType << " " << GGenerated << GValueAt << Name << "(" << Name << "* current, int index) { " << endl
-           << "    return " << GGenerated << GAt << Name << "(current, index)->" << GValue << "; " << endl
-           << "} " << endl
-           << endl;
-
     // Generate compare function for list
     *Header << "int " << GGenerated << GCompare << Name << "(" << Name << "* list1, " << Name << "* list2); " << endl;
     Buffer << "int " << GGenerated << GCompare << Name << "(" << Name << "* list1, " << Name << "* list2) { " << endl
@@ -699,7 +692,7 @@ void CCodeGen::generateStd() {
             << endl
             << "    if (size == string->" << GSize << ") { " << endl
             << "        for (i = 0; i < size; i++) { " << endl
-            << "            if (" << GGenerated << GValueAt << StringTypeName << "(string, i) != values[i]) " << endl
+            << "            if (" << GGenerated << GAt << StringTypeName << "(string, i)->" << GValue << " != values[i]) " << endl
             << "                return 0; " << endl
             << "        } " << endl
             << "    } else { " << endl
@@ -784,7 +777,7 @@ void CCodeGen::generateStd() {
             << "    int i; " << endl
             << endl
             << "    for (i = 0; i < string->" << GSize << "; i++) { " << endl
-            << "        buffer[i] = (char)" << GGenerated << GValueAt << StringTypeName << "(string, i); " << endl
+            << "        buffer[i] = (char)" << GGenerated << GAt << StringTypeName << "(string, i)->" << GValue << "; " << endl
             << "    } " << endl
             << endl
             << "    buffer[i] = '\\0'; " << endl
