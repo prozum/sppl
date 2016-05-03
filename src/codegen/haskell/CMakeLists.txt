@@ -1,2 +1,2 @@
-add_library(chaskell HCodeGenerator.cpp HCodeGenerator.h)
-target_link_libraries(chaskell common parser compiler)
+add_library(chaskell HCodeGen.cpp HCodeGen.h)
+target_link_libraries(chaskell common parser)

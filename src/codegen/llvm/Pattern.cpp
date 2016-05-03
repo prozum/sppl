@@ -1,42 +1,42 @@
-#include "LLVMCodeGenerator.h"
+#include "LLVMCodeGen.h"
 
 using namespace llvm;
 using namespace codegen;
 
-void LLVMCodeGenerator::visit(common::FloatPattern &Node) {
+void LLVMCodeGen::visit(common::FloatPattern &Node) {
     auto PatVal = ConstantFP::get(getType(Node.RetTy), Node.Val);
-    CurVal = Builder.CreateFCmpONE(PatVal, &*CurArg, "cmptmp");
+    CurVal = Builder.CreateFCmpONE(PatVal, *CurArg, "cmptmp");
 }
 
-void LLVMCodeGenerator::visit(common::IntPattern &Node) {
+void LLVMCodeGen::visit(common::IntPattern &Node) {
     auto PatVal = ConstantInt::get(getType(Node.RetTy), (uint64_t)Node.Val);
-    CurVal = Builder.CreateICmpEQ(PatVal, &*CurArg, "cmptmp");
+    CurVal = Builder.CreateICmpEQ(PatVal, *CurArg, "cmptmp");
 }
 
-void LLVMCodeGenerator::visit(common::BoolPattern &Node) {
+void LLVMCodeGen::visit(common::BoolPattern &Node) {
     auto PatVal = ConstantInt::get(getType(Node.RetTy), (uint64_t)Node.Val);
-    CurVal = Builder.CreateICmpEQ(PatVal, &*CurArg, "cmptmp");
+    CurVal = Builder.CreateICmpEQ(PatVal, *CurArg, "cmptmp");
 }
 
-void LLVMCodeGenerator::visit(common::CharPattern &Node) {
+void LLVMCodeGen::visit(common::CharPattern &Node) {
     auto PatVal = ConstantInt::get(getType(Node.RetTy), (uint64_t)Node.Val);
-    CurVal = Builder.CreateICmpEQ(PatVal, &*CurArg, "cmptmp");
+    CurVal = Builder.CreateICmpEQ(PatVal, *CurArg, "cmptmp");
 }
 
-void LLVMCodeGenerator::visit(common::IdPattern &Node) {
-    CtxVals[Node.Val] = &*CurArg;
+void LLVMCodeGen::visit(common::IdPattern &Node) {
+    CtxVals[Node.Val] = *CurArg;
     CurVal = ConstantInt::get(Int1, 1);
 }
 
-void LLVMCodeGenerator::visit(common::WildPattern &Node) {
+void LLVMCodeGen::visit(common::WildPattern &Node) {
     CurVal = ConstantInt::get(Int1, 1);
 }
 
-void LLVMCodeGenerator::visit(common::TuplePattern &Node) {
+void LLVMCodeGen::visit(common::TuplePattern &Node) {
     std::vector<llvm::Constant *> TupleVal;
     for (auto &Element : Node.Patterns) {
         Element->accept(*this);
-        TupleVal.push_back((Constant *)CurVal);
+        TupleVal.push_back(static_cast<Constant *>(CurVal));
     }
 
     auto ConstVal = ConstantStruct::get(getTupleType(Node.RetTy), TupleVal);
@@ -44,7 +44,7 @@ void LLVMCodeGenerator::visit(common::TuplePattern &Node) {
                                 GlobalVariable::ExternalLinkage, ConstVal);
 }
 
-void LLVMCodeGenerator::visit(common::ListPattern &Node) {
+void LLVMCodeGen::visit(common::ListPattern &Node) {
     std::vector<llvm::Constant *> ListData;
 
     for (auto &Element : Node.Patterns) {
@@ -59,6 +59,6 @@ void LLVMCodeGenerator::visit(common::ListPattern &Node) {
                                 GlobalVariable::ExternalLinkage, ConstVal);
 }
 
-void LLVMCodeGenerator::visit(common::ParPattern &Node) {
+void LLVMCodeGen::visit(common::ParPattern &Node) {
     Node.Pat->accept(*this);
 }

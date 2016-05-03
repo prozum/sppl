@@ -1,30 +1,32 @@
-#include "LLVMCodeGenerator.h"
+#include "LLVMCodeGen.h"
 
 using namespace std;
 using namespace codegen;
 using namespace llvm;
 
-void LLVMCodeGenerator::visit(common::FloatExpr &Node) {
+void LLVMCodeGen::visit(common::FloatExpr &Node) {
     CurVal = ConstantFP::get(getType(Node.RetTy), Node.Val);
 }
 
-void LLVMCodeGenerator::visit(common::IntExpr &Node) {
+void LLVMCodeGen::visit(common::IntExpr &Node) {
     CurVal = ConstantInt::get(getType(Node.RetTy), (uint64_t)Node.Val);
 }
 
-void LLVMCodeGenerator::visit(common::BoolExpr &Node) {
+void LLVMCodeGen::visit(common::BoolExpr &Node) {
     CurVal = ConstantInt::get(getType(Node.RetTy), (uint64_t)Node.Val);
 }
 
-void LLVMCodeGenerator::visit(common::StringExpr &Node) {
-    CurVal = Builder.CreateGlobalString(Node.Val, CurFunc->getName() + ".str");
+void LLVMCodeGen::visit(common::StringExpr &Node) {
+    auto GlobalVar = Builder.CreateGlobalString(Node.Val, CurFunc->getName() + ".str");
+
+    CurVal = CreateList(Node.RetTy, GlobalVar, ConstantInt::get(Int32, Node.Val.size()), *CurCaseBlock);
 }
 
-void LLVMCodeGenerator::visit(common::CharExpr &Node) {
+void LLVMCodeGen::visit(common::CharExpr &Node) {
     CurVal = ConstantInt::get(getType(Node.RetTy), (uint64_t)Node.Val);
 }
 
-void LLVMCodeGenerator::visit(common::IdExpr &Node) {
+void LLVMCodeGen::visit(common::IdExpr &Node) {
     // Pattern value
     CurVal = CtxVals[Node.Val];
     if (CurVal)
@@ -46,11 +48,11 @@ void LLVMCodeGenerator::visit(common::IdExpr &Node) {
     assert(0 && "Something went wrong in the TypeChecker");
 }
 
-void LLVMCodeGenerator::visit(common::ParExpr &Node) {
+void LLVMCodeGen::visit(common::ParExpr &Node) {
     Node.Child->accept(*this);
 }
 
-void LLVMCodeGenerator::visit(common::TupleExpr &Node) {
+void LLVMCodeGen::visit(common::TupleExpr &Node) {
     std::vector<llvm::Constant *> TmpVec;
 
     for (auto &Element : Node.Elements) {
@@ -65,22 +67,22 @@ void LLVMCodeGenerator::visit(common::TupleExpr &Node) {
                                 GlobalVariable::ExternalLinkage, ConstVal);
 }
 
-void LLVMCodeGenerator::visit(common::ListExpr &Node) {
+void LLVMCodeGen::visit(common::ListExpr &Node) {
     // Create types
-    auto ListType = getListType(Node.RetTy);
-    auto ListPtrType = getType(Node.RetTy);
-    auto ArrayType = ArrayType::get(getType(Node.RetTy.Subtypes[0]), Node.Elements.size());
+    auto ArrayType = ArrayType::get(getType(Node.RetTy.Subtypes.front()), Node.Elements.size());
+
+    // Malloc list data
+    auto DataMalloc = CreateMalloc(ArrayType, *CurCaseBlock);
+    auto DataCast = Builder.CreateBitCast(DataMalloc, PointerType::getUnqual(ArrayType));
 
     // Create global list constant
-    std::vector<llvm::Constant *> ListData;
-    for (auto &Element : Node.Elements) {
-        Element->accept(*this);
-        ListData.push_back(static_cast<Constant *>(CurVal));
+    for (size_t i = 0; i < Node.Elements.size(); ++i) {
+        Node.Elements[i]->accept(*this);
+        auto GEP = Builder.CreateStructGEP(ArrayType, DataCast, i);
+        Builder.CreateStore(CurVal, GEP);
     }
-    auto ConstVal = ConstantArray::get(ArrayType, ListData);
-    auto GlobalVal = new GlobalVariable(*Module, ArrayType, true,
-                                GlobalVariable::ExternalLinkage, ConstVal);
 
+    /*
     // Malloc list data
     auto DataMalloc = CreateMalloc(ArrayType, *CurCaseBlock);
 
@@ -100,14 +102,19 @@ void LLVMCodeGenerator::visit(common::ListExpr &Node) {
     CurVal = Builder.CreateStructGEP(ListType, ListCast, 1);
     auto DataCast = Builder.CreateBitCast(DataMalloc, PointerType::getUnqual(ArrayType::get(getType(Node.RetTy.Subtypes[0]), 0)));
     Builder.CreateStore(DataCast, CurVal);
+    */
+    auto List = CreateList(Node.RetTy, DataCast, ConstantInt::get(Int32, Node.Elements.size()), *CurCaseBlock);
 
     // Set return value
+    auto ListPtrType = getType(Node.RetTy);
     auto RetVal = Builder.CreateAlloca(ListPtrType, nullptr, "allocatmp");
-    Builder.CreateStore(ListMalloc, RetVal);
+    Builder.CreateStore(List, RetVal);
     CurVal = Builder.CreateLoad(ListPtrType, RetVal, "loadtmp");
 }
 
-void LLVMCodeGenerator::visit(common::CallExpr &Node) {
+
+
+void LLVMCodeGen::visit(common::CallExpr &Node) {
     Node.Callee->accept(*this);
     auto Callee = CurVal;
 
@@ -120,14 +127,4 @@ void LLVMCodeGenerator::visit(common::CallExpr &Node) {
     CurVal = Builder.CreateCall(Callee, Args, "calltmp");
 }
 
-Instruction *LLVMCodeGenerator::CreateMalloc(llvm::Type *Type, BasicBlock *Block)
-{
-    auto Size = DataLayout.getPointerTypeSize(Type);
-    auto AllocSize = ConstantInt::get(Int32, APInt(32, Size));
-    auto Malloc = CallInst::CreateMalloc(Block,
-                                         Int32, Type, AllocSize,
-                                         nullptr, nullptr, "malloccall");
-    Block->getInstList().push_back(Malloc);
 
-    return Malloc;
-}

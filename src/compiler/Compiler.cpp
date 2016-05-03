@@ -11,25 +11,25 @@ void Compiler::setBackend(Backend B) {
     switch (B) {
 #ifdef CCPP
     case Backend::CPP:
-        CodeGen = std::make_unique<codegen::CCodeGenerator>(*this);
+        CodeGen = std::make_unique<codegen::CCodeGen>(*this);
         break;
     case Backend::CPAR:
-        CodeGen = std::make_unique<codegen::CParCodeGenerator>(*this);
+        CodeGen = std::make_unique<codegen::CParCodeGen>(*this);
         break;
 #endif
 #ifdef CGNUASM
     case Backend::GNUASM:
-        CodeGen = std::make_unique<codegen::GasCodeGenerator>(*this);
+        CodeGen = std::make_unique<codegen::GasCodeGen>(*this);
         break;
 #endif
 #ifdef CHASKELL
     case Backend::HASKELL:
-        CodeGen = std::make_unique<codegen::HCodeGenerator>(*this);
+        CodeGen = std::make_unique<codegen::HCodeGen>(*this);
         break;
 #endif
 #ifdef CLLVM
     case Backend::LLVM:
-        CodeGen = std::make_unique<codegen::LLVMCodeGenerator>(*this);
+        CodeGen = std::make_unique<codegen::LLVMCodeGen>(*this);
         break;
 #endif
     case Backend::PPRINTER:

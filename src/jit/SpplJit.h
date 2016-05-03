@@ -4,7 +4,7 @@
 #include "Driver.h"
 #include "ScopeGenerator.h"
 #include "TypeChecker.h"
-#include "LLVMCodeGenerator.h"
+#include "LLVMCodeGen.h"
 
 #include <llvm/ExecutionEngine/Orc/CompileUtils.h>
 #include <llvm/ExecutionEngine/Orc/IRCompileLayer.h>
@@ -53,7 +53,7 @@ class SpplJit {
     std::string getOutputTuple(intptr_t Addr, common::Type Type);
 
     parser::Driver Drv;
-    codegen::LLVMCodeGenerator CodeGen;
+    codegen::LLVMCodeGen CodeGen;
     semantics::ScopeGenerator ScopeGen;
     semantics::TypeChecker TypeChecker;
 #if OPTIMIZER

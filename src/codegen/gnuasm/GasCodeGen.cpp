@@ -1,4 +1,4 @@
-#include "GasCodeGenerator.h"
+#include "GasCodeGen.h"
 
 // TODO: Add compile messages and final error messages.
 // TODO: move all debug output lines to debug only.
@@ -7,10 +7,10 @@ using namespace common;
 using namespace std;
 using namespace codegen;
 
-GasCodeGenerator::GasCodeGenerator(parser::Driver &Drv)
+GasCodeGen::GasCodeGen(parser::Driver &Drv)
     : parser::CodeGenerator(Drv) {}
 
-void GasCodeGenerator::visit(Program &Node) {
+void GasCodeGen::visit(Program &Node) {
     // Visit all functions
 
     for (auto &Decl : Node.Decls) {
@@ -21,7 +21,7 @@ void GasCodeGenerator::visit(Program &Node) {
     *Drv.Out << Source << endl;
 }
 
-void GasCodeGenerator::visit(Function &Node) {
+void GasCodeGen::visit(Function &Node) {
     FuncName =
         Node.Id; // Function name used for anything function related including
                  // names and labels.
@@ -67,7 +67,7 @@ void GasCodeGenerator::visit(Function &Node) {
     Func.clear(); // Prepare string variable for next function
 }
 
-void GasCodeGenerator::visit(Case &Node) {
+void GasCodeGen::visit(Case &Node) {
     CaseCount++;
 
     int ArgCount = 0;
@@ -141,35 +141,35 @@ void GasCodeGenerator::visit(Case &Node) {
     cout << "CaseNotImplemented" << endl;
 }
 
-void GasCodeGenerator::visit(Or &Node) { cout << "OrNotImplemented" << endl; }
+void GasCodeGen::visit(Or &Node) { cout << "OrNotImplemented" << endl; }
 
-void GasCodeGenerator::visit(And &Node) { cout << "AndNotImplemented" << endl; }
+void GasCodeGen::visit(And &Node) { cout << "AndNotImplemented" << endl; }
 
-void GasCodeGenerator::visit(Equal &Node) {
+void GasCodeGen::visit(Equal &Node) {
     cout << "EqualNotImplemented" << endl;
 }
 
-void GasCodeGenerator::visit(NotEqual &Node) {
+void GasCodeGen::visit(NotEqual &Node) {
     cout << "NotEqualNotImplemented" << endl;
 }
 
-void GasCodeGenerator::visit(Lesser &Node) {
+void GasCodeGen::visit(Lesser &Node) {
     cout << "LesserNotImplemented" << endl;
 }
 
-void GasCodeGenerator::visit(Greater &Node) {
+void GasCodeGen::visit(Greater &Node) {
     cout << "GreaterNotImplemented" << endl;
 }
 
-void GasCodeGenerator::visit(LesserEq &Node) {
+void GasCodeGen::visit(LesserEq &Node) {
     cout << "LesserEqNotImplemented" << endl;
 }
 
-void GasCodeGenerator::visit(GreaterEq &Node) {
+void GasCodeGen::visit(GreaterEq &Node) {
     cout << "GreaterEqNotImplemented" << endl;
 }
 
-void GasCodeGenerator::visit(Add &Node) {
+void GasCodeGen::visit(Add &Node) {
     cout << "ADD" << endl;
 
     Node.Left->accept(*this);
@@ -182,25 +182,25 @@ void GasCodeGenerator::visit(Add &Node) {
     cout << "AddNotImplemented" << endl;
 }
 
-void GasCodeGenerator::visit(Sub &Node) { cout << "SubNotImplemented" << endl; }
+void GasCodeGen::visit(Sub &Node) { cout << "SubNotImplemented" << endl; }
 
-void GasCodeGenerator::visit(Mul &Node) { cout << "MulNotImplemented" << endl; }
+void GasCodeGen::visit(Mul &Node) { cout << "MulNotImplemented" << endl; }
 
-void GasCodeGenerator::visit(Div &Node) { cout << "DivNotImplemented" << endl; }
+void GasCodeGen::visit(Div &Node) { cout << "DivNotImplemented" << endl; }
 
-void GasCodeGenerator::visit(Mod &Node) { cout << "ModNotImplemented" << endl; }
+void GasCodeGen::visit(Mod &Node) { cout << "ModNotImplemented" << endl; }
 
-void GasCodeGenerator::visit(ListAdd &Node) {
+void GasCodeGen::visit(ListAdd &Node) {
     cout << "ListAddNotImplemented" << endl;
 }
 
-void GasCodeGenerator::visit(ParExpr &Node) {
+void GasCodeGen::visit(ParExpr &Node) {
     cout << "ParNotImplemented" << endl;
 }
 
-void GasCodeGenerator::visit(Not &Node) { cout << "NotNotImplemented" << endl; }
+void GasCodeGen::visit(Not &Node) { cout << "NotNotImplemented" << endl; }
 
-void GasCodeGenerator::visit(IntExpr &Node) {
+void GasCodeGen::visit(IntExpr &Node) {
     Func += "movl $";
     Func += Node.str();
     Func += ", %eax\n";
@@ -211,41 +211,41 @@ void GasCodeGenerator::visit(IntExpr &Node) {
     cout << "Got integer => " << Node.str() << endl;
 }
 
-void GasCodeGenerator::visit(FloatExpr &Node) {
+void GasCodeGen::visit(FloatExpr &Node) {
     cout << "FloatNotImplemented" << endl;
 }
 
-void GasCodeGenerator::visit(BoolExpr &Node) {
+void GasCodeGen::visit(BoolExpr &Node) {
     cout << "BoolNotImplemented" << endl;
 }
 
-void GasCodeGenerator::visit(CharExpr &Node) {
+void GasCodeGen::visit(CharExpr &Node) {
     cout << "CharNotImplemented" << endl;
 }
 
-void GasCodeGenerator::visit(StringExpr &Node) {
+void GasCodeGen::visit(StringExpr &Node) {
     cout << "CharNotImplemented" << endl;
 }
 
-void GasCodeGenerator::visit(ListExpr &Node) {
+void GasCodeGen::visit(ListExpr &Node) {
     cout << "ListPatternNotImplemented" << endl;
 }
 
-void GasCodeGenerator::visit(TupleExpr &Node) {
+void GasCodeGen::visit(TupleExpr &Node) {
     cout << "TuplePatternNotImplemented" << endl;
 }
 
-void GasCodeGenerator::visit(ListSplit &Node) {
+void GasCodeGen::visit(ListSplit &Node) {
     cout << "ListSplitNotImplemented" << endl;
 }
 
-void GasCodeGenerator::visit(IdExpr &Node) {
+void GasCodeGen::visit(IdExpr &Node) {
     Hpr.TypeName = "Id";
     Hpr.TypeValue = FuncName + Node.Val;
     cout << "Got ID => " << Node.Val << endl;
 }
 
-void GasCodeGenerator::visit(CallExpr &Node) {
+void GasCodeGen::visit(CallExpr &Node) {
     // TODO: Find way pu push arguments to stack.
     vector<string> Params;
     for (auto &Arg : Node.Args) {
@@ -267,13 +267,13 @@ void GasCodeGenerator::visit(CallExpr &Node) {
     cout << "CallNotImplemented" << endl;
 }
 
-void GasCodeGenerator::visit(Type &Node) {
+void GasCodeGen::visit(Type &Node) {
     cout << "TypeNotImplemented" << endl;
 }
 
-string GasCodeGenerator::getType(Type *Ty) { return "GasCodeGenerator"; }
+string GasCodeGen::getType(Type *Ty) { return "GasCodeGen"; }
 
-string GasCodeGenerator::buildSource() {
+string GasCodeGen::buildSource() {
     string Source = "";
 
     Source += ".data\n";

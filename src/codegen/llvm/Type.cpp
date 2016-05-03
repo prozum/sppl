@@ -1,10 +1,10 @@
-#include "LLVMCodeGenerator.h"
+#include "LLVMCodeGen.h"
 
 using namespace std;
 using namespace llvm;
 using namespace codegen;
 
-llvm::Type *LLVMCodeGenerator::getType(common::Type Ty) {
+llvm::Type *LLVMCodeGen::getType(common::Type Ty) {
     switch (Ty.Id) {
     case common::TypeId::FLOAT:
         return Double;
@@ -17,11 +17,10 @@ llvm::Type *LLVMCodeGenerator::getType(common::Type Ty) {
     case common::TypeId::TUPLE:
         return PointerType::getUnqual(getTupleType(Ty));
     case common::TypeId::LIST:
+    case common::TypeId::STRING:
         return PointerType::getUnqual(getListType(Ty));
     case common::TypeId::SIGNATURE:
         return PointerType::getUnqual(getFuncType(Ty));
-    case common::TypeId::STRING:
-        return getListType(common::Type(common::TypeId::LIST, vector<common::Type> {common::Type(common::TypeId::CHAR)}));
     case common::TypeId::VOID:
         return llvm::Type::getVoidTy(Ctx);
     default:
@@ -29,7 +28,7 @@ llvm::Type *LLVMCodeGenerator::getType(common::Type Ty) {
     }
 }
 
-llvm::StructType *LLVMCodeGenerator::getTupleType(common::Type Ty) {
+llvm::StructType *LLVMCodeGen::getTupleType(common::Type Ty) {
     auto CacheTy = TupleTypes.find(Ty);
 
     if (CacheTy != TupleTypes.end())
@@ -42,20 +41,20 @@ llvm::StructType *LLVMCodeGenerator::getTupleType(common::Type Ty) {
     return TupleTypes[Ty] = StructType::create(Ctx, Subtypes, "tuple");
 }
 
-llvm::StructType *LLVMCodeGenerator::getListType(common::Type Ty) {
+llvm::StructType *LLVMCodeGen::getListType(common::Type Ty) {
     auto CacheTy = ListTypes.find(Ty);
 
     if (CacheTy != ListTypes.end())
         return CacheTy->second;
 
     std::vector<llvm::Type *> Subtypes;
-    Subtypes.push_back(IntegerType::get(Ctx, 32));
-    Subtypes.push_back(PointerType::getUnqual(ArrayType::get(getType(Ty.Subtypes[0]), 0)));
+    Subtypes.push_back(Int32);
+    Subtypes.push_back(PointerType::getUnqual(ArrayType::get(getType(Ty.Subtypes.front()), 0)));
 
     return ListTypes[Ty] = StructType::create(Ctx, Subtypes, "list");
 }
 
-llvm::FunctionType *LLVMCodeGenerator::getFuncType(common::Type Ty) {
+llvm::FunctionType *LLVMCodeGen::getFuncType(common::Type Ty) {
     auto CacheType = FuncTypes.find(Ty);
 
     if (CacheType != FuncTypes.end())

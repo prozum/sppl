@@ -9,9 +9,9 @@
 #include <vector>
 
 namespace codegen {
-class CCodeGenerator : public parser::CodeGenerator {
+class CCodeGen : public parser::CodeGenerator {
   public:
-    CCodeGenerator(parser::Driver &Drv);
+    CCodeGen(parser::Driver &Drv);
     virtual void visit(common::Program &Node);
 
   protected:

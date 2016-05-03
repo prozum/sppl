@@ -1,8 +1,8 @@
-#include "LLVMCodeGenerator.h"
+#include "LLVMCodeGen.h"
 
 using namespace codegen;
 
-void LLVMCodeGenerator::visit(common::Add &Node) {
+void LLVMCodeGen::visit(common::Add &Node) {
     assert((Node.Left->RetTy.Id == common::TypeId::FLOAT && Node.Right->RetTy.Id == common::TypeId::FLOAT) ||
            (Node.Left->RetTy.Id == common::TypeId::INT && Node.Right->RetTy.Id == common::TypeId::INT));
 
@@ -18,7 +18,7 @@ void LLVMCodeGenerator::visit(common::Add &Node) {
     }
 }
 
-void LLVMCodeGenerator::visit(common::Sub &Node) {
+void LLVMCodeGen::visit(common::Sub &Node) {
     assert((Node.Left->RetTy.Id == common::TypeId::FLOAT && Node.Right->RetTy.Id == common::TypeId::FLOAT) ||
            (Node.Left->RetTy.Id == common::TypeId::INT && Node.Right->RetTy.Id == common::TypeId::INT));
 
@@ -34,7 +34,7 @@ void LLVMCodeGenerator::visit(common::Sub &Node) {
     }
 }
 
-void LLVMCodeGenerator::visit(common::Mul &Node) {
+void LLVMCodeGen::visit(common::Mul &Node) {
     assert((Node.Left->RetTy.Id == common::TypeId::FLOAT && Node.Right->RetTy.Id == common::TypeId::FLOAT) ||
            (Node.Left->RetTy.Id == common::TypeId::INT && Node.Right->RetTy.Id == common::TypeId::INT));
 
@@ -50,7 +50,7 @@ void LLVMCodeGenerator::visit(common::Mul &Node) {
     }
 }
 
-void LLVMCodeGenerator::visit(common::Div &Node) {
+void LLVMCodeGen::visit(common::Div &Node) {
     assert((Node.Left->RetTy.Id == common::TypeId::FLOAT && Node.Right->RetTy.Id == common::TypeId::FLOAT) ||
            (Node.Left->RetTy.Id == common::TypeId::INT && Node.Right->RetTy.Id == common::TypeId::INT));
 
@@ -66,7 +66,7 @@ void LLVMCodeGenerator::visit(common::Div &Node) {
     }
 }
 
-void LLVMCodeGenerator::visit(common::Mod &Node) {
+void LLVMCodeGen::visit(common::Mod &Node) {
     assert((Node.Left->RetTy.Id == common::TypeId::FLOAT && Node.Right->RetTy.Id == common::TypeId::FLOAT) ||
            (Node.Left->RetTy.Id == common::TypeId::INT && Node.Right->RetTy.Id == common::TypeId::INT));
 
@@ -82,7 +82,7 @@ void LLVMCodeGenerator::visit(common::Mod &Node) {
     }
 }
 
-void LLVMCodeGenerator::visit(common::And &Node) {
+void LLVMCodeGen::visit(common::And &Node) {
     assert(Node.Left->RetTy.Id == common::TypeId::BOOL &&
            Node.Right->RetTy.Id == common::TypeId::BOOL);
 
@@ -94,7 +94,7 @@ void LLVMCodeGenerator::visit(common::And &Node) {
     CurVal = Builder.CreateAnd(Left, Right, "andtmp");
 }
 
-void LLVMCodeGenerator::visit(common::Or &Node) {
+void LLVMCodeGen::visit(common::Or &Node) {
     assert(Node.Left->RetTy.Id == common::TypeId::BOOL &&
            Node.Right->RetTy.Id == common::TypeId::BOOL);
 
@@ -106,7 +106,7 @@ void LLVMCodeGenerator::visit(common::Or &Node) {
     CurVal = Builder.CreateOr(Left, Right, "ortmp");
 }
 
-void LLVMCodeGenerator::visit(common::Equal &Node) {
+void LLVMCodeGen::visit(common::Equal &Node) {
     assert((Node.Left->RetTy.Id == common::TypeId::FLOAT && Node.Right->RetTy.Id == common::TypeId::FLOAT) ||
            (Node.Left->RetTy.Id == common::TypeId::INT && Node.Right->RetTy.Id == common::TypeId::INT));
 
@@ -122,7 +122,7 @@ void LLVMCodeGenerator::visit(common::Equal &Node) {
     }
 }
 
-void LLVMCodeGenerator::visit(common::NotEqual &Node) {
+void LLVMCodeGen::visit(common::NotEqual &Node) {
     assert((Node.Left->RetTy.Id == common::TypeId::FLOAT && Node.Right->RetTy.Id == common::TypeId::FLOAT) ||
            (Node.Left->RetTy.Id == common::TypeId::INT && Node.Right->RetTy.Id == common::TypeId::INT));
 
@@ -138,7 +138,7 @@ void LLVMCodeGenerator::visit(common::NotEqual &Node) {
     }
 }
 
-void LLVMCodeGenerator::visit(common::Lesser &Node) {
+void LLVMCodeGen::visit(common::Lesser &Node) {
     assert((Node.Left->RetTy.Id == common::TypeId::FLOAT && Node.Right->RetTy.Id == common::TypeId::FLOAT) ||
            (Node.Left->RetTy.Id == common::TypeId::INT && Node.Right->RetTy.Id == common::TypeId::INT));
 
@@ -154,7 +154,7 @@ void LLVMCodeGenerator::visit(common::Lesser &Node) {
     }
 }
 
-void LLVMCodeGenerator::visit(common::Greater &Node) {
+void LLVMCodeGen::visit(common::Greater &Node) {
     assert((Node.Left->RetTy.Id == common::TypeId::FLOAT && Node.Right->RetTy.Id == common::TypeId::FLOAT) ||
            (Node.Left->RetTy.Id == common::TypeId::INT && Node.Right->RetTy.Id == common::TypeId::INT));
 
@@ -170,7 +170,7 @@ void LLVMCodeGenerator::visit(common::Greater &Node) {
     }
 }
 
-void LLVMCodeGenerator::visit(common::LesserEq &Node) {
+void LLVMCodeGen::visit(common::LesserEq &Node) {
     assert((Node.Left->RetTy.Id == common::TypeId::FLOAT && Node.Right->RetTy.Id == common::TypeId::FLOAT) ||
            (Node.Left->RetTy.Id == common::TypeId::INT && Node.Right->RetTy.Id == common::TypeId::INT));
 
@@ -186,7 +186,7 @@ void LLVMCodeGenerator::visit(common::LesserEq &Node) {
     }
 }
 
-void LLVMCodeGenerator::visit(common::GreaterEq &Node) {
+void LLVMCodeGen::visit(common::GreaterEq &Node) {
     assert((Node.Left->RetTy.Id == common::TypeId::FLOAT && Node.Right->RetTy.Id == common::TypeId::FLOAT) ||
            (Node.Left->RetTy.Id == common::TypeId::INT && Node.Right->RetTy.Id == common::TypeId::INT));
 

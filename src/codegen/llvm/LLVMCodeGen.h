@@ -18,9 +18,9 @@
 #include <unordered_map>
 
 namespace codegen {
-class LLVMCodeGenerator : public parser::CodeGenerator {
+class LLVMCodeGen : public parser::CodeGenerator {
   public:
-    LLVMCodeGenerator(parser::Driver &Drv);
+    LLVMCodeGen(parser::Driver &Drv);
 
     llvm::LLVMContext &Ctx;
     llvm::IRBuilder<> Builder;
@@ -34,12 +34,13 @@ class LLVMCodeGenerator : public parser::CodeGenerator {
     std::unordered_map<common::Type, llvm::StructType *> ListTypes;
     std::unordered_map<common::Type, llvm::FunctionType *> FuncTypes;
 
-    // Constants
+    // Type Constants
     llvm::Type *Int1;
     llvm::Type *Int8;
     llvm::Type *Int32;
     llvm::Type *Int64;
     llvm::Type *Double;
+    llvm::FunctionType *MainType;
 
     llvm::Value *CurVal = nullptr;
     llvm::Function *CurFunc = nullptr;
@@ -48,9 +49,8 @@ class LLVMCodeGenerator : public parser::CodeGenerator {
     llvm::BasicBlock *CurRetBlock = nullptr;
     llvm::PHINode *CurPhiNode = nullptr;
 
-    //std::vector<llvm::Argument *> Args;
-    //std::vector<llvm::Argument *>::const_iterator CurArg;
-    llvm::Function::arg_iterator CurArg;
+    std::vector<llvm::Value *> Args;
+    std::vector<llvm::Value *>::iterator CurArg;
 
     std::vector<std::unique_ptr<common::Case>>::const_iterator CurCase;
     std::vector<llvm::BasicBlock *> CaseBlocks;
@@ -108,7 +108,10 @@ class LLVMCodeGenerator : public parser::CodeGenerator {
     void visit(common::CallExpr &Node);
     void visit(common::ParExpr &Node);
 
-    llvm::Instruction *CreateMalloc(llvm::Type *Type,llvm::BasicBlock * Block);
+    llvm::Value *CreateList(common::Type Type, llvm::Value *Data, llvm::Value *Size, llvm::BasicBlock *Block);
+    llvm::Instruction *CreateMalloc(llvm::Type *Type, llvm::BasicBlock *Block);
+    llvm::Instruction *CreateMalloc(llvm::Value *Size, llvm::BasicBlock *Block);
+    llvm::Function *CreateMain();
 
     llvm::Type *getType(common::Type Ty);
     llvm::StructType *getTupleType(common::Type Ty);

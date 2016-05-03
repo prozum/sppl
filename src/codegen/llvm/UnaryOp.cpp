@@ -1,8 +1,8 @@
-#include "LLVMCodeGenerator.h"
+#include "LLVMCodeGen.h"
 
 using namespace codegen;
 
-void LLVMCodeGenerator::visit(common::Negative &Node) {
+void LLVMCodeGen::visit(common::Negative &Node) {
     Node.Child->accept(*this);
 
     assert(Node.Child->RetTy.Id == common::TypeId::INT || Node.Child->RetTy.Id == common::TypeId::FLOAT );
@@ -15,7 +15,7 @@ void LLVMCodeGenerator::visit(common::Negative &Node) {
     }
 }
 
-void LLVMCodeGenerator::visit(common::Not &Node) {
+void LLVMCodeGen::visit(common::Not &Node) {
     Node.Child->accept(*this);
 
     assert(Node.Child->RetTy.Id == common::TypeId::BOOL);
