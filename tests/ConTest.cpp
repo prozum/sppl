@@ -88,14 +88,14 @@ void Test::conMix() {
 }
 
 void Test::conFuncResOne() {
-    bool compStatus = compileChecker("con/conFunResOne.sppl");
+    bool compStatus = compileChecker("con/conFuncResOne.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus);
     bool execStatus = executeChecker("[1, 2, 3, 4]");
     CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
 }
 
 void Test::conFuncResTwo() {
-    bool compStatus = compileChecker("con/conFunResTwo.sppl");
+    bool compStatus = compileChecker("con/conFuncResTwo.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus);
     bool execStatus = executeChecker("[1, 2, 3, 4]");
     CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
