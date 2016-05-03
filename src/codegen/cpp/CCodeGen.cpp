@@ -7,8 +7,9 @@ using namespace codegen;
 CCodeGen::CCodeGen(parser::Driver &Drv)
     : CodeGenerator(Drv), Output(Drv.Out), Header(Drv.HOut),
       ListOffsets(vector<int>({0})),
-      StringList(Type(TypeId::LIST, vector<Type>({Type(TypeId::STRING)}))),
-      RealString(Type(TypeId::LIST, vector<Type>({Type(TypeId::CHAR)}))) {}
+      StringList(Type(TypeId::LIST, vector<Type>({ Type(TypeId::STRING, vector<Type>({ Type(TypeId::CHAR) })) }))),
+      RealString(Type(TypeId::LIST, vector<Type>({ Type(TypeId::CHAR) }))),
+      FakeString(Type(TypeId::STRING, vector<Type>({ Type(TypeId::CHAR) }))) { }
 
 void CCodeGen::visit(Program &Node) {
     Prog = &Node;
@@ -668,16 +669,16 @@ void CCodeGen::generateStd() {
     ToStrings[Type(TypeId::BOOL)] = GGenerated + GToString + "bool";
     ToStrings[Type(TypeId::FLOAT)] = GGenerated + GToString + "float";
     ToStrings[Type(TypeId::CHAR)] = GGenerated + GToString + "char";
-    ToStrings[Type(TypeId::STRING)] = GGenerated + GToString + "string";
+    ToStrings[FakeString] = GGenerated + GToString + "string";
     Prints[Type(TypeId::INT)] = GGenerated + GPrint + "int";
     Prints[Type(TypeId::BOOL)] = GGenerated + GPrint + "bool";
     Prints[Type(TypeId::FLOAT)] = GGenerated + GPrint + "float";
     Prints[Type(TypeId::CHAR)] = GGenerated + GPrint + "char";
-    Prints[Type(TypeId::STRING)] = GGenerated + GPrint + "string";
+    Prints[FakeString] = GGenerated + GPrint + "string";
 
 
     StringTypeName = GGenerated + GList + to_string(ListCount);
-    Lists[Type(TypeId::STRING)] = StringTypeName;
+    Lists[FakeString] = StringTypeName;
 
     generateList(RealString);
     generateList(StringList);
@@ -751,8 +752,8 @@ void CCodeGen::generateStd() {
             << "} " << endl
             << endl;
 
-    *Header << StringTypeName << "* " << ToStrings[Type(TypeId::STRING)] << "(" << StringTypeName << "* value); " << endl;
-    *Output << StringTypeName << "* " << ToStrings[Type(TypeId::STRING)] << "(" << StringTypeName << "* value) { " << endl
+    *Header << StringTypeName << "* " << ToStrings[FakeString] << "(" << StringTypeName << "* value); " << endl;
+    *Output << StringTypeName << "* " << ToStrings[FakeString] << "(" << StringTypeName << "* value) { " << endl
             << "    " << StringTypeName << "* res = " << GGenerated << GCreate << GString << "(\"\\\"\"); " << endl
             << "    res = " << GGenerated << GConcat << StringTypeName << "(value, res); " << endl
             << "    res = " << GGenerated << GAdd << StringTypeName << "(res, '\"'); " << endl
@@ -784,8 +785,8 @@ void CCodeGen::generateStd() {
             << "} " << endl
             << endl;
 
-    *Header << "void " << Prints[Type(TypeId::STRING)] << "(" << StringTypeName << "* string); " << endl;
-    *Output << "void " << Prints[Type(TypeId::STRING)] << "(" << StringTypeName << "* string) { " << endl
+    *Header << "void " << Prints[FakeString] << "(" << StringTypeName << "* string); " << endl;
+    *Output << "void " << Prints[FakeString] << "(" << StringTypeName << "* string) { " << endl
             << "    char* buffer = malloc(sizeof(char) * (string->"<< GSize << " + 1)); " << endl
             << "    int i; " << endl
             << endl

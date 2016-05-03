@@ -117,6 +117,7 @@ class CCodeGen : public parser::CodeGenerator {
 
     common::Type StringList;
     common::Type RealString;
+    common::Type FakeString;
 
     common::Program *Prog;
     common::Function *CurFunc;
