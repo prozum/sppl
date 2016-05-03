@@ -272,7 +272,7 @@ string CCodeGen::generateList(Type &Ty) {
     string ChildrenType = getType(Ty.Subtypes.front());
 
     // Generate the data type itself
-    *Header << " " << endl
+    *Header << endl
             << "typedef struct "<< Name << " { " << endl
             << "    struct "<< Name << "* " << GNext << "; " << endl
             << "    " << ChildrenType << " " << GValue << "; " << endl
@@ -318,11 +318,12 @@ string CCodeGen::generateList(Type &Ty) {
     // Generate at function for list
     *Header << Name << "* " << GGenerated << GAt << Name << "(" << Name << "* current, int index); " << endl;
     Buffer << Name << "* " << GGenerated << GAt << Name << "(" << Name << "* current, int index) { " << endl
-           << "    while (index-- > 0) { " << endl
-           << "        if (current->" << GEmpty << ") { " << endl
-           << "            return current; " << endl
-           << "        } " << endl
+           << "    if (current->" << GSize << " < index) { " << endl
+           << "        printf(\"Out of bound! " << Ty.str() << "\\n\"); " << endl
+           << "        exit(1); " << endl
+           << "    }" << endl
            << endl
+           << "    while (index-- > 0) { " << endl
            << "        current = current->" << GNext << "; " << endl
            << "    } " << endl
            << endl
@@ -333,21 +334,13 @@ string CCodeGen::generateList(Type &Ty) {
     // Generate valueat function for list
     *Header << ChildrenType << " " << GGenerated << GValueAt << Name << "(" << Name << "* current, int index); " << endl;
     Buffer << ChildrenType << " " << GGenerated << GValueAt << Name << "(" << Name << "* current, int index) { " << endl
-           << "    " << Name << "* res = " << GGenerated << GAt << Name << "(current, index); " << endl
-           << endl
-           << "    if (res->" << GEmpty << ") { " << endl
-           << "        printf(\"Out of bound! " << Ty.str() << "\\n\"); " << endl
-           << "        exit(1); " << endl
-           << "    }"
-           << endl
-           << "    return res->" << GValue << "; " << endl
+           << "    return " << GGenerated << GAt << Name << "(current, index)->" << GValue << "; " << endl
            << "} " << endl
            << endl;
 
     // Generate compare function for list
     *Header << "int " << GGenerated << GCompare << Name << "(" << Name << "* list1, " << Name << "* list2); " << endl;
     Buffer << "int " << GGenerated << GCompare << Name << "(" << Name << "* list1, " << Name << "* list2) { " << endl
-           << "    int i; " << endl
            << "    if (list1->" << GSize << " != list2->" << GSize << ") { " << endl
            << "         return 0; " << endl
            << "    } " << endl
