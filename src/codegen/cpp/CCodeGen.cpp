@@ -77,11 +77,8 @@ void CCodeGen::visit(Function &Node) {
 
     // Generate function arguments
     for (size_t i = 0; i < Node.Signature.Subtypes.size() - 1; ++i) {
-        string ArgName = GGenerated + GArg + to_string(i);
-
         // Add the argument to a list for later use in the pattern generation
-        ArgNames.push_back(ArgName);
-        Func << getType(Node.Signature.Subtypes[i]) << " " << ArgName;
+        Func << getType(Node.Signature.Subtypes[i]) << " " << GGenerated + GArg + to_string(i);
 
         if (i != Node.Signature.Subtypes.size() - 2)
             Func << ", ";
@@ -118,9 +115,6 @@ void CCodeGen::visit(Function &Node) {
             << "    exit(1); " << endl
             << "} " << endl
             << endl;
-
-    // Clear ArgNames for current function
-    ArgNames.clear();
 }
 
 void CCodeGen::visit(Case &Node) {
@@ -135,7 +129,7 @@ void CCodeGen::visit(Case &Node) {
         // Push the argument name assosiated with the current pattern on a stack.
         // This stack is later used for assigning the arguments of the function, to the
         // arguments in the patterns specified in sppl
-        GetValueBuilder.push_back(ArgNames[i]);
+        GetValueBuilder.push_back(GGenerated + GArg + to_string(i));
 
         Node.Patterns[i]->accept(*this);
 

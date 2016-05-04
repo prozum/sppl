@@ -105,7 +105,6 @@ class CCodeGen : public parser::CodeGenerator {
     std::unordered_map<common::Type, std::string> Closures;
     std::unordered_map<common::Type, std::string> ToStrings;
     std::unordered_map<common::Type, std::string> Prints;
-    std::vector<std::string> ArgNames;
     std::vector<std::string> GetValueBuilder;
     std::vector<std::string> Assignments;
     std::vector<int> ListOffsets;
