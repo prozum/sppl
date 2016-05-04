@@ -35,7 +35,7 @@ void CCodeGen::visit(ListPattern &Node) {
         GetValueBuilder.pop_back();
         GetValueBuilder.erase(GetValueBuilder.begin());
 
-        if (LastPattern != "1") {
+        if (!LastPattern.empty()) {
             Res << " && " << LastPattern;
         }
     }
@@ -44,8 +44,6 @@ void CCodeGen::visit(ListPattern &Node) {
 }
 
 void CCodeGen::visit(TuplePattern &Node) {
-    // Result is needed, so we don't start generating something in a signature
-    // in the header file
     stringstream Res;
     bool Empty = true;
 
@@ -58,7 +56,7 @@ void CCodeGen::visit(TuplePattern &Node) {
 
         GetValueBuilder.pop_back();
 
-        if (LastPattern != "1") {
+        if (!LastPattern.empty()) {
             if (!Empty)
                 Res << " && ";
 
@@ -67,9 +65,9 @@ void CCodeGen::visit(TuplePattern &Node) {
         }
     }
 
-    // If empty, then let LastPattern be "1"
+    // If empty, then let LastPattern be ""
     if (Empty) {
-        LastPattern = "1";
+        LastPattern.clear();
     } else {
         LastPattern = "(" + Res.str() + ")";
     }
@@ -92,7 +90,7 @@ void CCodeGen::visit(ListSplit &Node) {
     GetValueBuilder.pop_back();
     GetValueBuilder.erase(GetValueBuilder.begin());
 
-    if (LastPattern != "1") {
+    if (!LastPattern.empty()) {
         Empty = false;
         Res << LastPattern;
     }
@@ -104,7 +102,7 @@ void CCodeGen::visit(ListSplit &Node) {
 
     ListOffsets[ListOffsets.size() - 1]--;
 
-    if (LastPattern != "1") {
+    if (!LastPattern.empty()) {
         if (!Empty)
             Res << " && ";
 
@@ -112,9 +110,9 @@ void CCodeGen::visit(ListSplit &Node) {
         Res << LastPattern;
     }
 
-    // If empty, then let LastPattern be "1"
+    // If empty, then let LastPattern be ""
     if (Empty) {
-        LastPattern = "1";
+        LastPattern.clear();
     } else {
         LastPattern = "(" + Res.str() + ")";
     }
@@ -185,14 +183,14 @@ void CCodeGen::visit(IdPattern &Node) {
     Assignments.push_back(Assign.str());
 
     // Since an id, in a pattern is always true, then LastPattern is just
-    // set to "1"
-    LastPattern = "1";
+    // set to ""
+    LastPattern.clear();
 }
 
 void CCodeGen::visit(WildPattern &Node) {
     // Since a wildcard, in a pattern is always true, then LastPattern is just
-    // set to "1"
-    LastPattern = "1";
+    // set to ""
+    LastPattern.clear();
 }
 
 void CCodeGen::visit(AlgebraicPattern &Node) {
@@ -203,7 +201,7 @@ void CCodeGen::visit(AlgebraicPattern &Node) {
 void CCodeGen::visit(ParPattern &Node) {
     Node.Pat->accept(*this);
 
-    if (LastPattern != "1") {
+    if (!LastPattern.empty()) {
         LastPattern = "(" + LastPattern + ")";
     }
 }

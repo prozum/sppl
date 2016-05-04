@@ -66,7 +66,6 @@ void CCodeGen::visit(Program &Node) {
 void CCodeGen::visit(Function &Node) {
     stringstream Func;
     string RetType = getType(Node.Signature.Subtypes.back());
-    string ArgType;
     //string Signature = getEnvironment(Node.Signature);
 
     CurFunc = &Node;
@@ -135,8 +134,8 @@ void CCodeGen::visit(Case &Node) {
 
         GetValueBuilder.pop_back();
 
-        // Only add pattern, if pattern is not "1"
-        if (LastPattern != "1") {
+        // Only add pattern, if pattern is not ""
+        if (!LastPattern.empty()) {
 
             if (!Empty)
                 Pattern << " && ";

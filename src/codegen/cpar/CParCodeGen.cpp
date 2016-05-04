@@ -167,7 +167,7 @@ void CParCodeGen::visit(Case &Node) {
         GetValueBuilder.pop_back();
 
         // Only add pattern, if pattern is not "1"
-        if (LastPattern != "1") {
+        if (!LastPattern.empty()) {
 
             if (!Empty)
                 Pattern << " && ";
