@@ -10,42 +10,47 @@
 #include <cppunit/CompilerOutputter.h>
 #include "Test.h"
 
-CPPUNIT_TEST_SUITE_REGISTRATION(Test);
+/*
+ * This file handles all the general functions needed to run unit tests.
+ */
 
-compiler::Backend backend = compiler::Backend::PPRINTER;
+CPPUNIT_TEST_SUITE_REGISTRATION(Test);  // Add test suites. Repeat for additional new test suites
+                                        // This could be used to add performance tests as well
+
+compiler::Backend backend = compiler::Backend::PPRINTER;    // Standard compiler if no other valid is set
 
 int main(int argc, char* argv[]){
 
     // Set the target compiler
-    if (strcmp(argv[1], "c") == 0) {
+    if (strcmp(argv[1], "c") == 0) {    // Set compiler to c
 #ifdef CCPP
         cout << "Backend: C" << endl;
         backend = compiler::Backend::CPP;
 #else
         cout << "Unsupported: C - Defaulting to Pretty Printer" << endl;
 #endif
-    } else if (strcmp(argv[1], "p") == 0) {
+    } else if (strcmp(argv[1], "p") == 0) { // Set compiler to c parallel
 #ifdef CCPP
         cout << "Backend: C Parallel" << endl;
         backend = compiler::Backend::CPAR;
 #else
         cout << "Unsupported: C Parallel - Defaulting to Pretty Printer" << endl;
 #endif
-    } else if (strcmp(argv[1], "l") == 0) {
+    } else if (strcmp(argv[1], "l") == 0) { // Set compiler to llvm
 #ifdef CLLVM
         cout << "Backend: LLVM" << endl;
         backend = compiler::Backend::LLVM;
 #else
         cout << "Unsupported: LLVM - Defaulting to Pretty Printer" << endl;
 #endif
-    } else if (strcmp(argv[1], "h") == 0) {
+    } else if (strcmp(argv[1], "h") == 0) { // set compiler to haskell
 #ifdef CHASKELL
         cout << "Backend: Haskell" << endl;
         backend = compiler::Backend::HASKELL;
 #else
         cout << "Unsupported: Haskell - Defaulting to Pretty Printer" << endl;
 #endif
-    } else if (strcmp(argv[1], "a") == 0) {
+    } else if (strcmp(argv[1], "a") == 0) { // set compiler to gnu asm
 #ifdef CGNUASM
         cout << "Backend: Gnu Asm" << endl;
         backend = compiler::Backend::GNUASM;
@@ -55,6 +60,7 @@ int main(int argc, char* argv[]){
     }
 
     // CPPUNIT stuff
+    // It just have to be there. Dont mind it.
     CPPUNIT_NS::TestResult test_result;
 
     CPPUNIT_NS::TestResultCollector collector;
@@ -73,14 +79,17 @@ int main(int argc, char* argv[]){
     return collector.wasSuccessful() ? 0 : 1;
 }
 
+// Not used, but CppUnit require it
 void Test::setUp() {
     // First test setup
 }
 
+// Not used, but CppUnit require it
 void Test::tearDown() {
     // Final test cleanup
 }
 
+// Compiles the input program using the given sourcefile and the preset compiler target
 bool Test::compileChecker(std::string name) {
     int compStatus;     // Stores the return code from the compiler
 
@@ -90,6 +99,9 @@ bool Test::compileChecker(std::string name) {
         std::vector<std::string> in;
         string file = "";
 
+        // Split input to individual files.
+        // Better alternative to function overloading for different number of arguments,
+        // and easier than stdarg or creating a vector for every single test.
         for (char c : name) {
             if (c == ' ') {
                 in.push_back(file);
@@ -100,28 +112,35 @@ bool Test::compileChecker(std::string name) {
             }
         }
 
+        // Push last file to input vector
         if (file.length() > 0) {
             in.push_back(file);
         }
 
+        // Set output files
         compiler.setOutput("out.c");
         compiler.setHeaderOutput("test.h");
 
         compiler.setBackend(backend);
-        compStatus = compiler.compile(in);
+        compStatus = compiler.compile(in);  // Run compiler
     }
-    catch (...) {
+    catch (...) {   // The compiler should never throw an error
+                    // Special message if it is the case
+                    // Cant handle serious exceptions such as Abort SegFault.
         CPPUNIT_ASSERT_MESSAGE("Exception Thrown In Compiler", false);
         return false;
     }
 
-    if (compStatus != 0) {
+    if (compStatus != 0) {  // For the future, consider returning the errorcode to the user
         return false;
     } else {
         return true;
     }
 }
 
+// Run the code after compiled
+// Run separate function for each supported target language
+// Only currently relevant languages available
 bool Test::executeChecker(std::string args, std::string expectedOutput) {
     if (backend == compiler::Backend::CPP || backend == compiler::Backend::CPAR) {
         return executeCPP(args, expectedOutput);
@@ -132,17 +151,19 @@ bool Test::executeChecker(std::string args, std::string expectedOutput) {
     }
 }
 
+// Wrapper for when not using input arguments in the test
 bool Test::executeChecker(std::string expectedOutput) {
     return executeChecker("", expectedOutput);
 }
 
+// Used for testing the generated c code
 bool Test::executeCPP(std::string args, std::string expectedOutput) {
     int status;
 
-    // Compile program
-    if (backend == compiler::Backend::CPP) {
+    // Compile program using system c compiler
+    if (backend == compiler::Backend::CPP) {    // Sequential compiler
         status = system("cc out.c -o prog");
-    } else if (backend == compiler::Backend::CPAR) {
+    } else if (backend == compiler::Backend::CPAR) {    // Parallel compiler
         status = system("cc out.c context.c print.c queue.c runtime.c task.c -o prog -lpthread");
     } else{
         CPPUNIT_ASSERT_MESSAGE("Unsupported backend detected wrong place", false);
@@ -150,12 +171,13 @@ bool Test::executeCPP(std::string args, std::string expectedOutput) {
 
 
     if (status != 0) {
-        CPPUNIT_ASSERT_MESSAGE("C Compiler Error", false);
-    }
+        CPPUNIT_ASSERT_MESSAGE("C Compiler Error", false);  // If this happens, yell a the
+    }                                                       // C code generator
 
     // SOURCE: http://stackoverflow.com/questions/478898/how-to-execute-a-command-and-get-output-of-command-within-c
     // Used to read from outputstream for the program
 
+    // build the command line command
     std::string argBuilder = "./prog ";
     argBuilder += args;
     char* arg = (char*) argBuilder.c_str();
@@ -174,6 +196,9 @@ bool Test::executeCPP(std::string args, std::string expectedOutput) {
         }
     }
 
+    // Compare the output from the program to the expected output
+    // If the outputs are equal, the program executed correctly
+    // (as in it gave the correct output to the correct input)
     if (res.compare(expectedOutput + "\n") != 0) {
         // If fail, first clear last test output, then return
         std::string resTemp = "result differ from expected\nResult   => ";
@@ -196,6 +221,8 @@ bool Test::executeCPP(std::string args, std::string expectedOutput) {
     }
 }
 
+// This is where we would run out LLVM tests
+// IF WE HAD ANY
 bool Test::executeLLVM(std::string args, std::string expectedOutput) {
     return true; // TODO: DONT DO THIS
 }
