@@ -79,12 +79,7 @@ void CParCodeGen::visit(Function &Node) {
     ParFunc = "void " + GUser + GParallel + Node.Id + "(task_t *t)";
     SeqFunc = getType(Node.Signature.Subtypes.back()) + " " + GUser + GSequential + Node.Id + "(";
     for (size_t i = 0; i < Node.Signature.Subtypes.size() - 1; ++i) {
-        string ArgName = GGenerated + GArg + to_string(i);
-
-        ArgType = getType(Node.Signature.Subtypes[i]);
-        ArgNames.push_back(ArgName);
-
-        SeqFunc += ArgType + " " + ArgName;
+        SeqFunc += getType(Node.Signature.Subtypes[i]) + " " + GGenerated + GArg + to_string(i);
 
         if (i < Node.Signature.Subtypes.size() - 2)
             SeqFunc += ", ";
@@ -104,7 +99,6 @@ void CParCodeGen::visit(Function &Node) {
         string ArgName = GGenerated + GArg + to_string(i);
 
         ArgType = getType(Node.Signature.Subtypes[i]);
-        ArgNames.push_back(ArgName);
 
         *Output << "    " << ArgType << " " << ArgName << " = "
                     << "(" << ArgType << ")" << "(" << "(" << CurrentArg << "*)" << "t->startarg)->"
@@ -129,9 +123,6 @@ void CParCodeGen::visit(Function &Node) {
             << "} " << endl
             << endl;
 
-    // Clear ArgNames for current function
-    ArgNames.clear();
-
 
 
 
@@ -154,9 +145,6 @@ void CParCodeGen::visit(Function &Node) {
             << "    exit(1); " << endl
             << "} " << endl
             << endl;
-
-    // Clear ArgNames for current function
-    ArgNames.clear();
 }
 
 void CParCodeGen::visit(Case &Node) {
@@ -170,7 +158,7 @@ void CParCodeGen::visit(Case &Node) {
     for (size_t i = 0; i < Node.Patterns.size(); ++i) {
         // Push arg_name on get_value_builder. get_value_builder is used for
         // generate assignments in a case
-        GetValueBuilder.push_back(ArgNames[i]);
+        GetValueBuilder.push_back(GGenerated + GArg + to_string(i));
 
         // Generate pattern
         Node.Patterns[i]->accept(*this);
@@ -179,7 +167,7 @@ void CParCodeGen::visit(Case &Node) {
         GetValueBuilder.pop_back();
 
         // Only add pattern, if pattern is not "1"
-        if (LastPattern != "1") {
+        if (!LastPattern.empty()) {
 
             if (!Empty)
                 Pattern << " && ";
