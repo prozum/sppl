@@ -127,6 +127,7 @@ void LLVMCodeGen::visit(common::CallExpr &Node) {
     auto Call = Builder.CreateCall(Callee, Args, "calltmp");
 
     // Set tail recursion state
+    Call->setCallingConv(CallingConv::Fast);
     Call->setTailCall(TailRec);
 
     CurVal = Call;

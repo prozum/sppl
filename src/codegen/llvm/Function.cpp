@@ -25,6 +25,9 @@ void LLVMCodeGen::visit(common::Function &Node) {
         CurEntry = BasicBlock::Create(Ctx, "entry", CurFunc);
     }
 
+    // Set call convention to fast to enable tail recursion optimizations
+    CurFunc->setCallingConv(CallingConv::Fast);
+
     // Create error block
     CurErrBlock = BasicBlock::Create(Ctx, "error", CurFunc);
     Builder.SetInsertPoint(CurErrBlock);
