@@ -132,7 +132,7 @@ string SpplJit::getOutputTuple(intptr_t Addr, common::Type Type) {
     auto Subtypes = Type.Subtypes;
     string Out("(");
     for (size_t i = 0; i < Subtypes.size(); ++i) {
-        auto Offset = Alignment - (Alignment % 8);
+        auto Offset = Alignment - (Addr % 8);
         switch (Subtypes[i].Id) {
         case TypeId::INT:
             Addr += Offset;
