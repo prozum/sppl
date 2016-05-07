@@ -86,6 +86,9 @@ void LLVMCodeGen::visit(common::Case &Node) {
     BasicBlock *TrueBlock;
     BasicBlock *FalseBlock;
 
+    // Store tail recursion state in visitor
+    TailRec = Node.TailRec;
+
     CtxVals.clear();
     for (CurPat = Node.Patterns.cbegin(), CurArg = Args.begin(),
         CurPatBlock = CurPatVecBlock->cbegin(),

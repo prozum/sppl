@@ -29,6 +29,7 @@ class LLVMCodeGen : public parser::CodeGenerator {
     std::unique_ptr<llvm::Module> Module;
 
     std::map<std::string, llvm::Value *> CtxVals;
+    bool TailRec = false;
 
     std::unordered_map<common::Type, llvm::StructType *> TupleTypes;
     std::unordered_map<common::Type, llvm::StructType *> ListTypes;
