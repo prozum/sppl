@@ -112,6 +112,10 @@ void LLVMCodeGen::visit(common::Case &Node) {
         Builder.SetInsertPoint(*CurPatBlock);
         (*CurPat)->accept(*this);
 
+        // Visit when expression
+        if (Node.When)
+            Node.When->accept(*this);
+
         // Create condition
         Builder.CreateCondBr(CurVal, TrueBlock, FalseBlock);
     }
