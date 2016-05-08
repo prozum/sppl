@@ -27,8 +27,10 @@ void CParCodeGen::visit(Program &Node) {
         }
     }
 
-    if (!Main)
-        throw "No main, help!";
+    if (!Main) {
+        addError(Error("No main function");
+        return;
+    }
 
     // Get the type of main, so that return type of main is generated
     string MainSig = getType(Main->Signature);

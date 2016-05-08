@@ -117,7 +117,7 @@ void CCodeGen::visit(ListAdd &Node) {
 
 void CCodeGen::visit(ProducerConsumer &Node) {
     // TODO
-    throw std::runtime_error("Not implemented");
+    addError(Error::NotImplemented(Node.Loc));
 }
 
 void CCodeGen::visit(Concat &Node) {
@@ -146,7 +146,7 @@ void CCodeGen::visit(Not &Node) {
 
 void CCodeGen::visit(To &Node) {
     // TODO
-    throw std::runtime_error("Not implemented");
+    addError(Error::NotImplemented(Node.Loc));
 }
 
 void CCodeGen::visit(Negative &Node) {
@@ -230,7 +230,7 @@ void CCodeGen::visit(ListExpr &Node) {
 
 void CCodeGen::visit(AlgebraicExpr &Node) {
     // TODO
-    throw std::runtime_error("Not implemented");
+    addError(Error::NotImplemented(Node.Loc));
 }
 
 
@@ -272,13 +272,13 @@ void CCodeGen::visit(CallExpr &Node) {
 void CCodeGen::visit(LambdaArg &Node) {
 
     // TODO
-    throw std::runtime_error("Not implemented");
+    addError(Error::NotImplemented(Node.Loc));
 }
 
 void CCodeGen::visit(LambdaFunction &Node) {
 
     // TODO
-    throw std::runtime_error("Not implemented");
+    addError(Error::NotImplemented(Node.Loc));
 }
 
 void CCodeGen::outputEqual(Type &Ty, Expression &Left, Expression &Right) {

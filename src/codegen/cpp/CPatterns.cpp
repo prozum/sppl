@@ -195,7 +195,7 @@ void CCodeGen::visit(WildPattern &Node) {
 
 void CCodeGen::visit(AlgebraicPattern &Node) {
     // TODO
-    throw std::runtime_error("Not implemented");
+    addError(Error::NotImplemented(Node.Loc));
 }
 
 void CCodeGen::visit(ParPattern &Node) {
