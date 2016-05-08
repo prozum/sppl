@@ -246,7 +246,7 @@ int SpplJit::eval(string Str) {
 
     if (!Drv.accept(CodeGen))
         return 5;
-    auto FuncNode = static_cast<common::Function *>(Drv.Prog->Decls[0].get());
+    auto FuncNode = static_cast<common::Function *>(Drv.Prog->Decls.front().get());
     auto RetTy = FuncNode->Signature.Subtypes.back();
 
 // Optimize

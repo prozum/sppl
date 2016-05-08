@@ -513,7 +513,17 @@ void TypeChecker::visit(ListAdd &Node) {
 }
 
 void TypeChecker::visit(To &Node) {
-    // TODO Implement To Type Checking
+    Node.Child->accept(*this);
+
+    if (Node.Child->RetTy.Id == TypeId::BOOL ||
+        Node.Child->RetTy.Id == TypeId::CHAR ||
+        Node.Child->RetTy.Id == TypeId::INT ||
+        Node.Child->RetTy.Id == TypeId::FLOAT) {
+        Node.RetTy = Node.TypeCast;
+        return;
+    }
+
+    // TODO: Implement support for more
     addError(Error::NotImplemented(Node.Loc));
 }
 
