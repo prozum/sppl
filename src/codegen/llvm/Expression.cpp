@@ -19,7 +19,7 @@ void LLVMCodeGen::visit(common::BoolExpr &Node) {
 void LLVMCodeGen::visit(common::StringExpr &Node) {
     auto GlobalVar = Builder.CreateGlobalString(Node.Val, CurFunc->getName() + ".str");
 
-    CurVal = CreateList(Node.RetTy, GlobalVar, ConstantInt::get(Int32, Node.Val.size()), *CurCaseBlock);
+    CurVal = CreateList(Node.RetTy, GlobalVar, ConstantInt::get(Int32, Node.Val.size()), *CaseBlock);
 }
 
 void LLVMCodeGen::visit(common::CharExpr &Node) {
@@ -28,7 +28,7 @@ void LLVMCodeGen::visit(common::CharExpr &Node) {
 
 void LLVMCodeGen::visit(common::IdExpr &Node) {
     // Pattern value
-    CurVal = CtxVals[Node.Val];
+    CurVal = PatVals[Node.Val];
     if (CurVal)
         return;
 
@@ -72,7 +72,7 @@ void LLVMCodeGen::visit(common::ListExpr &Node) {
     auto ArrayType = ArrayType::get(getType(Node.RetTy.Subtypes.front()), Node.Elements.size());
 
     // Malloc list data
-    auto DataMalloc = CreateMalloc(ArrayType, *CurCaseBlock);
+    auto DataMalloc = CreateMalloc(ArrayType, *CaseBlock);
     auto DataCast = Builder.CreateBitCast(DataMalloc, PointerType::getUnqual(ArrayType));
 
     // Create global list constant
@@ -103,7 +103,7 @@ void LLVMCodeGen::visit(common::ListExpr &Node) {
     auto DataCast = Builder.CreateBitCast(DataMalloc, PointerType::getUnqual(ArrayType::get(getType(Node.RetTy.Subtypes[0]), 0)));
     Builder.CreateStore(DataCast, CurVal);
     */
-    auto List = CreateList(Node.RetTy, DataCast, ConstantInt::get(Int32, Node.Elements.size()), *CurCaseBlock);
+    auto List = CreateList(Node.RetTy, DataCast, ConstantInt::get(Int32, Node.Elements.size()), *CaseBlock);
 
     // Set return value
     auto ListPtrType = getType(Node.RetTy);

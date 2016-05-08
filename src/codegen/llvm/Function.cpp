@@ -22,26 +22,30 @@ void LLVMCodeGen::visit(common::Function &Node) {
             Args.push_back(&Arg);
         }
 
-        CurEntry = BasicBlock::Create(Ctx, "entry", CurFunc);
+        Entry = BasicBlock::Create(Ctx, "entry", CurFunc);
     }
+
+    // Allocate bool for pattern matching
+    Builder.SetInsertPoint(Entry);
+    PatBool = Builder.CreateAlloca(Int1);
 
     // Set call convention to fast to enable tail recursion optimizations
     CurFunc->setCallingConv(CallingConv::Fast);
 
     // Create error block
-    CurErrBlock = BasicBlock::Create(Ctx, "error", CurFunc);
-    Builder.SetInsertPoint(CurErrBlock);
+    ErrBlock = BasicBlock::Create(Ctx, "error", CurFunc);
+    Builder.SetInsertPoint(ErrBlock);
     Builder.CreateRet(UndefValue::get(CurFunc->getReturnType()));
 
     // Setup return block and phi node
-    CurRetBlock = BasicBlock::Create(Ctx, "ret", CurFunc);
-    Builder.SetInsertPoint(CurRetBlock);
+    CaseRetBlock = BasicBlock::Create(Ctx, "ret", CurFunc);
+    Builder.SetInsertPoint(CaseRetBlock);
 
     // Create ret instruction
     if (CurFunc->getReturnType()->getTypeID() != llvm::Type::TypeID::VoidTyID) {
-        CurPhiNode = Builder.CreatePHI(CurFunc->getReturnType(),
+        CasePhiNode = Builder.CreatePHI(CurFunc->getReturnType(),
                                        (unsigned) Node.Cases.size(), "rettmp");
-        Builder.CreateRet(CurPhiNode);
+        Builder.CreateRet(CasePhiNode);
     } else {
         Builder.CreateRetVoid();
     }
@@ -64,16 +68,14 @@ void LLVMCodeGen::visit(common::Function &Node) {
     }
 
     // Visit cases
-    for (CurCase = Node.Cases.cbegin(), CurCaseBlock = CaseBlocks.cbegin(),
-        LastCaseBlock = CaseBlocks.cend(),
-        CurPatVecBlock = PatVecBlocks.cbegin();
+    for (CurCase = Node.Cases.cbegin(), CaseBlock = CaseBlocks.cbegin(), CurPatVecBlock = PatVecBlocks.cbegin();
          CurCase != Node.Cases.cend();
-         ++CurCase, ++CurCaseBlock, ++CurPatVecBlock) {
+         ++CurCase, ++CaseBlock, ++CurPatVecBlock) {
         (*CurCase)->accept(*this);
     }
 
     // Make entry point to first block
-    Builder.SetInsertPoint(CurEntry);
+    Builder.SetInsertPoint(Entry);
     BasicBlock *FirstBlock;
     if (PatVecBlocks.front().empty())
         FirstBlock = CaseBlocks.front();
@@ -85,32 +87,35 @@ void LLVMCodeGen::visit(common::Function &Node) {
 }
 
 void LLVMCodeGen::visit(common::Case &Node) {
-
     BasicBlock *TrueBlock;
     BasicBlock *FalseBlock;
 
     // Store tail recursion state in visitor
     TailRec = Node.TailRec;
 
-    CtxVals.clear();
-    for (CurPat = Node.Patterns.cbegin(), CurArg = Args.begin(),
-        CurPatBlock = CurPatVecBlock->cbegin(),
-        LastPatBlock = CurPatVecBlock->cend();
-         CurPat != Node.Patterns.cend(); ++CurPat, ++CurArg, ++CurPatBlock) {
+    PatVals.clear();
+    for (CurPat = Node.Patterns.cbegin(), CurArg = Args.begin(), PatBlock = CurPatVecBlock->cbegin();
+         CurPat != Node.Patterns.cend();
+         ++CurPat, ++CurArg, ++PatBlock) {
 
-        if (next(CurPatBlock) != LastPatBlock)
-            TrueBlock = *next(CurPatBlock);
+        // Set true block
+        if (next(PatBlock) != CurPatVecBlock->cend())
+            TrueBlock = *next(PatBlock);
         else
-            TrueBlock = *CurCaseBlock;
+            TrueBlock = *CaseBlock;
 
-        if (next(CurCaseBlock) != LastCaseBlock)
+        // Set false block
+        if (next(CaseBlock) != CaseBlocks.cend())
             FalseBlock = (*next(CurPatVecBlock)).front();
         else
-            FalseBlock = CurErrBlock;
+            FalseBlock = ErrBlock;
 
-
-        Builder.SetInsertPoint(*CurPatBlock);
+        PatRetBlock = BasicBlock::Create(Ctx, (*PatBlock)->getName() + "_ret", CurFunc);
+        Builder.SetInsertPoint(*PatBlock);
+        CurVal = *CurArg;
         (*CurPat)->accept(*this);
+        Builder.CreateBr(PatRetBlock);
+        Builder.SetInsertPoint(PatRetBlock);
 
         // Visit when expression
         if (Node.When)
@@ -121,15 +126,23 @@ void LLVMCodeGen::visit(common::Case &Node) {
     }
 
     // Generate expression in case block
-    Builder.SetInsertPoint(*CurCaseBlock);
+    Builder.SetInsertPoint(*CaseBlock);
     Node.Expr->accept(*this);
+
+#ifdef SPPLDEBUG
+    auto Ty1 = CurVal->getType();
+    auto Te1 = CurVal->getType()->isIntegerTy();
+    auto Ty2 = CasePhiNode->getType();
+    auto Te2 = CasePhiNode->getType()->isIntegerTy();
+    assert(Ty1 == Ty2);
+#endif
 
     // Ignore expression type if function is void
     if (CurFunc->getReturnType()->getTypeID() != llvm::Type::TypeID::VoidTyID)
-        CurPhiNode->addIncoming(CurVal, *CurCaseBlock);
+        CasePhiNode->addIncoming(CurVal, *CaseBlock);
 
     // Add return value to phi node
-    Builder.CreateBr(CurRetBlock);
+    Builder.CreateBr(CaseRetBlock);
 }
 
 llvm::Function *LLVMCodeGen::CreateMain()
@@ -148,24 +161,24 @@ llvm::Function *LLVMCodeGen::CreateMain()
     Argument *Argv = &*(ArgIter);
 
     // Create blocks
-    CurEntry = BasicBlock::Create(Ctx, "entry", Func);
+    Entry = BasicBlock::Create(Ctx, "entry", Func);
     auto CheckBlock = BasicBlock::Create(Ctx, "check", Func);
     auto UpdateBlock = BasicBlock::Create(Ctx, "update", Func);
     auto LoopBlock = BasicBlock::Create(Ctx, "loop", Func);
     auto EndBlock = BasicBlock::Create(Ctx, "end", Func);
 
     // Init in entry block
-    Builder.SetInsertPoint(CurEntry);
+    Builder.SetInsertPoint(Entry);
     auto Iter = Builder.CreateAlloca(Int32);
     Builder.CreateStore(ConstantInt::get(Int32, APInt(32, 0)), Iter);
 
     // Data
     CurVal = ConstantInt::get(Int32, APInt(32, DataLayout.getPointerSize()));
     CurVal = Builder.CreateMul(Argc, CurVal);
-    auto Data = CreateMalloc(CurVal, CurEntry);
+    auto Data = CreateMalloc(CurVal, Entry);
 
     // List
-    auto List = CreateList(Type, Data, Argc, CurEntry);
+    auto List = CreateList(Type, Data, Argc, Entry);
     Builder.CreateBr(CheckBlock);
 
     // Check block

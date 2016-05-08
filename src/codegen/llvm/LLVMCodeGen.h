@@ -28,7 +28,7 @@ class LLVMCodeGen : public parser::CodeGenerator {
     const llvm::DataLayout DataLayout;
     std::unique_ptr<llvm::Module> Module;
 
-    std::map<std::string, llvm::Value *> CtxVals;
+    std::map<std::string, llvm::Value *> PatVals;
     bool TailRec = false;
     bool Runtime = false;
 
@@ -50,25 +50,29 @@ private:
     llvm::FunctionType *MainType;
 
     llvm::Value *CurVal = nullptr;
+    llvm::Value *PatBool = nullptr;
     llvm::Function *CurFunc = nullptr;
-    llvm::BasicBlock *CurEntry = nullptr;
-    llvm::BasicBlock *CurErrBlock = nullptr;
-    llvm::BasicBlock *CurRetBlock = nullptr;
-    llvm::PHINode *CurPhiNode = nullptr;
+
+    llvm::BasicBlock *Entry = nullptr;
+    llvm::BasicBlock *ErrBlock = nullptr;
+    llvm::BasicBlock *CaseRetBlock = nullptr;
+    llvm::PHINode *CasePhiNode = nullptr;
+    llvm::BasicBlock *PatRetBlock = nullptr;
 
     std::vector<llvm::Value *> Args;
     std::vector<llvm::Value *>::iterator CurArg;
 
     std::vector<std::unique_ptr<common::Case>>::const_iterator CurCase;
     std::vector<llvm::BasicBlock *> CaseBlocks;
-    std::vector<llvm::BasicBlock *>::const_iterator CurCaseBlock;
-    std::vector<llvm::BasicBlock *>::const_iterator LastCaseBlock;
+    std::vector<llvm::BasicBlock *>::const_iterator CaseBlock;
+    //std::vector<llvm::BasicBlock *>::const_iterator LastCaseBlock;
 
     std::vector<std::unique_ptr<common::Pattern>>::const_iterator CurPat;
+
     std::vector<std::vector<llvm::BasicBlock *>> PatVecBlocks;
     std::vector<std::vector<llvm::BasicBlock *>>::const_iterator CurPatVecBlock;
-    std::vector<llvm::BasicBlock *>::const_iterator CurPatBlock;
-    std::vector<llvm::BasicBlock *>::const_iterator LastPatBlock;
+    std::vector<llvm::BasicBlock *>::const_iterator PatBlock;
+    //std::vector<llvm::BasicBlock *>::const_iterator LastPatBlock;
 
 
     void visit(common::Program &node);
