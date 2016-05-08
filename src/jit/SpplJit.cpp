@@ -91,6 +91,7 @@ void SpplJit::createModule() {
         std::make_unique<legacy::FunctionPassManager>(CodeGen.Module.get());
 
     // Add optimization passes
+    PassMgr->add(createTailCallEliminationPass());
     PassMgr->add(createInstructionCombiningPass());
     PassMgr->add(createReassociatePass());
     PassMgr->add(createGVNPass());
