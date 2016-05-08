@@ -37,6 +37,7 @@ class SpplJit {
         llvm::InitializeNativeTargetAsmParser();
     }
 
+private:
     typedef llvm::orc::ObjectLinkingLayer<> ObjLayerT;
     typedef llvm::orc::IRCompileLayer<ObjLayerT> CompileLayerT;
     typedef CompileLayerT::ModuleSetHandleT ModuleHandleT;
@@ -50,7 +51,7 @@ class SpplJit {
     std::string mangle(const std::string &Name);
 
     std::string getOutput(intptr_t Data, common::Type Type);
-    std::string getOutputTuple(intptr_t Addr, common::Type Type);
+    std::string getOutputTuple(intptr_t Addr, common::Type Ty);
 
     parser::Driver Drv;
     codegen::LLVMCodeGen CodeGen;
@@ -66,7 +67,6 @@ class SpplJit {
     std::unique_ptr<llvm::legacy::FunctionPassManager> PassMgr;
     std::vector<ModuleHandleT> ModuleHandles;
     ModuleHandleT ModuleHandler;
-
 
 
     template <typename T> static std::vector<T> singletonSet(T Item) {

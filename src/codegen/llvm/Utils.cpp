@@ -42,4 +42,8 @@ Instruction *LLVMCodeGen::CreateMalloc(Value *Size, BasicBlock *Block)
     return Malloc;
 }
 
+unsigned LLVMCodeGen::getAlignment(common::Type Ty) {
+    return DataLayout.getPrefTypeAlignment(getType(Ty));
+}
+
 

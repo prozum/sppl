@@ -30,6 +30,12 @@ class LLVMCodeGen : public parser::CodeGenerator {
 
     std::map<std::string, llvm::Value *> CtxVals;
     bool TailRec = false;
+    bool Runtime = false;
+
+    unsigned getAlignment(common::Type Ty);
+    std::string ModuleString();
+
+private:
 
     std::unordered_map<common::Type, llvm::StructType *> TupleTypes;
     std::unordered_map<common::Type, llvm::StructType *> ListTypes;
@@ -64,7 +70,6 @@ class LLVMCodeGen : public parser::CodeGenerator {
     std::vector<llvm::BasicBlock *>::const_iterator CurPatBlock;
     std::vector<llvm::BasicBlock *>::const_iterator LastPatBlock;
 
-    std::string ModuleString();
 
     void visit(common::Program &node);
     void visit(common::Function &Node);

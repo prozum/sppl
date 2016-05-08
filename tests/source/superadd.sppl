@@ -4,4 +4,4 @@ def superadd: Int -> Int
 
 
 def main: [String] -> Int
-    | args = superadd(20)
+    | args = superadd(32)

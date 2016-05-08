@@ -10,9 +10,9 @@ SpplJit::SpplJit()
     : CodeGen(Drv), ScopeGen(&Drv.Global), TypeChecker(&Drv.Global),
       CompileLayer(ObjectLayer, SimpleCompiler(*CodeGen.Machine)) {
 
-    //CodeGen.Module->getOrInsertFunction("getchar", IntegerType::getInt32Ty(C), NULL);
-
     sys::DynamicLibrary::LoadLibraryPermanently(nullptr);
+
+    // Create initial module
     createModule();
 
     // Build-in functions
@@ -128,9 +128,9 @@ string SpplJit::getOutput(intptr_t Data, common::Type Type) {
     }
 }
 
-string SpplJit::getOutputTuple(intptr_t Addr, common::Type Type) {
-    auto Alignment = CodeGen.DataLayout.getPrefTypeAlignment(CodeGen.getTupleType(Type));
-    auto Subtypes = Type.Subtypes;
+string SpplJit::getOutputTuple(intptr_t Addr, common::Type Ty) {
+    auto Alignment = CodeGen.getAlignment(Ty);
+    auto Subtypes = Ty.Subtypes;
     string Out("(");
     for (size_t i = 0; i < Subtypes.size(); ++i) {
         auto Offset = Alignment - (Addr % 8);
@@ -173,10 +173,10 @@ string SpplJit::getOutputTuple(intptr_t Addr, common::Type Type) {
     return Out + ")";
 }
 
-string SpplJit::getOutputList(intptr_t Addr, common::Type Type)
+string SpplJit::getOutputList(intptr_t Addr, common::Type Ty)
 {
     string Out("[");
-    auto Subtype = Type.Subtypes[0];
+    auto Subtype = Ty.Subtypes.front();
 
     auto Count = *(int32_t *)Addr;
     Addr += sizeof(intptr_t *);

@@ -68,3 +68,7 @@ llvm::FunctionType *LLVMCodeGen::getFuncType(common::Type Ty) {
 
     return FuncTypes[Ty] = FunctionType::get(OutputType, InputTypes, false);
 }
+
+
+
+
