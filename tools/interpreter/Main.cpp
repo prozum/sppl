@@ -44,7 +44,9 @@ int main(int argc, char *argv[]) {
                     cout << "... ";
                     getline(cin, InputCase);
                 }
-                while (!(InputCase.compare(0, 1, "|") && InputCase.compare(0, 2, "\t|")));
+                while (!(InputCase.compare(0, 1, "|") &&
+                         InputCase.compare(0, 2, "\t|") &&
+                         InputCase.compare(0, 5, "    |")));
             }
 
             JIT.eval(Input);
