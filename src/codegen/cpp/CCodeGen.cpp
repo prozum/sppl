@@ -29,7 +29,7 @@ void CCodeGen::visit(Program &Node) {
 
     // If no main exists the c code generater shouldn't compile
     if (!Main) {
-        addError(Error("No main function");
+        addError(Error("No main function"));
         return;
     }
 

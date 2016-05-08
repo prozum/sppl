@@ -7,6 +7,7 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
+#include <cassert>
 
 namespace codegen {
 class CCodeGen : public parser::CodeGenerator {

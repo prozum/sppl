@@ -28,7 +28,7 @@ void CParCodeGen::visit(Program &Node) {
     }
 
     if (!Main) {
-        addError(Error("No main function");
+        addError(Error("No main function"));
         return;
     }
 

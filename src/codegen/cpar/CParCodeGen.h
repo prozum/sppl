@@ -1,5 +1,6 @@
 #pragma once
 #include "CCodeGen.h"
+#include <cassert>
 
 namespace codegen {
 class CParCodeGen : public CCodeGen {
