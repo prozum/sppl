@@ -1,0 +1,3 @@
+def superadd: Int -> Int
+| 0 = 1
+| n = superadd(n-1) + superadd(n-1)
