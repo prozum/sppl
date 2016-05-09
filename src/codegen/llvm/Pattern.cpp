@@ -41,23 +41,24 @@ void LLVMCodeGen::visit(common::WildPattern &Node) {
 
 void LLVMCodeGen::visit(common::TuplePattern &Node) {
 
+    // Create block for each tuple element
     vector<BasicBlock *> Blocks;
     for (size_t i = 0; i < Node.Patterns.size(); ++i) {
-        Blocks.push_back(BasicBlock::Create(Ctx, (*PatBlock)->getName() + "_tuple" + to_string(i), CurFunc));
+        Blocks.push_back(BasicBlock::Create(Ctx, (*PatBlock)->getName() + "_tuple", CurFunc));
     }
 
+    // Br to first tuple
     Builder.CreateBr(Blocks.front());
-
 
     auto PatId = 0;
     auto Block = Blocks.cbegin();
+    auto TupVal = CurVal;
     for (auto Pat = Node.Patterns.cbegin();
          Pat != Node.Patterns.cend();
          ++Pat, ++Block) {
         Builder.SetInsertPoint(*Block);
 
-        CurVal = Builder.CreateStructGEP(cast<PointerType>((*CurArg)->getType()->getScalarType())->getElementType(),
-                                         *CurArg, PatId++);
+        CurVal = Builder.CreateStructGEP(TupVal->getType()->getPointerElementType(), TupVal, PatId++);
         CurVal = Builder.CreateLoad(CurVal->getType()->getPointerElementType(), CurVal, "loadtmp");
         (*Pat)->accept(*this);
 

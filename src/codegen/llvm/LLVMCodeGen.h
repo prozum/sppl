@@ -65,15 +65,12 @@ private:
     std::vector<std::unique_ptr<common::Case>>::const_iterator CurCase;
     std::vector<llvm::BasicBlock *> CaseBlocks;
     std::vector<llvm::BasicBlock *>::const_iterator CaseBlock;
-    //std::vector<llvm::BasicBlock *>::const_iterator LastCaseBlock;
 
     std::vector<std::unique_ptr<common::Pattern>>::const_iterator CurPat;
 
     std::vector<std::vector<llvm::BasicBlock *>> PatVecBlocks;
     std::vector<std::vector<llvm::BasicBlock *>>::const_iterator CurPatVecBlock;
     std::vector<llvm::BasicBlock *>::const_iterator PatBlock;
-    //std::vector<llvm::BasicBlock *>::const_iterator LastPatBlock;
-
 
     void visit(common::Program &node);
     void visit(common::Function &Node);

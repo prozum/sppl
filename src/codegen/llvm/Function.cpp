@@ -131,9 +131,7 @@ void LLVMCodeGen::visit(common::Case &Node) {
 
 #ifdef SPPLDEBUG
     auto Ty1 = CurVal->getType();
-    auto Te1 = CurVal->getType()->isIntegerTy();
     auto Ty2 = CasePhiNode->getType();
-    auto Te2 = CasePhiNode->getType()->isIntegerTy();
     assert(Ty1 == Ty2);
 #endif
 
