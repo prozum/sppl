@@ -76,8 +76,8 @@ void CParCodeGen::visit(Function &Node) {
 
     CurFunc = &Node;
 
-    ParFunc = "void " + GUser + GParallel + Node.Id + "(task_t *t)";
-    SeqFunc = getType(Node.Signature.Subtypes.back()) + " " + GUser + GSequential + Node.Id + "(";
+    ParFunc = "void " + GGenerated + GParallel + Node.Id + "(task_t *t)";
+    SeqFunc = getType(Node.Signature.Subtypes.back()) + " " + GGenerated + GSequential + Node.Id + "(";
 
     for (size_t i = 0; i < Node.Signature.Subtypes.size() - 1; ++i) {
         SeqFunc += getType(Node.Signature.Subtypes[i]) + " " + GGenerated + GArg + to_string(i);
@@ -90,8 +90,8 @@ void CParCodeGen::visit(Function &Node) {
 
     *Header << ParFunc << ";" << endl;
     *Header << SeqFunc << ";" << endl;
-    *Header << Signature << " " << GUser << Node.Id  << " = { " << GUser << GParallel << Node.Id << ", "
-                                                                << GUser << GSequential << Node.Id << " };" << endl;
+    *Header << Signature << " " << GUser << Node.Id  << " = { " << GGenerated << GParallel << Node.Id << ", "
+                                                                << GGenerated << GSequential << Node.Id << " };" << endl;
 
     GenerateParallel = true;
     *Output << ParFunc << " { " << endl;
