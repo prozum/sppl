@@ -13,7 +13,7 @@ void CCodeGen::visit(ListPattern &Node) {
 
     // Get the actual list from the function arguments, but putting together
     // everything that is in GetValueBuilder
-    for (auto Str : GetValueBuilder) {
+    for (auto Str : PatternBuilder) {
         ValGotten += Str;
     }
 
@@ -22,8 +22,8 @@ void CCodeGen::visit(ListPattern &Node) {
     for (size_t i = 0; i < Node.Patterns.size(); ++i) {
         // Insert the way in which the current item of the list should be dereferenced so that later
         // patterns can match based on it
-        GetValueBuilder.insert(GetValueBuilder.begin(), GGenerated + GAt + TypeName + "(");
-        GetValueBuilder.push_back(", " + to_string(i + ListOffsets.back()) + ")->" + GValue);
+        PatternBuilder.insert(PatternBuilder.begin(), GGenerated + GAt + TypeName + "(");
+        PatternBuilder.push_back(", " + to_string(i + ListOffsets.back()) + ")->" + GValue);
 
         // Push a new offset on a stack. Offsets are used when ListSplits occure so that we don't need to make a
         // copy of the lists tail when list splits occure
@@ -32,8 +32,8 @@ void CCodeGen::visit(ListPattern &Node) {
         Node.Patterns[i]->accept(*this);
 
         ListOffsets.pop_back();
-        GetValueBuilder.pop_back();
-        GetValueBuilder.erase(GetValueBuilder.begin());
+        PatternBuilder.pop_back();
+        PatternBuilder.erase(PatternBuilder.begin());
 
         if (!LastPattern.empty()) {
             Res << " && " << LastPattern;
@@ -50,17 +50,18 @@ void CCodeGen::visit(TuplePattern &Node) {
     for (size_t i = 0; i < Node.Patterns.size(); ++i) {
         // Insert the way in which the current item of the tuple should be dereferenced so that later
         // patterns can match based on it
-        GetValueBuilder.push_back("." + GItem + to_string(i));
+        PatternBuilder.push_back("." + GItem + to_string(i));
 
         Node.Patterns[i]->accept(*this);
 
-        GetValueBuilder.pop_back();
+        PatternBuilder.pop_back();
 
         if (!LastPattern.empty()) {
             if (!Empty)
                 Res << " && ";
+            else
+                Empty = false;
 
-            Empty = false;
             Res << LastPattern;
         }
     }
@@ -80,15 +81,15 @@ void CCodeGen::visit(ListSplit &Node) {
 
     // Insert the way in which the first item of the list should be dereferenced so that later
     // patterns can match based on it
-    GetValueBuilder.insert(GetValueBuilder.begin(), GGenerated + GAt + TypeName + "(");
-    GetValueBuilder.push_back(", " + to_string(ListOffsets.back()) + ")->" + GValue);
+    PatternBuilder.insert(PatternBuilder.begin(), GGenerated + GAt + TypeName + "(");
+    PatternBuilder.push_back(", " + to_string(ListOffsets.back()) + ")->" + GValue);
     ListOffsets.push_back(0);
 
     Node.Left->accept(*this);
 
     ListOffsets.pop_back();
-    GetValueBuilder.pop_back();
-    GetValueBuilder.erase(GetValueBuilder.begin());
+    PatternBuilder.pop_back();
+    PatternBuilder.erase(PatternBuilder.begin());
 
     if (!LastPattern.empty()) {
         Empty = false;
@@ -105,8 +106,9 @@ void CCodeGen::visit(ListSplit &Node) {
     if (!LastPattern.empty()) {
         if (!Empty)
             Res << " && ";
+        else
+            Empty = false;
 
-        Empty = false;
         Res << LastPattern;
     }
 
@@ -121,7 +123,7 @@ void CCodeGen::visit(ListSplit &Node) {
 void CCodeGen::visit(IntPattern &Node) {
     string Val;
 
-    for (auto &Str : GetValueBuilder) {
+    for (auto &Str : PatternBuilder) {
         Val += Str;
     }
 
@@ -131,7 +133,7 @@ void CCodeGen::visit(IntPattern &Node) {
 void CCodeGen::visit(FloatPattern &Node) {
     string Val;
 
-    for (auto &Str : GetValueBuilder) {
+    for (auto &Str : PatternBuilder) {
         Val += Str;
     }
 
@@ -141,7 +143,7 @@ void CCodeGen::visit(FloatPattern &Node) {
 void CCodeGen::visit(CharPattern &Node) {
     string Val;
 
-    for (auto &Str : GetValueBuilder) {
+    for (auto &Str : PatternBuilder) {
         Val += Str;
     }
 
@@ -151,7 +153,7 @@ void CCodeGen::visit(CharPattern &Node) {
 void CCodeGen::visit(BoolPattern &Node) {
     string Val;
 
-    for (auto &Str : GetValueBuilder) {
+    for (auto &Str : PatternBuilder) {
         Val += Str;
     }
 
@@ -162,7 +164,7 @@ void CCodeGen::visit(IdPattern &Node) {
     stringstream Assign;
     string Name;
 
-    for (auto &Str : GetValueBuilder) {
+    for (auto &Str : PatternBuilder) {
         Name += Str;
     }
 
@@ -209,7 +211,7 @@ void CCodeGen::visit(ParPattern &Node) {
 void CCodeGen::visit(StringPattern &Node) {
     string Val;
 
-    for (auto &Str : GetValueBuilder) {
+    for (auto &Str : PatternBuilder) {
         Val += Str;
     }
 

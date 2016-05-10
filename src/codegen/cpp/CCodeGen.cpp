@@ -68,17 +68,13 @@ void CCodeGen::visit(Program &Node) {
 void CCodeGen::visit(Function &Node) {
     stringstream Func;
     string RetType = getType(Node.Signature.Subtypes.back());
-    //string Signature = getEnvironment(Node.Signature);
 
     CurFunc = &Node;
 
     // Generate function name and return type
     Func << RetType << " " << GUser << Node.Id << "(";
-    // << Signature << " *" << GGenerated << GSignature;
 
-    // Generate function arguments
     for (size_t i = 0; i < Node.Signature.Subtypes.size() - 1; ++i) {
-        // Add the argument to a list for later use in the pattern generation
         Func << getType(Node.Signature.Subtypes[i]) << " " << GGenerated + GArg + to_string(i);
 
         if (i != Node.Signature.Subtypes.size() - 2)
@@ -87,25 +83,15 @@ void CCodeGen::visit(Function &Node) {
 
     Func << ")";
 
-    // Generate function declaration in Header
     *Header << Func.str() << "; \n " << endl;
-
-    /*
-    *Header << Signature << " " << GGlobal << GUser << Node.Id << " = { "
-            << GUser << Node.Id << " }; \n" << endl;
-    */
-
-    // Generate function in Output
     *Output << Func.str() << " { " << endl
             << "Start: " << endl
             << endl;
 
-    // Generate cases
     for (auto &Case : Node.Cases) {
         Case->accept(*this);
         *Output << endl;
 
-        // Clear assigments specific for current case
         Assignments.clear();
     }
 
@@ -123,33 +109,29 @@ void CCodeGen::visit(Case &Node) {
     string ExtraTap = "   ";
     bool Empty = true;
 
-    // Generate if-statement for matching
     Pattern << "    if (";
 
     for (size_t i = 0; i < Node.Patterns.size(); ++i) {
         // Push the argument name assosiated with the current pattern on a stack.
-        // This stack is later used for assigning the arguments of the function, to the
-        // arguments in the patterns specified in sppl
-        GetValueBuilder.push_back(GGenerated + GArg + to_string(i));
+        // This is done, so that patterns can be generated based on the argument.
+        PatternBuilder.push_back(GGenerated + GArg + to_string(i));
 
         Node.Patterns[i]->accept(*this);
 
-        GetValueBuilder.pop_back();
+        PatternBuilder.pop_back();
 
-        // Only add pattern, if pattern is not ""
         if (!LastPattern.empty()) {
-
             if (!Empty)
                 Pattern << " && ";
+            else
+                Empty = false;
 
-            Empty = false;
             Pattern << LastPattern;
         }
     }
 
     Pattern << ")";
 
-    // Only generate if statement, if the pattern wasn't empty
     if (!Empty) {
         *Output << Pattern.str();
         ExtraTap = "";
@@ -803,7 +785,6 @@ string CCodeGen::getTuple(Type &Ty) {
 }
 
 string CCodeGen::getEnvironment(Type &Ty) {
-
     auto Got = Closures.find(Ty);
 
     if (Got == Closures.end()) {

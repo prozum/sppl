@@ -13,8 +13,11 @@ void CParCodeGen::visit(Program &Node) {
     Prog = &Node;
     Function *Main = nullptr;
 
+#ifdef TESTS
+    *Header << "#include \"task.h\" " << endl;
+#else
     *Header << "#include \"src/runtime/task.h\" " << endl;
-
+#endif
     // Generate the standard functionality for every program
     generateStd();
 
@@ -78,8 +81,9 @@ void CParCodeGen::visit(Function &Node) {
 
     CurFunc = &Node;
 
-    ParFunc = "void " + GUser + GParallel + Node.Id + "(task_t *t)";
-    SeqFunc = getType(Node.Signature.Subtypes.back()) + " " + GUser + GSequential + Node.Id + "(";
+    ParFunc = "void " + GGenerated + GParallel + Node.Id + "(task_t *t)";
+    SeqFunc = getType(Node.Signature.Subtypes.back()) + " " + GGenerated + GSequential + Node.Id + "(";
+
     for (size_t i = 0; i < Node.Signature.Subtypes.size() - 1; ++i) {
         SeqFunc += getType(Node.Signature.Subtypes[i]) + " " + GGenerated + GArg + to_string(i);
 
@@ -91,8 +95,8 @@ void CParCodeGen::visit(Function &Node) {
 
     *Header << ParFunc << ";" << endl;
     *Header << SeqFunc << ";" << endl;
-    *Header << Signature << " " << GUser << Node.Id  << " = { " << GUser << GParallel << Node.Id << ", "
-                                                                << GUser << GSequential << Node.Id << " };" << endl;
+    *Header << Signature << " " << GUser << Node.Id  << " = { " << GGenerated << GParallel << Node.Id << ", "
+                                                                << GGenerated << GSequential << Node.Id << " };" << endl;
 
     GenerateParallel = true;
     *Output << ParFunc << " { " << endl;
@@ -160,13 +164,13 @@ void CParCodeGen::visit(Case &Node) {
     for (size_t i = 0; i < Node.Patterns.size(); ++i) {
         // Push arg_name on get_value_builder. get_value_builder is used for
         // generate assignments in a case
-        GetValueBuilder.push_back(GGenerated + GArg + to_string(i));
+        PatternBuilder.push_back(GGenerated + GArg + to_string(i));
 
         // Generate pattern
         Node.Patterns[i]->accept(*this);
 
         // Cleanup
-        GetValueBuilder.pop_back();
+        PatternBuilder.pop_back();
 
         // Only add pattern, if pattern is not "1"
         if (!LastPattern.empty()) {
