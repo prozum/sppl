@@ -105,7 +105,7 @@ string SpplJit::getOutput(intptr_t Data, common::Type Type) {
         return to_string((int64_t)Data);
     case TypeId::FLOAT:
         // WTF is double type a pointer
-        return to_string(*(double *)Data);
+        return to_string((double)Data);
     case TypeId::CHAR:
         return "'" + string(1, (char)Data) + "'";
     case TypeId::STRING:
@@ -133,7 +133,7 @@ string SpplJit::getOutputTuple(intptr_t Addr, common::Type Ty) {
     auto Subtypes = Ty.Subtypes;
     string Out("(");
     for (size_t i = 0; i < Subtypes.size(); ++i) {
-        auto Offset = Alignment - (Addr % 8);
+        auto Offset = Addr % Alignment ? Alignment - Addr % Alignment : 0;
         switch (Subtypes[i].Id) {
         case TypeId::INT:
             Addr += Offset;
@@ -178,45 +178,19 @@ string SpplJit::getOutputList(intptr_t Addr, common::Type Ty)
     string Out("[");
     auto Subtype = Ty.Subtypes.front();
 
-    auto Count = *(int32_t *)Addr;
-    Addr += sizeof(intptr_t *);
-    Addr = *(intptr_t *)Addr;
+    auto Count  = *(int64_t *)Addr;
 
-    for (int32_t i = 0; i < Count; ++i) {
-        switch (Subtype.Id) {
-        case TypeId::INT:
-            Out += getOutput(*(int64_t *)Addr, Subtype);
-            Addr += sizeof(int64_t);
-            break;
-        case TypeId::FLOAT:
-            Out += getOutput(Addr, Subtype);
-            Addr += sizeof(double);
-            break;
-        case TypeId::CHAR:
-            Out += getOutput(*(char *)Addr, Subtype);
-            Addr += sizeof(char);
-            break;
-        case TypeId::BOOL:
-            Out += getOutput(*(bool *)Addr, Subtype);
-            Addr += sizeof(bool);
-            break;
-        case TypeId::STRING:
-            Out += getOutput(*(intptr_t *)Addr, Subtype);
-            Addr += sizeof(intptr_t *);
-            break;
-        case TypeId::TUPLE:
-            Out += getOutputTuple(*(intptr_t *)Addr, Subtype);
-            Addr += sizeof(intptr_t *);
-            break;
-        case TypeId::LIST:
-            Out += getOutputList(*(intptr_t *)Addr, Subtype);
-            Addr += sizeof(intptr_t *);
-            break;
-        default:
-            assert(0 && "Type not supported");
-        }
-        if (i + 1 != Count)
+    for (int64_t i = 0; i < Count; ++i) {
+        Addr += sizeof(int64_t *);
+
+        auto Data = *(intptr_t *)Addr;
+        Out += getOutput(Data, Subtype);
+
+        if (i + 1 != Count) {
             Out += ", ";
+            Addr += sizeof(intptr_t *);
+            Addr = *(intptr_t * )Addr;
+        }
     }
 
     return Out + "]";

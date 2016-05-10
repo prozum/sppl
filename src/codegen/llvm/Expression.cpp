@@ -19,7 +19,8 @@ void LLVMCodeGen::visit(common::BoolExpr &Node) {
 void LLVMCodeGen::visit(common::StringExpr &Node) {
     auto GlobalVar = Builder.CreateGlobalString(Node.Val, CurFunc->getName() + ".str");
 
-    CurVal = CreateList(Node.RetTy, GlobalVar, ConstantInt::get(Int32, Node.Val.size()), *CaseBlock);
+    //CurVal = CreateList(Node.RetTy, GlobalVar, ConstantInt::get(Int32, Node.Val.size()), *CaseBlock);
+    assert(0);
 }
 
 void LLVMCodeGen::visit(common::CharExpr &Node) {
@@ -53,14 +54,12 @@ void LLVMCodeGen::visit(common::ParExpr &Node) {
 }
 
 void LLVMCodeGen::visit(common::TupleExpr &Node) {
-    std::vector<llvm::Constant *> TmpVec;
+    std::vector<llvm::Constant *> TupleVal;
 
     for (auto &Element : Node.Elements) {
         Element->accept(*this);
-        TmpVec.push_back((Constant *)CurVal);
+        TupleVal.push_back((Constant *)CurVal);
     }
-
-    ArrayRef<Constant *> TupleVal(TmpVec);
 
     auto ConstVal = ConstantStruct::get(getTupleType(Node.RetTy), TupleVal);
     CurVal = new GlobalVariable(*Module.get(), ConstVal->getType(), true,
@@ -69,17 +68,26 @@ void LLVMCodeGen::visit(common::TupleExpr &Node) {
 
 void LLVMCodeGen::visit(common::ListExpr &Node) {
     // Create types
+    /*
     auto ArrayType = ArrayType::get(getType(Node.RetTy.Subtypes.front()), Node.Elements.size());
+    */
+    //auto ListType = getListType(Node.RetTy);
+
 
     // Malloc list data
+    /*
     auto DataMalloc = CreateMalloc(ArrayType, *CaseBlock);
     auto DataCast = Builder.CreateBitCast(DataMalloc, PointerType::getUnqual(ArrayType));
+     */
 
     // Create global list constant
-    for (size_t i = 0; i < Node.Elements.size(); ++i) {
-        Node.Elements[i]->accept(*this);
-        auto GEP = Builder.CreateStructGEP(ArrayType, DataCast, i);
-        Builder.CreateStore(CurVal, GEP);
+    Value *ListNode = nullptr;
+    for (auto Element = Node.Elements.rbegin(); Element < Node.Elements.rend(); ++Element) {
+
+        (*Element)->accept(*this);
+        ListNode = CreateListNode(Node.RetTy, CurVal, ListNode, *CaseBlock);
+        //auto GEP = Builder.CreateStructGEP(ArrayType, DataCast, i);
+        //Builder.CreateStore(CurVal, GEP);
     }
 
     /*
@@ -103,12 +111,12 @@ void LLVMCodeGen::visit(common::ListExpr &Node) {
     auto DataCast = Builder.CreateBitCast(DataMalloc, PointerType::getUnqual(ArrayType::get(getType(Node.RetTy.Subtypes[0]), 0)));
     Builder.CreateStore(DataCast, CurVal);
     */
-    auto List = CreateList(Node.RetTy, DataCast, ConstantInt::get(Int32, Node.Elements.size()), *CaseBlock);
+    //auto List = CreateList(Node.RetTy, DataCast, ConstantInt::get(Int32, Node.Elements.size()), *CaseBlock);
 
     // Set return value
     auto ListPtrType = getType(Node.RetTy);
     auto RetVal = Builder.CreateAlloca(ListPtrType, nullptr, "allocatmp");
-    Builder.CreateStore(List, RetVal);
+    Builder.CreateStore(ListNode, RetVal);
     CurVal = Builder.CreateLoad(ListPtrType, RetVal, "loadtmp");
 }
 

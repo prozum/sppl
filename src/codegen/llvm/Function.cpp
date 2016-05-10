@@ -176,7 +176,8 @@ llvm::Function *LLVMCodeGen::CreateMain()
     auto Data = CreateMalloc(CurVal, Entry);
 
     // List
-    auto List = CreateList(Type, Data, Argc, Entry);
+    //auto List = CreateList(Type, Data, Argc, Entry);
+    assert(0);
     Builder.CreateBr(CheckBlock);
 
     // Check block
@@ -199,7 +200,8 @@ llvm::Function *LLVMCodeGen::CreateMain()
     // End block
     // TODO
 
-    Args.push_back(List);
+    //Args.push_back(List);
+    assert(0);
 
     return Func;
 }

@@ -4,7 +4,7 @@ using namespace codegen;
 using namespace llvm;
 
 
-Value *LLVMCodeGen::CreateList(common::Type Type, Value *Data, Value *Size, BasicBlock *Block)
+Value *LLVMCodeGen::CreateListNode(common::Type Type, Value *Data, Value *NextNode, BasicBlock *Block)
 {
     auto ListType = getListType(Type);
     auto ListPtrType = getType(Type);
@@ -14,15 +14,37 @@ Value *LLVMCodeGen::CreateList(common::Type Type, Value *Data, Value *Size, Basi
     auto ListCast = Builder.CreateBitCast(ListMalloc, ListPtrType);
 
     // Set list length
-    CurVal = Builder.CreateStructGEP(ListType, ListCast, 0);
-    Builder.CreateStore(Size, CurVal);
+    auto Length = Builder.CreateStructGEP(ListType, ListCast, 0);
+    if (NextNode) {
+        // Multi element list
+        //CurVal = Builder.CreateLoad(ListType, NextNode, "loadtmp");
+        auto Ty1 = CurVal->getType();
+        CurVal = Builder.CreateStructGEP(ListType, NextNode, 0);
+        auto NextLength = Builder.CreateLoad(Int64, CurVal, "loadtmp");
+        CurVal = Builder.CreateAdd(NextLength, ConstantInt::get(Int64, 1));
+        Builder.CreateStore(CurVal, Length);
+    } else {
+        if (Data)
+            // Single element list
+            Builder.CreateStore(ConstantInt::get(Int64, 1), Length);
+        else
+            // Empty list
+            Builder.CreateStore(ConstantInt::get(Int64, 0), Length);
+    }
 
     // Set list data
-    CurVal = Builder.CreateStructGEP(ListType, ListCast, 1);
-    auto DataCast = Builder.CreateBitCast(Data, PointerType::getUnqual(ArrayType::get(getType(Type.Subtypes.front()), 0)));
-    Builder.CreateStore(DataCast, CurVal);
+    if (Data) {
+        CurVal = Builder.CreateStructGEP(ListType, ListCast, 1);
+        Builder.CreateStore(Data, CurVal);
+    }
 
-    return ListMalloc;
+    // Set next node
+    if (NextNode) {
+        CurVal = Builder.CreateStructGEP(ListType, ListCast, 2);
+        Builder.CreateStore(NextNode, CurVal);
+    }
+
+    return ListCast;
 }
 
 Instruction *LLVMCodeGen::CreateMalloc(llvm::Type *Type, BasicBlock *Block)

@@ -47,11 +47,12 @@ llvm::StructType *LLVMCodeGen::getListType(common::Type Ty) {
     if (CacheTy != ListTypes.end())
         return CacheTy->second;
 
-    std::vector<llvm::Type *> Subtypes;
-    Subtypes.push_back(Int32);
-    Subtypes.push_back(PointerType::getUnqual(ArrayType::get(getType(Ty.Subtypes.front()), 0)));
+    //std::vector<llvm::Type *> Subtypes;
+    auto ListTy = StructType::create(Ctx, "list");
+    llvm::Type *Subtypes[] = { Int64, getType(Ty.Subtypes.front()), PointerType::getUnqual(ListTy) };
+    ListTy->setBody(Subtypes);
 
-    return ListTypes[Ty] = StructType::create(Ctx, Subtypes, "list");
+    return ListTypes[Ty] = ListTy;
 }
 
 llvm::FunctionType *LLVMCodeGen::getFuncType(common::Type Ty) {
