@@ -11,6 +11,8 @@
 #include <llvm/IR/TypeFinder.h>
 
 #include <llvm/Support/raw_os_ostream.h>
+#include <llvm/Support/TargetSelect.h>
+#include <llvm/Bitcode/ReaderWriter.h>
 
 #include <llvm/ExecutionEngine/ExecutionEngine.h>
 
@@ -24,8 +26,9 @@ class LLVMCodeGen : public parser::CodeGenerator {
 
     llvm::LLVMContext &Ctx;
     llvm::IRBuilder<> Builder;
+
     std::unique_ptr<llvm::TargetMachine> Machine;
-    const llvm::DataLayout DataLayout;
+    std::unique_ptr<llvm::DataLayout> DataLayout;
     std::unique_ptr<llvm::Module> Module;
 
     std::map<std::string, llvm::Value *> PatVals;
@@ -34,6 +37,12 @@ class LLVMCodeGen : public parser::CodeGenerator {
 
     unsigned getAlignment(common::Type Ty);
     std::string ModuleString();
+
+    static void initLLVM() {
+        llvm::InitializeNativeTarget();
+        llvm::InitializeNativeTargetAsmPrinter();
+        llvm::InitializeNativeTargetAsmParser();
+    }
 
 private:
 

@@ -171,7 +171,7 @@ llvm::Function *LLVMCodeGen::CreateMain()
     Builder.CreateStore(ConstantInt::get(Int32, APInt(32, 0)), Iter);
 
     // Data
-    CurVal = ConstantInt::get(Int32, APInt(32, DataLayout.getPointerSize()));
+    CurVal = ConstantInt::get(Int32, APInt(32, DataLayout->getPointerSize()));
     CurVal = Builder.CreateMul(Argc, CurVal);
     auto Data = CreateMalloc(CurVal, Entry);
 

@@ -12,6 +12,9 @@ SpplJit::SpplJit()
 
     sys::DynamicLibrary::LoadLibraryPermanently(nullptr);
 
+    // Set Driver to JIT mode
+    Drv.JIT = true;
+
     // Create initial module
     createModule();
 
@@ -27,9 +30,6 @@ SpplJit::SpplJit()
                                                  common::Type(TypeId::VOID)
                                          }));
 
-    // Time is short, mortal
-    Drv.setOutput("/dev/null");
-    Drv.setHeaderOutput("/dev/null");
 }
 
 SpplJit::ModuleHandleT SpplJit::addModule(unique_ptr<Module> M) {
@@ -75,7 +75,7 @@ string SpplJit::mangle(const string &Name) {
     string MangledName;
     {
         raw_string_ostream MangledNameStream(MangledName);
-        Mangler::getNameWithPrefix(MangledNameStream, Name, CodeGen.DataLayout);
+        Mangler::getNameWithPrefix(MangledNameStream, Name, *CodeGen.DataLayout);
     }
     return MangledName;
 }

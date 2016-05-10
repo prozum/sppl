@@ -30,10 +30,10 @@ void print_help(char *program_name)
 
 int main(int argc, char *argv[])
 {
-    Backend backend = Backend::PPRINTER;
-    vector<string> inputs;
-    string output("a.out");
-    string header_output("a.h");
+    Backend BE = Backend::PPRINTER;
+    vector<string> Inputs;
+    string Output("a.out");
+    string HeaderOutput("a.h");
 
     if (argc == 1) {
         print_help(argv[0]);
@@ -41,59 +41,65 @@ int main(int argc, char *argv[])
     }
 
     for (int i = 1; i < argc; ++i) {
-
-        if (strcmp(argv[i], "--help") == 0 || strcmp(argv[i], "-h") == 0) {
+        string Arg = string(argv[i]);
+        if (Arg.compare("--help") == 0 || Arg.compare("-h") == 0) {
             print_help(argv[0]);
             return 0;
         }
 #ifdef CCPP
-        else if (strcmp(argv[i], "--cpp") == 0)
-            backend = Backend::CPP;
-        else if (strcmp(argv[i], "--cpar") == 0)
-            backend = Backend::CPAR;
+        else if (Arg.compare("--cpp") == 0)
+            BE = Backend::CPP;
+        else if (Arg.compare("--cpar") == 0)
+            BE = Backend::CPAR;
 #endif
 #ifdef CGNUASM
-        else if (strcmp(argv[i], "--gnuasm") == 0)
+        else if (Arg.compare("--gnuasm") == 0)
             backend = Backend::GNUASM;
 #endif
 #ifdef CHASKELL
-        else if (strcmp(argv[i], "--haskell") == 0)
+        else if (Arg.compare("--haskell") == 0)
             backend = Backend::GNUASM;
 #endif
 #ifdef CLLVM
-        else if (strcmp(argv[i], "--llvm") == 0)
-            backend = Backend::LLVM;
+        else if (Arg.compare("--llvm") == 0)
+            BE = Backend::LLVM;
 #endif
-        else if (strcmp(argv[i], "--pprinter") == 0)
-            backend = Backend::PPRINTER;
-        else if (strcmp(argv[i], "--output") == 0 || strcmp(argv[i], "-o") == 0)
+        else if (Arg.compare("--pprinter") == 0)
+            BE = Backend::PPRINTER;
+        else if (Arg.compare("--output") == 0 || Arg.compare("-o") == 0)
             if (i < argc - 1)
-                output = argv[++i];
+                Output = argv[++i];
             else {
                 cerr << "No output file specified" << endl;
                 return 2;
             }
-        else if (strcmp(argv[i], "--header-output") == 0 || strcmp(argv[i], "-ho") == 0)
+        else if (Arg.compare("--header-output") == 0 || Arg.compare("-ho") == 0)
             if (i < argc - 1)
-                header_output = argv[++i];
+                HeaderOutput = argv[++i];
             else {
                 cerr << "No output header specified" << endl;
                 return 3;
             }
-         else
-            inputs.push_back(argv[i]);
+        else if (Arg.compare(0, 2, "--") == 0) {
+            cerr << "No such option: " << Arg << endl;
+            cerr << "For help use --help" << endl;
+            return 4;
+        }
+        else {
+            Inputs.push_back(Arg);
+        }
     }
 
-    if (inputs.size() == 0)
+    if (Inputs.size() == 0)
     {
         cerr << "No input files" << endl;
         return 1;
     }
 
     Compiler compiler;
-    compiler.setOutput(output);
-    compiler.setHeaderOutput(header_output);
-    compiler.setBackend(backend);
+    compiler.setOutput(Output);
+    compiler.setHeaderOutput(HeaderOutput);
+    compiler.setBackend(BE);
 
-    return compiler.compile(inputs);
+    return compiler.compile(Inputs);
 }

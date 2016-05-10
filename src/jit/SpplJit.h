@@ -31,12 +31,6 @@ class SpplJit {
 
     int eval(std::string Str);
 
-    static void initLLVM() {
-        llvm::InitializeNativeTarget();
-        llvm::InitializeNativeTargetAsmPrinter();
-        llvm::InitializeNativeTargetAsmParser();
-    }
-
 private:
     typedef llvm::orc::ObjectLinkingLayer<> ObjLayerT;
     typedef llvm::orc::IRCompileLayer<ObjLayerT> CompileLayerT;

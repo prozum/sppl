@@ -7,19 +7,21 @@ using namespace common;
 using namespace parser;
 
 Driver::Driver(ostream *out, ostream *hout, ostream *mout)
-    : Out(out), HOut(hout), MOut(mout), Scr(*this), Psr(*this),
-      Global(new Scope()) {}
+    : Scr(*this), Psr(*this), Global(new Scope()),
+      Out(out), HOut(hout), MOut(mout) { }
 
 bool Driver::nextInput() {
     if (SrcType != SourceType::FILES)
         return false;
-    if (Files.size() > CurFile) {
-        FIn = ifstream(Files[CurFile]);
+    if (InFiles.size() > CurInFile) {
+        FIn = ifstream(InFiles[CurInFile]);
         In = &FIn;
-        if (!FIn.good())
+        if (!FIn.good()) {
+            showError(Error("File could not be found: " + InFiles.front()));
             return false;
+        }
         Scr.switch_streams(In, MOut);
-        Source = Files[CurFile++];
+        Source = InFiles[CurInFile++];
         return true;
     }
     return false;
@@ -27,11 +29,13 @@ bool Driver::nextInput() {
 
 void Driver::setOutput(string Filename) {
     FOut = ofstream(Filename);
+    OutFile = Filename;
     Out = &FOut;
 }
 
 void Driver::setHeaderOutput(string Filename) {
     FHOut = ofstream(Filename);
+    HOutFile = Filename;
     HOut = &FHOut;
 }
 
@@ -59,10 +63,11 @@ bool Driver::parseFile(const std::string &Filename) {
 
 bool Driver::parseFiles(const vector<string> &Filenames) {
     SrcType = SourceType::FILES;
-    Files = Filenames;
+    InFiles = Filenames;
 
     if (!nextInput())
         return false;
+
     if (Psr.parse() != 0)
         return false;
 

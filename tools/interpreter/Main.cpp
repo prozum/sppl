@@ -7,8 +7,6 @@ using namespace std;
 using namespace jit;
 
 int main(int argc, char *argv[]) {
-
-    SpplJit::initLLVM();
     SpplJit JIT;
 
     if (argc > 1) {

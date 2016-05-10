@@ -27,7 +27,7 @@ Value *LLVMCodeGen::CreateList(common::Type Type, Value *Data, Value *Size, Basi
 
 Instruction *LLVMCodeGen::CreateMalloc(llvm::Type *Type, BasicBlock *Block)
 {
-    auto Size = DataLayout.getPointerTypeSize(Type);
+    auto Size = DataLayout->getPointerTypeSize(Type);
     auto AllocSize = ConstantInt::get(Int64, APInt(64, Size));
     return CreateMalloc(AllocSize, Block);
 }
@@ -43,7 +43,7 @@ Instruction *LLVMCodeGen::CreateMalloc(Value *Size, BasicBlock *Block)
 }
 
 unsigned LLVMCodeGen::getAlignment(common::Type Ty) {
-    return DataLayout.getPrefTypeAlignment(getType(Ty));
+    return DataLayout->getPrefTypeAlignment(getType(Ty));
 }
 
 

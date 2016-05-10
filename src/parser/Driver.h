@@ -28,8 +28,23 @@ class Driver {
     Driver(std::ostream *out = &std::cout, std::ostream *hout = &std::cout,
            std::ostream *mout = &std::cout);
 
+    // Parsing classes
+    Scanner Scr;
+    Parser Psr;
+    std::unique_ptr<common::Program> Prog;
+    common::Scope Global;
+
+    // Input options
+    std::vector<std::string> InFiles;
+    size_t CurInFile = 0;
     SourceType SrcType = SourceType::UNKNOWN;
     std::string Source;
+
+    // Out options
+    bool Binary = true;
+    bool JIT = false;
+    std::string OutFile;
+    std::string HOutFile;
 
     // Code, header and message streams
     std::istream *In;
@@ -42,34 +57,28 @@ class Driver {
     std::ofstream FOut;
     std::ofstream FHOut;
 
-    std::unique_ptr<common::Program> Prog;
-    Scanner Scr;
-    Parser Psr;
-    common::Scope Global;
 
+    // Trace options
     bool TraceScanning = false;
     bool TraceParsing = false;
 
-    bool nextInput();
-    std::vector<std::string> Files;
-    size_t CurFile = 0;
-
-
+    // File management method
     void setOutput(std::string Filename);
     void setHeaderOutput(std::string Filename);
+    bool nextInput();
 
+    // Parse methods
     bool parseStream(std::istream &In, const std::string &Src = "stream");
-    bool parseString(const std::string &Input,
-                     const std::string &Src = "string");
+    bool parseString(const std::string &Input, const std::string &Src = "string");
     bool parseFile(const std::string &Filename);
     bool parseFiles(const std::vector<std::string> &Filenames);
 
-    bool accept(common::Visitor &V);
-
+    // Error methods
     void error(const common::Location &Loc, const std::string &Msg);
     void error(const std::string &Msg);
     void showError(common::Error Err);
 
+    bool accept(common::Visitor &V);
     void addExternFunc(std::string Name, common::Type Signature);
 };
 }
