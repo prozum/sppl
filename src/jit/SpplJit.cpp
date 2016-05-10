@@ -18,7 +18,7 @@ SpplJit::SpplJit()
     // Create initial module
     createModule();
 
-    // Build-in functions
+    // Print functions
     Drv.addExternFunc("printff", common::Type(TypeId::SIGNATURE,
                                              vector<common::Type> {
                                                      common::Type(TypeId::FLOAT),
@@ -30,6 +30,22 @@ SpplJit::SpplJit()
                                                  common::Type(TypeId::VOID)
                                          }));
 
+    // Trigonometry function
+    Drv.addExternFunc("sin", common::Type(TypeId::SIGNATURE,
+                                         vector<common::Type> {
+                                                 common::Type(TypeId::FLOAT),
+                                                 common::Type(TypeId::FLOAT)
+                                         }));
+    Drv.addExternFunc("cos", common::Type(TypeId::SIGNATURE,
+                                         vector<common::Type> {
+                                                 common::Type(TypeId::FLOAT),
+                                                 common::Type(TypeId::FLOAT)
+                                         }));
+    Drv.addExternFunc("tan", common::Type(TypeId::SIGNATURE,
+                                         vector<common::Type> {
+                                                 common::Type(TypeId::FLOAT),
+                                                 common::Type(TypeId::FLOAT)
+                                         }));
 }
 
 SpplJit::ModuleHandleT SpplJit::addModule(unique_ptr<Module> M) {
@@ -105,7 +121,7 @@ string SpplJit::getOutput(intptr_t Data, common::Type Type) {
         return to_string((int64_t)Data);
     case TypeId::FLOAT:
         // WTF is double type a pointer
-        return to_string((double)Data);
+        return to_string(*(double *)Data);
     case TypeId::CHAR:
         return "'" + string(1, (char)Data) + "'";
     case TypeId::STRING:
