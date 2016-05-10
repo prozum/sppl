@@ -78,6 +78,7 @@ void CParCodeGen::visit(Function &Node) {
 
     ParFunc = "void " + GUser + GParallel + Node.Id + "(task_t *t)";
     SeqFunc = getType(Node.Signature.Subtypes.back()) + " " + GUser + GSequential + Node.Id + "(";
+
     for (size_t i = 0; i < Node.Signature.Subtypes.size() - 1; ++i) {
         SeqFunc += getType(Node.Signature.Subtypes[i]) + " " + GGenerated + GArg + to_string(i);
 
@@ -158,13 +159,13 @@ void CParCodeGen::visit(Case &Node) {
     for (size_t i = 0; i < Node.Patterns.size(); ++i) {
         // Push arg_name on get_value_builder. get_value_builder is used for
         // generate assignments in a case
-        GetValueBuilder.push_back(GGenerated + GArg + to_string(i));
+        PatternBuilder.push_back(GGenerated + GArg + to_string(i));
 
         // Generate pattern
         Node.Patterns[i]->accept(*this);
 
         // Cleanup
-        GetValueBuilder.pop_back();
+        PatternBuilder.pop_back();
 
         // Only add pattern, if pattern is not "1"
         if (!LastPattern.empty()) {
