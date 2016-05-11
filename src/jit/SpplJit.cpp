@@ -125,6 +125,7 @@ string SpplJit::getOutput(intptr_t Data, common::Type Type) {
     case TypeId::CHAR:
         return "'" + string(1, (char)Data) + "'";
     case TypeId::STRING:
+        return getOutputString(Data, Type);
         // Ignore list container
         Data += sizeof(int64_t);
         Data = *(int64_t *)Data;
@@ -209,24 +210,25 @@ string SpplJit::getOutputList(intptr_t Addr, common::Type Ty)
 
     } while (Addr);
 
-    /*
-    while (Next) {
-        Next += sizeof(int64_t *);
-
-        auto Data = *(intptr_t *)Addr;
-        Out += getOutput(Data, Subtype);
-
-        if (i + 1 != Count) {
-            Out += ", ";
-            Addr += sizeof(intptr_t *);
-            Addr = *(intptr_t * )Addr;
-        }
-    }
-     */
-
     return Out + "]";
 }
 
+string SpplJit::getOutputString(intptr_t Addr, common::Type Ty)
+{
+    string Out("\"");
+    auto Subtype = Ty.Subtypes.front();
+
+    do {
+        auto Data = *(intptr_t *)Addr;
+        Out += string(1, (char)Data);
+
+        Addr += sizeof(intptr_t *);
+        Addr = *(intptr_t * )Addr;
+
+    } while (Addr);
+
+    return Out + "\"";
+}
 extern "C" void printff(double Float) {
     fprintf(stderr, "%f", Float);
 }

@@ -46,6 +46,8 @@ private:
 
     std::string getOutput(intptr_t Data, common::Type Type);
     std::string getOutputTuple(intptr_t Addr, common::Type Ty);
+    std::string getOutputList(intptr_t Addr, common::Type);
+    std::string getOutputString(intptr_t Addr, common::Type);
 
     parser::Driver Drv;
     codegen::LLVMCodeGen CodeGen;
@@ -69,6 +71,5 @@ private:
         return Vec;
     }
 
-    std::string getOutputList(intptr_t Addr, common::Type);
 };
 }

@@ -17,10 +17,12 @@ void LLVMCodeGen::visit(common::BoolExpr &Node) {
 }
 
 void LLVMCodeGen::visit(common::StringExpr &Node) {
-    auto GlobalVar = Builder.CreateGlobalString(Node.Val, CurFunc->getName() + ".str");
-
-    //CurVal = CreateList(Node.RetTy, GlobalVar, ConstantInt::get(Int32, Node.Val.size()), *CaseBlock);
-    assert(0);
+    Value *ListNode = nullptr;
+    for (auto Char = Node.Val.rbegin(); Char < Node.Val.rend(); ++Char) {
+        CurVal = ConstantInt::get(Int8, (uint64_t)*Char);
+        ListNode = CreateListNode(Node.RetTy, CurVal, ListNode, *CaseBlock);
+    }
+    CurVal = ListNode;
 }
 
 void LLVMCodeGen::visit(common::CharExpr &Node) {
