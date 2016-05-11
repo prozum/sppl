@@ -488,13 +488,14 @@ void TypeChecker::visit(ListAdd &Node) {
         return;
 
     if (containsEmptyList(Node.Right->RetTy)) {
-        resolveEmptyList(Node.Right->RetTy, CurFunc->Signature.Subtypes.back());
+        auto Resolver = Type(TypeId::LIST, vector<Type> { Node.Left->RetTy });
+        resolveEmptyList(Node.Right->RetTy, Resolver);
     }
 
     if (Node.Right->RetTy.Id == TypeId::LIST) {
         if (Node.Left->RetTy != Node.Right->RetTy.Subtypes.front()) {
             addError(Error::Binary(
-                    "Left type must be same type of right List", Node));
+                    "Left type must be same type as the Lists children", Node));
             return;
         }
     } else if (Node.Right->RetTy.Id == TypeId::STRING) {
