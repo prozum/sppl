@@ -45,6 +45,7 @@ class LLVMCodeGen : public parser::CodeGenerator {
     }
 
 private:
+    llvm::raw_os_ostream RawOut;
 
     std::unordered_map<common::Type, llvm::StructType *> TupleTypes;
     std::unordered_map<common::Type, llvm::StructType *> ListTypes;
@@ -128,7 +129,7 @@ private:
     void visit(common::CallExpr &Node);
     void visit(common::ParExpr &Node);
 
-    llvm::Value *CreateListNode(common::Type Type, llvm::Value *Data, llvm::Value *Size, llvm::BasicBlock *Block);
+    llvm::Value *CreateListNode(common::Type Type, llvm::Value *Data, llvm::Value *NextNode, llvm::BasicBlock *Block, bool Runtime = false);
     llvm::Instruction *CreateMalloc(llvm::Type *Type, llvm::BasicBlock *Block);
     llvm::Instruction *CreateMalloc(llvm::Value *Size, llvm::BasicBlock *Block);
     llvm::Function *CreateMain();

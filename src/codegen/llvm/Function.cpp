@@ -83,9 +83,9 @@ void LLVMCodeGen::visit(common::Function &Node) {
         FirstBlock = PatVecBlocks.front().front();
     Builder.CreateBr(FirstBlock);
 
-    raw_os_ostream RawOut(*Drv.Out);
     if (verifyFunction(*CurFunc, &RawOut)) {
         addError(Error("LLVM Error"));
+        RawOut.flush();
     }
 }
 
@@ -132,6 +132,11 @@ void LLVMCodeGen::visit(common::Case &Node) {
     Builder.SetInsertPoint(*CaseBlock);
     Node.Expr->accept(*this);
 
+    // Main must return Int32
+    if (CurFunc->getName() == "main") {
+        CurVal = Builder.CreateTrunc(CurVal, Int32, "tmptrunc");
+    }
+
 #ifdef SPPLDEBUG
     auto Ty1 = CurVal->getType();
     auto Ty2 = CasePhiNode->getType();
@@ -149,7 +154,8 @@ void LLVMCodeGen::visit(common::Case &Node) {
 llvm::Function *LLVMCodeGen::CreateMain()
 {
     // Input Type
-    auto Type = common::Type(TypeId::STRING, vector<common::Type> { common::Type(TypeId::CHAR)});
+    auto CharListType = common::Type(TypeId::STRING, vector<common::Type> { common::Type(TypeId::CHAR)});
+    auto StrListType = common::Type(TypeId::LIST, vector<common::Type> { CharListType });
 
     // Create Function
     auto Func = llvm::Function::Create(MainType,
@@ -160,51 +166,83 @@ llvm::Function *LLVMCodeGen::CreateMain()
     auto ArgIter = Func->args().begin();
     Argument *Argc = &*(ArgIter++);
     Argument *Argv = &*(ArgIter);
+    Argc->setName("argc");
+    Argv->setName("argv");
 
     // Create blocks
     Entry = BasicBlock::Create(Ctx, "entry", Func);
     auto CheckBlock = BasicBlock::Create(Ctx, "check", Func);
-    auto UpdateBlock = BasicBlock::Create(Ctx, "update", Func);
-    auto LoopBlock = BasicBlock::Create(Ctx, "loop", Func);
+    auto StrAddBlock = BasicBlock::Create(Ctx, "update", Func);
+    auto StrLoopBlock = BasicBlock::Create(Ctx, "str_loop", Func);
+    auto CharLoopBlock = BasicBlock::Create(Ctx, "char_loop", Func);
+    auto CharAddBlock = BasicBlock::Create(Ctx, "str_add", Func);
     auto EndBlock = BasicBlock::Create(Ctx, "end", Func);
+
 
     // Init in entry block
     Builder.SetInsertPoint(Entry);
-    auto Iter = Builder.CreateAlloca(Int32);
-    Builder.CreateStore(ConstantInt::get(Int32, APInt(32, 0)), Iter);
-
-    // Data
-    CurVal = ConstantInt::get(Int32, APInt(32, DataLayout->getPointerSize()));
-    CurVal = Builder.CreateMul(Argc, CurVal);
-    auto Data = CreateMalloc(CurVal, Entry);
-
-    // List
-    //auto List = CreateList(Type, Data, Argc, Entry);
-    assert(0);
+    Value *StrList = Builder.CreateAlloca(getType(StrListType), nullptr, "str_list");
+    Value *CharList = Builder.CreateAlloca(getType(CharListType), nullptr, "char_list");
+    Value *StrIter = Builder.CreateAlloca(Int32, nullptr, "str_iter");
+    Value *CharIter = Builder.CreateAlloca(Int32, nullptr, "char_iter");
+    Value *Char = Builder.CreateAlloca(Int8, nullptr, "char");
+    Value *CharPtr = Builder.CreateAlloca(PointerType::getUnqual(Int8), nullptr, "char_ptr");
+    Value *TmpVal;
+    Builder.CreateStore(ConstantInt::get(Int32, APInt(32, 0)), StrIter);
     Builder.CreateBr(CheckBlock);
 
     // Check block
     Builder.SetInsertPoint(CheckBlock);
-    CurVal = Builder.CreateLoad(Int32, Iter, "loadtmp");
+    CurVal = Builder.CreateLoad(Int32, StrIter, "loadtmp");
     CurVal = Builder.CreateICmpULT(CurVal, Argc, "cmptmp");
-    Builder.CreateCondBr(CurVal, LoopBlock, EndBlock);
+    Builder.CreateCondBr(CurVal, StrLoopBlock, EndBlock);
 
-    // Update block
-    Builder.SetInsertPoint(UpdateBlock);
-    CurVal = Builder.CreateLoad(Int32, Iter, "loadtmp");
+    // String add block
+    Builder.SetInsertPoint(StrAddBlock);
+    CurVal = Builder.CreateLoad(CharList);
+    TmpVal = Builder.CreateLoad(StrList);
+    CurVal = CreateListNode(StrListType, CurVal, TmpVal, StrAddBlock, true);
+    Builder.CreateStore(CurVal, StrList);
+
+    CurVal = Builder.CreateLoad(Int32, StrIter, "loadtmp");
     CurVal = Builder.CreateAdd(CurVal, ConstantInt::get(Int32, APInt(32, 1)), "addtmp");
-    Builder.CreateStore(CurVal, Iter);
+    Builder.CreateStore(CurVal, StrIter);
     Builder.CreateBr(CheckBlock);
 
-    // Loop block
-    //CreateMalloc()
+    // String loop block    CurVal = Builder.CreateLoad(CharIter);
+    Builder.SetInsertPoint(StrLoopBlock);
+    CurVal = Builder.CreateLoad(StrIter);
+    CurVal = Builder.CreateGEP(Argv, CurVal);
+    CurVal = Builder.CreateLoad(CurVal);
+    Builder.CreateStore(CurVal, CharPtr);
+    Builder.CreateBr(CharLoopBlock);
 
+    // Char loop block
+    Builder.SetInsertPoint(CharLoopBlock);
+    TmpVal = Builder.CreateLoad(CharPtr);
+    CurVal = Builder.CreateLoad(CharIter);
+    CurVal = Builder.CreateGEP(TmpVal, CurVal);
+    CurVal = Builder.CreateLoad(Int8, CurVal);
+    Builder.CreateStore(CurVal, Char);
+    CurVal = Builder.CreateICmpEQ(CurVal, ConstantInt::get(Int8, 0));
+    Builder.CreateCondBr(CurVal, StrAddBlock, CharAddBlock);
 
-    // End block
-    // TODO
+    // Char add block
+    Builder.SetInsertPoint(CharAddBlock);
+    CurVal = Builder.CreateLoad(Char);
+    TmpVal = Builder.CreateLoad(CharList);
+    CurVal = CreateListNode(CharListType, CurVal, TmpVal, CharAddBlock, true);
+    Builder.CreateStore(CurVal, CharList);
 
-    //Args.push_back(List);
-    assert(0);
+    CurVal = Builder.CreateLoad(Int32, CharIter);
+    CurVal = Builder.CreateAdd(CurVal, ConstantInt::get(Int32, APInt(32, 1)), "addtmp");
+    Builder.CreateStore(CurVal, CharIter);
+    Builder.CreateBr(CharLoopBlock);
+
+    // EndBlock should be entry for the rest of function
+    Entry = EndBlock;
+
+    Args.push_back(StrList);
 
     return Func;
 }

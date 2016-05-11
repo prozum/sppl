@@ -7,9 +7,10 @@ using namespace codegen;
 LLVMCodeGen::LLVMCodeGen(parser::Driver &Drv)
         : CodeGenerator(Drv),
           Ctx(getGlobalContext()),
-          Builder(Ctx) {
+          Builder(Ctx),
+          RawOut(*Drv.MOut) {
 
-    // Init LLVM before initializing TagetMachine and DataLayout
+    // Init LLVM before TagetMachine and DataLayout
     initLLVM();
     Machine = std::unique_ptr<TargetMachine>(EngineBuilder().selectTarget());
     DataLayout = std::make_unique<llvm::DataLayout>(Machine->createDataLayout());

@@ -212,7 +212,6 @@ string SpplJit::getOutputList(intptr_t Addr, common::Type Ty)
 string SpplJit::getOutputString(intptr_t Addr, common::Type Ty)
 {
     string Out("\"");
-    auto Subtype = Ty.Subtypes.front();
 
     do {
         auto Data = *(intptr_t *)Addr;

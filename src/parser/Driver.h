@@ -41,7 +41,7 @@ class Driver {
     std::string Source;
 
     // Out options
-    bool Binary = true;
+    bool Binary = false;
     bool JIT = false;
     std::string OutFile;
     std::string HOutFile;

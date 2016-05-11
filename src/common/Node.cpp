@@ -3,7 +3,6 @@
 #include "Visitor.h"
 
 using namespace std;
-
 using namespace common;
 
 void Program::accept(Visitor &V) { V.visit(*this); }

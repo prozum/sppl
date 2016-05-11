@@ -98,7 +98,7 @@ std::string Type::str(bool isTop) {
     case TypeId::UNKNOWN:
         return "_Unknown_";
     case TypeId::EMPTYLIST:
-        return "_EmptyList_";
+        return "[]";
     case TypeId::VOID:
         return "Void";
     }

@@ -4,7 +4,7 @@ using namespace codegen;
 using namespace llvm;
 
 
-Value *LLVMCodeGen::CreateListNode(common::Type Type, Value *Data, Value *NextNode, BasicBlock *Block)
+Value *LLVMCodeGen::CreateListNode(common::Type Type, Value *Data, Value *NextNode, BasicBlock *Block, bool Runtime)
 {
     auto ListType = getListType(Type);
     auto ListPtrType = getType(Type);
@@ -19,6 +19,8 @@ Value *LLVMCodeGen::CreateListNode(common::Type Type, Value *Data, Value *NextNo
 
     // Set next node
     CurVal = Builder.CreateStructGEP(ListType, ListCast, 1);
+    //if ()
+
     if (!NextNode)
         NextNode = ConstantPointerNull::get(static_cast<PointerType *>(ListPtrType));
     Builder.CreateStore(NextNode, CurVal);
