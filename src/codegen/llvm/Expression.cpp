@@ -141,4 +141,13 @@ void LLVMCodeGen::visit(common::CallExpr &Node) {
     CurVal = Call;
 }
 
+void LLVMCodeGen::visit(common::ListAdd &Node) {
+    Node.Left->accept(*this);
+    auto Element = CurVal;
+
+    Node.Right->accept(*this);
+    auto List = CurVal;
+
+    CurVal = CreateListNode(Node.RetTy, Element, List, *CaseBlock);
+}
 

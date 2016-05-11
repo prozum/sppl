@@ -110,6 +110,7 @@ private:
     void visit(common::LesserEq &Node);
     void visit(common::GreaterEq &Node);
     void visit(common::To &Node);
+    void visit(common::ListAdd &Node);
 
     void visit(common::Negative &Node);
     void visit(common::Not &Node);
