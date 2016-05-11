@@ -302,7 +302,7 @@ void CParCodeGen::visit(common::CallExpr &Node) {
 
         if (Node.DoParallel) {
             GeneratedCall << "        " << Signature << GArg << "* " << Name << GArg << " = malloc(sizeof("
-            << Signature << GArg << "));" << endl;
+                                        << Signature << GArg << "));" << endl;
 
             for (size_t i = 0; i < Node.Args.size(); ++i) {
                 ExprStack.push(stringstream());
