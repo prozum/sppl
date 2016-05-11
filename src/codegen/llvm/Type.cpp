@@ -49,7 +49,7 @@ llvm::StructType *LLVMCodeGen::getListType(common::Type Ty) {
 
     //std::vector<llvm::Type *> Subtypes;
     auto ListTy = StructType::create(Ctx, "list");
-    llvm::Type *Subtypes[] = { Int64, getType(Ty.Subtypes.front()), PointerType::getUnqual(ListTy) };
+    llvm::Type *Subtypes[] = { getType(Ty.Subtypes.front()), PointerType::getUnqual(ListTy) };
     ListTy->setBody(Subtypes);
 
     return ListTypes[Ty] = ListTy;

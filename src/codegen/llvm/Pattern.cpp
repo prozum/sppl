@@ -89,3 +89,13 @@ void LLVMCodeGen::visit(common::ListPattern &Node) {
 void LLVMCodeGen::visit(common::ParPattern &Node) {
     Node.Pat->accept(*this);
 }
+
+void LLVMCodeGen::visit(common::ListSplit &Node) {
+
+    /*
+    CurArg;
+    CurVal = Builder.CreateStructGEP((*CurArg)->getType()->getPointerElementType(), *CurArg, 0);
+    static_cast<common::IdPattern *>(Node.Right.get())->Val;
+    auto Element =
+     */
+}

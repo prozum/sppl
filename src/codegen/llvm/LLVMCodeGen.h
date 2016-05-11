@@ -94,6 +94,7 @@ private:
     void visit(common::ListPattern &Node);
     void visit(common::ParPattern &Node);
     void visit(common::WildPattern &Node);
+    void visit(common::ListSplit &Node);
 
     void visit(common::Add &Node);
     void visit(common::Sub &Node);

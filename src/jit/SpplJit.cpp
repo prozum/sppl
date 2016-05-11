@@ -194,10 +194,22 @@ string SpplJit::getOutputList(intptr_t Addr, common::Type Ty)
     string Out("[");
     auto Subtype = Ty.Subtypes.front();
 
-    auto Count  = *(int64_t *)Addr;
+    do {
+        auto Data = *(intptr_t *)Addr;
+        Out += getOutput(Data, Subtype);
 
-    for (int64_t i = 0; i < Count; ++i) {
-        Addr += sizeof(int64_t *);
+        Addr += sizeof(intptr_t *);
+        Addr = *(intptr_t * )Addr;
+
+        if (Addr) {
+            Out += ", ";
+        }
+
+    } while (Addr);
+
+    /*
+    while (Next) {
+        Next += sizeof(int64_t *);
 
         auto Data = *(intptr_t *)Addr;
         Out += getOutput(Data, Subtype);
@@ -208,6 +220,7 @@ string SpplJit::getOutputList(intptr_t Addr, common::Type Ty)
             Addr = *(intptr_t * )Addr;
         }
     }
+     */
 
     return Out + "]";
 }
