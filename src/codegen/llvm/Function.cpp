@@ -83,7 +83,10 @@ void LLVMCodeGen::visit(common::Function &Node) {
         FirstBlock = PatVecBlocks.front().front();
     Builder.CreateBr(FirstBlock);
 
-    verifyFunction(*CurFunc);
+    raw_os_ostream RawOut(*Drv.Out);
+    if (verifyFunction(*CurFunc, &RawOut)) {
+        addError(Error("LLVM Error"));
+    }
 }
 
 void LLVMCodeGen::visit(common::Case &Node) {

@@ -64,7 +64,6 @@ private:
     std::vector<ModuleHandleT> ModuleHandles;
     ModuleHandleT ModuleHandler;
 
-
     template <typename T> static std::vector<T> singletonSet(T Item) {
         std::vector<T> Vec;
         Vec.push_back(std::move(Item));

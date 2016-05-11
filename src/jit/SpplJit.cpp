@@ -126,10 +126,6 @@ string SpplJit::getOutput(intptr_t Data, common::Type Type) {
         return "'" + string(1, (char)Data) + "'";
     case TypeId::STRING:
         return getOutputString(Data, Type);
-        // Ignore list container
-        Data += sizeof(int64_t);
-        Data = *(int64_t *)Data;
-        return "\"" + string((char *)Data) + "\"";
     case TypeId::BOOL:
         return ((bool)Data) ? "True" : "False";
     case TypeId::TUPLE:
