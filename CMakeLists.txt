@@ -70,6 +70,9 @@ endif()
 if (OPTIMIZER)
     add_definitions(-DOPTIMIZER)
 endif()
+if (TESTS)
+    add_definitions(-DTESTS)
+endif()
 
 include_directories(
         src/common

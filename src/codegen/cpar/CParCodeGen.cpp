@@ -13,8 +13,11 @@ void CParCodeGen::visit(Program &Node) {
     Prog = &Node;
     Function *Main = nullptr;
 
+#ifdef TESTS
+    *Header << "#include \"task.h\" " << endl;
+#else
     *Header << "#include \"src/runtime/task.h\" " << endl;
-
+#endif
     // Generate the standard functionality for every program
     generateStd();
 
