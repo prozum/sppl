@@ -48,7 +48,7 @@ void CParCodeGen::visit(Program &Node) {
                                             << GCreate << GString << "(argv[i])); " << endl
             << "    } " << endl
             << " " << endl
-            << "    " << MainSig << GArg << "* main_args = GC_MALLOC(sizeof(" << MainSig << GArg << ")); " << endl
+            << "    " << MainSig << GArg << "* main_args = malloc(sizeof(" << MainSig << GArg << ")); " << endl
             << "    main_args->" << GGenerated << GArg << "0 = args; " << endl
             << "    task_t *main_task = taskcreate((void (*)(void*))" << GUser << GMain << "."
                                     << GParallel << ", (void *)main_args); " << endl
@@ -304,7 +304,7 @@ void CParCodeGen::visit(common::CallExpr &Node) {
         CallDepth++;
 
         if (Node.DoParallel) {
-            GeneratedCall << "        " << Signature << GArg << "* " << Name << GArg << " = GC_MALLOC(sizeof("
+            GeneratedCall << "        " << Signature << GArg << "* " << Name << GArg << " = malloc(sizeof("
             << Signature << GArg << "));" << endl;
 
             for (size_t i = 0; i < Node.Args.size(); ++i) {
