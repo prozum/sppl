@@ -19,6 +19,8 @@ llvm::Type *LLVMCodeGen::getType(common::Type Ty) {
     case common::TypeId::LIST:
     case common::TypeId::STRING:
         return PointerType::getUnqual(getListType(Ty));
+    case common::TypeId::EMPTYLIST:
+        return VoidPtr;
     case common::TypeId::SIGNATURE:
         return PointerType::getUnqual(getFuncType(Ty));
     case common::TypeId::VOID:
@@ -47,7 +49,6 @@ llvm::StructType *LLVMCodeGen::getListType(common::Type Ty) {
     if (CacheTy != ListTypes.end())
         return CacheTy->second;
 
-    //std::vector<llvm::Type *> Subtypes;
     auto ListTy = StructType::create(Ctx, "list");
     llvm::Type *Subtypes[] = { getType(Ty.Subtypes.front()), PointerType::getUnqual(ListTy) };
     ListTy->setBody(Subtypes);

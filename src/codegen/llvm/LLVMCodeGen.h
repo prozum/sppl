@@ -56,6 +56,7 @@ private:
     llvm::Type *Int32;
     llvm::Type *Int64;
     llvm::Type *Double;
+    llvm::PointerType *VoidPtr;
     llvm::FunctionType *MainType;
 
     llvm::Value *CurVal = nullptr;

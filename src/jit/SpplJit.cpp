@@ -137,6 +137,8 @@ string SpplJit::getOutput(intptr_t Data, common::Type Type) {
         return getOutputList(Data, Type);
     case TypeId::SIGNATURE:
         return Type.str();
+    case TypeId::EMPTYLIST:
+        return "[]";
     case TypeId::VOID:
         return "";
     default:

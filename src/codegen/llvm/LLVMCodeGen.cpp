@@ -21,6 +21,7 @@ LLVMCodeGen::LLVMCodeGen(parser::Driver &Drv)
     Int32 = llvm::Type::getInt32Ty(Ctx);
     Int64 = llvm::Type::getInt64Ty(Ctx);
     Double = llvm::Type::getDoubleTy(Ctx);
+    VoidPtr = PointerType::getUnqual(Int8);
     MainType = FunctionType::get(Int32,
                                  vector<Type *> {
                                          Int32,

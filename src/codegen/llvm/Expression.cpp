@@ -67,55 +67,19 @@ void LLVMCodeGen::visit(common::TupleExpr &Node) {
 }
 
 void LLVMCodeGen::visit(common::ListExpr &Node) {
-    // Create types
-    /*
-    auto ArrayType = ArrayType::get(getType(Node.RetTy.Subtypes.front()), Node.Elements.size());
-    */
-    //auto ListType = getListType(Node.RetTy);
-
-
-    // Malloc list data
-    /*
-    auto DataMalloc = CreateMalloc(ArrayType, *CaseBlock);
-    auto DataCast = Builder.CreateBitCast(DataMalloc, PointerType::getUnqual(ArrayType));
-     */
-
     // Create global list constant
     Value *ListNode = nullptr;
     for (auto Element = Node.Elements.rbegin(); Element < Node.Elements.rend(); ++Element) {
 
         (*Element)->accept(*this);
         ListNode = CreateListNode(Node.RetTy, CurVal, ListNode, *CaseBlock);
-        //auto GEP = Builder.CreateStructGEP(ArrayType, DataCast, i);
-        //Builder.CreateStore(CurVal, GEP);
     }
-
-    /*
-    // Malloc list data
-    auto DataMalloc = CreateMalloc(ArrayType, *CurCaseBlock);
-
-    // Memcpy
-    auto Size = DataLayout.getPointerTypeSize(ArrayType);
-    Builder.CreateMemCpy(DataMalloc, GlobalVal, Size, 1);
-
-    // Malloc list container
-    auto ListMalloc = CreateMalloc(ListType, *CurCaseBlock);
-    auto ListCast = Builder.CreateBitCast(ListMalloc, ListPtrType);
-
-    // Set list length
-    CurVal = Builder.CreateStructGEP(ListType, ListCast, 0);
-    Builder.CreateStore(ConstantInt::get(Int32, Node.Elements.size()), CurVal);
-
-    // Set list data
-    CurVal = Builder.CreateStructGEP(ListType, ListCast, 1);
-    auto DataCast = Builder.CreateBitCast(DataMalloc, PointerType::getUnqual(ArrayType::get(getType(Node.RetTy.Subtypes[0]), 0)));
-    Builder.CreateStore(DataCast, CurVal);
-    */
-    //auto List = CreateList(Node.RetTy, DataCast, ConstantInt::get(Int32, Node.Elements.size()), *CaseBlock);
 
     // Set return value
     auto ListPtrType = getType(Node.RetTy);
     auto RetVal = Builder.CreateAlloca(ListPtrType, nullptr, "allocatmp");
+    if (!ListNode)
+        ListNode = ConstantPointerNull::get(VoidPtr);
     Builder.CreateStore(ListNode, RetVal);
     CurVal = Builder.CreateLoad(ListPtrType, RetVal, "loadtmp");
 }
