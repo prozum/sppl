@@ -357,7 +357,6 @@ string CCodeGen::generateList(Type &Ty) {
            << "        list2 = " << GGenerated << GAdd << Name << "(list2, elements[i]->" << GValue << ");" << endl
            << "    } " << endl
            << endl
-           << "    free(elements); " << endl
            << "    return list2; " << endl
            << "} " << endl
            << endl;
@@ -758,7 +757,6 @@ void CCodeGen::generateStd() {
             << endl
             << "    buffer[i] = '\\0'; " << endl
             << "    printf(\"\\\"%s\\\"\", buffer); " << endl
-            << "    free(buffer); " << endl
             << "} " << endl
             << endl;
 }
