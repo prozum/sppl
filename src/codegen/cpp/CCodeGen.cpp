@@ -624,6 +624,7 @@ void CCodeGen::generateStd() {
             << "#include <stdlib.h> " << endl
             << "#include <string.h> " << endl
             << "#include <stdint.h> " << endl
+            << "#include <gc.h> " << endl
             << "#include <inttypes.h> " << endl;
 
     ToStrings[Type(TypeId::INT)] = GGenerated + GToString + "int";
