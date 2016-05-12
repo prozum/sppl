@@ -20,11 +20,17 @@ void GeneralOptimizer::visit(Function &Node) {
     for (auto &Case : Node.Cases) {
         auto Expr = Case->Expr.get();
 
-        if (typeid(*Expr) == typeid(CallExpr) &&
-            typeid(*static_cast<CallExpr *>(Expr)->Callee.get()) == typeid(IdExpr) &&
-            static_cast<IdExpr *>(static_cast<CallExpr *>(Expr)->Callee.get())->Val == Node.Id)
-        {
-            Case->TailRec = true;
+        if (typeid(*Expr) == typeid(CallExpr)) {
+            auto Callee = static_cast<CallExpr *>(Expr)->Callee.get();
+
+            if (typeid(*Callee) == typeid(IdExpr)) {
+                auto Id = static_cast<IdExpr *>(Callee);
+
+                if (Id->Val == Node.Id) {
+                    Case->TailRec = true;
+                }
+            }
+
         }
 
         Case->accept(*this);
