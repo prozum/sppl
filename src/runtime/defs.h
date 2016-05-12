@@ -37,6 +37,8 @@ typedef unsigned short ushort;
 typedef unsigned long long uvlong;
 typedef long long vlong;
 
+void print(char *str);
+
 enum
 {
     STACK = 8192
