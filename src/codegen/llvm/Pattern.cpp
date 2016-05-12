@@ -38,7 +38,8 @@ void LLVMCodeGen::visit(common::TuplePattern &Node) {
     auto TupVal = CurVal;
     auto PatId = 0;
 
-    auto Block = BasicBlock::Create(Ctx, "tuple", CurFunc);
+    addPrefix("tuple");
+    auto Block = BasicBlock::Create(Ctx, getPrefix(), CurFunc);
     Builder.CreateBr(Block);
     for (auto Pat = Node.Patterns.cbegin(); Pat != Node.Patterns.cend(); ++Pat) {
         Builder.SetInsertPoint(Block);
@@ -46,12 +47,14 @@ void LLVMCodeGen::visit(common::TuplePattern &Node) {
         CurVal = Builder.CreateStructGEP(TupVal->getType()->getPointerElementType(), TupVal, PatId++);
         CurVal = Builder.CreateLoad(CurVal->getType()->getPointerElementType(), CurVal, "loadtmp");
         (*Pat)->accept(*this);
+        stepPrefix();
 
         if (next(Pat) != Node.Patterns.cend()) {
-            Block = BasicBlock::Create(Ctx, "tuple", CurFunc);
+            Block = BasicBlock::Create(Ctx, getPrefix(), CurFunc);
             Builder.CreateCondBr(CurVal, Block, FalseBlock);
         }
     }
+    delPrefix();
 
     CurPatBlock = Block;
 }

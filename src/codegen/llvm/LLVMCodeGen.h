@@ -74,8 +74,9 @@ private:
 
     std::vector<std::unique_ptr<common::Case>>::const_iterator CurCase;
     std::vector<std::unique_ptr<common::Pattern>>::const_iterator CurPat;
-
     llvm::BasicBlock *CurPatBlock;
+
+    std::vector<std::pair<std::string,int>> Prefixes;
 
     void visit(common::Program &node);
     void visit(common::Function &Node);
@@ -132,5 +133,10 @@ private:
     llvm::StructType *getTupleType(common::Type Ty);
     llvm::StructType *getListType(common::Type Ty);
     llvm::FunctionType *getFuncType(common::Type Ty);
+
+    void addPrefix(std::string Prefix);
+    void delPrefix();
+    std::string getPrefix();
+    void stepPrefix();
 };
 }

@@ -66,15 +66,17 @@ void LLVMCodeGen::visit(common::Function &Node) {
      */
 
     // Visit cases
+    addPrefix("case");
     for (CurCase = Node.Cases.cbegin(); CurCase != Node.Cases.cend(); ++CurCase) {
-        if (next(CurCase) != Node.Cases.cend()) {
-            FalseBlock = BasicBlock::Create(Ctx, "case", CurFunc);
-        } else {
+        if (next(CurCase) != Node.Cases.cend())
+            FalseBlock = BasicBlock::Create(Ctx, getPrefix(), CurFunc);
+        else
             FalseBlock = ErrBlock;
-        }
 
         (*CurCase)->accept(*this);
+        stepPrefix();
     }
+    delPrefix();
 
     // Verify function and get error
     if (verifyFunction(*CurFunc, &RawOut)) {
@@ -85,7 +87,7 @@ void LLVMCodeGen::visit(common::Function &Node) {
 
 void LLVMCodeGen::visit(common::Case &Node) {
     // Create case block
-    auto CaseBlock = BasicBlock::Create(Ctx, "case", CurFunc);
+    auto CaseBlock = BasicBlock::Create(Ctx, getPrefix(), CurFunc);
 
     // Store tail recursion state in visitor
     TailRec = Node.TailRec;
@@ -93,15 +95,19 @@ void LLVMCodeGen::visit(common::Case &Node) {
     // Clear pattern values
     PatVals.clear();
 
+
+    addPrefix("pat");
+
     // Set first block after entry
     Builder.SetInsertPoint(Entry);
     if (!Node.Patterns.empty()) {
-        CurPatBlock = BasicBlock::Create(Ctx, "pat", CurFunc);
+        CurPatBlock = BasicBlock::Create(Ctx, getPrefix(), CurFunc);
         Builder.CreateBr(CurPatBlock);
     } else {
         Builder.CreateBr(CaseBlock);
     }
 
+    // Visit patterns
     for (CurPat = Node.Patterns.cbegin(), CurArg = Args.cbegin();
          CurPat != Node.Patterns.cend();
          ++CurPat, ++CurArg) {
@@ -110,16 +116,18 @@ void LLVMCodeGen::visit(common::Case &Node) {
         Builder.SetInsertPoint(CurPatBlock);
         CurVal = *CurArg;
         (*CurPat)->accept(*this);
+        stepPrefix();
 
         if (next(CurPat) != Node.Patterns.cend()) {
-            CurPatBlock = BasicBlock::Create(Ctx, "pat", CurFunc);
+            CurPatBlock = BasicBlock::Create(Ctx, getPrefix(), CurFunc);
             Builder.CreateCondBr(CurVal, CurPatBlock, FalseBlock);
         }
     }
+    delPrefix();
 
     // Create when block
     if (Node.When) {
-        auto WhenBlock = BasicBlock::Create(Ctx, "when", CurFunc);
+        auto WhenBlock = BasicBlock::Create(Ctx, getPrefix() + "_when", CurFunc);
         Builder.CreateCondBr(CurVal, WhenBlock, FalseBlock);
         Builder.SetInsertPoint(WhenBlock);
         Node.When->accept(*this);

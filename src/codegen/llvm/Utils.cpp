@@ -2,7 +2,7 @@
 
 using namespace codegen;
 using namespace llvm;
-
+using namespace std;
 
 Value *LLVMCodeGen::CreateListNode(common::Type Type, Value *Data, Value *NextNode, BasicBlock *Block, bool Runtime)
 {
@@ -48,5 +48,6 @@ Instruction *LLVMCodeGen::CreateMalloc(Value *Size, BasicBlock *Block)
 unsigned LLVMCodeGen::getAlignment(common::Type Ty) {
     return DataLayout->getPrefTypeAlignment(getType(Ty));
 }
+
 
 
