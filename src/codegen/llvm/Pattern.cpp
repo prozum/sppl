@@ -78,11 +78,16 @@ void LLVMCodeGen::visit(common::ParPattern &Node) {
 }
 
 void LLVMCodeGen::visit(common::ListSplit &Node) {
+    auto CurNode = CurVal;
+    CurVal = Builder.CreateStructGEP(CurVal->getType()->getPointerElementType(), CurVal, 0);
+    CurVal = Builder.CreateLoad(CurVal);
+    Node.Left->accept(*this);
 
-    /*
-    CurArg;
-    CurVal = Builder.CreateStructGEP((*CurArg)->getType()->getPointerElementType(), *CurArg, 0);
-    static_cast<common::IdPattern *>(Node.Right.get())->Val;
-    auto Element =
-     */
+    CurPatBlock = BasicBlock::Create(Ctx, CurPatBlock->getName() + "_split", CurFunc);
+    Builder.CreateCondBr(CurVal, CurPatBlock, NextCaseBlock);
+    Builder.SetInsertPoint(CurPatBlock);
+    
+    CurVal = Builder.CreateStructGEP(CurNode->getType()->getPointerElementType(), CurNode, 1);
+    CurVal = Builder.CreateLoad(CurVal);
+    Node.Right->accept(*this);
 }
