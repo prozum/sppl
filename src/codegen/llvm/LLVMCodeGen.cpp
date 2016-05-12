@@ -10,7 +10,7 @@ LLVMCodeGen::LLVMCodeGen(parser::Driver &Drv)
           Builder(Ctx),
           RawOut(*Drv.MOut) {
 
-    // Init LLVM before TagetMachine and DataLayout
+    // Init LLVM before TargetMachine and DataLayout
     initLLVM();
     Machine = std::unique_ptr<TargetMachine>(EngineBuilder().selectTarget());
     DataLayout = std::make_unique<llvm::DataLayout>(Machine->createDataLayout());
@@ -44,8 +44,7 @@ void LLVMCodeGen::visit(common::Program &node) {
     if (Drv.Binary) {
         raw_os_ostream RawOut(*Drv.Out);
         WriteBitcodeToFile(Module.get(), RawOut);
-    }
-    else {
+    } else {
         *Drv.Out << ModuleString();
     }
 }

@@ -20,7 +20,7 @@ void LLVMCodeGen::visit(common::StringExpr &Node) {
     Value *ListNode = nullptr;
     for (auto Char = Node.Val.rbegin(); Char < Node.Val.rend(); ++Char) {
         CurVal = ConstantInt::get(Int8, (uint64_t)*Char);
-        ListNode = CreateListNode(Node.RetTy, CurVal, ListNode, *CaseBlock);
+        ListNode = CreateListNode(Node.RetTy, CurVal, ListNode, Builder.GetInsertBlock());
     }
     CurVal = ListNode;
 }
@@ -72,9 +72,8 @@ void LLVMCodeGen::visit(common::ListExpr &Node) {
     // Create global list constant
     Value *ListNode = nullptr;
     for (auto Element = Node.Elements.rbegin(); Element < Node.Elements.rend(); ++Element) {
-
         (*Element)->accept(*this);
-        ListNode = CreateListNode(Node.RetTy, CurVal, ListNode, *CaseBlock);
+        ListNode = CreateListNode(Node.RetTy, CurVal, ListNode, Builder.GetInsertBlock());
     }
 
     // Set return value
@@ -114,6 +113,6 @@ void LLVMCodeGen::visit(common::ListAdd &Node) {
     Node.Right->accept(*this);
     auto List = CurVal;
 
-    CurVal = CreateListNode(Node.RetTy, Element, List, *CaseBlock);
+    CurVal = CreateListNode(Node.RetTy, Element, List, Builder.GetInsertBlock());
 }
 

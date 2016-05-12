@@ -61,27 +61,21 @@ private:
     llvm::FunctionType *MainType;
 
     llvm::Value *CurVal = nullptr;
-    llvm::Value *PatBool = nullptr;
     llvm::Function *CurFunc = nullptr;
 
     llvm::BasicBlock *Entry = nullptr;
     llvm::BasicBlock *ErrBlock = nullptr;
     llvm::BasicBlock *CaseRetBlock = nullptr;
     llvm::PHINode *CasePhiNode = nullptr;
-    llvm::BasicBlock *PatRetBlock = nullptr;
+    llvm::BasicBlock *FalseBlock = nullptr;
 
     std::vector<llvm::Value *> Args;
-    std::vector<llvm::Value *>::iterator CurArg;
+    std::vector<llvm::Value *>::const_iterator CurArg;
 
     std::vector<std::unique_ptr<common::Case>>::const_iterator CurCase;
-    std::vector<llvm::BasicBlock *> CaseBlocks;
-    std::vector<llvm::BasicBlock *>::const_iterator CaseBlock;
-
     std::vector<std::unique_ptr<common::Pattern>>::const_iterator CurPat;
 
-    std::vector<std::vector<llvm::BasicBlock *>> PatVecBlocks;
-    std::vector<std::vector<llvm::BasicBlock *>>::const_iterator CurPatVecBlock;
-    std::vector<llvm::BasicBlock *>::const_iterator PatBlock;
+    llvm::BasicBlock *CurPatBlock;
 
     void visit(common::Program &node);
     void visit(common::Function &Node);
