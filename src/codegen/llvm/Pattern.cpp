@@ -6,22 +6,22 @@ using namespace std;
 
 void LLVMCodeGen::visit(common::FloatPattern &Node) {
     auto PatVal = ConstantFP::get(getType(Node.RetTy), Node.Val);
-    CurVal = Builder.CreateFCmpONE(PatVal, *CurArg, "cmptmp");
+    CurVal = Builder.CreateFCmpONE(PatVal, CurVal, "cmptmp");
 }
 
 void LLVMCodeGen::visit(common::IntPattern &Node) {
     auto PatVal = ConstantInt::get(getType(Node.RetTy), (uint64_t)Node.Val);
-    CurVal = Builder.CreateICmpEQ(PatVal, *CurArg, "cmptmp");
+    CurVal = Builder.CreateICmpEQ(PatVal, CurVal, "cmptmp");
 }
 
 void LLVMCodeGen::visit(common::BoolPattern &Node) {
     auto PatVal = ConstantInt::get(getType(Node.RetTy), (uint64_t)Node.Val);
-    CurVal = Builder.CreateICmpEQ(PatVal, *CurArg, "cmptmp");
+    CurVal = Builder.CreateICmpEQ(PatVal, CurVal, "cmptmp");
 }
 
 void LLVMCodeGen::visit(common::CharPattern &Node) {
     auto PatVal = ConstantInt::get(getType(Node.RetTy), (uint64_t)Node.Val);
-    CurVal = Builder.CreateICmpEQ(PatVal, *CurArg, "cmptmp");
+    CurVal = Builder.CreateICmpEQ(PatVal, CurVal, "cmptmp");
 }
 
 void LLVMCodeGen::visit(common::IdPattern &Node) {
@@ -34,7 +34,6 @@ void LLVMCodeGen::visit(common::WildPattern &Node) {
 }
 
 void LLVMCodeGen::visit(common::TuplePattern &Node) {
-
     auto TupVal = CurVal;
     auto PatId = 0;
 
