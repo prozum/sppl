@@ -50,7 +50,7 @@ void LLVMCodeGen::visit(common::TuplePattern &Node) {
 
         if (next(Pat) != Node.Patterns.cend()) {
             Block = BasicBlock::Create(Ctx, getPrefix(), CurFunc);
-            Builder.CreateCondBr(CurVal, Block, FalseBlock);
+            Builder.CreateCondBr(CurVal, Block, NextCaseBlock);
         }
     }
     delPrefix();

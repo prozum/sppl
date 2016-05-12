@@ -67,16 +67,19 @@ private:
     llvm::BasicBlock *ErrBlock = nullptr;
     llvm::BasicBlock *CaseRetBlock = nullptr;
     llvm::PHINode *CasePhiNode = nullptr;
-    llvm::BasicBlock *FalseBlock = nullptr;
+    llvm::BasicBlock *NextCaseBlock = nullptr;
 
     std::vector<llvm::Value *> Args;
     std::vector<llvm::Value *>::const_iterator CurArg;
 
     std::vector<std::unique_ptr<common::Case>>::const_iterator CurCase;
     std::vector<std::unique_ptr<common::Pattern>>::const_iterator CurPat;
+    llvm::BasicBlock *CurCaseBlock;
     llvm::BasicBlock *CurPatBlock;
 
     std::vector<std::pair<std::string,int>> Prefixes;
+
+    bool FirstBlock;
 
     void visit(common::Program &node);
     void visit(common::Function &Node);
