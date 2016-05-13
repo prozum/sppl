@@ -50,7 +50,7 @@ void LLVMCodeGen::visit(common::TuplePattern &Node) {
 
         if (next(Pat) != Node.Patterns.cend()) {
             Block = BasicBlock::Create(Ctx, getPrefix(), CurFunc);
-            Builder.CreateCondBr(CurVal, Block, NextCaseBlock);
+            Builder.CreateCondBr(CurVal, Block, NextPatBlock);
         }
     }
     delPrefix();
@@ -84,9 +84,9 @@ void LLVMCodeGen::visit(common::ListSplit &Node) {
     Node.Left->accept(*this);
 
     CurPatBlock = BasicBlock::Create(Ctx, CurPatBlock->getName() + "_split", CurFunc);
-    Builder.CreateCondBr(CurVal, CurPatBlock, NextCaseBlock);
+    Builder.CreateCondBr(CurVal, CurPatBlock, NextPatBlock);
     Builder.SetInsertPoint(CurPatBlock);
-    
+
     CurVal = Builder.CreateStructGEP(CurNode->getType()->getPointerElementType(), CurNode, 1);
     CurVal = Builder.CreateLoad(CurVal);
     Node.Right->accept(*this);

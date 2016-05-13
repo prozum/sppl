@@ -67,7 +67,7 @@ private:
     llvm::BasicBlock *ErrBlock = nullptr;
     llvm::BasicBlock *CaseRetBlock = nullptr;
     llvm::PHINode *CasePhiNode = nullptr;
-    llvm::BasicBlock *NextCaseBlock = nullptr;
+    llvm::BasicBlock *NextPatBlock = nullptr;
 
     std::vector<llvm::Value *> Args;
     std::vector<llvm::Value *>::const_iterator CurArg;
