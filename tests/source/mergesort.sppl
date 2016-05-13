@@ -1,12 +1,9 @@
-include "stringlib.sppl"
+def num : Int
+    | = 5000000
 
 def main : [String] -> [Int]
-#    | _ = generate2(0, 200, [])
-    | path : "map_par" : size : rest = map_par(add2, generate2(0, parsestring(), []))
-    | path : "mergesort" : size : rest = map_par(add2, generate(0, 200, []))
-
-def add2 : Int -> Int
-    | n = n + 2
+    | _ = mergesort(generate(0, num(), []))
+    | _ = generate(0, num(), [])
 
 def mergesort : [Int] -> [Int]
     | l = mergesortsplit(split(l, count(l)))
@@ -16,22 +13,6 @@ def mergesortsplit : ([Int], [Int], Int) -> [Int]
     | (l, [], c)  = l
     | (l1, l2, c) = merge(mergesortsplit(split(l1, c)),
                           mergesortsplit(split(l2, c)))
-
-def map_par : (Int -> Int) -> [Int] -> [Int]
-    | f l = map_par_split(f, split(l, count(l)))
-
-def map_par_split : (Int -> Int) -> ([Int], [Int], Int) -> [Int]
-    | f ([], l, c)    = map_acc(f, l, [])
-    | f (l, [], c)    = map_acc(f, l, [])
-    | f (l1, l2, c) = map_par_split(f, split(l1, c)) ++ map_par_split(f, split(l2, c))
-
-def map_acc : (Int -> Int) -> [Int] -> [Int] -> [Int]
-    | f [] res = reverse_acc(res, [])
-    | f x : xs res = map_acc(f, xs, x : res)
-
-def reverse_acc : [Int] -> [Int] -> [Int]
-    | [] res = res
-    | x : xs res = reverse_acc(xs, x : res)
 
 def split : [Int] -> Int -> ([Int], [Int], Int)
     | l n = splitacc(l, [], n / 2, n)
@@ -48,16 +29,19 @@ def countacc : [Int] -> Int -> Int
     | x : xs res = countacc(xs, res + 1)
 
 def merge : [Int] -> [Int] -> [Int]
-    | [] []                    = []
-    | x : l1 []                = x : merge(l1, [])
-    | [] x : l1                = x : merge([], l1)
-    | x : l1 y : l2 when x > y = y : merge(x : l1, l2)
-    | x : l1 y : l2            = x : merge(l1, y : l2)
+    | l1 l2 = merge_acc(l1, l2, [])
+
+def merge_acc : [Int] -> [Int] -> [Int] -> [Int]
+    | [] [] res                    = reverse_acc(res, [])
+    | x : l1 [] res                = merge_acc(l1, [], x : res)
+    | [] x : l1 res                = merge_acc([], l1, x : res)
+    | x : l1 y : l2 res when x > y = merge_acc(x : l1, l2, y : res)
+    | x : l1 y : l2 res            = merge_acc(l1, y : l2, x : res)
+
+def reverse_acc : [Int] -> [Int] -> [Int]
+    | [] res = res
+    | x : xs res = reverse_acc(xs, x : res)
 
 def generate : Int -> Int -> [Int] -> [Int]
     | n m list when n == m = list
     | n m list when n < m = generate(n + 1, m, ((n % 4 + n % 3 + n % 2 + n % 1) * n) : list)
-
-def generate2 : Int -> Int -> [Int] -> [Int]
-    | n m list when n == m = list
-    | n m list when n < m = generate2(n + 1, m, 2 : list)

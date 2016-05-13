@@ -54,8 +54,6 @@ void CParCodeGen::visit(Program &Node) {
                                     << GParallel << ", (void *)main_args); " << endl
             << "    rmain(4, main_task); " << endl
             << endl
-            << "    " << Prints[Main->Signature.Subtypes.back()] << "(main_args->" << GGenerated << GRes << "); " << endl
-            << "    printf(\"\\n\");" << endl
             << "    taskdealloc(main_task); " << endl
             << "    return 0; " << endl
             << "} " << endl
@@ -201,11 +199,14 @@ void CParCodeGen::visit(Case &Node) {
     if (Node.When) {
         // Generate return expression
         ExprStack.push(stringstream());
+        SequentialCall.push_back(string());
+        BeforeExpr.push_back(string());
+        CallStackCount.push_back(0);
 
         Node.When->accept(*this);
 
         if (GenerateParallel) {
-            outputParallelCode();
+            outputBeforeExpr();
 
             for (auto &Dealloc: TaskDeallocs){
                 WhenDealloc += "        " + Dealloc + "\n";
@@ -223,6 +224,9 @@ void CParCodeGen::visit(Case &Node) {
 
     // Generate return expression
     ExprStack.push(stringstream());
+    SequentialCall.push_back(string());
+    BeforeExpr.push_back(string());
+    CallStackCount.push_back(0);
 
     if (Node.TailRec) {
         string Deallocs;
@@ -233,7 +237,7 @@ void CParCodeGen::visit(Case &Node) {
             C->Args[i]->accept(*this);
 
             if (GenerateParallel) {
-                outputParallelCode();
+                outputBeforeExpr();
 
                 for (auto &Dealloc: TaskDeallocs){
                     Deallocs += "        " + Dealloc + "\n";
@@ -258,7 +262,7 @@ void CParCodeGen::visit(Case &Node) {
         Node.Expr->accept(*this);
 
         if (GenerateParallel) {
-            outputParallelCode();
+            outputBeforeExpr();
 
             for (auto &Dealloc: TaskDeallocs){
                 Deallocs += "        " + Dealloc + "\n";
@@ -296,13 +300,13 @@ void CParCodeGen::visit(common::CallExpr &Node) {
 
         CurrentTasks.push_back(Name);
 
-        if (CallStack.size() == CallDepth) {
+        if (BeforeExpr.size() == BeforeExprDepth) {
             SequentialCall.push_back(string());
-            CallStack.push_back(string());
+            BeforeExpr.push_back(string());
             CallStackCount.push_back(0);
         }
 
-        CallDepth++;
+        BeforeExprDepth++;
 
         if (Node.DoParallel) {
             GeneratedCall << "        " << Signature << GArg << "* " << Name << GArg << " = malloc(sizeof("
@@ -331,9 +335,9 @@ void CParCodeGen::visit(common::CallExpr &Node) {
 
             TaskDeallocs.push_back("taskdealloc(" + Name + ");");
 
-            CallDepth--;
-            CallStack[CallDepth] += GeneratedCall.str();
-            CallStackCount[CallDepth]++;
+            BeforeExprDepth--;
+            BeforeExpr[BeforeExprDepth] += GeneratedCall.str();
+            CallStackCount[BeforeExprDepth]++;
         } else {
 
             ExprStack.push(stringstream());
@@ -359,7 +363,7 @@ void CParCodeGen::visit(common::CallExpr &Node) {
                           << endl;
 
             ExprStack.top() << Name << GRes;
-            SequentialCall[--CallDepth] = GeneratedCall.str();
+            SequentialCall[--BeforeExprDepth] = GeneratedCall.str();
         }
     } else {
         Node.Callee->accept(*this);
@@ -411,9 +415,9 @@ std::string CParCodeGen::generateEnvironment(common::Type &Ty) {
     return Name;
 }
 
-void CParCodeGen::outputParallelCode() {
-    for (size_t i = CallStack.size(); i > 0; i--) {
-        *Output << CallStack.back();
+void CParCodeGen::outputBeforeExpr() {
+    while (BeforeExpr.size()) {
+        *Output << BeforeExpr.back();
 
         if (!SequentialCall.back().empty())
             *Output << SequentialCall.back();
@@ -423,10 +427,10 @@ void CParCodeGen::outputParallelCode() {
                     << endl;
 
         SequentialCall.pop_back();
-        CallStack.pop_back();
+        BeforeExpr.pop_back();
         CallStackCount.pop_back();
     }
 
-    CallDepth = 0;
+    BeforeExprDepth = 0;
 }
 

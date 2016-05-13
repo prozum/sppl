@@ -96,6 +96,8 @@ using namespace common;
 %token CURLSTART "{"
 %token CURLEND "}"
 %token EXMARK "!"
+%token AT "@"
+%token DOLLAR "$"
 %token COMMA ","
 %token PIPE "|"
 %token COLONCOLON "::"
@@ -106,6 +108,7 @@ using namespace common;
 %token <LongDouble> FLOATLITERAL "Float"
 %token <Str> IDSMALL IDBIG STRINGLITERAL "String"
 
+%left DOLLAR
 %left OR
 %left AND
 %left EQUAL NOTEQUAL
@@ -116,7 +119,7 @@ using namespace common;
 %left CONCAT
 %right COLON
 %left TO
-%precedence EXMARK NEGATIVE
+%precedence EXMARK AT NEGATIVE
 
 %type <DeclVec> decls
 %type <Decl> decl include
@@ -176,6 +179,7 @@ cases_ne:	cases_ne case                                   { $$ = $1; $$->push_ba
 	|       case                                            { $$ = new vector<unique_ptr<Case>>(); $$->push_back(unique_ptr<Case>($1)); }
 case: 		PIPE patterns ASSIGN expr                       { $$ = new Case(unique_ptr<Expression>($4), nullptr, move(* $2), @1); delete $2; }
     |		PIPE patterns WHEN expr ASSIGN expr             { $$ = new Case(unique_ptr<Expression>($6), unique_ptr<Expression>($4), move(* $2), @1); delete $2; }
+
 patterns:	patterns pattern                                { $$ = $1; $$->push_back(unique_ptr<Pattern>($2)); }
 	|                                                       { $$ = new vector<unique_ptr<Pattern>>(); }
 pattern:    INTLITERAL                                      { $$ = new IntPattern($1, @1); }
@@ -201,7 +205,8 @@ literal:	INTLITERAL                                      { $$ = new IntExpr($1, 
 	|	CHARLITERAL                                         { $$ = new CharExpr($1, @1); }
 	|	BOOLLITERAL                                         { $$ = new BoolExpr($1, @1); }
 	|	STRINGLITERAL                                       { $$ = new StringExpr(* $1, @1); delete $1; }
-expr:	expr OR expr                                        { $$ = new Or(unique_ptr<Expression>($1), unique_ptr<Expression>($3), @1); }
+expr:	expr DOLLAR expr                                    { $$ = new BinPrint(unique_ptr<Expression>($1), unique_ptr<Expression>($3), @1); }
+    |   expr OR expr                                        { $$ = new Or(unique_ptr<Expression>($1), unique_ptr<Expression>($3), @1); }
 	|	expr AND expr                                       { $$ = new And(unique_ptr<Expression>($1), unique_ptr<Expression>($3), @1); }
 	|	expr EQUAL expr                                     { $$ = new Equal(unique_ptr<Expression>($1), unique_ptr<Expression>($3), @1); }
 	|	expr NOTEQUAL expr                                  { $$ = new NotEqual(unique_ptr<Expression>($1), unique_ptr<Expression>($3), @1); }
@@ -228,6 +233,7 @@ expr:	expr OR expr                                        { $$ = new Or(unique_p
     |   BACKSLASH args LAMBARROW expr                       { $$ = new LambdaFunction(unique_ptr<Expression>($4), move(* $2), @1); delete $2; }
     |   EXMARK expr                                         { $$ = new Not(unique_ptr<Expression>($2), @1); }
     |	SUB expr %prec NEGATIVE                             { $$ = new Negative(unique_ptr<Expression>($2), @1); }
+    |	AT expr                                             { $$ = new UnPrint(unique_ptr<Expression>($2), @1); }
 args:    args IDSMALL                                       { $$ = $1; $$->push_back(unique_ptr<LambdaArg>(new LambdaArg(* $2, @1))); }
     |                                                       { $$ = new vector<unique_ptr<LambdaArg>>();  }
 exprs: exprs expr                                           { $$ = $1; $$->push_back(unique_ptr<Expression>($2)); }

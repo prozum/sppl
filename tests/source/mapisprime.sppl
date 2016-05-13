@@ -1,0 +1,59 @@
+def start : Int
+    | = 0
+
+def end : Int
+    | = 10000
+
+def main : [String] -> [Bool]
+    | path : "seq" : rest = map(isprime, generate(end(), start(), []))
+    | path : "par" : rest = map_par(isprime, generate(end(), start(), []))
+
+def isprime : Int -> Bool
+    | n = isprime_helper(n, n - 1)
+
+def isprime_helper : Int -> Int -> Bool
+    | _ 1                 = True
+    | n d when n % d == 0 = False
+    | n d                 = isprime_helper(n, d - 1)
+
+def add2 : Int -> Int
+    | n = n + 2
+
+def map_par : (Int -> Bool) -> [Int] -> [Bool]
+    | f l = map_par_split(f, split(l, count(l)))
+
+def map_par_split : (Int -> Bool) -> ([Int], [Int], Int) -> [Bool]
+    | f ([], l, c)    = map_acc(f, l, [])
+    | f (l, [], c)    = map_acc(f, l, [])
+    | f (l1, l2, c) = map_par_split(f, split(l1, c)) ++ map_par_split(f, split(l2, c))
+
+def map : (Int -> Bool) -> [Int] -> [Bool]
+    | f [] = []
+    | f x : xs = f(x) : map(f, xs)
+
+def map_acc : (Int -> Bool) -> [Int] -> [Bool] -> [Bool]
+    | f [] res = reverse_acc(res, [])
+    | f x : xs res = map_acc(f, xs, f(x) : res)
+
+def reverse_acc : [Bool] -> [Bool] -> [Bool]
+    | [] res = res
+    | x : xs res = reverse_acc(xs, x : res)
+
+def split : [Int] -> Int -> ([Int], [Int], Int)
+    | l n = splitacc(l, [], n / 2, n)
+
+def splitacc : [Int] -> [Int] -> Int -> Int -> ([Int], [Int], Int)
+    | l acc n m when n == 0 = (acc, l, m)
+    | x : xs acc n m        = splitacc(xs, x : acc, n - 1, m - 1)
+
+def count : [Int] -> Int
+    | l = countacc(l, 0)
+
+def countacc : [Int] -> Int -> Int
+    | [] res = res
+    | x : xs res = countacc(xs, res + 1)
+
+def generate : Int -> Int -> [Int] -> [Int]
+    | n m list when n == m = list
+    | n m list when n < m = generate(n + 1, m, n : list)
+    | n m list when n > m = generate(n - 1, m, n : list)

@@ -211,6 +211,14 @@ using namespace std;
     return token::ASSIGN;
 }
 
+"$" {
+    return token::DOLLAR;
+}
+
+"@" {
+    return token::AT;
+}
+
 "["	{
     return token::SQSTART;
 }

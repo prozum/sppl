@@ -313,3 +313,35 @@ void CCodeGen::outputEqual(Type &Ty, Expression &Left, Expression &Right) {
             break;
     }
 }
+
+void CCodeGen::visit(common::BinPrint &Node) {
+    string Name = GTemp + to_string(TempCount++);
+
+    ExprStack.push(stringstream());
+    Node.Left->accept(*this);
+
+    BeforeExpr[BeforeExprDepth] += "        " + getType(Node.RetTy) + " " + Name
+                                    + " = " + ExprStack.top().str() + "; \n";
+    ExprStack.pop();
+    ExprStack.top() << Name;
+
+    ExprStack.push(stringstream());
+    Node.Right->accept(*this);
+
+    BeforeExpr[BeforeExprDepth] += "        " + Prints[Node.Right->RetTy] + "("
+                                   + ExprStack.top().str() + ", 1)" + "; \n";
+    ExprStack.pop();
+}
+
+void CCodeGen::visit(common::UnPrint &Node) {
+    string Name = GTemp + to_string(TempCount++);
+
+    ExprStack.push(stringstream());
+    Node.Child->accept(*this);
+
+    BeforeExpr[BeforeExprDepth] += "        " + getType(Node.RetTy) + " " + Name
+                                    + " = " + ExprStack.top().str() + "; \n";
+    BeforeExpr[BeforeExprDepth] += "        " + Prints[Node.RetTy] + "(" + Name + ", 1)" + "; \n";
+    ExprStack.pop();
+    ExprStack.top() << Name;
+}

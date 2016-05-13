@@ -84,7 +84,13 @@ class Visitor {
     virtual void visit(Concat &Node) {
         addError(Error::NotImplemented(Node.Loc));
     }
+    virtual void visit(BinPrint &Node) {
+        addError(Error::NotImplemented(Node.Loc));
+    }
     virtual void visit(To &Node) {
+        addError(Error::NotImplemented(Node.Loc));
+    }
+    virtual void visit(UnPrint &Node) {
         addError(Error::NotImplemented(Node.Loc));
     }
     virtual void visit(ParExpr &Node) {

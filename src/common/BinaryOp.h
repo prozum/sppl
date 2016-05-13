@@ -228,5 +228,18 @@ class Concat : public BinaryOp {
     virtual BinaryOp *doClone() const;
 };
 
+class BinPrint : public BinaryOp {
+public:
+    BinPrint(std::unique_ptr<Expression> Left, std::unique_ptr<Expression> Right,
+           Location Loc);
+
+    virtual void accept(Visitor &V);
+
+    std::string str();
+
+private:
+    virtual BinaryOp *doClone() const;
+};
+
 template <class T> T *cloneBinaryOp(const T &Op);
 }

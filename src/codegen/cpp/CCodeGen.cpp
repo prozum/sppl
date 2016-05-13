@@ -47,8 +47,7 @@ void CCodeGen::visit(Program &Node) {
                                  << GCreate << GString << "(argv[i])); " << endl
             << "    } " << endl
             <<  endl
-            << "    " << Prints[Main->Signature.Subtypes.back()] << "(" << GUser << GMain << "(args)); " << endl
-            << "    printf(\"\\n\");" << endl
+            << "    " << GUser << GMain << "(args); " << endl
             << "    return 0; " << endl
             << "} " << endl
             << " " << endl;
@@ -147,14 +146,19 @@ void CCodeGen::visit(Case &Node) {
 
     // If the when expression exists, generate an if-statement for it
     if (Node.When) {
+
         // An expression stack is used when generating expressions, because other things could be generated
         // while an expression is being generated. This is mostly used when generating parallel code
         // but is kept here, since it could be usefull in the future
         ExprStack.push(stringstream());
+        BeforeExpr.push_back(string());
 
         Node.When->accept(*this);
 
-        *Output << "        if (" << ExprStack.top().str() << ") {" << endl;
+        outputBeforeExpr();
+
+        *Output << endl
+                << "        if (" << ExprStack.top().str() << ") {" << endl;
 
         ExprStack.pop();
 
@@ -162,6 +166,7 @@ void CCodeGen::visit(Case &Node) {
     }
 
     ExprStack.push(stringstream());
+    BeforeExpr.push_back(string());
 
     if (Node.TailRec) {
         auto C = (CallExpr *)Node.Expr.get();
@@ -170,9 +175,12 @@ void CCodeGen::visit(Case &Node) {
 
             C->Args[i]->accept(*this);
 
+            outputBeforeExpr();
+
             // If the case is tail recursive, the arguments of the function is just assigned
             // to the argument of the recursive call
-            *Output << "        " << ExtraTap << GGenerated << GArg << i << " = "
+            *Output << endl
+                    << "        " << ExtraTap << GGenerated << GArg << i << " = "
                                   << ExprStack.top().str() << "; " << endl;
             ExprStack.pop();
         }
@@ -187,6 +195,8 @@ void CCodeGen::visit(Case &Node) {
         ExprStack.push(stringstream());
 
         Node.Expr->accept(*this);
+
+        outputBeforeExpr();
 
         // A res variable is being declared here, so that some cleanup can occure
         // before the function returns
@@ -387,11 +397,11 @@ string CCodeGen::generateList(Type &Ty) {
     // generate print
     Prints[Ty] = GGenerated + GPrint + Name;
 
-    *Header << "void " << Prints[Ty] << "(" << Name << "* value); " << endl;
-    Buffer << "void " << Prints[Ty] << "(" << Name << "* value) { " << endl
+    *Header << "void " << Prints[Ty] << "(" << Name << "* value, int is_top); " << endl;
+    Buffer << "void " << Prints[Ty] << "(" << Name << "* value, int is_top) { " << endl
             << "    printf(\"[\"); \n" << endl
             << "    while (!value->" << GEmpty << ") {" << endl
-            << "        " << Prints[Ty.Subtypes.front()] << "(value->" << GValue << ");" << endl
+            << "        " << Prints[Ty.Subtypes.front()] << "(value->" << GValue << ", 0);" << endl
             << "        value = value->" << GNext << ";" << endl
             << "        if (!value->" << GEmpty << ")" << endl
             << "            printf(\", \"); \n" << endl
@@ -436,8 +446,8 @@ string CCodeGen::generateEnvironment(Type &Ty) {
     // Generate print
     Prints[Ty] = GGenerated + GPrint + Name;
 
-    *Header << "void " << Prints[Ty] << "(" << Name << " value); " << endl;
-    Buffer << "void " << Prints[Ty] << "(" << Name << " value) { " << endl
+    *Header << "void " << Prints[Ty] << "(" << Name << " value, int is_top); " << endl;
+    Buffer << "void " << Prints[Ty] << "(" << Name << " value, int is_top) { " << endl
            << "    printf(\"" << Ty.str() << "\"); " << endl
            << "} " << endl
            << endl;
@@ -593,12 +603,12 @@ string CCodeGen::generateTuple(Type &Ty) {
     // Generate print for tuple
     Prints[Ty] = GGenerated + GPrint + Name;
 
-    *Header << "void " << Prints[Ty] << "(" << Name << " value); " << endl;
-    Buffer << "void " << Prints[Ty] << "(" << Name << " value) { " << endl
+    *Header << "void " << Prints[Ty] << "(" << Name << " value, int is_top); " << endl;
+    Buffer << "void " << Prints[Ty] << "(" << Name << " value, int is_top) { " << endl
            << "    printf(\"(\");" << endl;
 
     for (size_t i = 0; i < Ty.Subtypes.size(); i++) {
-        Buffer << "    " << Prints[Ty.Subtypes[i]] << "(value." << GItem << i << ");" << endl;
+        Buffer << "    " << Prints[Ty.Subtypes[i]] << "(value." << GItem << i << ", 0);" << endl;
 
         if (i < Ty.Subtypes.size() - 1)
             Buffer << "    printf(\", \");" << endl;
@@ -722,32 +732,35 @@ void CCodeGen::generateStd() {
             << endl;
 
     // Generate default prints
-    *Header << "void " << Prints[Type(TypeId::INT)] << "(" << GInt << " value); " << endl;
-    *Output << "void " << Prints[Type(TypeId::INT)] << "(" << GInt << " value) { " << endl
+    *Header << "void " << Prints[Type(TypeId::INT)] << "(" << GInt << " value, int is_top); " << endl;
+    *Output << "void " << Prints[Type(TypeId::INT)] << "(" << GInt << " value, int is_top) { " << endl
             << "    printf(\"%\" PRId64 \"\", value);" << endl
             << "} " << endl
             << endl;
 
-    *Header << "void " << Prints[Type(TypeId::FLOAT)] << "(" << GFloat << " value); " << endl;
-    *Output << "void " << Prints[Type(TypeId::FLOAT)] << "(" << GFloat << " value) { " << endl
+    *Header << "void " << Prints[Type(TypeId::FLOAT)] << "(" << GFloat << " value, int is_top); " << endl;
+    *Output << "void " << Prints[Type(TypeId::FLOAT)] << "(" << GFloat << " value, int is_top) { " << endl
             << "    printf(\"%lf\", value);" << endl
             << "} " << endl
             << endl;
 
-    *Header << "void " << Prints[Type(TypeId::CHAR)] << "(" << GChar << " value); " << endl;
-    *Output << "void " << Prints[Type(TypeId::CHAR)] << "(" << GChar << " value) { " << endl
-            << "    printf(\"'%c'\", (char)value);" << endl
+    *Header << "void " << Prints[Type(TypeId::CHAR)] << "(" << GChar << " value, int is_top); " << endl;
+    *Output << "void " << Prints[Type(TypeId::CHAR)] << "(" << GChar << " value, int is_top) { " << endl
+            << "    if (is_top)" << endl
+            << "        printf(\"%c\", (char)value);" << endl
+            << "    else" << endl
+            << "        printf(\"'%c'\", (char)value);" << endl
             << "} " << endl
             << endl;
 
-    *Header << "void " << Prints[Type(TypeId::BOOL)] << "(" << GChar << " value); " << endl;
-    *Output << "void " << Prints[Type(TypeId::BOOL)] << "(" << GChar << " value) { " << endl
+    *Header << "void " << Prints[Type(TypeId::BOOL)] << "(" << GChar << " value, int is_top); " << endl;
+    *Output << "void " << Prints[Type(TypeId::BOOL)] << "(" << GChar << " value, int is_top) { " << endl
             << "    printf(\"%s\", (value) ? \"True\" : \"False\");" << endl
             << "} " << endl
             << endl;
 
-    *Header << "void " << Prints[FakeString] << "(" << StringTypeName << "* string); " << endl;
-    *Output << "void " << Prints[FakeString] << "(" << StringTypeName << "* string) { " << endl
+    *Header << "void " << Prints[FakeString] << "(" << StringTypeName << "* string, int is_top); " << endl;
+    *Output << "void " << Prints[FakeString] << "(" << StringTypeName << "* string, int is_top) { " << endl
             << "    char* buffer = " << Alloc << "(sizeof(char) * (string->"<< GSize << " + 1)); " << endl
             << "    int i; " << endl
             << endl
@@ -756,7 +769,11 @@ void CCodeGen::generateStd() {
             << "    } " << endl
             << endl
             << "    buffer[i] = '\\0'; " << endl
-            << "    printf(\"\\\"%s\\\"\", buffer); " << endl
+            << endl
+            << "    if (is_top)" << endl
+            << "        printf(\"%s\", buffer); " << endl
+            << "    else" << endl
+            << "        printf(\"\\\"%s\\\"\", buffer); " << endl
             << "} " << endl
             << endl;
 }
@@ -795,3 +812,15 @@ string CCodeGen::getEnvironment(Type &Ty) {
 void CCodeGen::outputBuffer() {
     *Output << Buffer.str(), Buffer.str(string());
 }
+
+void CCodeGen::outputBeforeExpr() {
+    while (BeforeExpr.size()) {
+        *Output<< BeforeExpr.back();
+        BeforeExpr.pop_back();
+    }
+}
+
+
+
+
+

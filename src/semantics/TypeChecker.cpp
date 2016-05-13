@@ -524,6 +524,8 @@ void TypeChecker::visit(AlgebraicExpr &Node) {
     for (auto &Expr : Node.Exprs) {
         Expr->accept(*this);
     }
+    if (checkNotSafe())
+        return;
 
     if (CurScope->tryGetCon(Node.Constructor, Out)) {
         // TODO Implement Checking if constructor was found
@@ -584,6 +586,8 @@ void TypeChecker::visit(Concat &Node) {
 void TypeChecker::visit(ParExpr &Node) {
     // Visit children
     Node.Child->accept(*this);
+    if (checkNotSafe())
+        return;
 
     Node.RetTy = Node.Child->RetTy;
 }
@@ -623,6 +627,8 @@ void TypeChecker::visit(ListExpr &Node) {
     for (auto &Element : Node.Elements) {
         Element->accept(*this);
     }
+    if (checkNotSafe())
+        return;
 
     if (Node.Elements.size() != 0) {
         auto ListType = Node.Elements.front()->RetTy;
@@ -647,6 +653,8 @@ void TypeChecker::visit(TupleExpr &Node) {
     for (auto &Element : Node.Elements) {
         Element->accept(*this);
     }
+    if (checkNotSafe())
+        return;
 
     Node.RetTy = Type(TypeId::TUPLE);
 
@@ -674,6 +682,8 @@ void TypeChecker::visit(CallExpr &Node) {
     for (auto &Arg : Node.Args) {
         Arg->accept(*this);
     }
+    if (checkNotSafe())
+        return;
 
     if (Node.Callee->RetTy.Id != TypeId::SIGNATURE) {
         addError(Error::Expected("Can't call a type that is not a Signature",
@@ -704,6 +714,23 @@ void TypeChecker::visit(CallExpr &Node) {
     }
 
     Node.RetTy = Node.Callee->RetTy.Subtypes.back();
+}
+
+void TypeChecker::visit(common::BinPrint &Node) {
+    Node.Left->accept(*this);
+    Node.Right->accept(*this);
+    if (checkNotSafe())
+        return;
+
+    Node.RetTy = Node.Left->RetTy;
+}
+
+void TypeChecker::visit(common::UnPrint &Node) {
+    Node.Child->accept(*this);
+    if (checkNotSafe())
+        return;
+
+    Node.RetTy = Node.Child->RetTy;
 }
 
 void TypeChecker::visit(IntExpr &Node) { }
@@ -745,3 +772,7 @@ void TypeChecker::resolveEmptyList(Type &Ty, Type &Resolver) {
             break;
     }
 }
+
+
+
+

@@ -42,7 +42,9 @@ class GeneralOptimizer : public common::Visitor {
     void visit(common::ListAdd &Node);
     void visit(common::ProducerConsumer &Node);
     void visit(common::Concat &Node);
+    void visit(common::BinPrint &Node);
     void visit(common::To &Node);
+    void visit(common::UnPrint &Node);
     void visit(common::ParExpr &Node);
     void visit(common::Not &Node);
     void visit(common::Negative &Node);

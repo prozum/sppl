@@ -246,5 +246,18 @@ void GeneralOptimizer::determingParallelism() {
     CallDepth = 0;
 }
 
+void GeneralOptimizer::visit(common::BinPrint &Node) {
+    Node.Left->accept(*this);
+    Node.Right->accept(*this);
+}
+
+void GeneralOptimizer::visit(common::UnPrint &Node) {
+    Node.Child->accept(*this);
+}
+
+
+
+
+
 
 

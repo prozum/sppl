@@ -8,6 +8,7 @@ void ParExpr::accept(Visitor &V) { V.visit(*this); }
 void Not::accept(Visitor &V) { V.visit(*this); }
 void To::accept(Visitor &V) { V.visit(*this); }
 void Negative::accept(Visitor &V) { V.visit(*this); }
+void UnPrint::accept(Visitor &V) { V.visit(*this); }
 
 unique_ptr<UnaryOp> UnaryOp::clone() const {
     return unique_ptr<UnaryOp>(doClone());
@@ -20,6 +21,8 @@ UnaryOp *Not::doClone() const { return new Not(Child->clone(), Loc); }
 UnaryOp *To::doClone() const { return new To(Child->clone(), TypeCast, Loc); }
 
 UnaryOp *Negative::doClone() const { return new Negative(Child->clone(), Loc); }
+
+UnaryOp *UnPrint::doClone() const { return new UnPrint(Child->clone(), Loc); }
 
 UnaryOp::UnaryOp(unique_ptr<Expression> Child, Location Loc)
     : Expression(Loc), Child(move(Child)) {}
@@ -36,6 +39,9 @@ To::To(unique_ptr<Expression> Child, Type TypeCast, Location Loc)
 Negative::Negative(unique_ptr<Expression> Child, Location Loc)
     : UnaryOp(move(Child), Loc) {}
 
+UnPrint::UnPrint(unique_ptr<Expression> Child, Location Loc)
+        : UnaryOp(move(Child), Loc) {}
+
 string ParExpr::str() { return "(" + Child->str() + ")"; }
 
 string Not::str() { return "!" + Child->str(); }
@@ -46,6 +52,8 @@ string To::str() {
     // TODO Fix the Ty.str. Error "Ty must be static"
     return Child->str() + " to " /* + Ty.str() */;
 }
+
+string UnPrint::str() { return "@" + Child->str(); }
 
 template <class T> T *const cloneUnaryOp(T &Op) {
     return new T(Op.Child->clone(), Op.Loc);
