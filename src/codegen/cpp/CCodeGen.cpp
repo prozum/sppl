@@ -261,7 +261,7 @@ string CCodeGen::generateList(Type &Ty) {
                             << "* current, " << ChildrenType << " item); " << endl;
     Buffer << Name << "* " << GGenerated << GAdd << Name << "(" << Name
                            << "* current, " << ChildrenType << " item) { " << endl
-           << "    " << Name << "* res = GC_MALLOC(sizeof(" << Name << "));" << endl
+           << "    " << Name << "* res = " << Alloc << "(sizeof(" << Name << "));" << endl
            << "    res->" << GValue << " = item; " << endl
            << "    res->" << GNext << " = current; " << endl
            << "    res->"  << GEmpty << " = 0; " << endl
@@ -275,7 +275,7 @@ string CCodeGen::generateList(Type &Ty) {
     Buffer << Name << "* " << GGenerated << GCreate << Name << "(int count, ...) { " << endl
            << "    int i; " << endl
            << "    va_list args; " << endl
-           << "    " << Name << "* res = GC_MALLOC(sizeof(" << Name << ")); " << endl
+           << "    " << Name << "* res = " << Alloc << "(sizeof(" << Name << ")); " << endl
            << "    res->"  << GEmpty << " = 1; " << endl
            << "    res->" << GSize << " = 0; " << endl
            << endl
@@ -346,7 +346,7 @@ string CCodeGen::generateList(Type &Ty) {
     Buffer << Name << "* " << GGenerated << GConcat << Name << "("
                            << Name << "* list1, " << Name << "* list2) { " << endl
            << "    int i; " << endl
-           << "    " << Name << "** elements = GC_MALLOC(sizeof(" << Name << "*) * list1->" << GSize << "); " << endl
+           << "    " << Name << "** elements = " << Alloc << "(sizeof(" << Name << "*) * list1->" << GSize << "); " << endl
            << endl
            << "    for (i = 0; !list1->" << GEmpty << "; ++i) { " << endl
            << "        elements[i] = list1; " << endl
@@ -748,7 +748,7 @@ void CCodeGen::generateStd() {
 
     *Header << "void " << Prints[FakeString] << "(" << StringTypeName << "* string); " << endl;
     *Output << "void " << Prints[FakeString] << "(" << StringTypeName << "* string) { " << endl
-            << "    char* buffer = GC_MALLOC(sizeof(char) * (string->"<< GSize << " + 1)); " << endl
+            << "    char* buffer = " << Alloc << "(sizeof(char) * (string->"<< GSize << " + 1)); " << endl
             << "    int i; " << endl
             << endl
             << "    for (i = 0; i < string->" << GSize << "; i++) { " << endl

@@ -36,7 +36,7 @@ using namespace common;
     long double                         LongDouble;
     bool                                Boolean;
 
-    std::string *                            Str;
+    std::string *                       Str;
 
     common::Declaration *                       Decl;
     common::Function *                          Func;

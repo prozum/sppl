@@ -64,6 +64,8 @@ class CCodeGen : public parser::CodeGenerator {
     virtual void visit(common::CallExpr &Node);
     virtual void visit(common::AlgebraicExpr &Node);
 
+    const std::string Alloc = "malloc";
+
     const std::string GGenerated = "g_";
     const std::string GUser = "u_";
     const std::string GAdd = "add_";

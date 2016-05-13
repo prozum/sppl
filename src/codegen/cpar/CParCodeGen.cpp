@@ -216,7 +216,8 @@ void CParCodeGen::visit(Case &Node) {
 
         *Output << "        if (" << ExprStack.top().str() << ") " << endl
                 << "        { " << endl
-                << WhenDealloc << endl;
+                << WhenDealloc << endl
+                ;
         ExprStack.pop();
     }
 
