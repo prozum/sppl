@@ -23,7 +23,7 @@ void Concat::accept(Visitor &V) { V.visit(*this); }
 
 BinaryOp::BinaryOp(unique_ptr<Expression> Left, unique_ptr<Expression> Right,
                    Location Loc)
-    : Expression(Loc), Left(move(Left)), Right(move(Right)) {}
+    : Expression(Loc, Left->Const && Right->Const), Left(move(Left)), Right(move(Right)) {}
 
 Add::Add(unique_ptr<Expression> Left, unique_ptr<Expression> Right,
          Location Loc)

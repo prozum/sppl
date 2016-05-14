@@ -4,29 +4,43 @@
 using namespace std;
 using namespace common;
 
-Expression::Expression(Location Loc) : Node(Loc), RetTy(TypeId::UNKNOWN) {}
+Expression::Expression(Location Loc, bool Const) : Node(Loc, Const), RetTy(TypeId::UNKNOWN) { }
 
-Expression::Expression(Type Ty, Location Loc) : Node(Loc), RetTy(Ty) {}
+Expression::Expression(Type Ty, Location Loc, bool Const) : Node(Loc, Const), RetTy(Ty) { }
 
-IdExpr::IdExpr(string Val, Location Loc) : Expression(Loc), Val(Val) {}
+IdExpr::IdExpr(string Val, Location Loc) : Expression(Loc, false), Val(Val) { }
 
 IntExpr::IntExpr(long Val, Location Loc)
-    : Expression(Type(TypeId::INT), Loc), Val(Val) {}
+    : Expression(Type(TypeId::INT), Loc, true), Val(Val) {}
 
 FloatExpr::FloatExpr(double Val, Location Loc)
-    : Expression(Type(TypeId::FLOAT), Loc), Val(Val) {}
+    : Expression(Type(TypeId::FLOAT), Loc, true), Val(Val) {}
 
 CharExpr::CharExpr(char Val, Location Loc)
-    : Expression(Type(TypeId::CHAR), Loc), Val(Val) {}
+    : Expression(Type(TypeId::CHAR), Loc, true), Val(Val) {}
 
 BoolExpr::BoolExpr(bool Val, Location Loc)
-    : Expression(Type(TypeId::BOOL), Loc), Val(Val) {}
+    : Expression(Type(TypeId::BOOL), Loc, true), Val(Val) {}
 
 ListExpr::ListExpr(vector<unique_ptr<Expression>> Elements, Location Loc)
-    : Expression(Type(TypeId::LIST), Loc), Elements(move(Elements)) {}
+    : Expression(Type(TypeId::LIST), Loc, true), Elements(move(Elements)) {
+    for (auto &Element : Elements) {
+        if (!Element->Const) {
+            Const = false;
+            return;
+        }
+    }
+}
 
 TupleExpr::TupleExpr(vector<unique_ptr<Expression>> Elements, Location Loc)
-    : Expression(Type(TypeId::TUPLE), Loc), Elements(move(Elements)) {}
+    : Expression(Type(TypeId::TUPLE), Loc, true), Elements(move(Elements)) {
+    for (auto &Element : Elements) {
+        if (!Element->Const) {
+            Const = false;
+            return;
+        }
+    }
+}
 
 CallExpr::CallExpr(unique_ptr<Expression> Callee,
                    vector<unique_ptr<Expression>> Args, Location Loc)

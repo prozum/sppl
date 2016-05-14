@@ -12,6 +12,46 @@ void LambdaArg::accept(Visitor &V) { V.visit(*this); }
 void AlgebraicDT::accept(Visitor &V) { V.visit(*this); }
 void Product::accept(Visitor &V) { V.visit(*this); }
 
+
+Node::Node(Location Loc, bool Const) : Loc(Loc), Const(Const) {}
+
+Program::Program(vector<unique_ptr<Declaration>> Decls, Location Loc)
+    : Node(Loc), Decls(move(Decls)) {}
+
+Program::Program(unique_ptr<Expression> AnonFunc, Location Loc) : Node(Loc) {
+
+    Decls.push_back(make_unique<Function>(move(AnonFunc)));
+}
+
+Declaration::Declaration(Location Loc) : Node(Loc) {}
+
+Function::Function(unique_ptr<Expression> Expr)
+    : Declaration(Expr->Loc), Id(ANON_FUNC_NAME),
+      Signature(Type(TypeId::UNKNOWN)), Anon(true) {
+    Cases.push_back(make_unique<Case>(
+        move(Expr), nullptr, vector<unique_ptr<Pattern>>(), Expr->Loc));
+    Const = Expr->Const;
+}
+
+Function::Function(string Id, Type Ty, Location Loc)
+    : Declaration(Loc), Id(Id), Signature(Ty) {
+}
+
+Case::Case(unique_ptr<Expression> Expr, unique_ptr<Expression> When,
+           vector<unique_ptr<Pattern>> Patterns, Location Loc)
+    : Node(Loc, Expr->Const), Expr(move(Expr)), When(move(When)), Patterns(move(Patterns)) {}
+
+LambdaArg::LambdaArg(string Id, Location Loc) : Node(Loc), Id(Id) {}
+
+AlgebraicDT::AlgebraicDT(string Name, vector<Type> TypeConstructor,
+                         vector<unique_ptr<Product>> Sum, Location Loc)
+    : Declaration(Loc), Name(Name), TypeConstructor(TypeConstructor),
+      Sum(move(Sum)) {}
+
+Product::Product(string Constructor, vector<Type> Values, Location Loc)
+    : Node(Loc), Constructor(Constructor), Values(Values) {}
+
+
 unique_ptr<Node> Node::clone() const { return unique_ptr<Node>(doClone()); }
 
 unique_ptr<Declaration> Declaration::clone() const {
@@ -82,41 +122,6 @@ Product *Product::doClone() const {
     return new Product(Constructor, Values, Loc);
 }
 
-Node::Node(Location Loc) : Loc(Loc) {}
-
-Program::Program(vector<unique_ptr<Declaration>> Decls, Location Loc)
-    : Node(Loc), Decls(move(Decls)) {}
-
-Program::Program(unique_ptr<Expression> AnonFunc, Location Loc) : Node(Loc) {
-
-    Decls.push_back(make_unique<Function>(move(AnonFunc)));
-}
-
-Declaration::Declaration(Location Loc) : Node(Loc) {}
-
-Function::Function(unique_ptr<Expression> AnonFunc)
-    : Declaration(AnonFunc->Loc), Id(ANON_FUNC_NAME),
-      Signature(Type(TypeId::UNKNOWN)), Anon(true) {
-    Cases.push_back(make_unique<Case>(
-        move(AnonFunc), nullptr, vector<unique_ptr<Pattern>>(), AnonFunc->Loc));
-}
-
-Function::Function(string Id, Type Ty, Location Loc)
-    : Declaration(Loc), Id(Id), Signature(Ty) {}
-
-Case::Case(unique_ptr<Expression> Expr, unique_ptr<Expression> When,
-           vector<unique_ptr<Pattern>> Patterns, Location Loc)
-    : Node(Loc), Expr(move(Expr)), When(move(When)), Patterns(move(Patterns)) {}
-
-LambdaArg::LambdaArg(string Id, Location Loc) : Node(Loc), Id(Id) {}
-
-AlgebraicDT::AlgebraicDT(string Name, vector<Type> TypeConstructor,
-                         vector<unique_ptr<Product>> Sum, Location Loc)
-    : Declaration(Loc), Name(Name), TypeConstructor(TypeConstructor),
-      Sum(move(Sum)) {}
-
-Product::Product(string Constructor, vector<Type> Values, Location Loc)
-    : Node(Loc), Constructor(Constructor), Values(Values) {}
 
 string Program::str() {
     string Str;

@@ -1,9 +1,4 @@
 #include "GeneralOptimizer.h"
-
-#include <iostream>
-#include <string>
-#include <typeinfo>
-
 using namespace std;
 using namespace common;
 using namespace optimizer;

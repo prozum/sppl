@@ -17,6 +17,47 @@ void WildPattern::accept(Visitor &V) { V.visit(*this); }
 void AlgebraicPattern::accept(Visitor &V) { V.visit(*this); }
 void ParPattern::accept(Visitor &V) { V.visit(*this); }
 
+Pattern::Pattern(Type Ty, Location Loc) : Node(Loc, true), RetTy(Ty) {}
+
+IntPattern::IntPattern(long Val, Location Loc)
+    : Pattern(Type(TypeId::INT), Loc), Val(Val) {}
+
+FloatPattern::FloatPattern(double Val, Location Loc)
+    : Pattern(Type(TypeId::FLOAT), Loc), Val(Val) {}
+
+CharPattern::CharPattern(char Val, Location Loc)
+    : Pattern(Type(TypeId::CHAR), Loc), Val(Val) {}
+
+BoolPattern::BoolPattern(bool Val, Location Loc)
+    : Pattern(Type(TypeId::CHAR), Loc), Val(Val) {}
+
+StringPattern::StringPattern(string Val, Location Loc)
+    : Pattern(Type(TypeId::CHAR), Loc), Val(Val) {}
+
+ListPattern::ListPattern(vector<unique_ptr<Pattern>> Patterns, Location Loc)
+    : Pattern(Type(TypeId::LIST), Loc), Patterns(move(Patterns)) {}
+
+TuplePattern::TuplePattern(vector<unique_ptr<Pattern>> Patterns, Location Loc)
+    : Pattern(Type(TypeId::TUPLE), Loc), Patterns(move(Patterns)) {}
+
+ListSplit::ListSplit(unique_ptr<Pattern> left, unique_ptr<Pattern> Patterns,
+                     Location Loc)
+    : Pattern(Type(TypeId::UNKNOWN), Loc), Left(move(left)),
+      Right(move(Patterns)) {}
+
+AlgebraicPattern::AlgebraicPattern(string Constructor,
+                                   vector<unique_ptr<Pattern>> Patterns,
+                                   Location Loc)
+    : Pattern(Type(TypeId::CUSTOM), Loc), Constructor(Constructor),
+      Patterns(move(Patterns)) {}
+
+IdPattern::IdPattern(string Val, Location Loc)
+    : Pattern(Type(TypeId::UNKNOWN), Loc), Val(Val) {}
+
+WildPattern::WildPattern(Location Loc) : Pattern(Type(TypeId::UNKNOWN), Loc) {}
+
+ParPattern::ParPattern(unique_ptr<Pattern> Pat, Location Loc)
+    : Pattern(Type(TypeId::UNKNOWN), Loc), Pat(move(Pat)) {}
 unique_ptr<Pattern> Pattern::clone() const {
     return unique_ptr<Pattern>(doClone());
 }
@@ -79,47 +120,6 @@ Pattern *ParPattern::doClone() const {
     return new ParPattern(Pat->clone(), Loc);
 }
 
-Pattern::Pattern(Type Ty, Location Loc) : Node(Loc), RetTy(Ty) {}
-
-IntPattern::IntPattern(long Val, Location Loc)
-    : Pattern(Type(TypeId::INT), Loc), Val(Val) {}
-
-FloatPattern::FloatPattern(double Val, Location Loc)
-    : Pattern(Type(TypeId::FLOAT), Loc), Val(Val) {}
-
-CharPattern::CharPattern(char Val, Location Loc)
-    : Pattern(Type(TypeId::CHAR), Loc), Val(Val) {}
-
-BoolPattern::BoolPattern(bool Val, Location Loc)
-    : Pattern(Type(TypeId::CHAR), Loc), Val(Val) {}
-
-StringPattern::StringPattern(string Val, Location Loc)
-    : Pattern(Type(TypeId::CHAR), Loc), Val(Val) {}
-
-ListPattern::ListPattern(vector<unique_ptr<Pattern>> Patterns, Location Loc)
-    : Pattern(Type(TypeId::LIST), Loc), Patterns(move(Patterns)) {}
-
-TuplePattern::TuplePattern(vector<unique_ptr<Pattern>> Patterns, Location Loc)
-    : Pattern(Type(TypeId::TUPLE), Loc), Patterns(move(Patterns)) {}
-
-ListSplit::ListSplit(unique_ptr<Pattern> left, unique_ptr<Pattern> Patterns,
-                     Location Loc)
-    : Pattern(Type(TypeId::UNKNOWN), Loc), Left(move(left)),
-      Right(move(Patterns)) {}
-
-AlgebraicPattern::AlgebraicPattern(string Constructor,
-                                   vector<unique_ptr<Pattern>> Patterns,
-                                   Location Loc)
-    : Pattern(Type(TypeId::CUSTOM), Loc), Constructor(Constructor),
-      Patterns(move(Patterns)) {}
-
-IdPattern::IdPattern(string Val, Location Loc)
-    : Pattern(Type(TypeId::UNKNOWN), Loc), Val(Val) {}
-
-WildPattern::WildPattern(Location Loc) : Pattern(Type(TypeId::UNKNOWN), Loc) {}
-
-ParPattern::ParPattern(unique_ptr<Pattern> Pat, Location Loc)
-    : Pattern(Type(TypeId::UNKNOWN), Loc), Pat(move(Pat)) {}
 
 string IdPattern::str() { return Val; }
 

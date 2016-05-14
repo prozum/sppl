@@ -7,8 +7,8 @@ class Expression : public Node {
   public:
     Type RetTy;
 
-    Expression(Location Loc);
-    Expression(Type Ty, Location Loc);
+    Expression(Location Loc, bool Const = false);
+    Expression(Type Ty, Location Loc, bool Const = false);
 
     virtual void accept(Visitor &V) = 0;
 

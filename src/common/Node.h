@@ -128,8 +128,9 @@ class Scope;
 class Node {
   public:
     Location Loc;
+    bool Const;
 
-    Node(Location Loc);
+    Node(Location Loc, bool Const = false);
     Node(const Node &Other);
     ~Node() = default;
 
@@ -176,7 +177,7 @@ class Function : public Declaration {
     std::vector<std::unique_ptr<Case>> Cases;
     bool Anon = false;
 
-    Function(std::unique_ptr<Expression> AnonFunc);
+    Function(std::unique_ptr<Expression> Expr);
     Function(std::string Id, Type Ty, Location Loc);
 
     void accept(Visitor &V);
