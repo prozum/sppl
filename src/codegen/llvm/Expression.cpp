@@ -60,7 +60,7 @@ void LLVMCodeGen::visit(common::TupleExpr &Node) {
 
     for (auto &Element : Node.Elements) {
         Element->accept(*this);
-        TupleVal.push_back((Constant *)CurVal);
+        TupleVal.push_back(static_cast<Constant *>(CurVal));
     }
 
     auto ConstVal = ConstantStruct::get(getTupleType(Node.RetTy), TupleVal);
@@ -73,7 +73,7 @@ void LLVMCodeGen::visit(common::ListExpr &Node) {
     Value *ListNode = nullptr;
     for (auto Element = Node.Elements.rbegin(); Element < Node.Elements.rend(); ++Element) {
         (*Element)->accept(*this);
-        ListNode = CreateListNode(Node.RetTy, CurVal, ListNode, Builder.GetInsertBlock());
+        ListNode = CreateListNode(Node.RetTy, CurVal, ListNode, Builder.GetInsertBlock(), Node.Const);
     }
 
     // Set return value
