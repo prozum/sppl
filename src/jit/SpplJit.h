@@ -25,6 +25,14 @@
 #include <llvm/Transforms/Scalar.h>
 
 namespace jit {
+union OutputData {
+    int64_t Int;
+    double *Float;
+    char Char;
+    bool Bool;
+    size_t Size;
+    OutputData *Ptr;
+};
 class SpplJit {
   public:
     SpplJit();
@@ -44,10 +52,10 @@ private:
     llvm::orc::JITSymbol findMangledSymbol(const std::string &Name);
     std::string mangle(const std::string &Name);
 
-    std::string getOutput(intptr_t Data, common::Type Type);
-    std::string getOutputTuple(intptr_t Addr, common::Type Ty);
-    std::string getOutputList(intptr_t Addr, common::Type);
-    std::string getOutputString(intptr_t Addr, common::Type);
+    std::string getOutput(OutputData Data, common::Type Ty);
+    std::string getOutputTuple(OutputData Addr, common::Type Ty);
+    std::string getOutputList(OutputData Addr, common::Type);
+    std::string getOutputString(OutputData Addr, common::Type);
 
     parser::Driver Drv;
     codegen::LLVMCodeGen CodeGen;

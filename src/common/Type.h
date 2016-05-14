@@ -31,6 +31,8 @@ class Type {
     std::string Name;
     Location Loc;
 
+    static Type String;
+
     Type();
     ~Type();
     Type(TypeId Id);

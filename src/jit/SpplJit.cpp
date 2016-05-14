@@ -19,6 +19,11 @@ SpplJit::SpplJit()
     createModule();
 
     // Print functions
+    Drv.addExternFunc("print", common::Type(TypeId::SIGNATURE,
+                                     vector<common::Type> {
+                                             common::Type(TypeId::STRING, vector<common::Type> { common::Type(TypeId::CHAR) }),
+                                             common::Type(TypeId::VOID)
+                                     }));
     Drv.addExternFunc("printff", common::Type(TypeId::SIGNATURE,
                                              vector<common::Type> {
                                                      common::Type(TypeId::FLOAT),
@@ -115,25 +120,24 @@ void SpplJit::createModule() {
     PassMgr->doInitialization();
 }
 
-string SpplJit::getOutput(intptr_t Data, common::Type Type) {
-    switch (Type.Id) {
+string SpplJit::getOutput(OutputData Data, common::Type Ty) {
+    switch (Ty.Id) {
     case TypeId::INT:
-        return to_string((int64_t)Data);
+        return to_string(Data.Int);
     case TypeId::FLOAT:
-        // WTF is double type a pointer
-        return to_string(*(double *)Data);
+        return to_string(*Data.Float);
     case TypeId::CHAR:
-        return "'" + string(1, (char)Data) + "'";
+        return "'" + string(1, Data.Char) + "'";
     case TypeId::STRING:
-        return getOutputString(Data, Type);
+        return getOutputString(Data, Ty);
     case TypeId::BOOL:
-        return ((bool)Data) ? "True" : "False";
+        return Data.Bool ? "True" : "False";
     case TypeId::TUPLE:
-        return getOutputTuple(Data, Type);
+        return getOutputTuple(Data, Ty);
     case TypeId::LIST:
-        return getOutputList(Data, Type);
+        return getOutputList(Data, Ty);
     case TypeId::SIGNATURE:
-        return Type.str();
+        return Ty.str();
     case TypeId::EMPTYLIST:
         return "[]";
     case TypeId::VOID:
@@ -143,40 +147,45 @@ string SpplJit::getOutput(intptr_t Data, common::Type Type) {
     }
 }
 
-string SpplJit::getOutputTuple(intptr_t Addr, common::Type Ty) {
+string SpplJit::getOutputTuple(OutputData Addr, common::Type Ty) {
     auto Alignment = CodeGen.getAlignment(Ty);
     auto Subtypes = Ty.Subtypes;
     string Out("(");
     for (size_t i = 0; i < Subtypes.size(); ++i) {
-        auto Offset = Addr % Alignment ? Alignment - Addr % Alignment : 0;
+        auto Offset = Addr.Size % Alignment ? Alignment - Addr.Size % Alignment : 0;
         switch (Subtypes[i].Id) {
         case TypeId::INT:
-            Addr += Offset;
-            Out += getOutput(*(int64_t *)Addr, Subtypes[i]);
-            Addr += sizeof(int64_t);
+            Addr.Size += Offset;
+            Out += getOutput(*Addr.Ptr, Subtypes[i]);
+            Addr.Size += sizeof(Addr.Ptr);
             break;
         case TypeId::FLOAT:
-            Addr += Offset;
+            Addr.Size += Offset;
             Out += getOutput(Addr, Subtypes[i]);
-            Addr += sizeof(double);
+            Addr.Size += sizeof(Addr.Float);
             break;
         case TypeId::CHAR:
-            Out += getOutput(*(char *)Addr, Subtypes[i]);
-            Addr += sizeof(char);
+            Out += getOutput(*Addr.Ptr, Subtypes[i]);
+            Addr.Size += sizeof(Addr.Char);
             break;
         case TypeId::BOOL:
-            Out += getOutput(*(bool *)Addr, Subtypes[i]);
-            Addr += sizeof(bool);
+            Out += getOutput(*Addr.Ptr, Subtypes[i]);
+            Addr.Size += sizeof(Addr.Bool);
             break;
         case TypeId::STRING:
-            Addr += Offset;
-            Out += getOutput(*(intptr_t *)Addr, Subtypes[i]);
-            Addr += sizeof(intptr_t *);
+            Addr.Size += Offset;
+            Out += getOutputString(*Addr.Ptr, Subtypes[i]);
+            Addr.Size += sizeof(Addr.Ptr);
             break;
         case TypeId::TUPLE:
-            Addr += Offset;
-            Out += getOutputTuple(*(intptr_t *)Addr, Subtypes[i]);
-            Addr += sizeof(intptr_t *);
+            Addr.Size += Offset;
+            Out += getOutputTuple(*Addr.Ptr, Subtypes[i]);
+            Addr.Size += sizeof(Addr.Ptr);
+            break;
+        case TypeId::LIST:
+            Addr.Size += Offset;
+            Out += getOutputList(*Addr.Ptr, Subtypes[i]);
+            Addr.Size += sizeof(Addr.Ptr);
             break;
         default:
             assert(0 && "Type not supported");
@@ -188,48 +197,68 @@ string SpplJit::getOutputTuple(intptr_t Addr, common::Type Ty) {
     return Out + ")";
 }
 
-string SpplJit::getOutputList(intptr_t Addr, common::Type Ty)
+
+string SpplJit::getOutputList(OutputData Addr, common::Type Ty)
 {
     string Out("[");
     auto Subtype = Ty.Subtypes.front();
 
+    OutputData Data;
     do {
-        auto Data = *(intptr_t *)Addr;
+        if (Subtype.Id != TypeId::FLOAT)
+            Data = *Addr.Ptr;
+        else
+            Data = Addr;
         Out += getOutput(Data, Subtype);
 
-        Addr += sizeof(intptr_t *);
-        Addr = *(intptr_t * )Addr;
+        Addr.Size += sizeof(Addr.Ptr);
+        Addr = *Addr.Ptr;
 
-        if (Addr) {
+        if (Addr.Ptr) {
             Out += ", ";
         }
 
-    } while (Addr);
+    } while (Addr.Ptr);
 
     return Out + "]";
 }
 
-string SpplJit::getOutputString(intptr_t Addr, common::Type Ty)
+string SpplJit::getOutputString(OutputData Addr, common::Type Ty)
 {
     string Out("\"");
 
     do {
-        auto Data = *(intptr_t *)Addr;
-        Out += string(1, (char)Data);
+        auto Data = *Addr.Ptr;
+        Out += string(1, Data.Char);
 
-        Addr += sizeof(intptr_t *);
-        Addr = *(intptr_t * )Addr;
+        Addr.Size += sizeof(Addr.Ptr);
+        Addr = *Addr.Ptr;
 
-    } while (Addr);
+    } while (Addr.Ptr);
 
     return Out + "\"";
 }
+
 extern "C" void printff(double Float) {
     fprintf(stderr, "%f", Float);
 }
 
 extern "C" void printii(long Int) {
     fprintf(stderr, "%li", Int);
+}
+
+struct String {
+    char Char;
+    String *Next;
+};
+
+extern "C" void print(String *Str) {
+    auto Char = Str;
+
+    while (Char) {
+        fprintf(stderr, "%c", Char->Char);
+        Char = Char->Next;
+    }
 }
 
 int SpplJit::eval(string Str) {
@@ -288,11 +317,11 @@ int SpplJit::eval(string Str) {
     // Only run anonymous functions
     if (FuncNode->Anon) {
         auto Func = findSymbol(FuncNode->Id);
-        auto FuncJIT = (size_t(*)())Func.getAddress();
+        auto FuncJIT = (OutputData(*)())Func.getAddress();
 
         assert(FuncJIT);
 
-        auto Res = FuncJIT();
+        OutputData Res = FuncJIT();
         string Output = getOutput(Res, RetTy);
         cout << Output
              << endl

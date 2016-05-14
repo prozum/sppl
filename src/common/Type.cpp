@@ -4,10 +4,9 @@
 using namespace std;
 using namespace common;
 
+Type Type::String = Type(TypeId::STRING, vector<Type> { Type(TypeId::CHAR) });
 
-Type::Type() {
-    Id = TypeId::UNKNOWN;
-}
+Type::Type() : Id(TypeId::UNKNOWN) {}
 
 Type::~Type() {}
 

@@ -86,20 +86,16 @@ void LLVMCodeGen::visit(common::TupleExpr &Node) {
 }
 
 void LLVMCodeGen::visit(common::ListExpr &Node) {
-    // Create global list constant
     Value *ListNode = nullptr;
     for (auto Element = Node.Elements.rbegin(); Element < Node.Elements.rend(); ++Element) {
         (*Element)->accept(*this);
         ListNode = CreateListNode(Node.RetTy, CurVal, ListNode, Builder.GetInsertBlock(), Node.Const);
     }
 
-    // Set return value
-    auto ListPtrType = getType(Node.RetTy);
-    auto RetVal = Builder.CreateAlloca(ListPtrType, nullptr, "allocatmp");
     if (!ListNode)
         ListNode = ConstantPointerNull::get(static_cast<PointerType *>(getType(Node.RetTy)));
-    Builder.CreateStore(ListNode, RetVal);
-    CurVal = Builder.CreateLoad(ListPtrType, RetVal, "loadtmp");
+
+    CurVal = ListNode;
 }
 
 
@@ -114,7 +110,7 @@ void LLVMCodeGen::visit(common::CallExpr &Node) {
         Args.push_back(CurVal);
     }
 
-    auto Call = Builder.CreateCall(Callee, Args, "calltmp");
+    auto Call = Builder.CreateCall(Callee, Args);
 
     // Set tail recursion state
     Call->setCallingConv(CallingConv::Fast);

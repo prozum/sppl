@@ -56,7 +56,7 @@ AlgebraicExpr::AlgebraicExpr(string Constructor,
       Exprs(move(Exprs)) {}
 
 StringExpr::StringExpr(string Val, Location Loc)
-    : Expression(Type(TypeId::STRING, vector<Type> { Type(TypeId::CHAR) }), Loc), Val(Val) {}
+    : Expression(Type::String, Loc, true), Val(Val) {}
 
 DoExpr::DoExpr(std::vector<std::unique_ptr<Expression>> Exprs,
                std::unique_ptr<Expression> ReturnExpr,

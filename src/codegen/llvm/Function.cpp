@@ -31,14 +31,18 @@ void LLVMCodeGen::visit(common::Function &Node) {
     // Create error block
     ErrBlock = BasicBlock::Create(Ctx, "error", CurFunc);
     Builder.SetInsertPoint(ErrBlock);
-    Builder.CreateRet(UndefValue::get(CurFunc->getReturnType()));
+    if (!CurFunc->getReturnType()->isVoidTy())
+        Builder.CreateRet(UndefValue::get(CurFunc->getReturnType()));
+    else
+        Builder.CreateRetVoid();
+
 
     // Create return block and setup phi node
     RetBlock = BasicBlock::Create(Ctx, "ret", CurFunc);
     Builder.SetInsertPoint(RetBlock);
 
     // Create ret instruction
-    if (CurFunc->getReturnType()->getTypeID() != llvm::Type::TypeID::VoidTyID) {
+    if (!CurFunc->getReturnType()->isVoidTy()) {
         CasePhiNode = Builder.CreatePHI(CurFunc->getReturnType(),
                                        (unsigned) Node.Cases.size(), "rettmp");
         Builder.CreateRet(CasePhiNode);
@@ -140,8 +144,10 @@ void LLVMCodeGen::visit(common::Case &Node) {
 
 #ifdef SPPLDEBUG
     auto Ty1 = CurVal->getType();
-    auto Ty2 = CasePhiNode->getType();
-    assert(Ty1 == Ty2);
+    if (CurFunc->getReturnType()->getTypeID() != llvm::Type::TypeID::VoidTyID) {
+        auto Ty2 = CasePhiNode->getType();
+        assert(Ty1 == Ty2);
+    }
 #endif
 
     // Ignore expression type if function is void
