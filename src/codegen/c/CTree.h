@@ -5,8 +5,8 @@
 namespace ctree {
 class Node {
 public:
-    virtual void outputCode(std::ostream &Output, int TapCount = 0) { };
     virtual ~Node() { };
+    virtual void outputCode(std::ostream &Output, int TapCount = 0) { };
 };
 
 class Statement : public Node {
@@ -16,22 +16,32 @@ public:
 
 class Expression : public Node {
 public:
+    bool IsLeaf;
+
     virtual void outputCode(std::ostream &Output, int TapCount = 0) { };
+
+    Expression(bool IsLeaf) : IsLeaf(IsLeaf) {};
+
+    virtual Expression* clone() { return nullptr; };
 };
 
 class Include : public Node {
 public:
+    bool IsStd;
     std::string Path;
 
-    Include(bool InOutput, std::string Path)
-            : Path(Path) {};
+    Include(std::string Path, bool IsStd = true)
+            : IsStd(IsStd), Path(Path) {};
 
     void outputCode(std::ostream &Output, int TapCount = 0);
 };
 
 class Block : public Statement {
 public:
+    Block* Parent;
     std::vector<Statement*> Stmts;
+
+    Block(Block* Parent = nullptr) : Parent(Parent) {};
 
     ~Block() {
         for (auto Stmt: Stmts) {
@@ -121,8 +131,8 @@ public:
     std::unique_ptr<Expression> Expr = nullptr;
     std::unique_ptr<Block> Blk = nullptr;
 
-    IfElse(bool IsElse, Expression* Expr,
-           Block* Blk)
+    IfElse(Expression* Expr, Block* Blk,
+           bool IsElse = false)
             : IsElse(IsElse), Expr(Expr),
               Blk(Blk) {};
 
@@ -193,10 +203,11 @@ public:
 
     BinOp(std::string Op, Expression* Left,
           Expression* Right)
-            : Op(Op), Left(Left),
-              Right(Right) {};
+            : Expression(false), Op(Op),
+              Left(Left), Right(Right) {};
 
     void outputCode(std::ostream &Output, int TapCount);
+    Expression* clone() { return new BinOp(Op, Left->clone(), Right->clone()); };
 };
 
 class UnOp : public Expression {
@@ -207,10 +218,11 @@ public:
 
     UnOp(std::string Op, Expression* Child,
          bool Prefix = true)
-            : Prefix(Prefix), Op(Op),
-              Child(Child) {};
+            : Expression(false), Prefix(Prefix),
+              Op(Op), Child(Child) {};
 
     void outputCode(std::ostream &Output, int TapCount);
+    Expression* clone() { return new UnOp(Op, Child->clone(), Prefix); };
 };
 
 class Call : public Expression {
@@ -219,7 +231,7 @@ public:
     std::vector<Expression*> Args;
 
     Call(Expression* Callee)
-            : Callee(Callee) {};
+            : Expression(true), Callee(Callee) {};
 
     ~Call() {
         for (auto Arg: Args) {
@@ -228,56 +240,72 @@ public:
     }
 
     void outputCode(std::ostream &Output, int TapCount);
+    Expression* clone() {
+        auto res = new Call(Callee->clone());
+
+        for (auto Expr: Args) {
+            res->Args.push_back(Expr->clone());
+        }
+
+        return res;
+    };
 };
 
 class Int : public Expression {
 public:
     long Value;
 
-    Int(int Value) : Value(Value) {};
+    Int(long Value) : Expression(true), Value(Value) {};
 
     void outputCode(std::ostream &Output, int TapCount);
+    Expression* clone() { return new Int(Value); };
 };
 
 class Float : public Expression {
 public:
     long double Value;
 
-    Float(long double Value) : Value(Value) {};
+    Float(long double Value) : Expression(true), Value(Value) {};
 
     void outputCode(std::ostream &Output, int TapCount);
+    Expression* clone() { return new Float(Value); };
 };
 
 class Char : public Expression {
 public:
     char Value;
 
-    Char(char Value) : Value(Value) {};
+    Char(char Value) : Expression(true), Value(Value) {};
 
     void outputCode(std::ostream &Output, int TapCount);
+    Expression* clone() { return new Char(Value); };
 };
 
 class String : public Expression {
 public:
     std::string Value;
 
-    String(std::string Value) : Value(Value) {};
+    String(std::string Value) : Expression(true), Value(Value) {};
 
     void outputCode(std::ostream &Output, int TapCount);
+    Expression* clone() { return new String(Value); };
 };
 
 class Ident : public Expression {
 public:
     std::string Value;
 
-    Ident(std::string Value) : Value(Value) {};
+    Ident(std::string Value) : Expression(true), Value(Value) {};
 
     void outputCode(std::ostream &Output, int TapCount);
+    Expression* clone() { return new Ident(Value); };
 };
 
 class ArrayLiteral : public Expression {
 public:
     std::vector<Expression*> Exprs;
+
+    ArrayLiteral() : Expression(true) {};
 
     ~ArrayLiteral() {
         for (auto Expr: Exprs) {
@@ -286,6 +314,15 @@ public:
     }
 
     void outputCode(std::ostream &Output, int TapCount);
+    Expression* clone() {
+        auto res = new ArrayLiteral();
+
+        for (auto Expr: Exprs) {
+            res->Exprs.push_back(Expr->clone());
+        }
+
+        return res;
+    };
 };
 
 }
