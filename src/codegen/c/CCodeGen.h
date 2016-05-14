@@ -130,6 +130,6 @@ protected:
     std::string generateList(common::Type &Ty);
     std::string generateSignature(common::Type &Ty);
     std::string generateTuple(common::Type &Ty);
-    void generateStd(common::Type &Ty);
+    void generateStd();
 };
 }

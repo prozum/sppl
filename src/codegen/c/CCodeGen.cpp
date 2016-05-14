@@ -18,6 +18,8 @@ void CCodeGen::visit(common::Program &Node) {
     Prog = &Node;
     CProg = new ctree::Program();
 
+    generateStd();
+
     /* The main function of the C program will be build below.
      * For readablity, the code that the C tree will generate,
      * can be seen below.
@@ -798,7 +800,7 @@ string CCodeGen::generateList(Type &Ty) {
     VaArg->Args.push_back(new Ident(ChildrenType));
     auto AddList = new Call(new Ident(GAdd + Name));
     AddList->Args.push_back(new Ident("res"));
-    AddList->Args.push_back(AddList);
+    AddList->Args.push_back(VaArg);
     WhileBlock->Stmts.push_back(new ExprStmt(new BinOp("=", new Ident("res"), AddList)));
 
     // va_end(args);
@@ -884,7 +886,7 @@ string CCodeGen::generateList(Type &Ty) {
 
     // printf("Out of bound! list\n");
     auto Print = new Call(new Ident("printf"));
-    Print->Args.push_back(new String("Out of bound! " + Name + "\n"));
+    Print->Args.push_back(new String("Out of bound! " + Name + "\\n"));
     IfBlock->Stmts.push_back(new ExprStmt(Print));
 
     // exit(1);
@@ -1010,7 +1012,7 @@ string CCodeGen::generateTuple(Type &Ty) {
     return Name;
 }
 
-void CCodeGen::generateStd(Type &Ty) {
+void CCodeGen::generateStd() {
     CProg->Includes.push_back(new Include("stdarg.h"));
     CProg->Includes.push_back(new Include("stdio.h"));
     CProg->Includes.push_back(new Include("stdlib.h"));
@@ -1024,9 +1026,9 @@ void CCodeGen::generateStd(Type &Ty) {
 
     StringName = generateList(RealString);
     StringType = StringName + typePostfix(RealString);
+    GenTypes[FakeString] = StringName;
     generateList(StringList);
 
-    GenTypes[FakeString] = StringName;
 
     //----------------------------------------------
 
