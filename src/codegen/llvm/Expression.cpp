@@ -80,7 +80,7 @@ void LLVMCodeGen::visit(common::ListExpr &Node) {
     auto ListPtrType = getType(Node.RetTy);
     auto RetVal = Builder.CreateAlloca(ListPtrType, nullptr, "allocatmp");
     if (!ListNode)
-        ListNode = ConstantPointerNull::get(VoidPtr);
+        ListNode = ConstantPointerNull::get(static_cast<PointerType *>(getType(Node.RetTy)));
     Builder.CreateStore(ListNode, RetVal);
     CurVal = Builder.CreateLoad(ListPtrType, RetVal, "loadtmp");
 }

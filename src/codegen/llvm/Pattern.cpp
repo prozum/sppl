@@ -50,7 +50,7 @@ void LLVMCodeGen::visit(common::TuplePattern &Node) {
 
         if (next(Pat) != Node.Patterns.cend()) {
             Block = BasicBlock::Create(Ctx, getPrefix(), CurFunc);
-            Builder.CreateCondBr(CurVal, Block, NextPatBlock);
+            Builder.CreateCondBr(CurVal, Block, NextBlock);
         }
     }
     delPrefix();
@@ -59,18 +59,49 @@ void LLVMCodeGen::visit(common::TuplePattern &Node) {
 }
 
 void LLVMCodeGen::visit(common::ListPattern &Node) {
-    std::vector<llvm::Constant *> ListData;
+    auto ListVal = CurVal;
 
-    for (auto &Element : Node.Patterns) {
-        Element->accept(*this);
-        ListData.push_back(static_cast<Constant *>(CurVal));
+    addPrefix("list");
+    auto NullBlock = BasicBlock::Create(Ctx, getPrefix("null"), CurFunc);
+    auto ListBlock = BasicBlock::Create(Ctx, getPrefix(), CurFunc);
+    Builder.CreateBr(NullBlock);
+    Builder.SetInsertPoint(NullBlock);
+
+    for (auto Element = Node.Patterns.cbegin(); Element < Node.Patterns.cend(); ++Element) {
+        // Check if empty node
+        CurVal = ConstantPointerNull::get(static_cast<PointerType *>(ListVal->getType()));
+        CurVal = Builder.CreateICmpNE(ListVal, CurVal);
+        Builder.CreateCondBr(CurVal, ListBlock, NextBlock);
+
+        // Check element
+        Builder.SetInsertPoint(ListBlock);
+        CurVal = Builder.CreateStructGEP(ListVal->getType()->getPointerElementType(), ListVal, 0);
+        CurVal = Builder.CreateLoad(CurVal->getType()->getPointerElementType(), CurVal, "loadtmp");
+        (*Element)->accept(*this);
+
+        if (next(Element) != Node.Patterns.cend()) {
+            stepPrefix();
+            NullBlock = BasicBlock::Create(Ctx, getPrefix("null"), CurFunc);
+            ListBlock = BasicBlock::Create(Ctx, getPrefix(), CurFunc);
+            Builder.CreateCondBr(CurVal, NullBlock, NextBlock);
+
+            Builder.SetInsertPoint(NullBlock);
+            CurVal = Builder.CreateStructGEP(ListVal->getType()->getPointerElementType(), ListVal, 1);
+            ListVal = Builder.CreateLoad(CurVal->getType()->getPointerElementType(), CurVal, "loadtmp");
+        }
+
     }
 
-    auto ListType = ArrayType::get(getType(Node.RetTy), Node.Patterns.size());
-    auto ConstVal = ConstantArray::get(ListType, ListData);
+    auto EndBlock = BasicBlock::Create(Ctx, getPrefix("end"), CurFunc);
+    Builder.CreateCondBr(CurVal, EndBlock, NextBlock);
 
-    CurVal = new GlobalVariable(*Module.get(), ConstVal->getType(), true,
-                                GlobalVariable::ExternalLinkage, ConstVal);
+    // Check if list ends
+    Builder.SetInsertPoint(EndBlock);
+    CurVal = Builder.CreateStructGEP(ListVal->getType()->getPointerElementType(), ListVal, 1);
+    ListVal = Builder.CreateLoad(CurVal->getType()->getPointerElementType(), CurVal, "loadtmp");
+    CurVal = ConstantPointerNull::get(static_cast<PointerType *>(ListVal->getType()));
+    CurVal = Builder.CreateICmpEQ(ListVal, CurVal);
+    delPrefix();
 }
 
 void LLVMCodeGen::visit(common::ParPattern &Node) {
@@ -78,16 +109,29 @@ void LLVMCodeGen::visit(common::ParPattern &Node) {
 }
 
 void LLVMCodeGen::visit(common::ListSplit &Node) {
-    auto CurNode = CurVal;
-    CurVal = Builder.CreateStructGEP(CurVal->getType()->getPointerElementType(), CurVal, 0);
+    auto ListVal = CurVal;
+
+    addPrefix("split", false);
+
+    // Check if empty list
+    CurPatBlock = BasicBlock::Create(Ctx, getPrefix("null"), CurFunc);
+    CurVal = ConstantPointerNull::get(static_cast<PointerType *>(ListVal->getType()));
+    CurVal = Builder.CreateICmpNE(ListVal, CurVal);
+    Builder.CreateCondBr(CurVal, CurPatBlock, NextBlock);
+    Builder.SetInsertPoint(CurPatBlock);
+
+    // Check element
+    CurVal = Builder.CreateStructGEP(ListVal->getType()->getPointerElementType(), ListVal, 0);
     CurVal = Builder.CreateLoad(CurVal);
     Node.Left->accept(*this);
 
-    CurPatBlock = BasicBlock::Create(Ctx, CurPatBlock->getName() + "_split", CurFunc);
-    Builder.CreateCondBr(CurVal, CurPatBlock, NextPatBlock);
+    // Split list
+    CurPatBlock = BasicBlock::Create(Ctx, getPrefix(), CurFunc);
+    Builder.CreateCondBr(CurVal, CurPatBlock, NextBlock);
     Builder.SetInsertPoint(CurPatBlock);
 
-    CurVal = Builder.CreateStructGEP(CurNode->getType()->getPointerElementType(), CurNode, 1);
+    CurVal = Builder.CreateStructGEP(ListVal->getType()->getPointerElementType(), ListVal, 1);
     CurVal = Builder.CreateLoad(CurVal);
     Node.Right->accept(*this);
+    delPrefix();
 }

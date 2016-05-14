@@ -54,14 +54,14 @@ void LLVMCodeGen::visit(common::Function &Node) {
     for (CurCase = Node.Cases.cbegin(); CurCase != Node.Cases.cend(); ++CurCase) {
         if (next(CurCase) != Node.Cases.cend()) {
             if (!(*CurCase)->Patterns.empty())
-                NextPatBlock = BasicBlock::Create(Ctx, "", CurFunc);
+                NextBlock = BasicBlock::Create(Ctx, "", CurFunc);
         } else {
-            NextPatBlock = ErrBlock;
+            NextBlock = ErrBlock;
         }
 
         (*CurCase)->accept(*this);
         stepPrefix();
-        CurPatBlock = NextPatBlock;
+        CurPatBlock = NextBlock;
     }
     delPrefix();
 
@@ -110,7 +110,7 @@ void LLVMCodeGen::visit(common::Case &Node) {
 
         if (next(CurPat) != Node.Patterns.cend()) {
             CurPatBlock = BasicBlock::Create(Ctx, getPrefix(), CurFunc);
-            Builder.CreateCondBr(CurVal, CurPatBlock, NextPatBlock);
+            Builder.CreateCondBr(CurVal, CurPatBlock, NextBlock);
         }
     }
     delPrefix();
@@ -118,13 +118,13 @@ void LLVMCodeGen::visit(common::Case &Node) {
     // Create when block
     if (Node.When) {
         auto WhenBlock = BasicBlock::Create(Ctx, getPrefix() + "_when", CurFunc);
-        Builder.CreateCondBr(CurVal, WhenBlock, NextPatBlock);
+        Builder.CreateCondBr(CurVal, WhenBlock, NextBlock);
         Builder.SetInsertPoint(WhenBlock);
         Node.When->accept(*this);
-        Builder.CreateCondBr(CurVal, CurCaseBlock, NextPatBlock);
+        Builder.CreateCondBr(CurVal, CurCaseBlock, NextBlock);
     } else {
         if (!Node.Patterns.empty())
-            Builder.CreateCondBr(CurVal, CurCaseBlock, NextPatBlock);
+            Builder.CreateCondBr(CurVal, CurCaseBlock, NextBlock);
         else
             Builder.CreateBr(CurCaseBlock);
     }

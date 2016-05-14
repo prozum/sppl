@@ -17,10 +17,9 @@ llvm::Type *LLVMCodeGen::getType(common::Type Ty) {
     case common::TypeId::TUPLE:
         return PointerType::getUnqual(getTupleType(Ty));
     case common::TypeId::LIST:
+    case common::TypeId::EMPTYLIST:
     case common::TypeId::STRING:
         return PointerType::getUnqual(getListType(Ty));
-    case common::TypeId::EMPTYLIST:
-        return VoidPtr;
     case common::TypeId::SIGNATURE:
         return PointerType::getUnqual(getFuncType(Ty));
     case common::TypeId::VOID:

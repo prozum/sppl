@@ -67,7 +67,7 @@ private:
     llvm::BasicBlock *ErrBlock = nullptr;
     llvm::BasicBlock *CaseRetBlock = nullptr;
     llvm::PHINode *CasePhiNode = nullptr;
-    llvm::BasicBlock *NextPatBlock = nullptr;
+    llvm::BasicBlock *NextBlock = nullptr;
 
     std::vector<llvm::Value *> Args;
     std::vector<llvm::Value *>::const_iterator CurArg;
@@ -137,9 +137,10 @@ private:
     llvm::StructType *getListType(common::Type Ty);
     llvm::FunctionType *getFuncType(common::Type Ty);
 
-    void addPrefix(std::string Prefix);
+    void addPrefix(std::string Prefix, bool Numbered = true);
     void delPrefix();
     std::string getPrefix();
+    std::string getPrefix(std::string Str);
     void stepPrefix();
 };
 }
