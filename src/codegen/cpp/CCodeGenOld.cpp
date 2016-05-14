@@ -28,8 +28,10 @@ void CCodeGenOld::visit(Program &Node) {
     }
 
     // If no main exists the c code generater shouldn't compile
-    if (!Main)
-        throw runtime_error("No main, help!");
+    if (!Main) {
+        addError(Error("No main function"));
+        return;
+    }
 
     // Use getType on mains return type. This is done, so that the print function for
     // mains return type has been generated.
@@ -218,11 +220,11 @@ void CCodeGenOld::visit(Case &Node) {
 }
 
 void CCodeGenOld::visit(AlgebraicDT &Node) {
-    throw std::runtime_error("Not implemented");
+    addError(Error::NotImplemented(Node.Loc));
 }
 
 void CCodeGenOld::visit(Product &Node) {
-    throw std::runtime_error("Not implemented");
+    addError(Error::NotImplemented(Node.Loc));
 }
 
 string CCodeGenOld::getType(Type &Ty) {
@@ -247,8 +249,8 @@ string CCodeGenOld::getType(Type &Ty) {
         return getList(Ty) + "*";
     default:
         // This should never happen. If it does, the type checker made a
-        // mistake, or none supported features are being used
-        throw runtime_error("This should never happen!");
+        // mistake, or unsupported features might be in use
+        assert(0 && "This should never happen!");
     }
 }
 
