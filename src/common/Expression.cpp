@@ -4,9 +4,9 @@
 using namespace std;
 using namespace common;
 
-Expression::Expression(Location Loc, bool Const) : Node(Loc, Const), RetTy(TypeId::UNKNOWN) { }
+Expression::Expression(Location Loc, bool Const) : Node(Loc), RetTy(TypeId::UNKNOWN), Const(Const) { }
 
-Expression::Expression(Type Ty, Location Loc, bool Const) : Node(Loc, Const), RetTy(Ty) { }
+Expression::Expression(Type Ty, Location Loc, bool Const) : Node(Loc), RetTy(Ty), Const(Const) { }
 
 IdExpr::IdExpr(string Val, Location Loc) : Expression(Loc, false), Val(Val) { }
 

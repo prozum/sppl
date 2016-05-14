@@ -13,7 +13,7 @@ void AlgebraicDT::accept(Visitor &V) { V.visit(*this); }
 void Product::accept(Visitor &V) { V.visit(*this); }
 
 
-Node::Node(Location Loc, bool Const) : Loc(Loc), Const(Const) {}
+Node::Node(Location Loc) : Loc(Loc) {}
 
 Program::Program(vector<unique_ptr<Declaration>> Decls, Location Loc)
     : Node(Loc), Decls(move(Decls)) {}
@@ -30,7 +30,6 @@ Function::Function(unique_ptr<Expression> Expr)
       Signature(Type(TypeId::UNKNOWN)), Anon(true) {
     Cases.push_back(make_unique<Case>(
         move(Expr), nullptr, vector<unique_ptr<Pattern>>(), Expr->Loc));
-    Const = Expr->Const;
 }
 
 Function::Function(string Id, Type Ty, Location Loc)
@@ -39,7 +38,7 @@ Function::Function(string Id, Type Ty, Location Loc)
 
 Case::Case(unique_ptr<Expression> Expr, unique_ptr<Expression> When,
            vector<unique_ptr<Pattern>> Patterns, Location Loc)
-    : Node(Loc, Expr->Const), Expr(move(Expr)), When(move(When)), Patterns(move(Patterns)) {}
+    : Node(Loc), Expr(move(Expr)), When(move(When)), Patterns(move(Patterns)) {}
 
 LambdaArg::LambdaArg(string Id, Location Loc) : Node(Loc), Id(Id) {}
 

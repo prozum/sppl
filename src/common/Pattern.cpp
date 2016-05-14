@@ -17,7 +17,7 @@ void WildPattern::accept(Visitor &V) { V.visit(*this); }
 void AlgebraicPattern::accept(Visitor &V) { V.visit(*this); }
 void ParPattern::accept(Visitor &V) { V.visit(*this); }
 
-Pattern::Pattern(Type Ty, Location Loc) : Node(Loc, true), RetTy(Ty) {}
+Pattern::Pattern(Type Ty, Location Loc) : Node(Loc), RetTy(Ty) {}
 
 IntPattern::IntPattern(long Val, Location Loc)
     : Pattern(Type(TypeId::INT), Loc), Val(Val) {}

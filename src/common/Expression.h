@@ -6,6 +6,7 @@ namespace common {
 class Expression : public Node {
   public:
     Type RetTy;
+    bool Const;
 
     Expression(Location Loc, bool Const = false);
     Expression(Type Ty, Location Loc, bool Const = false);

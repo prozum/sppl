@@ -128,9 +128,8 @@ class Scope;
 class Node {
   public:
     Location Loc;
-    bool Const;
 
-    Node(Location Loc, bool Const = false);
+    Node(Location Loc);
     Node(const Node &Other);
     ~Node() = default;
 
