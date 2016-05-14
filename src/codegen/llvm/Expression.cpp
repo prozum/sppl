@@ -56,16 +56,33 @@ void LLVMCodeGen::visit(common::ParExpr &Node) {
 }
 
 void LLVMCodeGen::visit(common::TupleExpr &Node) {
-    std::vector<llvm::Constant *> TupleVal;
+    auto TupleType = getTupleType(Node.RetTy);
+    auto TuplePtrType = getType(Node.RetTy);
 
-    for (auto &Element : Node.Elements) {
-        Element->accept(*this);
-        TupleVal.push_back(static_cast<Constant *>(CurVal));
+    if (Node.Const) {
+        std::vector<llvm::Constant *> TupleVal;
+        for (auto &Element : Node.Elements) {
+            Element->accept(*this);
+            TupleVal.push_back(static_cast<Constant *>(CurVal));
+        }
+
+        auto ConstVal = ConstantStruct::get(TupleType, TupleVal);
+        CurVal = new GlobalVariable(*Module.get(), ConstVal->getType(), true,
+                                    GlobalVariable::ExternalLinkage, ConstVal);
+        return;
     }
 
-    auto ConstVal = ConstantStruct::get(getTupleType(Node.RetTy), TupleVal);
-    CurVal = new GlobalVariable(*Module.get(), ConstVal->getType(), true,
-                                GlobalVariable::ExternalLinkage, ConstVal);
+    auto TupleMalloc = CreateMalloc(TupleType, CurCaseBlock);
+    auto Tuple = Builder.CreateBitCast(TupleMalloc, TuplePtrType);
+
+    for (size_t i = 0; i < Node.Elements.size(); ++i) {
+        Node.Elements[i]->accept(*this);
+
+        auto GEP = Builder.CreateStructGEP(TupleType, Tuple, i);
+        Builder.CreateStore(CurVal, GEP);
+    }
+
+    CurVal = Tuple;
 }
 
 void LLVMCodeGen::visit(common::ListExpr &Node) {

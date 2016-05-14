@@ -65,7 +65,7 @@ private:
 
     llvm::BasicBlock *Entry = nullptr;
     llvm::BasicBlock *ErrBlock = nullptr;
-    llvm::BasicBlock *CaseRetBlock = nullptr;
+    llvm::BasicBlock *RetBlock = nullptr;
     llvm::PHINode *CasePhiNode = nullptr;
     llvm::BasicBlock *NextBlock = nullptr;
 

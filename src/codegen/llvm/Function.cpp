@@ -34,8 +34,8 @@ void LLVMCodeGen::visit(common::Function &Node) {
     Builder.CreateRet(UndefValue::get(CurFunc->getReturnType()));
 
     // Create return block and setup phi node
-    CaseRetBlock = BasicBlock::Create(Ctx, "ret", CurFunc);
-    Builder.SetInsertPoint(CaseRetBlock);
+    RetBlock = BasicBlock::Create(Ctx, "ret", CurFunc);
+    Builder.SetInsertPoint(RetBlock);
 
     // Create ret instruction
     if (CurFunc->getReturnType()->getTypeID() != llvm::Type::TypeID::VoidTyID) {
@@ -149,7 +149,7 @@ void LLVMCodeGen::visit(common::Case &Node) {
         CasePhiNode->addIncoming(CurVal, CurCaseBlock);
 
     // Add return value to phi node
-    Builder.CreateBr(CaseRetBlock);
+    Builder.CreateBr(RetBlock);
 }
 
 llvm::Function *LLVMCodeGen::CreateMain()

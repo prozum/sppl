@@ -24,7 +24,7 @@ BoolExpr::BoolExpr(bool Val, Location Loc)
 
 ListExpr::ListExpr(vector<unique_ptr<Expression>> Elements, Location Loc)
     : Expression(Type(TypeId::LIST), Loc, true), Elements(move(Elements)) {
-    for (auto &Element : Elements) {
+    for (auto &Element : this->Elements) {
         if (!Element->Const) {
             Const = false;
             return;
@@ -34,7 +34,7 @@ ListExpr::ListExpr(vector<unique_ptr<Expression>> Elements, Location Loc)
 
 TupleExpr::TupleExpr(vector<unique_ptr<Expression>> Elements, Location Loc)
     : Expression(Type(TypeId::TUPLE), Loc, true), Elements(move(Elements)) {
-    for (auto &Element : Elements) {
+    for (auto &Element : this->Elements) {
         if (!Element->Const) {
             Const = false;
             return;
