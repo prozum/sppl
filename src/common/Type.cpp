@@ -95,12 +95,12 @@ std::string Type::str(bool isTop) {
         return Name + " " + strJoin(" ");
     case TypeId::GENERIC:
         return Name;
-    case TypeId::UNKNOWN:
-        return "_Unknown_";
     case TypeId::EMPTYLIST:
         return "[]";
     case TypeId::VOID:
         return "Void";
+    case TypeId::UNKNOWN:
+        return "_Unknown_";
     }
 }
 

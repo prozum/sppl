@@ -681,6 +681,9 @@ void TypeChecker::visit(CallExpr &Node) {
 
     // Visit children
     Node.Callee->accept(*this);
+    if (checkNotSafe())
+        return;
+
     for (auto &Arg : Node.Args) {
         Arg->accept(*this);
     }
