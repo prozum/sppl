@@ -20,7 +20,6 @@ void LesserEq::accept(Visitor &V) { V.visit(*this); }
 void GreaterEq::accept(Visitor &V) { V.visit(*this); }
 void ProducerConsumer::accept(Visitor &V) { V.visit(*this); }
 void Concat::accept(Visitor &V) { V.visit(*this); }
-void BinPrint::accept(Visitor &V) { V.visit(*this); }
 
 BinaryOp::BinaryOp(unique_ptr<Expression> Left, unique_ptr<Expression> Right,
                    Location Loc)
@@ -89,10 +88,6 @@ Concat::Concat(unique_ptr<Expression> Left, unique_ptr<Expression> Right,
                Location Loc)
     : BinaryOp(move(Left), move(Right), Loc) {}
 
-BinPrint::BinPrint(unique_ptr<Expression> Left, unique_ptr<Expression> Right,
-               Location Loc)
-        : BinaryOp(move(Left), move(Right), Loc) {}
-
 string Or::str() { return Left->str() + " || " + Right->str(); }
 
 string And::str() { return Left->str() + " && " + Right->str(); }
@@ -125,8 +120,6 @@ string ProducerConsumer::str() { return Left->str() + " |> " + Right->str(); }
 
 string Concat::str() { return Left->str() + " ++ " + Right->str(); }
 
-string BinPrint::str() { return Left->str() + " $ " + Right->str(); }
-
 BinaryOp *Or::doClone() const { return cloneBinaryOp<Or>(*this); }
 
 BinaryOp *And::doClone() const { return cloneBinaryOp<And>(*this); }
@@ -154,8 +147,6 @@ BinaryOp *Div::doClone() const { return cloneBinaryOp<Div>(*this); }
 BinaryOp *Mod::doClone() const { return cloneBinaryOp<Mod>(*this); }
 
 BinaryOp *ListAdd::doClone() const { return cloneBinaryOp<ListAdd>(*this); }
-
-BinaryOp *BinPrint::doClone() const { return cloneBinaryOp<BinPrint>(*this); }
 
 BinaryOp *ProducerConsumer::doClone() const {
     return cloneBinaryOp<ProducerConsumer>(*this);

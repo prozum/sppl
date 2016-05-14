@@ -6,7 +6,7 @@ using namespace std;
 using namespace codegen;
 
 CParCodeGen::CParCodeGen(parser::Driver &Drv)
-    : CCodeGen(Drv) {}
+    : CCodeGenOld(Drv) {}
 
 
 void CParCodeGen::visit(Program &Node) {

@@ -1,109 +1,109 @@
-#include "CCodeGen.h"
+#include "CCodeGenOld.h"
 
 using namespace common;
 using namespace std;
 using namespace codegen;
 
 // Binary Operators
-void CCodeGen::visit(Or &Node) {
+void CCodeGenOld::visit(Or &Node) {
     ExprStack.top() << "(";
     Node.Left->accept(*this);
-    ExprStack.top() << "||";
+    ExprStack.top() << ") || (";
     Node.Right->accept(*this);
     ExprStack.top() << ")";
 }
 
-void CCodeGen::visit(And &Node) {
+void CCodeGenOld::visit(And &Node) {
     ExprStack.top() << "(";
     Node.Left->accept(*this);
-    ExprStack.top() << "&&";
+    ExprStack.top() << ") && (";
     Node.Right->accept(*this);
     ExprStack.top() << ")";
 }
 
-void CCodeGen::visit(Equal &Node) {
+void CCodeGenOld::visit(Equal &Node) {
     outputEqual(Node.Left->RetTy, *Node.Left.get(), *Node.Right.get());
 }
 
-void CCodeGen::visit(NotEqual &Node) {
-    ExprStack.top() << "(!";
+void CCodeGenOld::visit(NotEqual &Node) {
+    ExprStack.top() << "!(";
     outputEqual(Node.RetTy, *Node.Left.get(), *Node.Right.get());
     ExprStack.top() << ")";
 }
 
-void CCodeGen::visit(Lesser &Node) {
+void CCodeGenOld::visit(Lesser &Node) {
     ExprStack.top() << "(";
     Node.Left->accept(*this);
-    ExprStack.top() << "<";
+    ExprStack.top() << ") < (";
     Node.Right->accept(*this);
     ExprStack.top() << ")";
 }
 
-void CCodeGen::visit(LesserEq &Node) {
+void CCodeGenOld::visit(LesserEq &Node) {
     ExprStack.top() << "(";
     Node.Left->accept(*this);
-    ExprStack.top() << "<=";
+    ExprStack.top() << ") <= (";
     Node.Right->accept(*this);
     ExprStack.top() << ")";
 }
 
-void CCodeGen::visit(Greater &Node) {
+void CCodeGenOld::visit(Greater &Node) {
     ExprStack.top() << "(";
     Node.Left->accept(*this);
-    ExprStack.top() << ">";
+    ExprStack.top() << ") > (";
     Node.Right->accept(*this);
     ExprStack.top() << ")";
 }
 
-void CCodeGen::visit(GreaterEq &Node) {
+void CCodeGenOld::visit(GreaterEq &Node) {
     ExprStack.top() << "(";
     Node.Left->accept(*this);
-    ExprStack.top() << ">=";
+    ExprStack.top() << ") >= (";
     Node.Right->accept(*this);
     ExprStack.top() << ")";
 }
 
-void CCodeGen::visit(Add &Node) {
+void CCodeGenOld::visit(Add &Node) {
     ExprStack.top() << "(";
     Node.Left->accept(*this);
-    ExprStack.top() << "+";
+    ExprStack.top() << ") + (";
     Node.Right->accept(*this);
     ExprStack.top() << ")";
 }
 
-void CCodeGen::visit(Sub &Node) {
+void CCodeGenOld::visit(Sub &Node) {
     ExprStack.top() << "(";
     Node.Left->accept(*this);
-    ExprStack.top() << "-";
+    ExprStack.top() << ") - (";
     Node.Right->accept(*this);
     ExprStack.top() << ")";
 }
 
-void CCodeGen::visit(Mul &Node) {
+void CCodeGenOld::visit(Mul &Node) {
     ExprStack.top() << "(";
     Node.Left->accept(*this);
-    ExprStack.top() << "*";
+    ExprStack.top() << ") * (";
     Node.Right->accept(*this);
     ExprStack.top() << ")";
 }
 
-void CCodeGen::visit(Div &Node) {
+void CCodeGenOld::visit(Div &Node) {
     ExprStack.top() << "(";
     Node.Left->accept(*this);
-    ExprStack.top() << "/";
+    ExprStack.top() << ") / (";
     Node.Right->accept(*this);
     ExprStack.top() << ")";
 }
 
-void CCodeGen::visit(Mod &Node) {
+void CCodeGenOld::visit(Mod &Node) {
     ExprStack.top() << "(";
     Node.Left->accept(*this);
-    ExprStack.top() << "%";
+    ExprStack.top() << ") % (";
     Node.Right->accept(*this);
     ExprStack.top() << ")";
 }
 
-void CCodeGen::visit(ListAdd &Node) {
+void CCodeGenOld::visit(ListAdd &Node) {
     string ListName = getList(Node.RetTy);
 
     // Use pregenerated push function to push thing onto list
@@ -115,12 +115,12 @@ void CCodeGen::visit(ListAdd &Node) {
     ExprStack.top() << ")";
 }
 
-void CCodeGen::visit(ProducerConsumer &Node) {
+void CCodeGenOld::visit(ProducerConsumer &Node) {
     // TODO
     throw std::runtime_error("Not implemented");
 }
 
-void CCodeGen::visit(Concat &Node) {
+void CCodeGenOld::visit(Concat &Node) {
     string ListName = getList(Node.Left->RetTy);
 
     ExprStack.top() << GGenerated << GConcat << ListName << "(";
@@ -132,42 +132,40 @@ void CCodeGen::visit(Concat &Node) {
 
 
 // Unary Operators
-void CCodeGen::visit(ParExpr &Node) {
-    ExprStack.top() << "(";
+void CCodeGenOld::visit(ParExpr &Node) {
+    Node.Child->accept(*this);
+}
+
+void CCodeGenOld::visit(Not &Node) {
+    ExprStack.top() << "!(";
     Node.Child->accept(*this);
     ExprStack.top() << ")";
 }
 
-void CCodeGen::visit(Not &Node) {
-    ExprStack.top() << "(!";
-    Node.Child->accept(*this);
-    ExprStack.top() << ")";
-}
-
-void CCodeGen::visit(To &Node) {
+void CCodeGenOld::visit(To &Node) {
     // TODO
     throw std::runtime_error("Not implemented");
 }
 
-void CCodeGen::visit(Negative &Node) {
-    ExprStack.top() << "(-";
+void CCodeGenOld::visit(Negative &Node) {
+    ExprStack.top() << "-(";
     Node.Child->accept(*this);
     ExprStack.top() << ")";
 }
 
 
 // Literals
-void CCodeGen::visit(BoolExpr &Node) {
+void CCodeGenOld::visit(BoolExpr &Node) {
     ExprStack.top() << Node.Val;
 }
 
-void CCodeGen::visit(StringExpr &Node) {
+void CCodeGenOld::visit(StringExpr &Node) {
     // gcreate_string is generate by generate_std. It creates string base on
     // a char*
     ExprStack.top() << GGenerated << GCreate << GString << "(" << Node.str() << ")";
 }
 
-void CCodeGen::visit(IdExpr &Node) {
+void CCodeGenOld::visit(IdExpr &Node) {
     /*
     bool IsDeclared = false;
 
@@ -187,21 +185,21 @@ void CCodeGen::visit(IdExpr &Node) {
     ExprStack.top() << GUser << Node.Val;
 }
 
-void CCodeGen::visit(IntExpr &Node) {
+void CCodeGenOld::visit(IntExpr &Node) {
     ExprStack.top() << Node.Val;
 }
 
-void CCodeGen::visit(FloatExpr &Node) {
+void CCodeGenOld::visit(FloatExpr &Node) {
     ExprStack.top() << Node.str();
 }
 
-void CCodeGen::visit(CharExpr &Node) {
+void CCodeGenOld::visit(CharExpr &Node) {
     ExprStack.top() << Node.str();
 }
 
 
 // Composits
-void CCodeGen::visit(TupleExpr &Node) {
+void CCodeGenOld::visit(TupleExpr &Node) {
     string Name = getTuple(Node.RetTy);
 
     ExprStack.top() << GGenerated << GCreate << Name << "(";
@@ -214,7 +212,7 @@ void CCodeGen::visit(TupleExpr &Node) {
     ExprStack.top() << ")";
 }
 
-void CCodeGen::visit(ListExpr &Node) {
+void CCodeGenOld::visit(ListExpr &Node) {
     string Name = getList(Node.RetTy);
 
     ExprStack.top() << GGenerated << GCreate << Name << "("
@@ -228,14 +226,14 @@ void CCodeGen::visit(ListExpr &Node) {
     ExprStack.top() << ")";
 }
 
-void CCodeGen::visit(AlgebraicExpr &Node) {
+void CCodeGenOld::visit(AlgebraicExpr &Node) {
     // TODO
     throw std::runtime_error("Not implemented");
 }
 
 
 // Others
-void CCodeGen::visit(CallExpr &Node) {
+void CCodeGenOld::visit(CallExpr &Node) {
     Node.Callee->accept(*this);
 
     ExprStack.top() << "(";
@@ -269,19 +267,19 @@ void CCodeGen::visit(CallExpr &Node) {
      */
 }
 
-void CCodeGen::visit(LambdaArg &Node) {
+void CCodeGenOld::visit(LambdaArg &Node) {
 
     // TODO
     throw std::runtime_error("Not implemented");
 }
 
-void CCodeGen::visit(LambdaFunction &Node) {
+void CCodeGenOld::visit(LambdaFunction &Node) {
 
     // TODO
     throw std::runtime_error("Not implemented");
 }
 
-void CCodeGen::outputEqual(Type &Ty, Expression &Left, Expression &Right) {
+void CCodeGenOld::outputEqual(Type &Ty, Expression &Left, Expression &Right) {
     switch (Ty.Id) {
         case TypeId::TUPLE: {
             string Name = getTuple(Left.RetTy);
@@ -307,33 +305,14 @@ void CCodeGen::outputEqual(Type &Ty, Expression &Left, Expression &Right) {
         default:
             ExprStack.top() << "(";
             Left.accept(*this);
-            ExprStack.top() << "==";
+            ExprStack.top() << ") == (";
             Right.accept(*this);
             ExprStack.top() << ")";
             break;
     }
 }
 
-void CCodeGen::visit(common::BinPrint &Node) {
-    string Name = GTemp + to_string(TempCount++);
-
-    ExprStack.push(stringstream());
-    Node.Left->accept(*this);
-
-    BeforeExpr[BeforeExprDepth] += "        " + getType(Node.RetTy) + " " + Name
-                                    + " = " + ExprStack.top().str() + "; \n";
-    ExprStack.pop();
-    ExprStack.top() << Name;
-
-    ExprStack.push(stringstream());
-    Node.Right->accept(*this);
-
-    BeforeExpr[BeforeExprDepth] += "        " + Prints[Node.Right->RetTy] + "("
-                                   + ExprStack.top().str() + ", 1)" + "; \n";
-    ExprStack.pop();
-}
-
-void CCodeGen::visit(common::UnPrint &Node) {
+void CCodeGenOld::visit(common::UnPrint &Node) {
     string Name = GTemp + to_string(TempCount++);
 
     ExprStack.push(stringstream());
@@ -342,6 +321,32 @@ void CCodeGen::visit(common::UnPrint &Node) {
     BeforeExpr[BeforeExprDepth] += "        " + getType(Node.RetTy) + " " + Name
                                     + " = " + ExprStack.top().str() + "; \n";
     BeforeExpr[BeforeExprDepth] += "        " + Prints[Node.RetTy] + "(" + Name + ", 1)" + "; \n";
+    ExprStack.pop();
+    ExprStack.top() << Name;
+}
+
+void CCodeGenOld::visit(common::Assosiate &Node) {
+}
+
+void CCodeGenOld::visit(common::DoExpr &Node) {
+    string Name = GTemp + to_string(TempCount++);
+
+    for (auto &Expr: Node.Exprs) {
+        ExprStack.push(stringstream());
+        Expr->accept(*this);
+
+        BeforeExpr[BeforeExprDepth] += "        " + ExprStack.top().str() + "; \n";
+
+        ExprStack.pop();
+    }
+
+    ExprStack.push(stringstream());
+
+    Node.ReturnExpr->accept(*this);
+
+    BeforeExpr[BeforeExprDepth] += "        " + getType(Node.RetTy) + " " + Name
+                                   + " = " + ExprStack.top().str() + "; \n";
+
     ExprStack.pop();
     ExprStack.top() << Name;
 }

@@ -1,9 +1,9 @@
 
 #pragma once
-#include "CCodeGen.h"
+#include "CCodeGenOld.h"
 
 namespace codegen {
-class CParCodeGen : public CCodeGen {
+class CParCodeGen : public CCodeGenOld {
     public:
         CParCodeGen(parser::Driver &Drv);
         void visit(common::Program &Node);

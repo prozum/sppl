@@ -51,6 +51,8 @@ int main(int argc, char *argv[])
             backend = Backend::CPP;
         else if (strcmp(argv[i], "--cpar") == 0)
             backend = Backend::CPAR;
+        else if (strcmp(argv[i], "--c") == 0)
+            backend = Backend::C;
 #endif
 #ifdef CGNUASM
         else if (strcmp(argv[i], "--gnuasm") == 0)

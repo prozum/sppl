@@ -11,8 +11,9 @@
 #include <memory>
 
 #ifdef CCPP
-#include "CCodeGen.h"
+#include "CCodeGenOld.h"
 #include "CParCodeGen.h"
+#include "CCodeGen.h"
 #endif
 
 #ifdef CGNUASM
@@ -29,7 +30,7 @@
 
 namespace compiler {
 
-enum Backend { CPP, GNUASM, HASKELL, LLVM, PPRINTER, CPAR };
+enum Backend { CPP, GNUASM, HASKELL, LLVM, PPRINTER, CPAR, C };
 
 class Compiler : public parser::Driver {
   public:

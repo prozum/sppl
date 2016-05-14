@@ -716,21 +716,39 @@ void TypeChecker::visit(CallExpr &Node) {
     Node.RetTy = Node.Callee->RetTy.Subtypes.back();
 }
 
-void TypeChecker::visit(common::BinPrint &Node) {
-    Node.Left->accept(*this);
-    Node.Right->accept(*this);
-    if (checkNotSafe())
-        return;
-
-    Node.RetTy = Node.Left->RetTy;
-}
-
 void TypeChecker::visit(common::UnPrint &Node) {
     Node.Child->accept(*this);
     if (checkNotSafe())
         return;
 
     Node.RetTy = Node.Child->RetTy;
+}
+
+void TypeChecker::visit(common::Assosiate &Node) {
+    Type Out;
+
+    Node.Child->accept(*this);
+    if (checkNotSafe())
+        return;
+
+    if (CurScope->tryGetDecl(Node.Id, Out)) {
+        addError(Error(Node.Id + " was already declared in the current scope.",
+                       Node.Loc));
+        return;
+    }
+
+    CurScope->Decls.insert({Node.Id, Node.Child->RetTy});
+}
+
+void TypeChecker::visit(common::DoExpr &Node) {
+    for (auto &Expr: Node.Exprs) {
+        Expr->accept(*this);
+    }
+    Node.ReturnExpr->accept(*this);
+    if (checkNotSafe())
+        return;
+
+    Node.RetTy = Node.ReturnExpr->RetTy;
 }
 
 void TypeChecker::visit(IntExpr &Node) { }
@@ -772,6 +790,10 @@ void TypeChecker::resolveEmptyList(Type &Ty, Type &Resolver) {
             break;
     }
 }
+
+
+
+
 
 
 

@@ -84,9 +84,6 @@ class Visitor {
     virtual void visit(Concat &Node) {
         addError(Error::NotImplemented(Node.Loc));
     }
-    virtual void visit(BinPrint &Node) {
-        addError(Error::NotImplemented(Node.Loc));
-    }
     virtual void visit(To &Node) {
         addError(Error::NotImplemented(Node.Loc));
     }
@@ -100,6 +97,12 @@ class Visitor {
         addError(Error::NotImplemented(Node.Loc));
     }
     virtual void visit(Negative &Node) {
+        addError(Error::NotImplemented(Node.Loc));
+    }
+    virtual void visit(DoExpr &Node) {
+        addError(Error::NotImplemented(Node.Loc));
+    }
+    virtual void visit(Assosiate &Node) {
         addError(Error::NotImplemented(Node.Loc));
     }
     virtual void visit(LambdaFunction &Node) {

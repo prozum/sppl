@@ -99,6 +99,14 @@ using namespace std;
     return token::WHEN;
 }
 
+"do" {
+    return token::DO;
+}
+
+"return" {
+    return token::RETURN;
+}
+
 [0-9]+ {
     yylval->LongInt = atol(yytext);
     return token::INTLITERAL;
@@ -136,7 +144,11 @@ using namespace std;
 }
 
 "->" {
-    return token::ARROR;
+    return token::ARROW;
+}
+
+":=" {
+    return token::COLONEQUAL;
 }
 
 "=>" {
@@ -209,10 +221,6 @@ using namespace std;
 
 "=" {
     return token::ASSIGN;
-}
-
-"$" {
-    return token::DOLLAR;
 }
 
 "@" {
