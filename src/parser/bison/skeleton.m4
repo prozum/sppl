@@ -73,7 +73,7 @@ m4_define([b4_lhs_location],
 
 # b4_rhs_data(RULE-LENGTH, NUM)
 # -----------------------------
-# Return the data corresponding to the symbol #NUM, where the current
+# ReturnType the data corresponding to the symbol #NUM, where the current
 # rule has RULE-LENGTH symbols on RHS.
 m4_define([b4_rhs_data],
           [yystack_@{b4_subtract($@)@}])
@@ -518,7 +518,7 @@ m4_if(b4_prefix, [yy], [],
 
 ]b4_namespace_open[]b4_error_verbose_if([[
 
-  /* Return YYSTR after stripping away unnecessary quotes and
+  /* ReturnType YYSTR after stripping away unnecessary quotes and
      backslashes, so that it's suitable for yyerror.  The heuristic is
      that double-quoting is unnecessary unless the string contains an
      apostrophe, a comma, or backslash (other than backslash-backslash).
@@ -935,7 +935,7 @@ b4_dollar_popdef])[]dnl
         /* If just tried and failed to reuse lookahead token after an
            error, discard it.  */
 
-        // Return failure if at end of input.
+        // ReturnType failure if at end of input.
         if (yyla.type_get () == yyeof_)
           YYABORT;
         else if (!yyla.empty ())

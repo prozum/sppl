@@ -1,4 +1,5 @@
 if(CCPP)
+    add_subdirectory(c)
     add_subdirectory(cpp)
     add_subdirectory(cpar)
 endif()

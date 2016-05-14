@@ -10,9 +10,9 @@
 #include <cassert>
 
 namespace codegen {
-class CCodeGen : public parser::CodeGenerator {
+class CCodeGenOld : public parser::CodeGenerator {
   public:
-    CCodeGen(parser::Driver &Drv);
+    CCodeGenOld(parser::Driver &Drv);
     virtual void visit(common::Program &Node);
 
   protected:
@@ -38,9 +38,12 @@ class CCodeGen : public parser::CodeGenerator {
     virtual void visit(common::ProducerConsumer &Node);
     virtual void visit(common::Concat &Node);
     virtual void visit(common::To &Node);
+    virtual void visit(common::UnPrint &Node);
     virtual void visit(common::ParExpr &Node);
     virtual void visit(common::Not &Node);
     virtual void visit(common::Negative &Node);
+    virtual void visit(common::DoExpr &Node);
+    virtual void visit(common::Assosiate &Node);
     virtual void visit(common::LambdaFunction &Node);
     virtual void visit(common::IdPattern &Node);
     virtual void visit(common::IntPattern &Node);
@@ -64,6 +67,8 @@ class CCodeGen : public parser::CodeGenerator {
     virtual void visit(common::TupleExpr &Node);
     virtual void visit(common::CallExpr &Node);
     virtual void visit(common::AlgebraicExpr &Node);
+
+    const bool GC = false;
 
     const std::string GGenerated = "g_";
     const std::string GUser = "u_";
@@ -91,6 +96,7 @@ class CCodeGen : public parser::CodeGenerator {
     //const std::string GClosure = "closure";
     //const std::string GGlobal = "global";
     const std::string GMain = "main";
+    const std::string GTemp = "temp";
 
     std::stringstream Buffer;
     std::ostream *Output;
@@ -99,6 +105,7 @@ class CCodeGen : public parser::CodeGenerator {
     int TupleCount = 0;
     int ListCount = 0;
     int SigCount = 0;
+    int TempCount = 0;
     int OobCount = 0;
     int EnvCount = 0;
     std::unordered_map<common::Type, std::string> Tuples;
@@ -108,11 +115,14 @@ class CCodeGen : public parser::CodeGenerator {
     std::unordered_map<common::Type, std::string> Prints;
     std::vector<std::string> PatternBuilder;
     std::vector<std::string> Assignments;
+    std::vector<std::string> BeforeExpr;
     std::vector<int> ListOffsets;
     std::string LastPattern;
     std::string StringTypeName;
 
     std::stack<std::stringstream> ExprStack;
+
+    size_t BeforeExprDepth = 0;
 
     common::Type StringList;
     common::Type RealString;
@@ -131,5 +141,8 @@ class CCodeGen : public parser::CodeGenerator {
     virtual void generateStd();
     virtual void outputBuffer();
     virtual void outputEqual(common::Type &Ty, common::Expression &Left, common::Expression &Right);
+    virtual void outputBeforeExpr();
+
+    virtual std::string allocString();
 };
 }

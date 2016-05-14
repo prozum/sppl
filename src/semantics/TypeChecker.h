@@ -36,9 +36,12 @@ class TypeChecker : public common::Visitor {
     void visit(common::ProducerConsumer &Node);
     void visit(common::Concat &Node);
     void visit(common::To &Node);
+    void visit(common::UnPrint &Node);
     void visit(common::ParExpr &Node);
     void visit(common::Not &Node);
     void visit(common::Negative &Node);
+    void visit(common::DoExpr &Node);
+    void visit(common::Assosiate &Node);
     void visit(common::LambdaFunction &Node);
     void visit(common::IdPattern &Node);
     void visit(common::IntPattern &Node);

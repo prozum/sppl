@@ -51,6 +51,9 @@ int main(int argc, char *argv[])
             BE = Backend::CPP;
         else if (Arg.compare("--cpar") == 0)
             BE = Backend::CPAR;
+        else if (Arg.compare("--c") == 0)
+            BE = Backend::CPAR;
+#endif
 #endif
 #ifdef CGNUASM
         else if (Arg.compare("--gnuasm") == 0)

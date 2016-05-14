@@ -1,10 +1,10 @@
-#include "CCodeGen.h"
+#include "CCodeGenOld.h"
 
 using namespace common;
 using namespace std;
 using namespace codegen;
 
-void CCodeGen::visit(ListPattern &Node) {
+void CCodeGenOld::visit(ListPattern &Node) {
     // Result is needed, so we don't generate something else, while the
     // ListPattern is being generated
     stringstream Res;
@@ -43,7 +43,7 @@ void CCodeGen::visit(ListPattern &Node) {
     LastPattern = "(" + Res.str() + ")";
 }
 
-void CCodeGen::visit(TuplePattern &Node) {
+void CCodeGenOld::visit(TuplePattern &Node) {
     stringstream Res;
     bool Empty = true;
 
@@ -74,7 +74,7 @@ void CCodeGen::visit(TuplePattern &Node) {
     }
 }
 
-void CCodeGen::visit(ListSplit &Node) {
+void CCodeGenOld::visit(ListSplit &Node) {
     stringstream Res;
     string TypeName = getList(Node.RetTy);
     bool Empty = true;
@@ -120,7 +120,7 @@ void CCodeGen::visit(ListSplit &Node) {
     }
 }
 
-void CCodeGen::visit(IntPattern &Node) {
+void CCodeGenOld::visit(IntPattern &Node) {
     string Val;
 
     for (auto &Str : PatternBuilder) {
@@ -130,7 +130,7 @@ void CCodeGen::visit(IntPattern &Node) {
     LastPattern = Val + " == " + Node.str();
 }
 
-void CCodeGen::visit(FloatPattern &Node) {
+void CCodeGenOld::visit(FloatPattern &Node) {
     string Val;
 
     for (auto &Str : PatternBuilder) {
@@ -140,7 +140,7 @@ void CCodeGen::visit(FloatPattern &Node) {
     LastPattern = Val + " == " + Node.str();
 }
 
-void CCodeGen::visit(CharPattern &Node) {
+void CCodeGenOld::visit(CharPattern &Node) {
     string Val;
 
     for (auto &Str : PatternBuilder) {
@@ -150,7 +150,7 @@ void CCodeGen::visit(CharPattern &Node) {
     LastPattern = Val + " == " + Node.str();
 }
 
-void CCodeGen::visit(BoolPattern &Node) {
+void CCodeGenOld::visit(BoolPattern &Node) {
     string Val;
 
     for (auto &Str : PatternBuilder) {
@@ -160,7 +160,7 @@ void CCodeGen::visit(BoolPattern &Node) {
     LastPattern = Val + " == " + to_string(Node.Val);
 }
 
-void CCodeGen::visit(IdPattern &Node) {
+void CCodeGenOld::visit(IdPattern &Node) {
     stringstream Assign;
     string Name;
 
@@ -189,18 +189,18 @@ void CCodeGen::visit(IdPattern &Node) {
     LastPattern.clear();
 }
 
-void CCodeGen::visit(WildPattern &Node) {
+void CCodeGenOld::visit(WildPattern &Node) {
     // Since a wildcard, in a pattern is always true, then LastPattern is just
     // set to ""
     LastPattern.clear();
 }
 
-void CCodeGen::visit(AlgebraicPattern &Node) {
+void CCodeGenOld::visit(AlgebraicPattern &Node) {
     // TODO
     addError(Error::NotImplemented(Node.Loc));
 }
 
-void CCodeGen::visit(ParPattern &Node) {
+void CCodeGenOld::visit(ParPattern &Node) {
     Node.Pat->accept(*this);
 
     if (!LastPattern.empty()) {
@@ -208,7 +208,7 @@ void CCodeGen::visit(ParPattern &Node) {
     }
 }
 
-void CCodeGen::visit(StringPattern &Node) {
+void CCodeGenOld::visit(StringPattern &Node) {
     string Val;
 
     for (auto &Str : PatternBuilder) {

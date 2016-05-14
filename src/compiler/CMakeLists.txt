@@ -2,7 +2,7 @@ add_library(compiler Compiler.cpp Compiler.h)
 
 set (LIBS pprinter)
 if (CCPP)
-    set (LIBS ${LIBS} ccpp cpar)
+    set (LIBS ${LIBS} ccpp cpar cc)
 endif()
 if (CHASKELL)
     set (LIBS ${LIBS} chaskell)

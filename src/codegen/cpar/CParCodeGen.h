@@ -1,10 +1,9 @@
 
 #pragma once
-#include "CCodeGen.h"
-#include <cassert>
+#include "CCodeGenOld.h"
 
 namespace codegen {
-class CParCodeGen : public CCodeGen {
+class CParCodeGen : public CCodeGenOld {
     public:
         CParCodeGen(parser::Driver &Drv);
         void visit(common::Program &Node);
@@ -26,15 +25,13 @@ class CParCodeGen : public CCodeGen {
         std::vector<std::string> TaskDeallocs;
 
         std::vector<std::string> SequentialCall;
-        std::vector<std::string> CallStack;
         std::vector<size_t> CallStackCount;
         std::vector<std::string> CurrentTasks;
 
         bool GenerateParallel;
 
-        size_t CallDepth = 0;
         size_t TaskCount = 0;
 
-        void outputParallelCode();
+        void outputBeforeExpr();
 };
 }

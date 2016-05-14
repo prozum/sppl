@@ -170,4 +170,20 @@ class AlgebraicExpr : public Expression {
   private:
     virtual Expression *doClone() const;
 };
+
+class DoExpr : public Expression {
+public:
+    std::vector<std::unique_ptr<Expression>> Exprs;
+    std::unique_ptr<Expression> ReturnExpr;
+
+    DoExpr(std::vector<std::unique_ptr<Expression>> Exprs,
+           std::unique_ptr<Expression> ReturnExpr,
+           Location Loc);
+
+    virtual void accept(Visitor &V);
+    std::string str();
+
+private:
+    virtual Expression *doClone() const;
+};
 }

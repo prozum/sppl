@@ -58,6 +58,12 @@ AlgebraicExpr::AlgebraicExpr(string Constructor,
 StringExpr::StringExpr(string Val, Location Loc)
     : Expression(Type(TypeId::STRING, vector<Type> { Type(TypeId::CHAR) }), Loc), Val(Val) {}
 
+DoExpr::DoExpr(std::vector<std::unique_ptr<Expression>> Exprs,
+               std::unique_ptr<Expression> ReturnExpr,
+               Location Loc) : Expression(Loc),
+                               Exprs(move(Exprs)),
+                               ReturnExpr(move(ReturnExpr)) { }
+
 void IdExpr::accept(Visitor &V) { V.visit(*this); }
 void IntExpr::accept(Visitor &V) { V.visit(*this); }
 void FloatExpr::accept(Visitor &V) { V.visit(*this); }
@@ -69,6 +75,7 @@ void TupleExpr::accept(Visitor &V) { V.visit(*this); }
 void CallExpr::accept(Visitor &V) { V.visit(*this); }
 void LambdaFunction::accept(Visitor &V) { V.visit(*this); }
 void AlgebraicExpr::accept(Visitor &V) { V.visit(*this); }
+void DoExpr::accept(Visitor &V) { V.visit(*this); }
 
 unique_ptr<Expression> Expression::clone() const {
     return unique_ptr<Expression>(doClone());
@@ -135,6 +142,16 @@ Expression *LambdaFunction::doClone() const {
 Expression *AlgebraicExpr::doClone() const {
     auto Res =
         new AlgebraicExpr(Constructor, vector<unique_ptr<Expression>>(), Loc);
+
+    for (auto &Expr : Exprs) {
+        Res->Exprs.push_back(Expr->clone());
+    }
+
+    return Res;
+}
+
+Expression *DoExpr::doClone() const {
+    auto Res = new DoExpr(vector<unique_ptr<Expression>>(), ReturnExpr->clone(), Loc);
 
     for (auto &Expr : Exprs) {
         Res->Exprs.push_back(Expr->clone());
@@ -221,3 +238,21 @@ string AlgebraicExpr::str() {
 
     return Str;
 }
+
+std::string DoExpr::str() {
+// TODO fix strJoin problems. I give up for now
+    string Str("do {\n");
+
+    for (auto &Expr : Exprs) {
+        Str += "\t\t" + Expr->str();
+    }
+
+    return Str + "\treturn" + ReturnExpr->str() + "\n\t}";
+}
+
+
+
+
+
+
+

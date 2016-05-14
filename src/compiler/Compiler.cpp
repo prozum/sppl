@@ -11,10 +11,13 @@ void Compiler::setBackend(Backend B) {
     switch (B) {
 #ifdef CCPP
     case Backend::CPP:
-        CodeGen = std::make_unique<codegen::CCodeGen>(*this);
+        CodeGen = std::make_unique<codegen::CCodeGenOld>(*this);
         break;
     case Backend::CPAR:
         CodeGen = std::make_unique<codegen::CParCodeGen>(*this);
+        break;
+    case Backend::C:
+        CodeGen = std::make_unique<codegen::CCodeGen>(*this);
         break;
 #endif
 #ifdef CGNUASM

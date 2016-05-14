@@ -65,5 +65,29 @@ class To : public UnaryOp {
     virtual UnaryOp *doClone() const;
 };
 
+class Assosiate : public UnaryOp {
+public:
+    std::string Id;
+
+    Assosiate(std::unique_ptr<Expression> Child, std::string Id, Location Loc);
+
+    virtual void accept(Visitor &V);
+    std::string str();
+
+private:
+    virtual UnaryOp *doClone() const;
+};
+
+class UnPrint : public UnaryOp {
+public:
+    UnPrint(std::unique_ptr<Expression> Child, Location Loc);
+
+    virtual void accept(Visitor &V);
+    std::string str();
+
+private:
+    virtual UnaryOp *doClone() const;
+};
+
 template <class T> std::unique_ptr<Node> const cloneUnaryOp(UnaryOp &Op);
 }

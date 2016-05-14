@@ -1,7 +1,9 @@
-include "stringlib.sppl"
+def num : Int
+    | = 5000000
 
 def main : [String] -> [Int]
-    | path : input : rest = mergesort(generate(0, parsestring(input), []))
+    | _ = mergesort(generate(0, num(), []))
+    | _ = generate(0, num(), [])
 
 def mergesort : [Int] -> [Int]
     | l = mergesortsplit(split(l, count(l)))
@@ -27,11 +29,18 @@ def countacc : [Int] -> Int -> Int
     | x : xs res = countacc(xs, res + 1)
 
 def merge : [Int] -> [Int] -> [Int]
-    | [] []                    = []
-    | x : l1 []                = x : merge(l1, [])
-    | [] x : l1                = x : merge([], l1)
-    | x : l1 y : l2 when x > y = y : merge(x : l1, l2)
-    | x : l1 y : l2            = x : merge(l1, y : l2)
+    | l1 l2 = merge_acc(l1, l2, [])
+
+def merge_acc : [Int] -> [Int] -> [Int] -> [Int]
+    | [] [] res                    = reverse_acc(res, [])
+    | x : l1 [] res                = merge_acc(l1, [], x : res)
+    | [] x : l1 res                = merge_acc([], l1, x : res)
+    | x : l1 y : l2 res when x > y = merge_acc(x : l1, l2, y : res)
+    | x : l1 y : l2 res            = merge_acc(l1, y : l2, x : res)
+
+def reverse_acc : [Int] -> [Int] -> [Int]
+    | [] res = res
+    | x : xs res = reverse_acc(xs, x : res)
 
 def generate : Int -> Int -> [Int] -> [Int]
     | n m list when n == m = list
