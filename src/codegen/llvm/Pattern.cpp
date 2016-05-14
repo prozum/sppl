@@ -61,6 +61,13 @@ void LLVMCodeGen::visit(common::TuplePattern &Node) {
 void LLVMCodeGen::visit(common::ListPattern &Node) {
     auto ListVal = CurVal;
 
+    // Empty list
+    if (Node.Patterns.empty()) {
+        CurVal = ConstantPointerNull::get(static_cast<PointerType *>(ListVal->getType()));
+        CurVal = Builder.CreateICmpEQ(ListVal, CurVal);
+        return;
+    }
+
     addPrefix("list");
     auto NullBlock = BasicBlock::Create(Ctx, getPrefix("null"), CurFunc);
     auto ListBlock = BasicBlock::Create(Ctx, getPrefix(), CurFunc);
