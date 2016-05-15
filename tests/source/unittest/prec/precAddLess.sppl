@@ -1,2 +1,2 @@
 def main : [String]->Bool
-| s = 2+2<3
+| s = @(2+2<3)

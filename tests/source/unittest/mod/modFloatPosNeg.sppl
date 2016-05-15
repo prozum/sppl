@@ -1,2 +1,2 @@
 def main : [String]->Float
-| s = 2.0%-2.0
+| s = @(2.0%-2.0)

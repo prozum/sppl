@@ -1,2 +1,2 @@
 def main : [String]->(Char, Char, Char)
-| s = ('c','h','a')
+| s = @(('c','h','a'))

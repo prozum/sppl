@@ -1,5 +1,5 @@
 def main : [String]->Float
-| s = func(2.0)
+| s = @(func(2.0))
 
 def func : Float->Float
 | _ = 2.0

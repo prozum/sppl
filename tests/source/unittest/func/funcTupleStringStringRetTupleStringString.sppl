@@ -1,5 +1,5 @@
 def main : [String]->(String,String)
-| n = func1(("string","string"))
+| n = @(func1(("string","string")))
 
 def func1 : (String,String)->(String,String)
 | n = n

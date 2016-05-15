@@ -1,2 +1,2 @@
 def main : [String]->[(Int,Bool)]
-| s = [(1,True), (2,False)] ++ [(3,True), (4,False)]
+| s = @([(1,True), (2,False)] ++ [(3,True), (4,False)])

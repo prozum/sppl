@@ -1,2 +1,2 @@
 def main : [String]->Int
-| s = 2 # This is a comment
+| s = @(2) # This is a comment

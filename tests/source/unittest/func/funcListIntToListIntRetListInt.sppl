@@ -1,5 +1,5 @@
 def main : [String]->[Int]
-| n = func1(func2)
+| n = @(func1(func2))
 
 def func1 : ([Int]->[Int])->[Int]
 | f = f([1])

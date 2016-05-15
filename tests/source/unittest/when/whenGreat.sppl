@@ -1,5 +1,5 @@
 def main : [String] -> Bool
-| s = func(2,1)
+| s = @(func(2,1))
 
 def func : Int->Int->Bool
 | m n when m > n = True

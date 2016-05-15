@@ -1,2 +1,2 @@
 def main : [String]->Int
-| n = 2
+| n = @(2)

@@ -2,4 +2,4 @@ include "file/fileSupOne.sppl"
 include "file/fileSupOne.sppl"
 
 def main : [String]->Int
-| s = func1(2)
+| s = @(func1(2))

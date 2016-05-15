@@ -199,7 +199,7 @@ bool Test::executeCPP(std::string args, std::string expectedOutput) {
     // Compare the output from the program to the expected output
     // If the outputs are equal, the program executed correctly
     // (as in it gave the correct output to the correct input)
-    if (res.compare(expectedOutput + "\n") != 0) {
+    if (res.compare(expectedOutput) != 0) {
         // If fail, first clear last test output, then return
         std::string resTemp = "result differ from expected\nResult   => ";
         resTemp += res;

@@ -17,11 +17,11 @@ std::string getTaps(int TapCount) {
 }
 
 void Program::outputCode(std::ostream &Output, int TapCount = 0) {
-    for (auto &Incl: Includes) {
-        Incl->outputCode(Output, TapCount);
+    for (auto &Direc: Directives) {
+        Direc->outputCode(Output, TapCount);
     }
 
-    if (Includes.size())
+    if (Directives.size())
         Output << endl;
 
     for (auto &Strct: Structs) {
@@ -55,6 +55,10 @@ void Program::outputCode(std::ostream &Output, int TapCount = 0) {
     for (auto &Funcs: Functions) {
         Funcs->outputCode(Output, TapCount);
     }
+}
+
+void Define::outputCode(std::ostream &Output, int TapCount) {
+    OutputT << "#define " << Name << " " << Str << endl;
 }
 
 void Include::outputCode(std::ostream &Output, int TapCount) {
@@ -143,7 +147,7 @@ void IfElse::outputCode(std::ostream &Output, int TapCount = 0) {
     }
 
     if (Expr) {
-        OutputT << "if (";
+        Output << "if (";
         Expr->outputCode(Output, TapCount);
         Output << ")" << endl;
     } else if (IsElse) {
@@ -229,7 +233,9 @@ void BinOp::outputCode(std::ostream &Output, int TapCount = 0) {
 }
 
 void UnOp::outputCode(std::ostream &Output, int TapCount = 0) {
-    Output << Op;
+    if (Prefix) {
+        Output << Op;
+    }
 
     if (!Child->IsLeaf) {
         Output << " (";
@@ -237,6 +243,10 @@ void UnOp::outputCode(std::ostream &Output, int TapCount = 0) {
         Output << ")";
     } else {
         Child->outputCode(Output, TapCount);
+    }
+
+    if (!Prefix) {
+        Output << Op;
     }
 }
 

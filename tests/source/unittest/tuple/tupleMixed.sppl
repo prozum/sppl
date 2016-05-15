@@ -1,2 +1,2 @@
 def main : [String]->(Int, Float, Bool, Char, Char, Char, Char, String)
-| s = (2,2.0,True,'c','h','a','r',"string")
+| s = @((2,2.0,True,'c','h','a','r',"string"))
