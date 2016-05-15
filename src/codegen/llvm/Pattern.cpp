@@ -58,6 +58,17 @@ void LLVMCodeGen::visit(common::TuplePattern &Node) {
     CurPatBlock = Block;
 }
 
+void LLVMCodeGen::visit(common::StringPattern &Node) {
+    auto Patterns = vector<unique_ptr<common::Pattern>>();
+    for (auto Char = Node.Val.cbegin(); Char < Node.Val.cend(); ++Char) {
+        auto Pattern = new common::CharPattern(*Char, Node.Loc);
+        Patterns.push_back(unique_ptr<common::Pattern>(Pattern));
+    }
+    auto List = std::make_unique<common::ListPattern>(move(Patterns), Node.Loc);
+
+    List->accept(*this);
+}
+
 void LLVMCodeGen::visit(common::ListPattern &Node) {
     auto ListVal = CurVal;
 

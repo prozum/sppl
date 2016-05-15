@@ -92,6 +92,7 @@ private:
     void visit(common::BoolPattern &Node);
     void visit(common::CharPattern &Node);
     void visit(common::TuplePattern &Node);
+    void visit(common::StringPattern &Node);
     void visit(common::ListPattern &Node);
     void visit(common::ParPattern &Node);
     void visit(common::WildPattern &Node);
