@@ -39,7 +39,7 @@ llvm::StructType *LLVMCodeGen::getTupleType(common::Type Ty) {
     for (auto &Subtype : Ty.Subtypes)
         Subtypes.push_back(getType(Subtype));
 
-    return TupleTypes[Ty] = StructType::create(Ctx, Subtypes, "tuple");
+    return TupleTypes[Ty] = StructType::create(Ctx, Subtypes, Ty.str());
 }
 
 llvm::StructType *LLVMCodeGen::getListType(common::Type Ty) {
@@ -48,12 +48,15 @@ llvm::StructType *LLVMCodeGen::getListType(common::Type Ty) {
     if (CacheTy != ListTypes.end())
         return CacheTy->second;
 
-    auto ListTy = StructType::create(Ctx, "list");
     llvm::Type *ElementTy;
-    if (!Ty.Subtypes.empty())
+    StructType *ListTy;
+    if (!Ty.Subtypes.empty()) {
         ElementTy = getType(Ty.Subtypes.front());
-    else
+        ListTy = StructType::create(Ctx, Ty.str());
+    } else {
         ElementTy = VoidPtr;
+        ListTy = StructType::create(Ctx, "VoidPtr");
+    }
 
     llvm::Type *Body[] = { ElementTy, PointerType::getUnqual(ListTy) };
     ListTy->setBody(Body);

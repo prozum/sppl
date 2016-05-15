@@ -18,6 +18,7 @@
 
 #include <iostream>
 #include <unordered_map>
+#include <ctype.h>
 
 namespace codegen {
 class LLVMCodeGen : public parser::CodeGenerator {
@@ -130,7 +131,7 @@ private:
     llvm::Value *CreateListNode(common::Type Type, llvm::Value *Data, llvm::Value *NextNode, llvm::BasicBlock *Block, bool Const = false);
     llvm::Instruction *CreateMalloc(llvm::Type *Type, llvm::BasicBlock *Block);
     llvm::Instruction *CreateMalloc(llvm::Value *Size, llvm::BasicBlock *Block);
-    llvm::Function *CreateMain();
+    llvm::Value *CreateMainArg();
 
     llvm::Type *getType(common::Type Ty);
     llvm::StructType *getTupleType(common::Type Ty);
