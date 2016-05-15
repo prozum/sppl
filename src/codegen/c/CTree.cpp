@@ -58,7 +58,11 @@ void Program::outputCode(std::ostream &Output, int TapCount = 0) {
 }
 
 void Include::outputCode(std::ostream &Output, int TapCount) {
-    OutputT << "#include \"" << Path << "\"" << endl;
+    if (IsStd) {
+        OutputT << "#include <" << Path << ">" << endl;
+    } else {
+        OutputT << "#include \"" << Path << "\"" << endl;
+    }
 }
 
 void Block::outputCode(std::ostream &Output, int TapCount = 0) {
@@ -201,17 +205,39 @@ void Label::outputCode(std::ostream &Output, int TapCount = 0) {
 }
 
 void BinOp::outputCode(std::ostream &Output, int TapCount = 0) {
-    Output << "(";
-    Left->outputCode(Output, TapCount);
-    Output << ") " << Op << " (";
-    Right->outputCode(Output, TapCount);
-    Output << ")";
+    if (!Left->IsLeaf) {
+        Output << "(";
+        Left->outputCode(Output, TapCount);
+        Output << ")";
+    } else {
+        Left->outputCode(Output, TapCount);
+    }
+
+    if (Op == "->" || Op == ".") {
+        Output << Op;
+    } else {
+        Output << " " << Op << " ";
+    }
+
+    if (!Right->IsLeaf) {
+        Output << "(";
+        Right->outputCode(Output, TapCount);
+        Output << ")";
+    } else {
+        Right->outputCode(Output, TapCount);
+    }
 }
 
 void UnOp::outputCode(std::ostream &Output, int TapCount = 0) {
-    Output << Op << " (";
-    Child->outputCode(Output, TapCount);
-    Output << ")";
+    Output << Op;
+
+    if (!Child->IsLeaf) {
+        Output << " (";
+        Child->outputCode(Output, TapCount);
+        Output << ")";
+    } else {
+        Child->outputCode(Output, TapCount);
+    }
 }
 
 void Call::outputCode(std::ostream &Output, int TapCount = 0) {

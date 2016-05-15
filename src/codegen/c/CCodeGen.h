@@ -65,11 +65,17 @@ protected:
     virtual void visit(common::CallExpr &Node);
     virtual void visit(common::AlgebraicExpr &Node);
 
+    const std::string PrintFunc = "printf";
+    const std::string Alloc = "malloc";
+
     const std::string GGenerated = "g";
     const std::string GUser = "u";
     const std::string GCreate = GGenerated + "ctr_";
     const std::string GAdd = GGenerated + "add_";
-
+    const std::string GAt = GGenerated + "at_";
+    const std::string GCompare = GGenerated + "compare_";
+    const std::string GPrint = GGenerated + "print_";
+    const std::string GConcat = GGenerated + "concat_";
 
     const std::string GString = GGenerated + "string";
     const std::string GList = GGenerated + "list";
@@ -85,8 +91,11 @@ protected:
     const std::string GNode = "node";
     const std::string GNext = "next";
     const std::string GValue = "value";
+    const std::string GItem = "item";
+    const std::string GArg = GGenerated + "arg";
+    const std::string GRes = GGenerated + "res";
 
-    const std::string GAlloc = "malloc";
+    const bool GCed = false;
 
     std::unordered_map<common::Type, std::string> GenTypes;
     std::unordered_map<common::Type, std::string> ToStrings;
@@ -98,29 +107,30 @@ protected:
     common::Type FakeString;
 
     std::string StringName;
+    std::string StringType;
 
     int ListCount = 0;
     int TupleCount = 0;
     int SigCount = 0;
 
     common::Program* Prog = nullptr;
+    common::Function* CurrFunc = nullptr;
 
     // Data assosiated with the C tree
     ctree::Program* CProg = nullptr;
-    union {
-        ctree::Expression* LastExpr = nullptr;
-        ctree::Statement* LastStmt;
-    };
+    ctree::Block* CurrBlock = nullptr;
+    ctree::Expression* PatternBuilder = nullptr;
+    ctree::Expression* LastExpr = nullptr;
 
     virtual std::string typePostfix(common::Type &Ty);
     virtual std::string getName(common::Type &Ty);
     virtual std::string getOrGen(common::Type &Ty);
-
-
+    virtual ctree::Expression* visitBinOp(common::BinaryOp& Op, std::string OpStr);
+    ctree::Expression* visitEqual(common::Type &Ty, common::Expression &Left, common::Expression &Right);
 
     std::string generateList(common::Type &Ty);
     std::string generateSignature(common::Type &Ty);
     std::string generateTuple(common::Type &Ty);
-    void generateStd(common::Type &Ty);
+    void generateStd();
 };
 }
