@@ -108,8 +108,9 @@ void LLVMCodeGen::visit(Or &Node) {
 }
 
 void LLVMCodeGen::visit(Equal &Node) {
-    assert((Node.Left->RetTy.Id == TypeId::FLOAT && Node.Right->RetTy.Id == TypeId::FLOAT) ||
-           (Node.Left->RetTy.Id == TypeId::INT && Node.Right->RetTy.Id == TypeId::INT));
+    // TODO
+    //assert((Node.Left->RetTy.Id == TypeId::FLOAT && Node.Right->RetTy.Id == TypeId::FLOAT) ||
+    //       (Node.Left->RetTy.Id == TypeId::INT && Node.Right->RetTy.Id == TypeId::INT));
 
     Node.Left->accept(*this);
     auto Left = CurVal;
@@ -124,8 +125,9 @@ void LLVMCodeGen::visit(Equal &Node) {
 }
 
 void LLVMCodeGen::visit(NotEqual &Node) {
-    assert((Node.Left->RetTy.Id == TypeId::FLOAT && Node.Right->RetTy.Id == TypeId::FLOAT) ||
-           (Node.Left->RetTy.Id == TypeId::INT && Node.Right->RetTy.Id == TypeId::INT));
+    // TODO
+    //assert((Node.Left->RetTy.Id == TypeId::FLOAT && Node.Right->RetTy.Id == TypeId::FLOAT) ||
+    //       (Node.Left->RetTy.Id == TypeId::INT && Node.Right->RetTy.Id == TypeId::INT));
 
     Node.Left->accept(*this);
     auto Left = CurVal;

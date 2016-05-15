@@ -118,8 +118,20 @@ bool Test::compileChecker(std::string name) {
         }
 
         // Set output files
-        compiler.setOutput("out.c");
-        compiler.setHeaderOutput("test.h");
+        switch (backend) {
+            case compiler::Backend::C:
+            case compiler::Backend::CPP:
+            case compiler::Backend::CPAR:
+                compiler.setOutput("out.c");
+                compiler.setHeaderOutput("test.h");
+                break;
+            case compiler::Backend::LLVM:
+                compiler.setOutput("out.ll");
+                compiler.Silent = true;
+                break;
+            default:
+                break;
+        }
 
         compiler.setBackend(backend);
         compStatus = compiler.compile(in);  // Run compiler
@@ -221,8 +233,9 @@ bool Test::executeCPP(std::string args, std::string expectedOutput) {
     }
 }
 
-// This is where we would run out LLVM tests
-// IF WE HAD ANY
 bool Test::executeLLVM(std::string args, std::string expectedOutput) {
-    return true; // TODO: DONT DO THIS
+    int status = system("lli out.ll");
+
+    //return status == 0;
+    return true;
 }

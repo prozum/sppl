@@ -46,6 +46,10 @@ class Compiler : public parser::Driver {
     int compile(const std::string &Filename);
     int compile(const std::vector<std::string> &Filenames);
 
-    void setBackend(Backend B);
+    void setBackend(Backend BE);
+    Backend getBackend();
+
+    private:
+        Backend BE;
 };
 }

@@ -101,7 +101,10 @@ void Driver::error(const common::Location &Loc, const std::string &Msg) {
 
 void Driver::error(const std::string &Msg) { showError(Error(Msg)); }
 
-void Driver::showError(Error Err) { *MOut << Err << endl; }
+void Driver::showError(Error Err) {
+    if (!Silent)
+        *MOut << Err << endl;
+}
 
 void Driver::addExternFunc(std::string Name, common::Type Signature) {
     Global.Decls[Name] = Signature;

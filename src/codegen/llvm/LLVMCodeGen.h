@@ -34,7 +34,6 @@ class LLVMCodeGen : public parser::CodeGenerator {
 
     std::map<std::string, llvm::Value *> PatVals;
     bool TailRec = false;
-    bool Runtime = false;
 
     unsigned getAlignment(common::Type Ty);
     std::string ModuleString();

@@ -7,8 +7,8 @@ Compiler::Compiler()
     : ScopeGen(semantics::ScopeGenerator(&Global)),
       TypeChecker(semantics::TypeChecker(&Global)) {}
 
-void Compiler::setBackend(Backend B) {
-    switch (B) {
+void Compiler::setBackend(Backend BE) {
+    switch (BE) {
 #ifdef CCPP
     case Backend::CPP:
         CodeGen = std::make_unique<codegen::CCodeGenOld>(*this);
@@ -41,6 +41,12 @@ void Compiler::setBackend(Backend B) {
     default:
         cerr << "Not a valid backend!" << endl;
     }
+
+    this->BE = BE;
+}
+
+Backend Compiler::getBackend() {
+    return BE;
 }
 
 int Compiler::compile(const string &Filename) {

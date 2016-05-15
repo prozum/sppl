@@ -41,7 +41,6 @@ void LLVMCodeGen::visit(common::Function &Node) {
     else
         Builder.CreateRetVoid();
 
-
     // Create return block and setup phi node
     RetBlock = BasicBlock::Create(Ctx, "ret", CurFunc);
     Builder.SetInsertPoint(RetBlock);
@@ -77,7 +76,8 @@ void LLVMCodeGen::visit(common::Function &Node) {
     // Verify function and get error
     if (verifyFunction(*CurFunc, &RawOut)) {
         addError(Error("LLVM Error:\n" + ModuleString()));
-        RawOut.flush();
+        if (!Drv.Silent)
+            RawOut.flush();
     }
 }
 
@@ -144,7 +144,8 @@ void LLVMCodeGen::visit(common::Case &Node) {
 
     // Main must return Int32
     if (CurFunc->getName() == "main" && !Drv.JIT) {
-        CurVal = Builder.CreateTrunc(CurVal, Int32, "tmptrunc");
+        //CurVal = Builder.CreateTrunc(CurVal, Int32, "tmptrunc");
+        CurVal = ConstantInt::get(Int32, 0);
     }
 
 #ifdef SPPLDEBUG
@@ -169,8 +170,12 @@ llvm::Value *LLVMCodeGen::CreateMainArg()
     auto CharListType = common::Type(TypeId::STRING, vector<common::Type> { common::Type(TypeId::CHAR)});
     auto StrListType = common::Type(TypeId::LIST, vector<common::Type> { CharListType });
 
+    // TODO
+    return ConstantPointerNull::get(static_cast<PointerType *>(getType(StrListType)));
+
     // Create Function
-    auto CreateArg = llvm::Function::Create(MainType,
+    vector<llvm::Type *> types = {};
+    auto CreateArg = llvm::Function::Create(FunctionType::get(getType(StrListType), vector<llvm::Type *> { Int32, PointerType::getUnqual(PointerType::getUnqual(Int8)) }, false),
                                        llvm::Function::ExternalLinkage, "create_arg",
                                        Module.get());
 
@@ -192,65 +197,68 @@ llvm::Value *LLVMCodeGen::CreateMainArg()
 
     // Init in entry block
     Builder.SetInsertPoint(StartBlock);
-    Value *StrList = Builder.CreateAlloca(getType(StrListType), nullptr, "str_list");
-    Value *CharList = Builder.CreateAlloca(getType(CharListType), nullptr, "char_list");
-    Value *StrIter = Builder.CreateAlloca(Int32, nullptr, "str_iter");
-    Value *CharIter = Builder.CreateAlloca(Int32, nullptr, "char_iter");
-    Value *Char = Builder.CreateAlloca(Int8, nullptr, "char");
-    Value *CharPtr = Builder.CreateAlloca(VoidPtr, nullptr, "char_ptr");
-    Value *TmpVal;
-    Builder.CreateStore(ConstantInt::get(Int32, 0), StrIter);
+    Value *AllocaStringList = Builder.CreateAlloca(getType(StrListType), nullptr, "str_list");
+    Value *AllocaString = Builder.CreateAlloca(getType(CharListType), nullptr, "char_list");
+    Value *AllocaStringIter = Builder.CreateAlloca(Int32, nullptr, "str_iter");
+    Value *AllocaCharIter = Builder.CreateAlloca(Int32, nullptr, "char_iter");
+    //Value *AllocaChar = Builder.CreateAlloca(Int8, nullptr, "char");
+    //Value *CharPtr = Builder.CreateAlloca(VoidPtr, nullptr, "char_ptr");
+    //Value *TmpVal;
+    Builder.CreateStore(ConstantInt::get(Int32, 0), AllocaStringIter);
     Builder.CreateBr(CheckBlock);
 
     // Check block
     Builder.SetInsertPoint(CheckBlock);
-    CurVal = Builder.CreateLoad(StrIter, "loadtmp");
-    CurVal = Builder.CreateICmpULT(CurVal, Argc, "cmptmp");
+    auto StringIter = Builder.CreateLoad(AllocaStringIter, "loadtmp");
+    CurVal = Builder.CreateICmpULT(StringIter, Argc, "cmptmp");
     Builder.CreateCondBr(CurVal, StrLoopBlock, EndBlock);
 
     // String loop block
     Builder.SetInsertPoint(StrLoopBlock);
-    CurVal = Builder.CreateLoad(StrIter);
-    CurVal = Builder.CreateGEP(Argv, CurVal);
-    CurVal = Builder.CreateLoad(CurVal);
-    Builder.CreateStore(CurVal, CharPtr);
+    Builder.CreateStore(ConstantInt::get(Int32, 0), AllocaCharIter);
+    //CurVal = Builder.CreateLoad(AllocaStringIter);
+    CurVal = Builder.CreateGEP(Argv, StringIter);
+    auto CharPtr = Builder.CreateLoad(CurVal);
     Builder.CreateBr(CharLoopBlock);
 
     // Char loop block
     Builder.SetInsertPoint(CharLoopBlock);
-    TmpVal = Builder.CreateLoad(CharPtr);
-    TmpVal = Builder.CreatePointerCast(TmpVal, VoidPtr);
-    CurVal = Builder.CreateLoad(CharIter);
-    CurVal = Builder.CreateGEP(TmpVal, CurVal);
-    CurVal = Builder.CreateLoad(Int8, CurVal);
-    Builder.CreateStore(CurVal, Char);
-    CurVal = Builder.CreateICmpEQ(CurVal, ConstantInt::get(Int8, 0));
+    auto CharIter = Builder.CreateLoad(AllocaCharIter);
+    CurVal = Builder.CreateGEP(CharPtr, CharIter); // ??
+    auto Char = Builder.CreateLoad(Int8, CurVal);
+    //Builder.CreateStore(CurVal, AllocaChar);
+    CurVal = Builder.CreateICmpEQ(Char, ConstantInt::get(Int8, 0));
     Builder.CreateCondBr(CurVal, StrAddBlock, CharAddBlock);
 
-    // Char add blockFunc
+    // Char add block
     Builder.SetInsertPoint(CharAddBlock);
-    CurVal = Builder.CreateLoad(Char);
-    TmpVal = Builder.CreateLoad(CharList);
-    TmpVal = Builder.CreatePointerCast(TmpVal, getType(CharListType));
-    CurVal = CreateListNode(CharListType, CurVal, TmpVal, CharAddBlock);
-    Builder.CreateStore(CurVal, CharList);
+    //CurVal = Builder.CreateLoad(AllocaChar);
+    auto CharList = Builder.CreateLoad(AllocaString);
+    //TmpVal = Builder.CreatePointerCast(CharList, getType(CharListType));
+    CurVal = CreateListNode(CharListType, Char, CharList, CharAddBlock);
+    Builder.CreateStore(CurVal, AllocaString);
 
-    CurVal = Builder.CreateLoad(Int32, CharIter);
-    CurVal = Builder.CreateAdd(CurVal, ConstantInt::get(Int32, APInt(32, 1)), "addtmp");
-    Builder.CreateStore(CurVal, CharIter);
+    CharIter = Builder.CreateLoad(Int32, AllocaCharIter);
+    CurVal = Builder.CreateAdd(CharIter, ConstantInt::get(Int32, APInt(32, 1)), "addtmp");
+    Builder.CreateStore(CurVal, AllocaCharIter);
     Builder.CreateBr(CharLoopBlock);
 
     // String add block
     Builder.SetInsertPoint(StrAddBlock);
-    TmpVal = Builder.CreateLoad(VoidPtr, StrList, "loadtmp");
-    CurVal = Builder.CreateLoad(CharList);
-    CurVal = CreateListNode(StrListType, CurVal, TmpVal, StrAddBlock);
-    Builder.CreateStore(CurVal, StrList);
+    auto StringList = Builder.CreateLoad(AllocaStringList, "loadtmp");
+    auto String = Builder.CreateLoad(AllocaString);
+    CurVal = CreateListNode(StrListType, String, StringList, StrAddBlock);
+    Builder.CreateStore(CurVal, AllocaStringList);
 
-    CurVal = Builder.CreateLoad(Int32, StrIter, "loadtmp");
+    CurVal = Builder.CreateLoad(Int32, AllocaStringIter, "loadtmp");
     CurVal = Builder.CreateAdd(CurVal, ConstantInt::get(Int32, APInt(32, 1)), "addtmp");
-    Builder.CreateStore(CurVal, StrIter);
+    Builder.CreateStore(CurVal, AllocaStringIter);
     Builder.CreateBr(CheckBlock);
+
+    // End block
+    Builder.SetInsertPoint(EndBlock);
+    CurVal = Builder.CreateLoad(AllocaStringList);
+    Builder.CreateRet(CurVal);
 
     // Call create_arg
     Builder.SetInsertPoint(Entry);
@@ -262,7 +270,8 @@ llvm::Value *LLVMCodeGen::CreateMainArg()
 
     if (verifyFunction(*CreateArg, &RawOut)) {
         addError(Error("LLVM Error:\n" + ModuleString()));
-        RawOut.flush();
+        if (!Drv.Silent)
+            RawOut.flush();
     }
 
     return Builder.CreateCall(CreateArg, { MainArgc, MainArgv }, "_arg0");

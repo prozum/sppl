@@ -1,2 +1,5 @@
 def main: [String] -> Int
-	| n = 0
+	| [] = 10
+	| path : "ja" : rest = 1
+	| path : "nej" : rest = 2
+	| n = 20
