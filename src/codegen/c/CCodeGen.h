@@ -65,6 +65,9 @@ protected:
     virtual void visit(common::CallExpr &Node);
     virtual void visit(common::AlgebraicExpr &Node);
 
+    const std::string PrintFunc = "printf";
+    const std::string Alloc = "malloc";
+
     const std::string GGenerated = "g";
     const std::string GUser = "u";
     const std::string GCreate = GGenerated + "ctr_";
@@ -73,7 +76,6 @@ protected:
     const std::string GCompare = GGenerated + "compare_";
     const std::string GPrint = GGenerated + "print_";
     const std::string GConcat = GGenerated + "concat_";
-
 
     const std::string GString = GGenerated + "string";
     const std::string GList = GGenerated + "list";
@@ -94,7 +96,6 @@ protected:
     const std::string GRes = GGenerated + "res";
 
     const bool GCed = false;
-    const std::string GAlloc = "malloc";
 
     std::unordered_map<common::Type, std::string> GenTypes;
     std::unordered_map<common::Type, std::string> ToStrings;

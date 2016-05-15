@@ -273,9 +273,9 @@ public:
 
 class Char : public Expression {
 public:
-    char Value;
+    std::string Value;
 
-    Char(char Value) : Expression(true), Value(Value) {};
+    Char(std::string Value) : Expression(true), Value(Value) {};
 
     void outputCode(std::ostream &Output, int TapCount);
     Expression* clone() { return new Char(Value); };

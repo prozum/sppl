@@ -213,7 +213,11 @@ void BinOp::outputCode(std::ostream &Output, int TapCount = 0) {
         Left->outputCode(Output, TapCount);
     }
 
-    Output << " " << Op << " ";
+    if (Op == "->" || Op == ".") {
+        Output << Op;
+    } else {
+        Output << " " << Op << " ";
+    }
 
     if (!Right->IsLeaf) {
         Output << "(";

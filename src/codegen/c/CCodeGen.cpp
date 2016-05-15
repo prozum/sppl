@@ -399,7 +399,7 @@ void CCodeGen::visit(common::FloatPattern &Node) {
 }
 
 void CCodeGen::visit(common::CharPattern &Node) {
-    LastExpr = new BinOp("==", PatternBuilder->clone(), new Char(Node.Val));
+    LastExpr = new BinOp("==", PatternBuilder->clone(), new Char("" + Node.Val));
 }
 
 void CCodeGen::visit(common::BoolPattern &Node) {
@@ -604,7 +604,7 @@ void CCodeGen::visit(common::FloatExpr &Node) {
 }
 
 void CCodeGen::visit(common::CharExpr &Node) {
-    LastExpr = new Char(Node.Val);
+    LastExpr = new Char("" + Node.Val);
 }
 
 void CCodeGen::visit(common::BoolExpr &Node) {
@@ -771,7 +771,7 @@ string CCodeGen::generateList(Type &Ty) {
     // list* res = malloc(sizeof(list));
     auto SizeOfRes = new Call(new Ident("sizeof"));
     SizeOfRes->Args.push_back(new Ident(Name));
-    auto AllocRes = new Call(new Ident(GAlloc));
+    auto AllocRes = new Call(new Ident(Alloc));
     AllocRes->Args.push_back(SizeOfRes);
     FuncBlock->Stmts.push_back(new Decl(Type, new BinOp("=", new Ident("res"), AllocRes)));
 
@@ -833,7 +833,7 @@ string CCodeGen::generateList(Type &Ty) {
     // list* res = malloc(sizeof(list));
     SizeOfRes = new Call(new Ident("sizeof"));
     SizeOfRes->Args.push_back(new Ident(Name));
-    AllocRes = new Call(new Ident(GAlloc));
+    AllocRes = new Call(new Ident(Alloc));
     AllocRes->Args.push_back(SizeOfRes);
     FuncBlock->Stmts.push_back(new Decl(Type, new BinOp("=", new Ident("res"), AllocRes)));
 
@@ -979,14 +979,84 @@ string CCodeGen::generateList(Type &Ty) {
 
     //----------------------------------------------
 
-    /*
+    /* list* gconcat_list(list* l1, list* l2)
+     * {
+     *     int i;
+     *     list** elements = alloc(sizeof(list*) * l1->length);
+     *
+     *     for (i = 0; l1->length; ++i)
+     *     {
+     *         elements[i] = l1;
+     *         l1 = l1->next;
+     *     }
+     *
+     *     for (--i; i >= 0; --i)
+     *     {
+     *         l2 = gadd_list(l2, elements[i]->value);
+     *     }
+     *
+     *     return l2;
+     * }
      * */
 
-    // TODO Concat
+    FuncBlock = new Block();
+    Func = new ctree::Function(Type, GConcat + Name, FuncBlock);
+    Func->Args.push_back({ Type, "l1" });
+    Func->Args.push_back({ Type, "l2" });
+    CProg->Functions.push_back(Func);
+
+    FuncBlock->Stmts.push_back(new Decl("int", new Ident("i")));
+    auto SizeOf = new Call(new Ident("sizeof"));
+    SizeOf->Args.push_back(new Ident(Type));
+    L1Length = new BinOp("->", new Ident("l1"), new Ident(GLength));
+    auto ElAlloc = new Call(new Ident(Alloc));
+    ElAlloc->Args.push_back(new BinOp("*", SizeOf, L1Length));
+    FuncBlock->Stmts.push_back(new Decl(Type + "*", new BinOp("=", new Ident("elements"), ElAlloc) ));
+
+    auto ForBlock = new Block(FuncBlock);
+    ctree::Expression* Expr1 = new BinOp("=", new Ident("i"), new Int(0));
+    ctree::Expression* Expr2 = new BinOp("->", new Ident("l1"), new Ident(GLength));
+    ctree::Expression* Expr3 = new UnOp("++", new Ident("i"));
+    FuncBlock->Stmts.push_back(new For(Expr1, Expr2, Expr3, ForBlock));
+
+    auto AtElI = new UnOp("[i]", new Ident("elements"), false);
+    ForBlock->Stmts.push_back(new ExprStmt(new BinOp("=", AtElI, new Ident("l1"))));
+    auto L1Next = new BinOp("->", new Ident("l1"), new Ident(GNext));
+    ForBlock->Stmts.push_back(new ExprStmt(new BinOp("=", new Ident("l1"), L1Next)));
+
+    ForBlock = new Block(FuncBlock);
+    Expr1 = new UnOp("--", new Ident("i"));
+    Expr2 = new BinOp(">=", new Ident("i"), new Int(0));
+    Expr3 = new UnOp("--", new Ident("i"));
+    FuncBlock->Stmts.push_back(new For(Expr1, Expr2, Expr3, ForBlock));
+
+    auto ElValue = new BinOp("->", new UnOp("[i]", new Ident("elements"), false), new Ident(GValue));
+    auto Add = new Call(new Ident(GAdd +  Name));
+    Add->Args.push_back(new Ident("l2"));
+    Add->Args.push_back(ElValue);
+    ForBlock->Stmts.push_back(new ExprStmt(new BinOp("=", new Ident("l2"), Add)));
+
+    FuncBlock->Stmts.push_back(new Return(new Ident("l2")));
 
     //----------------------------------------------
 
-    /*
+    /* list* gprint_list(list* l)
+     * {
+     *     print("[");
+     *
+     *     while (l->length)
+     *     {
+     *         print_child(l->value);
+     *         l = l->next;
+     *
+     *         if (!l->length)
+     *         {
+     *             print(", ");
+     *         }
+     *     }
+     *
+     *     print("]");
+     * }
      * */
 
     // TODO Print
@@ -1027,6 +1097,10 @@ void CCodeGen::generateStd() {
     StringName = generateList(RealString);
     StringType = StringName + typePostfix(RealString);
     GenTypes[FakeString] = StringName;
+    GenTypes[Type(TypeId::CHAR)] = GChar;
+    GenTypes[Type(TypeId::BOOL)] = GBool;
+    GenTypes[Type(TypeId::INT)] = GInt;
+    GenTypes[Type(TypeId::FLOAT)] = GFloat;
     generateList(StringList);
 
 
@@ -1071,7 +1145,7 @@ void CCodeGen::generateStd() {
     // res = gadd_list(res, v[i]);
     auto Add = new Call(new Ident(GAdd + StringName));
     Add->Args.push_back(new Ident("res"));
-    Add->Args.push_back(new Ident("v[i]"));
+    Add->Args.push_back(new UnOp("[i]", new Ident("v"), false));
     ForBlock->Stmts.push_back(new ExprStmt(new BinOp("=", new Ident("res"), Add)));
 
     // return res;
@@ -1146,7 +1220,7 @@ void CCodeGen::generateStd() {
     // if (l->value != v[i])
     auto LValue = new BinOp("->", new Ident("l"), new Ident(GLength));
     IfBlock = new Block(ForBlock);
-    ForBlock->Stmts.push_back(new IfElse(new BinOp("!=", LValue, new Ident("v[i]")), IfBlock));
+    ForBlock->Stmts.push_back(new IfElse(new BinOp("!=", LValue, new UnOp("[i]", new Ident("v"), false)), IfBlock));
 
     // return 0;
     IfBlock->Stmts.push_back(new Return(new Int(0)));
@@ -1168,9 +1242,199 @@ void CCodeGen::generateStd() {
 
     //----------------------------------------------
 
-    /*
+    /* int gprint_int(int i)
+     * {
+     *     print("%d", i);
+     *     return i;
+     * }
      * */
 
-    // TODO Prints
+    FuncBlock = new Block();
+    Func = new ctree::Function(GInt, GPrint + GInt, FuncBlock);
+    Func->Args.push_back({ GInt, "i" });
+    CProg->Functions.push_back(Func);
+
+    auto Print = new Call(new Ident(PrintFunc));
+    Print->Args.push_back(new String("%d"));
+    Print->Args.push_back(new Ident("i"));
+    FuncBlock->Stmts.push_back(new ExprStmt(Print));
+    FuncBlock->Stmts.push_back(new Return(new Ident("i")));
+
+    //----------------------------------------------
+
+    /* double gprint_float(double f)
+     * {
+     *     print("%lf", f);
+     *     return value;
+     * }
+     * */
+
+    FuncBlock = new Block();
+    Func = new ctree::Function(GFloat, GPrint + GFloat, FuncBlock);
+    Func->Args.push_back({ GFloat, "f" });
+    CProg->Functions.push_back(Func);
+
+    Print = new Call(new Ident(PrintFunc));
+    Print->Args.push_back(new String("%lf"));
+    Print->Args.push_back(new Ident("f"));
+    FuncBlock->Stmts.push_back(new ExprStmt(Print));
+    FuncBlock->Stmts.push_back(new Return(new Ident("f")));
+
+    //----------------------------------------------
+
+    /* int gprint_char(int c, int is_top)
+     * {
+     *     if (is_top)
+     *     {
+     *         print("%c", (char)c);
+     *     }
+     *     else
+     *     {
+     *         print("'%c'", (char)c);
+     *     }
+     *
+     *     return c;
+     * }
+     * */
+
+    FuncBlock = new Block();
+    Func = new ctree::Function(GChar, GPrint + GChar, FuncBlock);
+    Func->Args.push_back({ GChar, "c" });
+    Func->Args.push_back({ GBool, "is_top" });
+    CProg->Functions.push_back(Func);
+
+    IfBlock = new Block(FuncBlock);
+    FuncBlock->Stmts.push_back(new IfElse(new Ident("is_top"), IfBlock));
+
+    Print = new Call(new Ident(PrintFunc));
+    Print->Args.push_back(new String("%c"));
+    Print->Args.push_back(new UnOp("(char)", new Ident("c")));
+    IfBlock->Stmts.push_back(new ExprStmt(Print));
+
+    IfBlock = new Block(FuncBlock);
+    FuncBlock->Stmts.push_back(new IfElse(nullptr, IfBlock, true));
+
+    Print = new Call(new Ident(PrintFunc));
+    Print->Args.push_back(new String("'%c'"));
+    Print->Args.push_back(new UnOp("(char)", new Ident("c")));
+    IfBlock->Stmts.push_back(new ExprStmt(Print));
+
+    FuncBlock->Stmts.push_back(new Return(new Ident("c")));
+
+
+    //----------------------------------------------
+
+    /* int gprint_bool(int b)
+     * {
+     *     if (b)
+     *     {
+     *         print("True");
+     *     }
+     *     else
+     *     {
+     *         print("False");
+     *     }
+     *
+     *     return value;
+     * }
+     * */
+
+    FuncBlock = new Block();
+    Func = new ctree::Function(GBool, GPrint + GBool, FuncBlock);
+    Func->Args.push_back({ GBool, "b" });
+    CProg->Functions.push_back(Func);
+
+    IfBlock = new Block(FuncBlock);
+    FuncBlock->Stmts.push_back(new IfElse(new Ident("b"), IfBlock));
+
+    Print = new Call(new Ident(PrintFunc));
+    Print->Args.push_back(new String("True"));
+    IfBlock->Stmts.push_back(new ExprStmt(Print));
+
+    IfBlock = new Block(FuncBlock);
+    FuncBlock->Stmts.push_back(new IfElse(nullptr, IfBlock, true));
+
+    Print = new Call(new Ident(PrintFunc));
+    Print->Args.push_back(new String("False"));
+    IfBlock->Stmts.push_back(new ExprStmt(Print));
+
+    FuncBlock->Stmts.push_back(new Return(new Ident("b")));
+
+    //----------------------------------------------
+
+    /* list* gprint_string(list* s, int is_top)
+     * {
+     *     char* buffer = alloc(sizeof(char) * s->length + 1);
+     *     int i;
+     *
+     *     for (i = 0; s->length, ++i)
+     *     {
+     *         buffer[i] = (char)s->value;
+     *         s = s->next;
+     *     }
+     *
+     *     buffer[i] = '\0';
+     *
+     *     if (is_top)
+     *     {
+     *         print("%s", buffer);
+     *     }
+     *     else
+     *     {
+     *         print("\"%s\"", buffer);
+     *     }
+     *
+     *     return s;
+     * }
+     * */
+
+    FuncBlock = new Block();
+    Func = new ctree::Function(StringType, GPrint + GString, FuncBlock);
+    Func->Args.push_back({ StringType, "s" });
+    Func->Args.push_back({ GBool, "is_top" });
+    CProg->Functions.push_back(Func);
+
+    auto SLength = new BinOp("+", new BinOp("->", new Ident("s"), new Ident(GLength)), new Int(1));
+    auto SizeOf = new Call(new Ident("sizeof"));
+    SizeOf->Args.push_back(new Ident("char"));
+    auto Size = new BinOp("*", SizeOf, SLength);
+    auto BufAlloc = new Call(new Ident(Alloc));
+    BufAlloc->Args.push_back(Size);
+    FuncBlock->Stmts.push_back(new Decl("char*", new BinOp("=", new Ident("buffer"), BufAlloc)));
+    FuncBlock->Stmts.push_back(new Decl("int", new Ident("i")));
+
+    ForBlock = new Block(FuncBlock);
+    Expr1 = new BinOp("=", new Ident("i"), new Int(0));
+    Expr2 = new BinOp("->", new Ident("s"), new Ident(GLength));
+    Expr3 = new UnOp("++", new Ident("i"));
+    FuncBlock->Stmts.push_back(new For(Expr1, Expr2, Expr3, ForBlock));
+
+    auto SVal = new BinOp("->", new UnOp("(char)", new Ident("s")), new Ident(GValue));
+    auto AtBufI = new UnOp("[i]", new Ident("buffer"), false);
+    ForBlock->Stmts.push_back(new ExprStmt(new BinOp("=", AtBufI, SVal)));
+
+    auto SNext = new BinOp("->", new Ident("s"), new Ident(GNext));
+    ForBlock->Stmts.push_back(new ExprStmt(new BinOp("=", new Ident("s"), SNext)));
+
+    AtBufI = new UnOp("[i]", new Ident("buffer"), false);
+    FuncBlock->Stmts.push_back(new ExprStmt(new BinOp("=", AtBufI, new Char("\\0"))));
+
+    IfBlock = new Block(FuncBlock);
+    FuncBlock->Stmts.push_back(new IfElse(new Ident("is_top"), IfBlock));
+
+    Print = new Call(new Ident(PrintFunc));
+    Print->Args.push_back(new String("%s"));
+    Print->Args.push_back(new Ident("buffer"));
+    IfBlock->Stmts.push_back(new ExprStmt(Print));
+
+    IfBlock = new Block(FuncBlock);
+    FuncBlock->Stmts.push_back(new IfElse(nullptr, IfBlock, true));
+
+    Print = new Call(new Ident(PrintFunc));
+    Print->Args.push_back(new String("\\\"%s\\\""));
+    Print->Args.push_back(new Ident("buffer"));
+    IfBlock->Stmts.push_back(new ExprStmt(Print));
+
+    FuncBlock->Stmts.push_back(new Return(new Ident("s")));
 }
 
