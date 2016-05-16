@@ -133,8 +133,6 @@ void LLVMCodeGen::visit(common::DoExpr &Node) {
     for (auto &Expr : Node.Exprs) {
         Expr->accept(*this);
     }
-
-    Node.ReturnExpr->accept(*this);
 }
 
 void LLVMCodeGen::visit(common::Assosiate &Node) {

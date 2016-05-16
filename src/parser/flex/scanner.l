@@ -103,10 +103,6 @@ using namespace std;
     return token::DO;
 }
 
-"return" {
-    return token::RETURN;
-}
-
 [0-9]+ {
     yylval->LongInt = atol(yytext);
     return token::INTLITERAL;

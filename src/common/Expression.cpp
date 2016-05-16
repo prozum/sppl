@@ -59,10 +59,8 @@ StringExpr::StringExpr(string Val, Location Loc)
     : Expression(Type::String, Loc, true), Val(Val) {}
 
 DoExpr::DoExpr(std::vector<std::unique_ptr<Expression>> Exprs,
-               std::unique_ptr<Expression> ReturnExpr,
                Location Loc) : Expression(Loc),
-                               Exprs(move(Exprs)),
-                               ReturnExpr(move(ReturnExpr)) { }
+                               Exprs(move(Exprs)) { }
 
 void IdExpr::accept(Visitor &V) { V.visit(*this); }
 void IntExpr::accept(Visitor &V) { V.visit(*this); }
@@ -151,7 +149,7 @@ Expression *AlgebraicExpr::doClone() const {
 }
 
 Expression *DoExpr::doClone() const {
-    auto Res = new DoExpr(vector<unique_ptr<Expression>>(), ReturnExpr->clone(), Loc);
+    auto Res = new DoExpr(vector<unique_ptr<Expression>>(), Loc);
 
     for (auto &Expr : Exprs) {
         Res->Exprs.push_back(Expr->clone());
@@ -247,7 +245,7 @@ std::string DoExpr::str() {
         Str += "\t\t" + Expr->str();
     }
 
-    return Str + "\treturn" + ReturnExpr->str() + "\n\t}";
+    return Str + "\n\t}";
 }
 
 
