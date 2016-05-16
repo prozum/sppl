@@ -3,7 +3,6 @@ def num : Int
 
 def main : [String] -> [Int]
     | _ = mergesort(generate(0, num(), []))
-    | _ = generate(0, num(), [])
 
 def mergesort : [Int] -> [Int]
     | l = mergesortsplit(split(l, count(l)))
@@ -44,4 +43,4 @@ def reverse_acc : [Int] -> [Int] -> [Int]
 
 def generate : Int -> Int -> [Int] -> [Int]
     | n m list when n == m = list
-    | n m list when n < m = generate(n + 1, m, ((n % 4 + n % 3 + n % 2 + n % 1) * n) : list)
+    | n m list when n < m = generate(n + 1, m, ((n % 4 + n % 3) * n) : list)

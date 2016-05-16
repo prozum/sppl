@@ -1,0 +1,16 @@
+def num : Int
+    | = 8000
+
+def main : [String] -> [Int]
+     | _ = map(add2, generate(num(), []))
+
+def add2 : Int -> Int
+    | n = n + 2
+
+def map : (Int -> Int) -> [Int] -> [Int]
+     | f [] = []
+     | f x:xs = f(x) : map(f, xs)
+
+def generate : Int  -> [Int] -> [Int]
+    | 0 list = list
+    | n list = generate(n - 1, 0 : list)
