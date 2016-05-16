@@ -313,16 +313,9 @@ void CCodeGenOld::outputEqual(Type &Ty, Expression &Left, Expression &Right) {
 }
 
 void CCodeGenOld::visit(common::UnPrint &Node) {
-    string Name = GTemp + to_string(TempCount++);
-
-    ExprStack.push(stringstream());
+    ExprStack.top() << Prints[Node.RetTy] << "(";
     Node.Child->accept(*this);
-
-    BeforeExpr[BeforeExprDepth] += "        " + getType(Node.RetTy) + " " + Name
-                                    + " = " + ExprStack.top().str() + "; \n";
-    BeforeExpr[BeforeExprDepth] += "        " + Prints[Node.RetTy] + "(" + Name + ", 1)" + "; \n";
-    ExprStack.pop();
-    ExprStack.top() << Name;
+    ExprStack.top() << ", 1)";
 }
 
 void CCodeGenOld::visit(common::Assosiate &Node) {

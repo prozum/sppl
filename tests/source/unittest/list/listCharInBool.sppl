@@ -1,2 +1,2 @@
 def main : [String]->[Bool]
-| s = ['c']
+| s = @(['c'])

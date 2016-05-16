@@ -18,6 +18,12 @@ void CCodeGen::visit(common::Program &Node) {
     Prog = &Node;
     CProg = new ctree::Program();
 
+    CProg->Directives.push_back(new Define("print", "printf"));
+
+    if (GCed) {
+        CProg->Directives.push_back(new Include("gc.h"));
+    }
+
     generateStd();
 
     /* The main function of the C program will be build below.
@@ -39,23 +45,21 @@ void CCodeGen::visit(common::Program &Node) {
      */
 
     string StrListName = getName(StringList);
-    string StrListType = StrListName + typePostfix(StringList);
-
-    auto MainBlock = new Block();
+    string StrListType = getType(StringList);
 
     // int main(int argc, char** argv)
+    auto MainBlock = new Block();
     auto MainFunc = new ctree::Function("int", "main", MainBlock);
     MainFunc->Args.push_back({ "int", "argc" });
     MainFunc->Args.push_back({ "char**", "argv" });
     CProg->Functions.push_back(MainFunc);
 
     // strlist args = gcreate_strlist(0);
+    // int i;
     auto StrListCreate = new Call(new Ident(GCreate + StrListName));
     StrListCreate->Args.push_back(new Int(0));
     MainBlock->Stmts.push_back(new Decl(StrListType, new BinOp("=", new Ident("args"), StrListCreate)));
-
-    // int i;
-    MainBlock->Stmts.push_back(new Decl(GInt, new Ident("i")));
+    MainBlock->Stmts.push_back(new Decl(GIntType, new Ident("i")));
 
     // for (i = argc - 1; i >= 0; --i)
     auto Expr1 = new BinOp("=", new Ident("i"), new BinOp("-", new Ident("argc"), new Int(1)));
@@ -66,7 +70,7 @@ void CCodeGen::visit(common::Program &Node) {
 
     // args = gadd_strlist(args, gctr_str(argv[i]));
     auto StrCreate = new Call(new Ident(GCreate + GString));
-    StrCreate->Args.push_back(new Ident("i"));
+    StrCreate->Args.push_back(new UnOp("[i]", new Ident("argv"), false));
     auto AddFunc = new Call(new Ident(GAdd + StrListName));
     AddFunc->Args.push_back(new Ident("args"));
     AddFunc->Args.push_back(StrCreate);
@@ -80,6 +84,7 @@ void CCodeGen::visit(common::Program &Node) {
     // return 0;
     MainBlock->Stmts.push_back(new Return(new Int(0)));
 
+    // Visit Functions
     for (auto &Func : Node.Decls) {
         Func->accept(*this);
     }
@@ -89,109 +94,115 @@ void CCodeGen::visit(common::Program &Node) {
 
 void CCodeGen::visit(common::Function &Node) {
     auto& SubTypes = Node.Signature.Subtypes;
-    string RetType = getName(SubTypes.back()) + typePostfix(SubTypes.back());
+    string RetType = getType(SubTypes.back());
 
     CurrFunc = &Node;
 
+    auto Val = new ArrayLiteral();
+    Val->Exprs.push_back(new Ident(GFunc + Node.Id));
+    CProg->Globals.push_back(new Decl(getType(Node.Signature), new BinOp("=", new Ident(GUser + Node.Id), Val)));
+
+    // retype funcname(type_1 arg_1, type_2 arg_2, ... , type_n arg_n)
     CurrBlock = new Block();
-    auto Func = new ctree::Function(RetType, GUser + Node.Id, CurrBlock);
+    auto Func = new ctree::Function(RetType, GFunc + Node.Id, CurrBlock);
     CProg->Functions.push_back(Func);
 
     for (size_t i = 0; i < SubTypes.size() - 1; ++i) {
-        Func->Args.push_back({ getName(SubTypes[i]) + typePostfix(SubTypes[i]), GArg + to_string(i) });
+        Func->Args.push_back({ getType(SubTypes[i]), GArg + to_string(i) });
     }
 
+    // Entry:
     CurrBlock->Stmts.push_back(new Label("Entry"));
 
+    // Visit Cases
     for (auto &Case: Node.Cases) {
         Case->accept(*this);
     }
 
-    auto Print = new Call(new Ident("printf"));
-    Print->Args.push_back(new String("No cases realized in " + Node.Id + "\n"));
+    // print("No cases realized in funcname\n");
+    auto Print = new Call(new Ident(PrintFunc));
+    Print->Args.push_back(new String("No cases realized in " + Node.Id + "\\n"));
     CurrBlock->Stmts.push_back(new ExprStmt(Print));
 
+    // exit(1);
     auto Exit = new Call(new Ident("exit"));
-    Exit->Args.push_back(new Int(0));
+    Exit->Args.push_back(new Int(1));
     CurrBlock->Stmts.push_back(new ExprStmt(Exit));
 }
 
 void CCodeGen::visit(common::Case &Node) {
+    vector<ctree::Expression*> Patterns;
+
     CurrBlock = new Block(CurrBlock);
 
+    // Visit patterns and get all none null expressions
+    // generated from visiting them.
+    for (size_t i = 0; i < Node.Patterns.size(); ++i) {
+        PatternBuilder = new Ident(GArg + to_string(i));
 
-    vector<ctree::Expression*> Patterns;
-    if (Node.Patterns.size() > 1) {
-        for (size_t i = 0; i < Node.Patterns.size(); ++i) {
-            PatternBuilder = new Ident(GArg + to_string(i));
+        Node.Patterns[i]->accept(*this);
 
-            Node.Patterns[i]->accept(*this);
-
-            if (LastExpr) {
-                Patterns.push_back(LastExpr);
-            }
-
-            delete PatternBuilder;
+        if (LastExpr) {
+            Patterns.push_back(LastExpr);
         }
+
+        delete PatternBuilder;
     }
 
-    if (Patterns.size() == 0) {
-        CurrBlock->Parent->Stmts.push_back(CurrBlock);
-    } else if (Patterns.size() == 1) {
-        auto If = new IfElse(Patterns.back(), CurrBlock);
+    auto Compare = generateAndChain(Patterns);
+
+    // if (pattern_1 && (pattern_2 && (... && pattern_n ...))
+    if (Compare) {
+        auto If = new IfElse(Compare, CurrBlock);
         CurrBlock->Parent->Stmts.push_back(If);
     } else {
-        auto Top = new BinOp("&&", nullptr, nullptr);
-        auto CurrAnd = Top;
-
-        for (size_t i = 0; i < Patterns.size(); ++i) {
-            if (i == 0) {
-                CurrAnd->Left = unique_ptr<ctree::Expression>(Patterns[i]);
-            } else if (i < Patterns.size() - 1) {
-                auto NewAnd = new BinOp("&&", Patterns[i], nullptr);
-                CurrAnd->Right = unique_ptr<ctree::Expression>(static_cast<ctree::Expression*>(NewAnd));
-
-                CurrAnd = NewAnd;
-            } else {
-                CurrAnd->Right = unique_ptr<ctree::Expression>(Patterns[i]);
-            }
-
-            auto If = new IfElse(Top, CurrBlock);
-            CurrBlock->Parent->Stmts.push_back(If);
-        }
+        CurrBlock->Parent->Stmts.push_back(CurrBlock);
     }
-
 
     if (Node.When) {
         CurrBlock = new Block(CurrBlock);
 
         Node.When->accept(*this);
+
+        // if (when_expr)
         auto If = new IfElse(LastExpr, CurrBlock);
         CurrBlock->Parent->Stmts.push_back(If);
     }
 
     if (Node.TailRec) {
+        // We know, that if a case is tail recursive, then the expression
+        // of that case is a call.
         auto Call = static_cast<CallExpr*>(Node.Expr.get());
 
-        for (size_t i = 0; i < CurrFunc->Signature.Subtypes.size(); ++i) {
+        // Reset all the arguments to the arguments of the call.
+        for (size_t i = 0; i < Call->Args.size(); ++i) {
             Call->Args[i]->accept(*this);
 
+            // arg_i = callarg_i
             auto Assign = new BinOp("=", new Ident(GArg + to_string(i)), LastExpr);
             CurrBlock->Stmts.push_back(new ExprStmt(Assign));
         }
 
+        // goto Entry;
         CurrBlock->Stmts.push_back(new Goto("Entry"));
     } else {
-        string RetType = getName(CurrFunc->Signature.Subtypes.back()) +
-                         typePostfix(CurrFunc->Signature.Subtypes.back());
+        string RetType = getType(CurrFunc->Signature.Subtypes.back());
 
         Node.Expr->accept(*this);
+
+        // rettype res = expr;
         auto Assign = new BinOp("=", new Ident(GRes), LastExpr);
         CurrBlock->Stmts.push_back(new Decl(RetType, Assign));
 
+        // We save the return value before returning, so that
+        // some cleanup can happen here. As for now, no cleanup
+        // is done.
+
+        // return res;
         CurrBlock->Stmts.push_back(new Return(new Ident(GRes)));
     }
 
+    // Reset back to the old CurrBlock
     if (Node.When) {
         CurrBlock = CurrBlock->Parent;
     }
@@ -211,18 +222,6 @@ void CCodeGen::visit(common::LambdaArg &Node) {
     throw runtime_error("Not implemented!");
 }
 
-ctree::Expression* CCodeGen::visitBinOp(common::BinaryOp& Op, std::string OpStr) {
-    ctree::Expression* Left;
-    ctree::Expression* Right;
-
-    Op.Left->accept(*this);
-    Left = LastExpr;
-    Op.Right->accept(*this);
-    Right = LastExpr;
-
-    return new BinOp(OpStr, Left, Right);
-}
-
 void CCodeGen::visit(common::Or &Node) {
     LastExpr = visitBinOp(Node, "||");
 }
@@ -231,41 +230,12 @@ void CCodeGen::visit(common::And &Node) {
     LastExpr = visitBinOp(Node, "&&");
 }
 
-ctree::Expression* CCodeGen::visitEqual(common::Type &Ty, common::Expression &Left, common::Expression &Right) {
-    switch (Ty.Id) {
-        case TypeId::TUPLE:
-        case TypeId::LIST:
-        case TypeId::STRING: {
-            string Name = getName(Left.RetTy);
-
-            auto Call = new ctree::Call(new Ident(GCompare + Name));
-            Left.accept(*this);
-            Call->Args.push_back(LastExpr);
-            Right.accept(*this);
-            Call->Args.push_back(LastExpr);
-
-            return Call;
-        }
-        default: {
-            ctree::Expression* CLeft;
-            ctree::Expression* CRight;
-
-            Left.accept(*this);
-            CLeft = LastExpr;
-            Right.accept(*this);
-            CRight = LastExpr;
-
-            return new BinOp("==", CLeft, CRight);
-        }
-    }
-}
-
 void CCodeGen::visit(common::Equal &Node) {
-    LastExpr = visitEqual(Node.Left->RetTy, *Node.Left, *Node.Right);
+    LastExpr = visitEqual(Node);
 }
 
 void CCodeGen::visit(common::NotEqual &Node) {
-    LastExpr = new UnOp("!", visitEqual(Node.Left->RetTy, *Node.Left, *Node.Right));
+    LastExpr = new UnOp("!", visitEqual(Node));
 }
 
 void CCodeGen::visit(common::Lesser &Node) {
@@ -305,6 +275,7 @@ void CCodeGen::visit(common::Mod &Node) {
 }
 
 void CCodeGen::visit(common::ListAdd &Node) {
+    // gadd_list(right, left)
     auto Add = new Call(new Ident(GAdd + getName(Node.RetTy)));
 
     Node.Right->accept(*this);
@@ -320,6 +291,7 @@ void CCodeGen::visit(common::ProducerConsumer &Node) {
 }
 
 void CCodeGen::visit(common::Concat &Node) {
+    // gconcat_list(left, right)
     auto Concat = new Call(new Ident(GConcat + getName(Node.RetTy)));
 
     Node.Left->accept(*this);
@@ -334,12 +306,23 @@ void CCodeGen::visit(common::To &Node) {
     throw runtime_error("Not implemented!");
 }
 
-
 void CCodeGen::visit(common::UnPrint &Node) {
     Node.Child->accept(*this);
 
-    auto Print = new Call(new Ident(GPrint + getName(Node.RetTy)));
+    Call* Print;
+
+    // print_type(child)
+    if (Node.RetTy.Id == TypeId::STRING) {
+        Print = new Call(new Ident(GPrint + GString));
+    } else {
+        Print = new Call(new Ident(GPrint + getName(Node.RetTy)));
+    }
+
     Print->Args.push_back(LastExpr);
+
+    if (Node.RetTy.Id == TypeId::STRING || Node.RetTy.Id == TypeId::CHAR){
+        Print->Args.push_back(new Int(1));
+    }
 
     LastExpr = Print;
 }
@@ -376,6 +359,7 @@ void CCodeGen::visit(common::IdPattern &Node) {
     if ((Node.RetTy.Id == TypeId::LIST ||
         Node.RetTy.Id == TypeId::STRING) &&
         ListOffsets.back() == 0) {
+
         auto Call = new ctree::Call(new Ident(GAt + getName(Node.RetTy)));
         Call->Args.push_back(PatternBuilder->clone());
         Call->Args.push_back(new Int(ListOffsets.back()));
@@ -386,7 +370,7 @@ void CCodeGen::visit(common::IdPattern &Node) {
     }
 
     auto Assign = new BinOp("=", new Ident(GUser + Node.Val), Right);
-    CurrBlock->Stmts.push_back(new ExprStmt(Assign));
+    CurrBlock->Stmts.push_back(new Decl(getType(Node.RetTy), Assign));
     LastExpr = nullptr;
 }
 
@@ -450,7 +434,7 @@ void CCodeGen::visit(common::ListPattern &Node) {
         if (ListOffsets.back() + i > 0) {
             CallAt->Args.erase(CallAt->Args.begin());
         } else {
-            static_cast<BinOp*>(PatternBuilder)->Left = nullptr;
+            static_cast<BinOp*>(PatternBuilder)->Left.release();
         }
 
         delete PatternBuilder;
@@ -461,27 +445,7 @@ void CCodeGen::visit(common::ListPattern &Node) {
         }
     }
 
-    if (Patterns.size() == 1) {
-        LastExpr = Patterns.back();
-    } else {
-        auto Top = new BinOp("&&", nullptr, nullptr);
-        auto CurrAnd = Top;
-
-        for (size_t i = 0; i < Patterns.size(); ++i) {
-            if (i == 0) {
-                CurrAnd->Left = unique_ptr<ctree::Expression>(Patterns[i]);
-            } else if (i < Patterns.size() - 1) {
-                auto NewAnd = new BinOp("&&", Patterns[i], nullptr);
-                CurrAnd->Right = unique_ptr<ctree::Expression>(static_cast<ctree::Expression*>(NewAnd));
-
-                CurrAnd = NewAnd;
-            } else {
-                CurrAnd->Right = unique_ptr<ctree::Expression>(Patterns[i]);
-            }
-        }
-
-        LastExpr = Top;
-    }
+    LastExpr = generateAndChain(Patterns);
 }
 
 void CCodeGen::visit(common::TuplePattern &Node) {
@@ -495,7 +459,7 @@ void CCodeGen::visit(common::TuplePattern &Node) {
 
         // Ensure that OldPatternBuilder is not deleted by the
         // deconstructor of PatternBuilder
-        static_cast<BinOp*>(PatternBuilder)->Left = nullptr;
+        static_cast<BinOp*>(PatternBuilder)->Left.release();
 
         delete PatternBuilder;
         PatternBuilder = OldPatternBuilder;
@@ -505,29 +469,7 @@ void CCodeGen::visit(common::TuplePattern &Node) {
         }
     }
 
-    if (Patterns.size() == 0) {
-        LastExpr = nullptr;
-    } else if (Patterns.size() == 1) {
-        LastExpr = Patterns.back();
-    } else {
-        auto Top = new BinOp("&&", nullptr, nullptr);
-        auto CurrAnd = Top;
-
-        for (size_t i = 0; i < Patterns.size(); ++i) {
-            if (i == 0) {
-                CurrAnd->Left = unique_ptr<ctree::Expression>(Patterns[i]);
-            } else if (i < Patterns.size() - 1) {
-                auto NewAnd = new BinOp("&&", Patterns[i], nullptr);
-                CurrAnd->Right = unique_ptr<ctree::Expression>(static_cast<ctree::Expression*>(NewAnd));
-
-                CurrAnd = NewAnd;
-            } else {
-                CurrAnd->Right = unique_ptr<ctree::Expression>(Patterns[i]);
-            }
-        }
-
-        LastExpr = Top;
-    }
+    LastExpr = generateAndChain(Patterns);
 }
 
 void CCodeGen::visit(common::ListSplit &Node) {
@@ -552,7 +494,7 @@ void CCodeGen::visit(common::ListSplit &Node) {
     if (ListOffsets.back() > 0) {
         CallAt->Args.erase(CallAt->Args.begin());
     } else {
-        static_cast<BinOp*>(PatternBuilder)->Left = nullptr;
+        static_cast<BinOp*>(PatternBuilder)->Left.release();
     }
 
     delete PatternBuilder;
@@ -592,7 +534,7 @@ void CCodeGen::visit(common::ParPattern &Node) {
 }
 
 void CCodeGen::visit(common::IdExpr &Node) {
-    LastExpr = new Ident(Node.Val);
+    LastExpr = new Ident(GUser + Node.Val);
 }
 
 void CCodeGen::visit(common::IntExpr &Node) {
@@ -640,7 +582,7 @@ void CCodeGen::visit(common::TupleExpr &Node) {
 
 void CCodeGen::visit(common::CallExpr &Node) {
     Node.Callee->accept(*this);
-    auto Call = new ctree::Call(LastExpr);
+    auto Call = new ctree::Call(new BinOp(".", LastExpr, new Ident(GCall)));
 
     for (auto &Expr: Node.Args) {
         Expr->accept(*this);
@@ -654,19 +596,90 @@ void CCodeGen::visit(common::AlgebraicExpr &Node) {
     throw runtime_error("Not implemented!");
 }
 
-string CCodeGen::typePostfix(Type &Ty) {
-    // Generate the correct c type, based on sppl's types
+ctree::Expression* CCodeGen::visitBinOp(common::BinaryOp& Op, std::string OpStr) {
+    ctree::Expression* Left;
+    ctree::Expression* Right;
+
+    Op.Left->accept(*this);
+    Left = LastExpr;
+    Op.Right->accept(*this);
+    Right = LastExpr;
+
+    return new BinOp(OpStr, Left, Right);
+}
+
+ctree::Expression* CCodeGen::visitEqual(common::BinaryOp& Equal) {
+    auto &Ty = Equal.Left->RetTy;
+
+    switch (Ty.Id) {
+        case TypeId::TUPLE:
+        case TypeId::LIST:
+        case TypeId::STRING: {
+            auto Call = new ctree::Call(new Ident(GCompare + getName(Ty)));
+            Equal.Left->accept(*this);
+            Call->Args.push_back(LastExpr);
+            Equal.Right->accept(*this);
+            Call->Args.push_back(LastExpr);
+
+            return Call;
+        }
+        default: {
+            ctree::Expression* CLeft;
+            ctree::Expression* CRight;
+
+            Equal.Left->accept(*this);
+            CLeft = LastExpr;
+            Equal.Right->accept(*this);
+            CRight = LastExpr;
+
+            return new BinOp("==", CLeft, CRight);
+        }
+    }
+}
+
+ctree::Expression* CCodeGen::generateAndChain(std::vector<ctree::Expression*>& Exprs) {
+    if (Exprs.size() == 0) {
+        return nullptr;
+    } else if (Exprs.size() == 1) {
+        return Exprs.back();
+    } else {
+        auto Top = new BinOp("&&", nullptr, nullptr);
+        auto CurrAnd = Top;
+
+        for (size_t i = 0; i < Exprs.size(); ++i) {
+            if (i == 0) {
+                CurrAnd->Left = unique_ptr<ctree::Expression>(Exprs[i]);
+            } else if (i < Exprs.size() - 1) {
+                auto NewAnd = new BinOp("&&", Exprs[i], nullptr);
+                CurrAnd->Right = unique_ptr<ctree::Expression>(static_cast<ctree::Expression*>(NewAnd));
+
+                CurrAnd = NewAnd;
+            } else {
+                CurrAnd->Right = unique_ptr<ctree::Expression>(Exprs[i]);
+            }
+        }
+
+        return Top;
+    }
+}
+
+std::string CCodeGen::getType(common::Type &Ty) {
     switch (Ty.Id) {
         case TypeId::FLOAT:
+            return GFloatType;
         case TypeId::CHAR:
+            return GCharType;
         case TypeId::INT:
+            return GIntType;
         case TypeId::BOOL:
-        case TypeId::TUPLE:
-        case TypeId::SIGNATURE:
-            return "";
+            return GBoolType;
         case TypeId::STRING:
+            return StringType;
+        case TypeId::TUPLE:
         case TypeId::LIST:
-            return "*";
+            return getOrGen(Ty) + "*";
+        case TypeId::SIGNATURE:
+            return getOrGen(Ty);
         default:
             // This should never happen. If it does, the type checker made a
             // mistake, or none supported features are being used
@@ -675,17 +688,15 @@ string CCodeGen::typePostfix(Type &Ty) {
 }
 
 std::string CCodeGen::getName(common::Type &Ty) {
-    // Generate the correct c type, based on sppl's types
     switch (Ty.Id) {
         case TypeId::FLOAT:
-            return GFloat;
+            return GFloatName;
         case TypeId::CHAR:
-            return GChar;
+            return GCharName;
         case TypeId::INT:
-            return GInt;
+            return GIntName;
         case TypeId::BOOL:
-            return GBool;
-            // For tuples, lists, signatures and strings, custom types will be generated
+            return GBoolName;
         case TypeId::STRING:
             return StringName;
         case TypeId::TUPLE:
@@ -721,10 +732,13 @@ std::string CCodeGen::getOrGen(common::Type &Ty) {
 }
 
 string CCodeGen::generateList(Type &Ty) {
-    string Name = GGenerated + GList + to_string(ListCount++);
+    auto &SubType = Ty.Subtypes.front();
+    string Name = GList + to_string(ListCount++);
     string Type = Name + "*";
-    string ChildrenName = getName(Ty.Subtypes.front());
-    string ChildrenType = ChildrenName + typePostfix(Ty);
+    string ChildrenName = getName(SubType);
+    string ChildrenType = getType(SubType);
+
+    GenTypes[Ty] = Name;
 
     /* struct list
      * {
@@ -735,7 +749,7 @@ string CCodeGen::generateList(Type &Ty) {
      * */
     auto ListStruct = new Struct(Name);
     ListStruct->Fields.push_back({ Type, GNext });
-    ListStruct->Fields.push_back({ GInt, GLength });
+    ListStruct->Fields.push_back({ GIntType, GLength });
     ListStruct->Fields.push_back({ ChildrenType, GValue });
     CProg->Structs.push_back(ListStruct);
 
@@ -748,7 +762,7 @@ string CCodeGen::generateList(Type &Ty) {
      *
      *     va_start(args, count);
      *
-     *     while (--count)
+     *     while (count--)
      *     {
      *         res = gadd_list(res, va_arg(args, childtype));
      *     }
@@ -789,10 +803,9 @@ string CCodeGen::generateList(Type &Ty) {
     VaStart->Args.push_back(new Ident("count"));
     FuncBlock->Stmts.push_back(new ExprStmt(VaStart));
 
-    // while (--count)
+    // while (count--)
     auto WhileBlock = new Block(FuncBlock);
-    auto While = new ctree::While(new UnOp("--", new Ident("count")), WhileBlock);
-    FuncBlock->Stmts.push_back(While);
+    FuncBlock->Stmts.push_back(new While(new UnOp("--", new Ident("count"), false), WhileBlock));
 
     // res = gadd_list(res, va_arg(args, childtype));
     auto VaArg = new Call(new Ident("va_arg"));
@@ -859,7 +872,7 @@ string CCodeGen::generateList(Type &Ty) {
      * {
      *     if (l->length < i)
      *     {
-     *         printf("Out of bound! list\n");
+     *         print("Out of bound! list\n");
      *         exit(1);
      *     }
      *
@@ -876,7 +889,7 @@ string CCodeGen::generateList(Type &Ty) {
     FuncBlock = new Block();
     Func = new ctree::Function(Type, GAt + Name, FuncBlock);
     Func->Args.push_back({ Type, "l" });
-    Func->Args.push_back({ GInt, "i" });
+    Func->Args.push_back({ GIntType, "i" });
     CProg->Functions.push_back(Func);
 
     // if (l->length < i)
@@ -884,8 +897,8 @@ string CCodeGen::generateList(Type &Ty) {
     auto IfBlock = new Block(FuncBlock);
     FuncBlock->Stmts.push_back(new IfElse(new BinOp("<", GetLengthL, new Ident("i")), IfBlock));
 
-    // printf("Out of bound! list\n");
-    auto Print = new Call(new Ident("printf"));
+    // print("Out of bound! list\n");
+    auto Print = new Call(new Ident(PrintFunc));
     Print->Args.push_back(new String("Out of bound! " + Name + "\\n"));
     IfBlock->Stmts.push_back(new ExprStmt(Print));
 
@@ -896,8 +909,8 @@ string CCodeGen::generateList(Type &Ty) {
 
     // while (i-- > 0)
     WhileBlock = new Block(FuncBlock);
-    While = new ctree::While(new BinOp(">", new UnOp("--", new Ident("i"), false), new Int(0)), WhileBlock);
-    FuncBlock->Stmts.push_back(While);
+    auto GComp = new BinOp(">", new UnOp("--", new Ident("i"), false), new Int(0));
+    FuncBlock->Stmts.push_back(new While(GComp, WhileBlock));
 
     // l = l->next;
     auto LAssign = new BinOp("=", new Ident("l"), new BinOp("->", new Ident("l"), new Ident(GNext)));
@@ -932,7 +945,7 @@ string CCodeGen::generateList(Type &Ty) {
 
     // int gcompare_list(list* l1, list* l2)
     FuncBlock = new Block();
-    Func = new ctree::Function(GBool, GCompare + Name, FuncBlock);
+    Func = new ctree::Function(GBoolType, GCompare + Name, FuncBlock);
     Func->Args.push_back({ Type, "l1" });
     Func->Args.push_back({ Type, "l2" });
     CProg->Functions.push_back(Func);
@@ -950,7 +963,7 @@ string CCodeGen::generateList(Type &Ty) {
     // while (l1->length)
     WhileBlock = new Block(FuncBlock);
     L1Length = new BinOp("->", new Ident("l1"), new Ident(GLength));
-    FuncBlock->Stmts.push_back(new ctree::While(L1Length, WhileBlock));
+    FuncBlock->Stmts.push_back(new While(L1Length, WhileBlock));
 
     // if (l1->value != l2->value)
     IfBlock = new Block(WhileBlock);
@@ -958,7 +971,7 @@ string CCodeGen::generateList(Type &Ty) {
     auto L2Value = new BinOp("->", new Ident("l2"), new Ident(GValue));
 
     ctree::Expression* V1CompV2;
-    switch (Ty.Subtypes.front().Id) {
+    switch (SubType.Id) {
         case TypeId::LIST:
         case TypeId::TUPLE: {
             auto CompCall = new Call(new Ident(GCompare + ChildrenName));
@@ -972,7 +985,16 @@ string CCodeGen::generateList(Type &Ty) {
             break;
     }
 
-    FuncBlock->Stmts.push_back(new IfElse(V1CompV2, IfBlock));
+    WhileBlock->Stmts.push_back(new IfElse(V1CompV2, IfBlock));
+
+    // l1 = l1->next;
+    // l2 = l2->next;
+    auto L1Next = new BinOp("->", new Ident("l1"), new Ident(GNext));
+    auto Assign = new BinOp("=", new Ident("l1"), L1Next);
+    WhileBlock->Stmts.push_back(new ExprStmt(Assign));
+    auto L2Next = new BinOp("->", new Ident("l2"), new Ident(GNext));
+    Assign = new BinOp("=", new Ident("l2"), L2Next);
+    WhileBlock->Stmts.push_back(new ExprStmt(Assign));
 
     IfBlock->Stmts.push_back(new Return(new Int(0)));
     FuncBlock->Stmts.push_back(new Return(new Int(1)));
@@ -999,12 +1021,15 @@ string CCodeGen::generateList(Type &Ty) {
      * }
      * */
 
+    // list* gconcat_list(list* l1, list* l2)
     FuncBlock = new Block();
     Func = new ctree::Function(Type, GConcat + Name, FuncBlock);
     Func->Args.push_back({ Type, "l1" });
     Func->Args.push_back({ Type, "l2" });
     CProg->Functions.push_back(Func);
 
+    // int i;
+    // list** elements = alloc(sizeof(list*) * l1->length);
     FuncBlock->Stmts.push_back(new Decl("int", new Ident("i")));
     auto SizeOf = new Call(new Ident("sizeof"));
     SizeOf->Args.push_back(new Ident(Type));
@@ -1013,35 +1038,43 @@ string CCodeGen::generateList(Type &Ty) {
     ElAlloc->Args.push_back(new BinOp("*", SizeOf, L1Length));
     FuncBlock->Stmts.push_back(new Decl(Type + "*", new BinOp("=", new Ident("elements"), ElAlloc) ));
 
+    // for (i = 0; l1->length; ++i)
     auto ForBlock = new Block(FuncBlock);
     ctree::Expression* Expr1 = new BinOp("=", new Ident("i"), new Int(0));
     ctree::Expression* Expr2 = new BinOp("->", new Ident("l1"), new Ident(GLength));
     ctree::Expression* Expr3 = new UnOp("++", new Ident("i"));
     FuncBlock->Stmts.push_back(new For(Expr1, Expr2, Expr3, ForBlock));
 
+    // elements[i] = l1;
     auto AtElI = new UnOp("[i]", new Ident("elements"), false);
     ForBlock->Stmts.push_back(new ExprStmt(new BinOp("=", AtElI, new Ident("l1"))));
-    auto L1Next = new BinOp("->", new Ident("l1"), new Ident(GNext));
+
+    // l1 = l1->next;
+    L1Next = new BinOp("->", new Ident("l1"), new Ident(GNext));
     ForBlock->Stmts.push_back(new ExprStmt(new BinOp("=", new Ident("l1"), L1Next)));
 
+    // for (--i; i >= 0; --i)
     ForBlock = new Block(FuncBlock);
     Expr1 = new UnOp("--", new Ident("i"));
     Expr2 = new BinOp(">=", new Ident("i"), new Int(0));
     Expr3 = new UnOp("--", new Ident("i"));
     FuncBlock->Stmts.push_back(new For(Expr1, Expr2, Expr3, ForBlock));
 
+    // l2 = gadd_list(l2, elements[i]->value);
     auto ElValue = new BinOp("->", new UnOp("[i]", new Ident("elements"), false), new Ident(GValue));
     auto Add = new Call(new Ident(GAdd +  Name));
     Add->Args.push_back(new Ident("l2"));
     Add->Args.push_back(ElValue);
     ForBlock->Stmts.push_back(new ExprStmt(new BinOp("=", new Ident("l2"), Add)));
 
+    // return l2;
     FuncBlock->Stmts.push_back(new Return(new Ident("l2")));
 
     //----------------------------------------------
 
     /* list* gprint_list(list* l)
      * {
+     *     list* res = l;
      *     print("[");
      *
      *     while (l->length)
@@ -1056,51 +1089,361 @@ string CCodeGen::generateList(Type &Ty) {
      *     }
      *
      *     print("]");
+     *     retrun res;
      * }
      * */
 
-    // TODO Print
+    // list* gprint_list(list* l)
+    FuncBlock = new Block();
+    Func = new ctree::Function(Type, GPrint + Name, FuncBlock);
+    Func->Args.push_back({ Type, "l" });
+    CProg->Functions.push_back(Func);
 
+    // list* res = l;
+    FuncBlock->Stmts.push_back(new Decl(Type, new BinOp("=", new Ident("res"), new Ident("l"))));
+
+    // print("[");
+    Print = new Call(new Ident(PrintFunc));
+    Print->Args.push_back(new String("["));
+    FuncBlock->Stmts.push_back(new ExprStmt(Print));
+
+    // while (l->length)
+    WhileBlock = new Block(FuncBlock);
+    FuncBlock->Stmts.push_back(new While(new BinOp("->", new Ident("l"), new Ident(GLength)), WhileBlock));
+
+    // print_child(l->value);
+    if (SubType.Id == TypeId::STRING) {
+        Print = new Call(new Ident(GPrint + GString));
+    } else {
+        Print = new Call(new Ident(GPrint + ChildrenName));
+    }
+
+    Print->Args.push_back(new BinOp("->", new Ident("l"), new Ident(GValue)));
+
+    if (SubType.Id == TypeId::STRING || SubType.Id == TypeId::CHAR){
+        Print->Args.push_back(new Int(0));
+    }
+    WhileBlock->Stmts.push_back(new ExprStmt(Print));
+
+    // l = l->next;
+    auto LNext = new BinOp("->", new Ident("l"), new Ident(GNext));
+    WhileBlock->Stmts.push_back(new ExprStmt(new BinOp("=", new Ident("l"), LNext)));
+
+    // if (!l->length)
+    IfBlock = new Block(WhileBlock);
+    auto LLength = new BinOp("->", new Ident("l"), new Ident(GLength));
+    WhileBlock->Stmts.push_back(new IfElse(new UnOp("!", LLength) , IfBlock));
+
+    // print(", ");
+    Print = new Call(new Ident(PrintFunc));
+    Print->Args.push_back(new String(", "));
+    IfBlock->Stmts.push_back(new ExprStmt(Print));
+
+    // print("]");
+    Print = new Call(new Ident(PrintFunc));
+    Print->Args.push_back(new String("]"));
+    FuncBlock->Stmts.push_back(new ExprStmt(Print));
+
+    // list* res = l;
+    FuncBlock->Stmts.push_back(new Return(new Ident("l")));
 
     return Name;
 }
 
 string CCodeGen::generateSignature(Type &Ty) {
-    // Result is needed, so we don't start generating something inside the signature
-    stringstream Res;
-    string Name = GGenerated + GSignature + to_string(SigCount++);
+    auto &SubTypes = Ty.Subtypes;
+    string Name = GSignature + to_string(SigCount++);
+    string Type = Name;
+
+    GenTypes[Ty] = Name;
+
+    /* struct signature
+     * {
+     *     type_n (*call)(type_1, type_2, ... , type_n-1);
+     * };
+     * */
+
+    string Args = "(";
+
+    for (size_t i = 0; i < SubTypes.size() - 1; ++i) {
+        Args += getType(SubTypes[i]);
+
+        if (i < Ty.Subtypes.size() - 2)
+            Args += ", ";
+    }
+
+    Args += ")";
+
+    auto SigStrcut = new Struct(Name);
+    SigStrcut->Fields.push_back({ getType(SubTypes.back()) + " (*" + GCall + ")", Args });
+    CProg->Structs.push_back(SigStrcut);
+
+    //----------------------------------------------
+
+    /* signature gprint_signature(signature s, int is_top)
+     * {
+     *     print("(Type_1 -> Type_2 -> ... -> Type_n)");
+     *     return s;
+     * }
+     * */
+
+    // signature gprint_signature(signature s, int is_top)
+    auto FuncBlock = new Block();
+    auto Func = new ctree::Function(Type, GPrint + Name, FuncBlock);
+    Func->Args.push_back({ Type, "s" });
+    Func->Args.push_back({ GBoolType, "is_top" });
+    CProg->Functions.push_back(Func);
+
+    // "(Type_1 -> Type_2 -> ... -> Type_n)"
+    string PrintString = "(";
+
+    for (size_t i = 0; i < SubTypes.size(); ++i) {
+        PrintString += SubTypes[i].str();
+
+        if (i < SubTypes.size() - 1)
+            PrintString += " -> ";
+    }
+    PrintString += ")";
+
+    // print("(Type_1 -> Type_2 -> ... -> Type_n)");
+    auto Print = new Call(new Ident(PrintFunc));
+    Print->Args.push_back(new String(PrintString));
+    FuncBlock->Stmts.push_back(new ExprStmt(Print));
+
+    // return s;
+    FuncBlock->Stmts.push_back(new Return(new Ident("s")));
 
     return Name;
 }
 
 string CCodeGen::generateTuple(Type &Ty) {
-    // Result is needed, so we don't start generating something inside the tuple
-    stringstream Res;
-    string Name = GGenerated + GTuple + to_string(TupleCount++);
+    auto &SubTypes = Ty.Subtypes;
+    string Name = GTuple + to_string(TupleCount++);
+    string Type = Name + "*";
 
-    // ReturnType name of tuple generated
+    GenTypes[Ty] = Name;
+
+    /* struct tuple
+     * {
+     *     type_1 item_1;
+     *     type_2 item_2;
+     *     ...
+     *     type_n item_n;
+     * };
+     * */
+
+    auto TupleStruct = new Struct(Name);
+
+    for (size_t i = 0; i < SubTypes.size(); ++i) {
+        TupleStruct->Fields.push_back({ getType(SubTypes[i]), GItem + to_string(i) });
+    }
+    CProg->Structs.push_back(TupleStruct);
+
+    //----------------------------------------------
+
+    /* tuple* gcrt_tuple(type_1 item_1, type_2 item_2, ... , type_n item_n)
+     * {
+     *     tuple* res = alloc(sizeof(tuple));
+     *     res->item_1 = item_1;
+     *     res->item_2 = item_2;
+     *     ...
+     *     res->item_n = item_n;
+     *
+     *     return res;
+     * }
+     * */
+
+    // tuple* gcrt_tuple(type_1 item_1, type_2 item_2, ... , type_n item_n)
+    auto FuncBlock = new Block();
+    auto Func = new ctree::Function(Type, GCreate + Name, FuncBlock);
+
+    for (size_t i = 0; i < SubTypes.size(); ++i) {
+        Func->Args.push_back({ getType(SubTypes[i]), GItem + to_string(i) });
+    }
+    CProg->Functions.push_back(Func);
+
+    // tuple* res = alloc(sizeof(tuple));
+    auto SizeOf = new Call(new Ident("sizeof"));
+    SizeOf->Args.push_back(new Ident(Name));
+    auto AllocTuple = new Call(new Ident(Alloc));
+    AllocTuple->Args.push_back(SizeOf);
+    FuncBlock->Stmts.push_back(new Decl(Type, new BinOp("=", new Ident("res"), AllocTuple)));
+
+    /*     res->item_1 = item_1;
+     *     res->item_2 = item_2;
+     *     ...
+     *     res->item_n = item_n;
+     * */
+    for (size_t i = 0; i < SubTypes.size(); ++i) {
+        string ItemName = GItem + to_string(i);
+        auto ResItem = new BinOp("->", new Ident("res"), new Ident(ItemName));
+        FuncBlock->Stmts.push_back(new ExprStmt(new BinOp("=", ResItem, new Ident(ItemName))));
+    }
+
+    // return res;
+    FuncBlock->Stmts.push_back(new Return(new Ident("res")));
+
+    //----------------------------------------------
+
+    /* int gcompare_tuple(tuple* t1, tuple* t2)
+     * {
+     *     if (t1->item_1 != t2->item_1)
+     *     {
+     *         return 0;
+     *     }
+     *
+     *     ...
+     *
+     *     if (t1->item_n != t2->item_n)
+     *     {
+     *         return 0;
+     *     }
+     *
+     *     return 1;
+     * }
+     * */
+
+    // int gcompare_tuple(tuple* t1, tuple* t2)
+    FuncBlock = new Block();
+    Func = new ctree::Function(Type, GCompare + Name, FuncBlock);
+    Func->Args.push_back({ Type, "t1" });
+    Func->Args.push_back({ Type, "t2" });
+    CProg->Functions.push_back(Func);
+
+    for (size_t i = 0; i < SubTypes.size(); ++i) {
+        // t1->item_i
+        // t2->item_i
+        string ItemName = GItem + to_string(i);
+        auto T1Item = new BinOp("->", new Ident("t1"), new Ident(ItemName));
+        auto T2Item = new BinOp("->", new Ident("t2"), new Ident(ItemName));
+
+        ctree::Expression* Compare;
+
+        switch (SubTypes[i].Id) {
+            case TypeId::FLOAT:
+            case TypeId::CHAR:
+            case TypeId::INT:
+            case TypeId::BOOL:
+                Compare = new BinOp("!=", T1Item, T2Item);
+                break;
+            case TypeId::STRING:
+            case TypeId::TUPLE:
+            case TypeId::LIST: {
+                auto CompCall = new Call(new Ident(GCompare + getName(SubTypes[i])));
+                CompCall->Args.push_back(T1Item);
+                CompCall->Args.push_back(T2Item);
+
+                Compare = new UnOp("!", CompCall);
+                break;
+            }
+            case TypeId::SIGNATURE:
+                // Signature not supported
+            default:
+                // This should never happen. If it does, the type checker made a
+                // mistake, or none supported features are being used
+                throw runtime_error("This should never happen!");
+        }
+
+        // if (t1->item_n != t2->item_n)
+        auto IfBlock = new Block(FuncBlock);
+        FuncBlock->Stmts.push_back(new IfElse(Compare, IfBlock));
+
+        // return 0;
+        IfBlock->Stmts.push_back(new Return(new Int(0)));
+    }
+
+    // return 1;
+    FuncBlock->Stmts.push_back(new Return(new Int(1)));
+
+    //----------------------------------------------
+
+    /* tuple* gprint_tuple(tuple* t)
+     * {
+     *     print("(");
+     *     print_item_1(t->item_1);
+     *     print(", ");
+     *     print_item_2(t->item_2);
+     *     print(", ");
+     *     ...
+     *     print(", ");
+     *     print_item_n(t->item_n);
+     *     print(")");
+     *
+     *     return t;
+     * }
+     * */
+
+    // tuple* gprint_tuple(tuple* t)
+    FuncBlock = new Block();
+    Func = new ctree::Function(Type, GPrint + Name, FuncBlock);
+    Func->Args.push_back({ Type, "t" });
+    CProg->Functions.push_back(Func);
+
+    // print("(");
+    auto Print = new Call(new Ident(PrintFunc));
+    Print->Args.push_back(new String("("));
+    FuncBlock->Stmts.push_back(new ExprStmt(Print));
+
+    /*
+     *     print_item_1(t->item_1);
+     *     print(", ");
+     *     print_item_2(t->item_2);
+     *     print(", ");
+     *     ...
+     *     print(", ");
+     *     print_item_n(t->item_n);
+     * */
+    for (size_t i = 0; i < SubTypes.size(); ++i) {
+        string ItemName = GItem + to_string(i);
+
+        // print_item_i(t->item_i);
+        if (SubTypes[i].Id == TypeId::STRING) {
+            Print = new Call(new Ident(GPrint + GString));
+        } else {
+            Print = new Call(new Ident(GPrint + getName(SubTypes[i])));
+        }
+
+        Print->Args.push_back(new BinOp("->", new Ident("t"), new Ident(ItemName)));
+
+        if (SubTypes[i].Id == TypeId::STRING || SubTypes[i].Id == TypeId::CHAR){
+            Print->Args.push_back(new Int(0));
+        }
+
+        FuncBlock->Stmts.push_back(new ExprStmt(Print));
+
+        // print(", ");
+        if (i < SubTypes.size() - 1) {
+            Print = new Call(new Ident(PrintFunc));
+            Print->Args.push_back(new String(", "));
+            FuncBlock->Stmts.push_back(new ExprStmt(Print));
+        }
+    }
+
+    // print(")");
+    Print = new Call(new Ident(PrintFunc));
+    Print->Args.push_back(new String(")"));
+    FuncBlock->Stmts.push_back(new ExprStmt(Print));
+    FuncBlock->Stmts.push_back(new Return(new Ident("t")));
+
+    // return t;
     return Name;
 }
 
 void CCodeGen::generateStd() {
-    CProg->Includes.push_back(new Include("stdarg.h"));
-    CProg->Includes.push_back(new Include("stdio.h"));
-    CProg->Includes.push_back(new Include("stdlib.h"));
-    CProg->Includes.push_back(new Include("string.h"));
-    CProg->Includes.push_back(new Include("stdint.h"));
-    CProg->Includes.push_back(new Include("inttypes.h"));
+    CProg->Directives.push_back(new Include("stdarg.h"));
+    CProg->Directives.push_back(new Include("stdio.h"));
+    CProg->Directives.push_back(new Include("stdlib.h"));
+    CProg->Directives.push_back(new Include("string.h"));
+    CProg->Directives.push_back(new Include("stdint.h"));
+    CProg->Directives.push_back(new Include("inttypes.h"));
 
-    if (GCed) {
-        CProg->Includes.push_back(new Include("gc.h"));
-    }
-
-    StringName = generateList(RealString);
-    StringType = StringName + typePostfix(RealString);
+    StringName = getName(RealString);
+    StringType = getType(RealString);
     GenTypes[FakeString] = StringName;
-    GenTypes[Type(TypeId::CHAR)] = GChar;
-    GenTypes[Type(TypeId::BOOL)] = GBool;
-    GenTypes[Type(TypeId::INT)] = GInt;
-    GenTypes[Type(TypeId::FLOAT)] = GFloat;
+    GenTypes[Type(TypeId::CHAR)] = GCharType;
+    GenTypes[Type(TypeId::BOOL)] = GBoolType;
+    GenTypes[Type(TypeId::INT)] = GIntType;
+    GenTypes[Type(TypeId::FLOAT)] = GFloatType;
     generateList(StringList);
 
 
@@ -1128,8 +1471,8 @@ void CCodeGen::generateStd() {
 
     // int i;
     // list* res = gcrt_list(0);
-    FuncBlock->Stmts.push_back(new Decl(GInt, new Ident("i")));
-    auto Create = new Call(new Ident(GCreate + StringType));
+    FuncBlock->Stmts.push_back(new Decl(GIntType, new Ident("i")));
+    auto Create = new Call(new Ident(GCreate + StringName));
     Create->Args.push_back(new Int(0));
     FuncBlock->Stmts.push_back(new Decl(StringType, new BinOp("=", new Ident("res"), Create)));
 
@@ -1185,20 +1528,20 @@ void CCodeGen::generateStd() {
 
     // int gcompare_string(list* l1, char* v, int offset)
     FuncBlock = new Block();
-    Func = new ctree::Function(GBool, GCompare + GString, FuncBlock);
+    Func = new ctree::Function(GBoolType, GCompare + GString, FuncBlock);
     Func->Args.push_back({ StringType, "l" });
     Func->Args.push_back({ "char*", "v" });
-    Func->Args.push_back({ GInt, "o" });
+    Func->Args.push_back({ GIntType, "o" });
     CProg->Functions.push_back(Func);
 
     // int i;
     // if (o)
-    FuncBlock->Stmts.push_back(new Decl(GInt, new Ident("i")));
+    FuncBlock->Stmts.push_back(new Decl(GIntType, new Ident("i")));
     auto IfBlock = new Block(FuncBlock);
     FuncBlock->Stmts.push_back(new IfElse(new Ident("o"), IfBlock));
 
     // l = gat_list(l, o);
-    auto At = new Call(new Ident(GAt + StringType));
+    auto At = new Call(new Ident(GAt + StringName));
     At->Args.push_back(new Ident("l"));
     At->Args.push_back(new Ident("o"));
     IfBlock->Stmts.push_back(new ExprStmt(new BinOp("=", new Ident("l"), At)));
@@ -1249,13 +1592,16 @@ void CCodeGen::generateStd() {
      * }
      * */
 
+    // int gprint_int(int i)
     FuncBlock = new Block();
-    Func = new ctree::Function(GInt, GPrint + GInt, FuncBlock);
-    Func->Args.push_back({ GInt, "i" });
+    Func = new ctree::Function(GIntType, GPrint + GIntName, FuncBlock);
+    Func->Args.push_back({ GIntType, "i" });
     CProg->Functions.push_back(Func);
 
+    // print("%d", i);
+    // return i;
     auto Print = new Call(new Ident(PrintFunc));
-    Print->Args.push_back(new String("%d"));
+    Print->Args.push_back(new Ident("\"%\" PRId64 \"\""));
     Print->Args.push_back(new Ident("i"));
     FuncBlock->Stmts.push_back(new ExprStmt(Print));
     FuncBlock->Stmts.push_back(new Return(new Ident("i")));
@@ -1265,15 +1611,18 @@ void CCodeGen::generateStd() {
     /* double gprint_float(double f)
      * {
      *     print("%lf", f);
-     *     return value;
+     *     return f;
      * }
      * */
 
+    // double gprint_float(double f)
     FuncBlock = new Block();
-    Func = new ctree::Function(GFloat, GPrint + GFloat, FuncBlock);
-    Func->Args.push_back({ GFloat, "f" });
+    Func = new ctree::Function(GFloatType, GPrint + GFloatName, FuncBlock);
+    Func->Args.push_back({ GFloatType, "f" });
     CProg->Functions.push_back(Func);
 
+    // print("%lf", f);
+    // return value;
     Print = new Call(new Ident(PrintFunc));
     Print->Args.push_back(new String("%lf"));
     Print->Args.push_back(new Ident("f"));
@@ -1297,28 +1646,34 @@ void CCodeGen::generateStd() {
      * }
      * */
 
+    // int gprint_char(int c, int is_top)
     FuncBlock = new Block();
-    Func = new ctree::Function(GChar, GPrint + GChar, FuncBlock);
-    Func->Args.push_back({ GChar, "c" });
-    Func->Args.push_back({ GBool, "is_top" });
+    Func = new ctree::Function(GCharType, GPrint + GCharName, FuncBlock);
+    Func->Args.push_back({ GCharType, "c" });
+    Func->Args.push_back({ GBoolType, "is_top" });
     CProg->Functions.push_back(Func);
 
+    // if (is_top)
     IfBlock = new Block(FuncBlock);
     FuncBlock->Stmts.push_back(new IfElse(new Ident("is_top"), IfBlock));
 
+    // print("%c", (char)c);
     Print = new Call(new Ident(PrintFunc));
     Print->Args.push_back(new String("%c"));
     Print->Args.push_back(new UnOp("(char)", new Ident("c")));
     IfBlock->Stmts.push_back(new ExprStmt(Print));
 
+    // else
     IfBlock = new Block(FuncBlock);
     FuncBlock->Stmts.push_back(new IfElse(nullptr, IfBlock, true));
 
+    // print("'%c'", (char)c);
     Print = new Call(new Ident(PrintFunc));
     Print->Args.push_back(new String("'%c'"));
     Print->Args.push_back(new UnOp("(char)", new Ident("c")));
     IfBlock->Stmts.push_back(new ExprStmt(Print));
 
+    // return c;
     FuncBlock->Stmts.push_back(new Return(new Ident("c")));
 
 
@@ -1339,25 +1694,31 @@ void CCodeGen::generateStd() {
      * }
      * */
 
+    // int gprint_bool(int b)
     FuncBlock = new Block();
-    Func = new ctree::Function(GBool, GPrint + GBool, FuncBlock);
-    Func->Args.push_back({ GBool, "b" });
+    Func = new ctree::Function(GBoolType, GPrint + GBoolName, FuncBlock);
+    Func->Args.push_back({ GBoolType, "b" });
     CProg->Functions.push_back(Func);
 
+    // if (b)
     IfBlock = new Block(FuncBlock);
     FuncBlock->Stmts.push_back(new IfElse(new Ident("b"), IfBlock));
 
+    // print("True");
     Print = new Call(new Ident(PrintFunc));
     Print->Args.push_back(new String("True"));
     IfBlock->Stmts.push_back(new ExprStmt(Print));
 
+    // else
     IfBlock = new Block(FuncBlock);
     FuncBlock->Stmts.push_back(new IfElse(nullptr, IfBlock, true));
 
+    // print("False");
     Print = new Call(new Ident(PrintFunc));
     Print->Args.push_back(new String("False"));
     IfBlock->Stmts.push_back(new ExprStmt(Print));
 
+    // return value;
     FuncBlock->Stmts.push_back(new Return(new Ident("b")));
 
     //----------------------------------------------
@@ -1388,12 +1749,15 @@ void CCodeGen::generateStd() {
      * }
      * */
 
+    // list* gprint_string(list* s, int is_top)
     FuncBlock = new Block();
     Func = new ctree::Function(StringType, GPrint + GString, FuncBlock);
     Func->Args.push_back({ StringType, "s" });
-    Func->Args.push_back({ GBool, "is_top" });
+    Func->Args.push_back({ GBoolType, "is_top" });
     CProg->Functions.push_back(Func);
 
+    // char* buffer = alloc(sizeof(char) * s->length + 1);
+    // int i;
     auto SLength = new BinOp("+", new BinOp("->", new Ident("s"), new Ident(GLength)), new Int(1));
     auto SizeOf = new Call(new Ident("sizeof"));
     SizeOf->Args.push_back(new Ident("char"));
@@ -1403,38 +1767,47 @@ void CCodeGen::generateStd() {
     FuncBlock->Stmts.push_back(new Decl("char*", new BinOp("=", new Ident("buffer"), BufAlloc)));
     FuncBlock->Stmts.push_back(new Decl("int", new Ident("i")));
 
+    // for (i = 0; s->length, ++i)
     ForBlock = new Block(FuncBlock);
     Expr1 = new BinOp("=", new Ident("i"), new Int(0));
     Expr2 = new BinOp("->", new Ident("s"), new Ident(GLength));
     Expr3 = new UnOp("++", new Ident("i"));
     FuncBlock->Stmts.push_back(new For(Expr1, Expr2, Expr3, ForBlock));
 
-    auto SVal = new BinOp("->", new UnOp("(char)", new Ident("s")), new Ident(GValue));
+    // buffer[i] = (char)s->value;
+    auto SVal = new UnOp("(char)", new BinOp("->", new Ident("s"), new Ident(GValue)));
     auto AtBufI = new UnOp("[i]", new Ident("buffer"), false);
     ForBlock->Stmts.push_back(new ExprStmt(new BinOp("=", AtBufI, SVal)));
 
+    // s = s->next;
     auto SNext = new BinOp("->", new Ident("s"), new Ident(GNext));
     ForBlock->Stmts.push_back(new ExprStmt(new BinOp("=", new Ident("s"), SNext)));
 
+    // buffer[i] = '\0';
     AtBufI = new UnOp("[i]", new Ident("buffer"), false);
     FuncBlock->Stmts.push_back(new ExprStmt(new BinOp("=", AtBufI, new Char("\\0"))));
 
+    // if (is_top)
     IfBlock = new Block(FuncBlock);
     FuncBlock->Stmts.push_back(new IfElse(new Ident("is_top"), IfBlock));
 
+    // print("%s", buffer);
     Print = new Call(new Ident(PrintFunc));
     Print->Args.push_back(new String("%s"));
     Print->Args.push_back(new Ident("buffer"));
     IfBlock->Stmts.push_back(new ExprStmt(Print));
 
+    // else
     IfBlock = new Block(FuncBlock);
     FuncBlock->Stmts.push_back(new IfElse(nullptr, IfBlock, true));
 
+    // print("\"%s\"", buffer);
     Print = new Call(new Ident(PrintFunc));
     Print->Args.push_back(new String("\\\"%s\\\""));
     Print->Args.push_back(new Ident("buffer"));
     IfBlock->Stmts.push_back(new ExprStmt(Print));
 
+    // return s;
     FuncBlock->Stmts.push_back(new Return(new Ident("s")));
 }
 

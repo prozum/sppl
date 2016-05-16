@@ -1,5 +1,5 @@
 def main : [String]->(Bool,Bool)
-| n = func1((True,False))
+| n = @(func1((True,False)))
 
 def func1 : (Bool,Bool)->(Bool,Bool)
 | n = n

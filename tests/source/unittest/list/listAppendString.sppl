@@ -1,2 +1,2 @@
 def main : [String]->[String]
-| s = "string":["string","string"]
+| s = @("string":["string","string"])

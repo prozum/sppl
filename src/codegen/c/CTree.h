@@ -6,12 +6,17 @@ namespace ctree {
 class Node {
 public:
     virtual ~Node() { };
-    virtual void outputCode(std::ostream &Output, int TapCount = 0) { };
+    virtual void outputCode(std::ostream &Output, int TapCount = 0) = 0;
 };
 
 class Statement : public Node {
 public:
-    virtual void outputCode(std::ostream &Output, int TapCount = 0) { };
+    virtual void outputCode(std::ostream &Output, int TapCount = 0) = 0;
+};
+
+class Directive : public Node {
+public:
+    virtual void outputCode(std::ostream &Output, int TapCount = 0) = 0;
 };
 
 class Expression : public Node {
@@ -22,10 +27,21 @@ public:
 
     Expression(bool IsLeaf) : IsLeaf(IsLeaf) {};
 
-    virtual Expression* clone() { return nullptr; };
+    virtual Expression* clone() = 0;
 };
 
-class Include : public Node {
+class Define : public Directive {
+public:
+    std::string Name;
+    std::string Str;
+
+    Define(std::string Name, std::string Str)
+            : Name(Name), Str(Str) {};
+
+    void outputCode(std::ostream &Output, int TapCount = 0);
+};
+
+class Include : public Directive {
 public:
     bool IsStd;
     std::string Path;
@@ -93,14 +109,14 @@ public:
 
 class Program : public Node {
 public:
-    std::vector<Include*> Includes;
+    std::vector<Directive*> Directives;
     std::vector<Struct*> Structs;
     std::vector<Function*> Functions;
     std::vector<Decl*> Globals;
 
     ~Program() {
-        for (auto Incl: Includes) {
-            delete Incl;
+        for (auto Direc: Directives) {
+            delete Direc;
         }
         for (auto Strt: Structs) {
             delete Strt;

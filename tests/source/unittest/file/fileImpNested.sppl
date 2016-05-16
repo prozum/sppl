@@ -1,4 +1,4 @@
 include "file/fileNestedOne.sppl"
 
 def main : [String] -> Int
-| s = func1(2)
+| s = @(func1(2))

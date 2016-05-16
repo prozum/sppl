@@ -2,4 +2,4 @@ include "file/fileNestedDupOne.sppl"
 include "file/fileNestedDupTwo.sppl"
 
 def main : [String] -> Int
-| s = func(1)
+| s = @(func(1))

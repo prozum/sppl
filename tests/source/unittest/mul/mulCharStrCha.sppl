@@ -1,2 +1,2 @@
 def main : [String]->String
-| s = "string"*'c'
+| s = @("string"*'c')

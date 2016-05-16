@@ -1,5 +1,5 @@
 def main : [String]->(Char,Char)
-| n = func1(('c','h'))
+| n = @(func1(('c','h')))
 
 def func1 : (Char,Char)->(Char,Char)
 | n = n

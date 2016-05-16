@@ -1,2 +1,2 @@
 def main : [String]->Bool
-| s = False == 0 < 0
+| s = @(False == 0 < 0)

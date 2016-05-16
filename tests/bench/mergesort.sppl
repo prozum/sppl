@@ -1,0 +1,47 @@
+def num : Int
+    | = 600000
+
+def main : [String] -> [Int]
+    | _ = mergesort(generate(0, num(), []))
+    | _ = generate(0, num(), [])
+
+def mergesort : [Int] -> [Int]
+    | l = mergesortsplit(split(l, count(l)))
+
+def mergesortsplit : ([Int], [Int], Int) -> [Int]
+    | ([], l, c)  = l
+    | (l, [], c)  = l
+    | (l1, l2, c) = merge(mergesortsplit(split(l1, c)),
+                          mergesortsplit(split(l2, c)))
+
+def split : [Int] -> Int -> ([Int], [Int], Int)
+    | l n = splitacc(l, [], n / 2, n)
+
+def splitacc : [Int] -> [Int] -> Int -> Int -> ([Int], [Int], Int)
+    | l acc n m when n == 0 = (acc, l, m)
+    | x : xs acc n m        = splitacc(xs, x : acc, n - 1, m - 1)
+
+def count : [Int] -> Int
+    | l = countacc(l, 0)
+
+def countacc : [Int] -> Int -> Int
+    | [] res = res
+    | x : xs res = countacc(xs, res + 1)
+
+def merge : [Int] -> [Int] -> [Int]
+    | l1 l2 = merge_acc(l1, l2, [])
+
+def merge_acc : [Int] -> [Int] -> [Int] -> [Int]
+    | [] [] res                    = reverse_acc(res, [])
+    | x : l1 [] res                = merge_acc(l1, [], x : res)
+    | [] x : l1 res                = merge_acc([], l1, x : res)
+    | x : l1 y : l2 res when x > y = merge_acc(x : l1, l2, y : res)
+    | x : l1 y : l2 res            = merge_acc(l1, y : l2, x : res)
+
+def reverse_acc : [Int] -> [Int] -> [Int]
+    | [] res = res
+    | x : xs res = reverse_acc(xs, x : res)
+
+def generate : Int -> Int -> [Int] -> [Int]
+    | n m list when n == m = list
+    | n m list when n < m = generate(n + 1, m, ((n % 4 + n % 3 + n % 2 + n % 1) * n) : list)

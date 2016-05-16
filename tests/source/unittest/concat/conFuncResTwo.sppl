@@ -1,5 +1,5 @@
 def main : [String]->[Int]
-| s = func1() ++ func2()
+| s = @(func1() ++ func2())
 
 def func1 : [Int]
 | = [1,2]

@@ -1,2 +1,2 @@
 def main : [String]->Bool
-| s = True<True
+| s = @(True<True)

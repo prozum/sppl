@@ -1,2 +1,2 @@
 def main : [String]->[Int]
-| s = [2,2.0,False,'c',"string"]
+| s = @([2,2.0,False,'c',"string"])

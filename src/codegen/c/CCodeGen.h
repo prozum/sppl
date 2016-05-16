@@ -65,7 +65,7 @@ protected:
     virtual void visit(common::CallExpr &Node);
     virtual void visit(common::AlgebraicExpr &Node);
 
-    const std::string PrintFunc = "printf";
+    const std::string PrintFunc = "print";
     const std::string Alloc = "malloc";
 
     const std::string GGenerated = "g";
@@ -76,22 +76,26 @@ protected:
     const std::string GCompare = GGenerated + "compare_";
     const std::string GPrint = GGenerated + "print_";
     const std::string GConcat = GGenerated + "concat_";
+    const std::string GFunc = GGenerated + "func_";
 
     const std::string GString = GGenerated + "string";
     const std::string GList = GGenerated + "list";
     const std::string GSignature = GGenerated + "sig";
     const std::string GTuple = GGenerated + "tuple";
-    const std::string GFloat = "double";
-    const std::string GInt = "int64_t";
-    const std::string GChar = "int";
-    const std::string GBool = "int";
+    const std::string GFloatType = "double";
+    const std::string GIntType = "int64_t";
+    const std::string GCharType = "int";
+    const std::string GBoolType = "int";
+    const std::string GFloatName = "float";
+    const std::string GIntName = "int";
+    const std::string GCharName = "char";
+    const std::string GBoolName = "bool";
 
-    const std::string GHead = "head";
     const std::string GLength = "length";
-    const std::string GNode = "node";
     const std::string GNext = "next";
     const std::string GValue = "value";
     const std::string GItem = "item";
+    const std::string GCall = "call";
     const std::string GArg = GGenerated + "arg";
     const std::string GRes = GGenerated + "res";
 
@@ -122,11 +126,12 @@ protected:
     ctree::Expression* PatternBuilder = nullptr;
     ctree::Expression* LastExpr = nullptr;
 
-    virtual std::string typePostfix(common::Type &Ty);
     virtual std::string getName(common::Type &Ty);
+    virtual std::string getType(common::Type &Ty);
     virtual std::string getOrGen(common::Type &Ty);
     virtual ctree::Expression* visitBinOp(common::BinaryOp& Op, std::string OpStr);
-    ctree::Expression* visitEqual(common::Type &Ty, common::Expression &Left, common::Expression &Right);
+    virtual ctree::Expression* generateAndChain(std::vector<ctree::Expression*>& Exprs);
+    ctree::Expression* visitEqual(common::BinaryOp& Equal);
 
     std::string generateList(common::Type &Ty);
     std::string generateSignature(common::Type &Ty);

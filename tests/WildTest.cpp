@@ -24,14 +24,14 @@ void Test::wildBool() {
 void Test::wildChar() {
     bool compStatus = compileChecker("wild/wildChar.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus);
-    bool execStatus = executeChecker("'c'");
+    bool execStatus = executeChecker("c");
     CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
 }
 
 void Test::wildString() {
     bool compStatus = compileChecker("wild/wildString.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus);
-    bool execStatus = executeChecker("\"String\"");
+    bool execStatus = executeChecker("String");
     CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
 }
 

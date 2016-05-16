@@ -1,5 +1,5 @@
 def main : [String]->String
-| s = func("string")
+| s = @(func("string"))
 
 def func : String->String
 | String = "string"

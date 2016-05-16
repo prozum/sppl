@@ -1,2 +1,2 @@
 def main : [String]->[String]
-| s = [2]
+| s = @([2])

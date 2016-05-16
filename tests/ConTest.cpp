@@ -78,7 +78,7 @@ void Test::conChar() {
 void Test::conString() {
     bool compStatus = compileChecker("concat/conString.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus);
-    bool execStatus = executeChecker("\"concatstring\"");
+    bool execStatus = executeChecker("concatstring");
     CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
 }
 

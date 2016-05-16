@@ -1,2 +1,2 @@
 def main : [String] -> String
-| s = "concat" ++ "string"
+| s = @("concat" ++ "string")
