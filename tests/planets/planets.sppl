@@ -1,0 +1,48 @@
+def sin : Float -> Float
+    | x = x - ((x*x*x)/3.0*2.0) + ((x*x*x*x*x)/5.0*4.0*3.0*2.0) + ((x*x*x*x*x*x*x) / 7.0*6.0*5.0*4.0*3.0*2.0)
+
+def cos : Float -> Float
+    | x = 1.0 + x + ((x*x)/2.0) + ((x*x*x)/3.0*2.0)
+
+def powsq : Float -> Float
+    | x = x*x
+
+def getposx : (Float, Float, Float, Float, Float, Float) -> Float
+    | (_,x,_,_,_,_) = x
+
+def getposy : (Float, Float, Float, Float, Float, Float) -> Float
+    | (_,_,y,_,_,_) = y
+
+def getvelx : (Float, Float, Float, Float, Float, Float) -> Float
+    | (_,_,_,x,_,_) = x
+
+def getvely : (Float, Float, Float, Float, Float, Float) -> Float
+    | (_,_,_,_,y,_) = y
+
+def getmass : (Float, Float, Float, Float, Float, Float) -> Float
+    | (m,_,_,_,_,_) = m
+
+def getrad : (Float, Float, Float, Float, Float, Float) -> Float
+    | (_,_,_,_,_,r) = r
+
+def updatepos : (Float, Float, Float, Float, Float, Float) -> (Float, Float) -> (Float, Float, Float, Float, Float, Float)
+    | (m,px,py,vx,vy,r) (npx,npy) = (m,px+npx,py+npy,vx,vy,r)
+
+def updatevel : (Float, Float, Float, Float, Float, Float) -> (Float, Float) -> (Float, Float, Float, Float, Float, Float)
+    | (m,px,py,vx,vy,r) (nvx,nvy) = (m,px,py,vx+nvx,vy+nvy,r)
+
+def dist : (Float, Float, Float, Float, Float, Float) -> (Float, Float, Float, Float, Float, Float) -> Float
+    | p1 p2 = powsq(getposx(p2) - getposx(p1)) + powsq(getposy(p2) - getposy(p1))
+
+def newton : (Float, Float, Float, Float, Float, Float) -> (Float, Float, Float, Float, Float, Float) -> Float
+    | p1 p2 when dist(p1,p2) != 0.0 = (getmass(p1) * getmass(p2)) / dist(p1,p2)
+    | _ _ = 0.0
+
+def acc : (Float -> Float) -> (Float, Float, Float, Float, Float, Float) -> (Float, Float, Float, Float, Float, Float) -> Float
+    | fun p1 p2 = (fun(newton(p1,p2))) / (getmass(p1))
+
+def updatePlanet : (Float, Float, Float, Float, Float, Float) -> (Float, Float, Float, Float, Float, Float) -> (Float, Float, Float, Float, Float, Float)  
+    | (m1,px1,py1,vx1,vy1,r1) (m2,px2,py2,vx2,vy2,r2) = (m1,px1+vx1,py1+vy1,vx1+acc(cos,(m1,px1,py1,vx1,vy1,r1),(m2,px2,py2,vx2,vy2,r2)),vy1+acc(sin,(m1,px1,py1,vx1,vy1,r1),(m2,px2,py2,vx2,vy2,r2)),r1)
+
+def main : [String] -> (Float, Float, Float, Float, Float, Float)
+    | _ = @updatePlanet((100000.0,0.0,0.0,10.0,10.0,100.0),(1000.0,1000.0,1000.0,10.0,10.0,100.0))
