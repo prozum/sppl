@@ -40,8 +40,8 @@ script:
   - docker exec xenial /bin/sh -c "cd /root/source/build && make -j 8"
   - docker exec xenial /bin/sh -c "cd /root/source/build && make install"
   - #Test C
-  - docker exec xenial /bin/sh -c "cd /root/source/test-c && make tests -j 8"
-  - docker exec xenial /bin/sh -c "cd /root/source/test-c/tests && tests c"
+  - docker exec xenial /bin/sh -c "cd /root/source/build-test && make tests -j 8"
+  - docker exec xenial /bin/sh -c "cd /root/source/build-test/tests && tests c"
 
 after_script:
   - pwd
