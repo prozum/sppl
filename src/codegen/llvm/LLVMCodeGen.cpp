@@ -10,7 +10,7 @@ LLVMCodeGen::LLVMCodeGen(parser::Driver &Drv)
           Builder(Ctx),
           RawOut(*Drv.MOut) {
 
-    // Init LLVM before TargetMachine and DataLayout
+    // Initialize LLVM before TargetMachine and DataLayout
     initLLVM();
     Machine = std::unique_ptr<TargetMachine>(EngineBuilder().selectTarget());
     DataLayout = std::make_unique<llvm::DataLayout>(Machine->createDataLayout());
@@ -23,15 +23,30 @@ LLVMCodeGen::LLVMCodeGen(parser::Driver &Drv)
     Int64 = llvm::Type::getInt64Ty(Ctx);
     Double = llvm::Type::getDoubleTy(Ctx);
     VoidPtr = PointerType::getUnqual(Int8);
+
+    // Union type used for easy bitcast
+    UnionType = StructType::create(Ctx, Int64, "union");
+
+    // Runtime type
+    RuntimeType = StructType::create(Ctx, "runtime_type");
+    llvm::Type *Body[] = { Int64, PointerType::getUnqual( ArrayType::get(RuntimeType, 0) ) };
+    RuntimeType->setBody(Body);
+
+    // Main type
     MainType = FunctionType::get(Int32,
                                  vector<Type *> {
                                          Int32,
                                          PointerType::getUnqual(PointerType::getUnqual(Int8))
                                  },
                                  false);
+
 }
 
 void LLVMCodeGen::visit(common::Program &node) {
+    // Helper functions
+    ArgFunc = CreateArgFunc();
+    PrintFunc = CreatePrintFunc();
+
     for (auto &func : node.Decls) {
         func->accept(*this);
     }

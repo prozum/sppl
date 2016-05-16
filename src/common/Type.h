@@ -21,7 +21,8 @@ enum class TypeId {
     GENERIC,
     EMPTYLIST,
     CUSTOM,
-    VOID
+    VOID,
+    TYPES
 };
 
 class Type {

@@ -79,6 +79,30 @@ llvm::FunctionType *LLVMCodeGen::getFuncType(common::Type Ty) {
     return FuncTypes[Ty] = FunctionType::get(OutputType, InputTypes, false);
 }
 
+llvm::GlobalVariable *LLVMCodeGen::getRuntimeType(common::Type Ty) {
+    auto CacheType = RuntimeTypes.find(Ty);
+
+    if (CacheType != RuntimeTypes.end())
+        return CacheType->second;
+
+    vector<Constant *> ArrayElements;
+    for (auto Subtype : Ty.Subtypes) {
+        ArrayElements.push_back(getRuntimeType(Subtype));
+    }
+    ArrayElements.push_back(ConstantPointerNull::get(PointerType::getUnqual(RuntimeType)));
+
+    // Create constant array with subtypes
+    auto ConstArray = ConstantArray::get(ArrayType::get(RuntimeType, 0), ArrayElements);
+    auto GlobalArray = new GlobalVariable(*Module.get(), ConstArray->getType(), true,
+                                          GlobalVariable::ExternalLinkage, ConstArray);
+
+    // Create runtime type
+    auto ConstVal = ConstantStruct::get(RuntimeType, { ConstantInt::get(Int64, (uint64_t)Ty.Id), GlobalArray } );
+
+    return RuntimeTypes[Ty] = new GlobalVariable(*Module.get(), ConstVal->getType(), true,
+                                GlobalVariable::ExternalLinkage, ConstVal);
+}
+
 
 
 

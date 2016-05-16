@@ -22,3 +22,9 @@ void LLVMCodeGen::visit(common::Not &Node) {
 
     CurVal = Builder.CreateNot(CurVal, "nottmp");
 }
+
+void LLVMCodeGen::visit(common::UnPrint &Node) {
+    Node.Child->accept(*this);
+
+    CreatePrint(CurVal, Node.RetTy);
+}

@@ -1,5 +1,2 @@
-def main: [String] -> Int
-	| [] = 10
-	| path : "ja" : rest = 1
-	| path : "nej" : rest = 2
-	| n = 20
+def main: [String] -> Bool
+	| n = do { @False @' '  @100 @1.1 @True }

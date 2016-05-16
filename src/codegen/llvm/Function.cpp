@@ -14,7 +14,21 @@ void LLVMCodeGen::visit(common::Function &Node) {
                                          llvm::Function::ExternalLinkage, Node.Id,
                                          Module.get());
         Entry = BasicBlock::Create(Ctx, "entry", CurFunc);
-        Args.push_back(CreateMainArg());
+
+        // System args
+        auto ArgIter = CurFunc->args().begin();
+        Argument *Argc = &*(ArgIter++);
+        Argument *Argv = &*(ArgIter);
+        Argc->setName("argc");
+        Argv->setName("argv");
+
+        // Call create arg function
+        // TODO
+        //CurVal = Builder.CreateCall(ArgFunc, vector<Value *> { Argc, Argv } );
+        auto CharListType = common::Type(TypeId::STRING, vector<common::Type> { common::Type(TypeId::CHAR)});
+        auto StrListType = common::Type(TypeId::LIST, vector<common::Type> { CharListType });
+        CurVal = ConstantPointerNull::get(static_cast<PointerType *>(getType(StrListType)));
+        Args.push_back(CurVal);
     }
     else {
         CurFunc = llvm::Function::Create(getFuncType(Node.Signature),
@@ -44,12 +58,10 @@ void LLVMCodeGen::visit(common::Function &Node) {
     // Create return block and setup phi node
     RetBlock = BasicBlock::Create(Ctx, "ret", CurFunc);
     Builder.SetInsertPoint(RetBlock);
-
-    // Create ret instruction
     if (!CurFunc->getReturnType()->isVoidTy()) {
-        CasePhiNode = Builder.CreatePHI(CurFunc->getReturnType(),
+        RetPhiNode = Builder.CreatePHI(CurFunc->getReturnType(),
                                        (unsigned) Node.Cases.size(), "rettmp");
-        Builder.CreateRet(CasePhiNode);
+        Builder.CreateRet(RetPhiNode);
     } else {
         Builder.CreateRetVoid();
     }
@@ -91,7 +103,7 @@ void LLVMCodeGen::visit(common::Case &Node) {
     // Clear pattern values
     PatVals.clear();
 
-
+    // Set pattern prefix
     addPrefix("pat");
     if (!Node.Patterns.empty()) {
         CurPatBlock->setName(getPrefix());
@@ -115,9 +127,9 @@ void LLVMCodeGen::visit(common::Case &Node) {
         Builder.SetInsertPoint(CurPatBlock);
         CurVal = *CurArg;
         (*CurPat)->accept(*this);
-        stepPrefix();
 
         if (next(CurPat) != Node.Patterns.cend()) {
+            stepPrefix();
             CurPatBlock = BasicBlock::Create(Ctx, getPrefix(), CurFunc);
             Builder.CreateCondBr(CurVal, CurPatBlock, NextBlock);
         }
@@ -130,13 +142,13 @@ void LLVMCodeGen::visit(common::Case &Node) {
         Builder.CreateCondBr(CurVal, WhenBlock, NextBlock);
         Builder.SetInsertPoint(WhenBlock);
         Node.When->accept(*this);
-        Builder.CreateCondBr(CurVal, CurCaseBlock, NextBlock);
-    } else {
-        if (!Node.Patterns.empty())
-            Builder.CreateCondBr(CurVal, CurCaseBlock, NextBlock);
-        else
-            Builder.CreateBr(CurCaseBlock);
     }
+
+    // Branch to next block
+    if (!Node.Patterns.empty())
+        Builder.CreateCondBr(CurVal, CurCaseBlock, NextBlock);
+    else
+        Builder.CreateBr(CurCaseBlock);
 
     // Generate expression in case block
     Builder.SetInsertPoint(CurCaseBlock);
@@ -144,135 +156,25 @@ void LLVMCodeGen::visit(common::Case &Node) {
 
     // Main must return Int32
     if (CurFunc->getName() == "main" && !Drv.JIT) {
-        //CurVal = Builder.CreateTrunc(CurVal, Int32, "tmptrunc");
-        CurVal = ConstantInt::get(Int32, 0);
+        if (CurVal->getType()->isIntegerTy())
+            CurVal = Builder.CreateTrunc(CurVal, Int32, "tmptrunc");
+        else if (CurVal->getType()->getFloatTy(Ctx))
+            CurVal = Builder.CreateFPToSI(CurVal, Int32, "casttmp");
+        else
+            CurVal = ConstantInt::get(Int32, 0);
     }
 
 #ifdef SPPLDEBUG
     auto Ty1 = CurVal->getType();
     if (CurFunc->getReturnType()->getTypeID() != llvm::Type::TypeID::VoidTyID) {
-        auto Ty2 = CasePhiNode->getType();
+        auto Ty2 = RetPhiNode->getType();
         assert(Ty1 == Ty2);
     }
 #endif
 
-    // Ignore expression type if function is void
-    if (CurFunc->getReturnType()->getTypeID() != llvm::Type::TypeID::VoidTyID)
-        CasePhiNode->addIncoming(CurVal, CurCaseBlock);
-
     // Add return value to phi node
+    RetPhiNode->addIncoming(CurVal, CurCaseBlock);
     Builder.CreateBr(RetBlock);
 }
 
-llvm::Value *LLVMCodeGen::CreateMainArg()
-{
-    // Input Type
-    auto CharListType = common::Type(TypeId::STRING, vector<common::Type> { common::Type(TypeId::CHAR)});
-    auto StrListType = common::Type(TypeId::LIST, vector<common::Type> { CharListType });
 
-    // TODO
-    return ConstantPointerNull::get(static_cast<PointerType *>(getType(StrListType)));
-
-    // Create Function
-    vector<llvm::Type *> types = {};
-    auto CreateArg = llvm::Function::Create(FunctionType::get(getType(StrListType), vector<llvm::Type *> { Int32, PointerType::getUnqual(PointerType::getUnqual(Int8)) }, false),
-                                       llvm::Function::ExternalLinkage, "create_arg",
-                                       Module.get());
-
-    // System arguments
-    auto ArgIter = CreateArg->args().begin();
-    Argument *Argc = &*(ArgIter++);
-    Argument *Argv = &*(ArgIter);
-    Argc->setName("argc");
-    Argv->setName("argv");
-
-    // Create blocks
-    auto StartBlock = BasicBlock::Create(Ctx, "entry", CreateArg);
-    auto CheckBlock = BasicBlock::Create(Ctx, "check", CreateArg);
-    auto StrLoopBlock = BasicBlock::Create(Ctx, "str_loop", CreateArg);
-    auto CharLoopBlock = BasicBlock::Create(Ctx, "char_loop", CreateArg);
-    auto CharAddBlock = BasicBlock::Create(Ctx, "char_add", CreateArg);
-    auto StrAddBlock = BasicBlock::Create(Ctx, "str_add", CreateArg);
-    auto EndBlock = BasicBlock::Create(Ctx, "end", CreateArg);
-
-    // Init in entry block
-    Builder.SetInsertPoint(StartBlock);
-    Value *AllocaStringList = Builder.CreateAlloca(getType(StrListType), nullptr, "str_list");
-    Value *AllocaString = Builder.CreateAlloca(getType(CharListType), nullptr, "char_list");
-    Value *AllocaStringIter = Builder.CreateAlloca(Int32, nullptr, "str_iter");
-    Value *AllocaCharIter = Builder.CreateAlloca(Int32, nullptr, "char_iter");
-    //Value *AllocaChar = Builder.CreateAlloca(Int8, nullptr, "char");
-    //Value *CharPtr = Builder.CreateAlloca(VoidPtr, nullptr, "char_ptr");
-    //Value *TmpVal;
-    Builder.CreateStore(ConstantInt::get(Int32, 0), AllocaStringIter);
-    Builder.CreateBr(CheckBlock);
-
-    // Check block
-    Builder.SetInsertPoint(CheckBlock);
-    auto StringIter = Builder.CreateLoad(AllocaStringIter, "loadtmp");
-    CurVal = Builder.CreateICmpULT(StringIter, Argc, "cmptmp");
-    Builder.CreateCondBr(CurVal, StrLoopBlock, EndBlock);
-
-    // String loop block
-    Builder.SetInsertPoint(StrLoopBlock);
-    Builder.CreateStore(ConstantInt::get(Int32, 0), AllocaCharIter);
-    //CurVal = Builder.CreateLoad(AllocaStringIter);
-    CurVal = Builder.CreateGEP(Argv, StringIter);
-    auto CharPtr = Builder.CreateLoad(CurVal);
-    Builder.CreateBr(CharLoopBlock);
-
-    // Char loop block
-    Builder.SetInsertPoint(CharLoopBlock);
-    auto CharIter = Builder.CreateLoad(AllocaCharIter);
-    CurVal = Builder.CreateGEP(CharPtr, CharIter); // ??
-    auto Char = Builder.CreateLoad(Int8, CurVal);
-    //Builder.CreateStore(CurVal, AllocaChar);
-    CurVal = Builder.CreateICmpEQ(Char, ConstantInt::get(Int8, 0));
-    Builder.CreateCondBr(CurVal, StrAddBlock, CharAddBlock);
-
-    // Char add block
-    Builder.SetInsertPoint(CharAddBlock);
-    //CurVal = Builder.CreateLoad(AllocaChar);
-    auto CharList = Builder.CreateLoad(AllocaString);
-    //TmpVal = Builder.CreatePointerCast(CharList, getType(CharListType));
-    CurVal = CreateListNode(CharListType, Char, CharList, CharAddBlock);
-    Builder.CreateStore(CurVal, AllocaString);
-
-    CharIter = Builder.CreateLoad(Int32, AllocaCharIter);
-    CurVal = Builder.CreateAdd(CharIter, ConstantInt::get(Int32, APInt(32, 1)), "addtmp");
-    Builder.CreateStore(CurVal, AllocaCharIter);
-    Builder.CreateBr(CharLoopBlock);
-
-    // String add block
-    Builder.SetInsertPoint(StrAddBlock);
-    auto StringList = Builder.CreateLoad(AllocaStringList, "loadtmp");
-    auto String = Builder.CreateLoad(AllocaString);
-    CurVal = CreateListNode(StrListType, String, StringList, StrAddBlock);
-    Builder.CreateStore(CurVal, AllocaStringList);
-
-    CurVal = Builder.CreateLoad(Int32, AllocaStringIter, "loadtmp");
-    CurVal = Builder.CreateAdd(CurVal, ConstantInt::get(Int32, APInt(32, 1)), "addtmp");
-    Builder.CreateStore(CurVal, AllocaStringIter);
-    Builder.CreateBr(CheckBlock);
-
-    // End block
-    Builder.SetInsertPoint(EndBlock);
-    CurVal = Builder.CreateLoad(AllocaStringList);
-    Builder.CreateRet(CurVal);
-
-    // Call create_arg
-    Builder.SetInsertPoint(Entry);
-    auto MainArgIter = CurFunc->args().begin();
-    Argument *MainArgc = &*(MainArgIter++);
-    Argument *MainArgv = &*(MainArgIter);
-    MainArgc->setName("argc");
-    MainArgv->setName("argv");
-
-    if (verifyFunction(*CreateArg, &RawOut)) {
-        addError(Error("LLVM Error:\n" + ModuleString()));
-        if (!Drv.Silent)
-            RawOut.flush();
-    }
-
-    return Builder.CreateCall(CreateArg, { MainArgc, MainArgv }, "_arg0");
-}
