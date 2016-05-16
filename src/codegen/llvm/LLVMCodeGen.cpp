@@ -43,6 +43,9 @@ LLVMCodeGen::LLVMCodeGen(parser::Driver &Drv)
 }
 
 void LLVMCodeGen::visit(common::Program &node) {
+    // Clear runtime types
+    RuntimeTypes.clear();
+
     // Helper functions
     ArgFunc = CreateArgFunc();
     PrintFunc = CreatePrintFunc();
