@@ -13,6 +13,7 @@ void print_help(char *program_name)
     cout << "  --output         -o  <file>  Set binary output file" << endl;
     cout << "  --header-output  -ho <file>  Set header output file" << endl << endl;
 #ifdef CCPP
+    cout << "  --c                          C backend" << endl;
     cout << "  --cpp                        C++ backend" << endl;
     cout << "  --cpar                       Parallel C backend" << endl;
 #endif
@@ -52,7 +53,7 @@ int main(int argc, char *argv[])
         else if (Arg.compare("--cpar") == 0)
             BE = Backend::CPAR;
         else if (Arg.compare("--c") == 0)
-            BE = Backend::CPAR;
+            BE = Backend::C;
 #endif
 #ifdef CGNUASM
         else if (Arg.compare("--gnuasm") == 0)

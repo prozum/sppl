@@ -22,7 +22,15 @@ compiler::Backend backend = compiler::Backend::PPRINTER;    // Standard compiler
 int main(int argc, char* argv[]){
 
     // Set the target compiler
-    if (strcmp(argv[1], "c") == 0) {    // Set compiler to c
+    if (strcmp(argv[1], "cnew") == 0) {    // Set compiler to c
+#ifdef CCPP
+        cout << "Backend: C" << endl;
+        backend = compiler::Backend::C;
+#else
+        cout << "Unsupported: C - Defaulting to Pretty Printer" << endl;
+#endif
+        // Set the target compiler
+    } else if (strcmp(argv[1], "c") == 0) {    // Set compiler to c
 #ifdef CCPP
         cout << "Backend: C" << endl;
         backend = compiler::Backend::CPP;
@@ -154,7 +162,9 @@ bool Test::compileChecker(std::string name) {
 // Run separate function for each supported target language
 // Only currently relevant languages available
 bool Test::executeChecker(std::string args, std::string expectedOutput) {
-    if (backend == compiler::Backend::CPP || backend == compiler::Backend::CPAR) {
+    if (backend == compiler::Backend::CPP
+        || backend == compiler::Backend::CPAR
+        || backend == compiler::Backend::C) {
         return executeCPP(args, expectedOutput);
     } else if (backend == compiler::Backend::LLVM) {
         return executeLLVM(args, expectedOutput);
@@ -173,7 +183,7 @@ bool Test::executeCPP(std::string args, std::string expectedOutput) {
     int status;
 
     // Compile program using system c compiler
-    if (backend == compiler::Backend::CPP) {    // Sequential compiler
+    if (backend == compiler::Backend::CPP || backend == compiler::Backend::C) {    // Sequential compiler
         status = system("cc out.c -o prog");
     } else if (backend == compiler::Backend::CPAR) {    // Parallel compiler
         status = system("cc out.c context.c print.c queue.c runtime.c task.c -o prog -lpthread");
