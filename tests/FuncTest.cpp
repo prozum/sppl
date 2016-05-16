@@ -25,14 +25,14 @@ void Test::funcRetBool() {
 void Test::funcRetChar() { 
     bool compStatus = compileChecker("func/funcRetChar.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus);
-    bool execStatus = executeChecker("'c'");
+    bool execStatus = executeChecker("c");
     CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
 }
 
 void Test::funcRetString() { 
     bool compStatus = compileChecker("func/funcRetString.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus);
-    bool execStatus = executeChecker("\"string\"");
+    bool execStatus = executeChecker("string");
     CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
 }
 
@@ -60,14 +60,14 @@ void Test::funcBoolRetBool() {
 void Test::funcCharRetChar() { 
     bool compStatus = compileChecker("func/funcCharRetChar.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus);
-    bool execStatus = executeChecker("'c'");
+    bool execStatus = executeChecker("c");
     CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
 }
 
 void Test::funcStringRetString() { 
     bool compStatus = compileChecker("func/funcStringRetString.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus);
-    bool execStatus = executeChecker("\"string\"");
+    bool execStatus = executeChecker("string");
     CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
 }
 
@@ -95,14 +95,14 @@ void Test::funcBoolBoolRetBool() {
 void Test::funcCharCharRetChar() { 
     bool compStatus = compileChecker("func/funcCharCharRetChar.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus);
-    bool execStatus = executeChecker("'c'");
+    bool execStatus = executeChecker("c");
     CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
 }
 
 void Test::funcStringStringRetString() { 
     bool compStatus = compileChecker("func/funcStringStringRetString.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus);
-    bool execStatus = executeChecker("\"string\"");
+    bool execStatus = executeChecker("string");
     CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
 }
 
@@ -200,14 +200,14 @@ void Test::funcBoolToBoolRetBool() {
 void Test::funcCharToCharRetChar() { 
     bool compStatus = compileChecker("func/funcCharToCharRetChar.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus);
-    bool execStatus = executeChecker("'c'");
+    bool execStatus = executeChecker("c");
     CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
 }
 
 void Test::funcStringToStringRetString() { 
     bool compStatus = compileChecker("func/funcStringToStringRetString.sppl");
     CPPUNIT_ASSERT_MESSAGE(compMsgFail, compStatus);
-    bool execStatus = executeChecker("\"string\"");
+    bool execStatus = executeChecker("string");
     CPPUNIT_ASSERT_MESSAGE(execMsg, execStatus);
 }
 
