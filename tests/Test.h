@@ -843,5 +843,5 @@ protected:
     bool executeChecker(std::string args, std::string expectedOutput);
     bool executeChecker(std::string expectedOutput);
     bool executeCPP(std::string args, std::string expectedOutput);
-    bool executeLLVM(std::string args, std::string expectedOutput);
+    bool executeLLVM(std::string Args, std::string ExpectedOutput);
 };

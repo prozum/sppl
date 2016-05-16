@@ -200,11 +200,10 @@ bool Test::executeCPP(std::string args, std::string expectedOutput) {
     // Used to read from outputstream for the program
 
     // build the command line command
-    std::string argBuilder = "./prog ";
-    argBuilder += args;
+    std::string argBuilder = "./prog " + args;
     char* arg = (char*) argBuilder.c_str();
 
-    std::shared_ptr<FILE> pipe(popen(arg,"r"),pclose);
+    std::shared_ptr<FILE> pipe(popen(arg,"r"), pclose);
     if (!pipe) {
         CPPUNIT_ASSERT_MESSAGE("could not open pipe", false);
         return false;
@@ -243,9 +242,34 @@ bool Test::executeCPP(std::string args, std::string expectedOutput) {
     }
 }
 
-bool Test::executeLLVM(std::string args, std::string expectedOutput) {
-    int status = system("lli out.ll");
+bool Test::executeLLVM(std::string Args, std::string ExpectedOutput) {
+    std::shared_ptr<FILE> Pipe(popen((string("lli out.ll ") + Args).c_str(), "r"), pclose);
+    if (!Pipe) {
+        CPPUNIT_ASSERT_MESSAGE("could not open pipe", false);
+        return false;
+    }
 
-    //return status == 0;
-    return true;
+    std::string Res = "";
+    char Buffer[128];
+    while(!feof(Pipe.get())) {
+        if (fgets(Buffer, 128, Pipe.get()) != NULL) {
+            Res += Buffer;
+        }
+    }
+
+    // Compare the output from the program to the expected output
+    // If the outputs are equal, the program executed correctly
+    // (as in it gave the correct output to the correct input)
+    if (Res.compare(ExpectedOutput) != 0) {
+        // If fail, first clear last test output, then return
+        std::string Msg = "Result differ from expected:\nResult   => " + Res + "\nExpected => " + ExpectedOutput;
+
+        CPPUNIT_ASSERT_MESSAGE(Msg, false);
+
+        remove("out.ll");
+        return false;
+    } else {
+        remove("out.ll");
+        return true;
+    }
 }
