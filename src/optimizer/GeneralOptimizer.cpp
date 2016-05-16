@@ -253,7 +253,6 @@ void GeneralOptimizer::visit(common::DoExpr &Node) {
     for (auto &Expr: Node.Exprs) {
         Expr->accept(*this);
     }
-    Node.ReturnExpr->accept(*this);
 }
 
 

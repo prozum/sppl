@@ -174,10 +174,8 @@ class AlgebraicExpr : public Expression {
 class DoExpr : public Expression {
 public:
     std::vector<std::unique_ptr<Expression>> Exprs;
-    std::unique_ptr<Expression> ReturnExpr;
 
     DoExpr(std::vector<std::unique_ptr<Expression>> Exprs,
-           std::unique_ptr<Expression> ReturnExpr,
            Location Loc);
 
     virtual void accept(Visitor &V);

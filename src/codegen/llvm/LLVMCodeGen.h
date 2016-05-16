@@ -113,6 +113,8 @@ private:
     void visit(common::GreaterEq &Node);
     void visit(common::To &Node);
     void visit(common::ListAdd &Node);
+    void visit(common::DoExpr &Node);
+    void visit(common::Assosiate &Node);
 
     void visit(common::Negative &Node);
     void visit(common::Not &Node);

@@ -65,7 +65,6 @@ using namespace common;
 %token WHEN "when"
 %token TO "to"
 %token DO "do"
-%token RETURN "return"
 %token WILD "_"
 %token CONCAT "++"
 %token PROCON "|>"
@@ -234,7 +233,7 @@ expr:   expr OR expr                                        { $$ = new Or(unique
     |   EXMARK expr                                         { $$ = new Not(unique_ptr<Expression>($2), @1); }
     |	SUB expr %prec NEGATIVE                             { $$ = new Negative(unique_ptr<Expression>($2), @1); }
     |	AT expr                                             { $$ = new UnPrint(unique_ptr<Expression>($2), @1); }
-    |   DO CURLSTART as_exprs RETURN expr CURLEND           { $$ = new DoExpr(move(* $3), unique_ptr<Expression>($5), @1); delete $3; }
+    |   DO CURLSTART as_exprs expr CURLEND                  { $3->push_back(unique_ptr<Expression>($4)); $$ = new DoExpr(move(* $3), @1);  delete $3; }
 as_expr: expr                                               { $$ = $1; }
     |    assosiate                                          { $$ = $1; }
 assosiate: IDSMALL COLONEQUAL expr                          { $$ = new Assosiate(unique_ptr<Expression>($3), * $1, @1); }

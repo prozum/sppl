@@ -129,3 +129,14 @@ void LLVMCodeGen::visit(common::ListAdd &Node) {
     CurVal = CreateListNode(Node.RetTy, Element, List, Builder.GetInsertBlock());
 }
 
+void LLVMCodeGen::visit(common::DoExpr &Node) {
+    for (auto &Expr : Node.Exprs) {
+        Expr->accept(*this);
+    }
+}
+
+void LLVMCodeGen::visit(common::Assosiate &Node) {
+    Node.Child->accept(*this);
+
+    PatVals[Node.Id] = CurVal;
+}

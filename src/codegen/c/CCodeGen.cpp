@@ -77,7 +77,7 @@ void CCodeGen::visit(common::Program &Node) {
     ForBlock->Stmts.push_back(new ExprStmt(new BinOp("=", new Ident("args"), AddFunc)));
 
     // umain(args);
-    auto UMainCall = new Call(new Ident(GUser + "main"));
+    auto UMainCall = new Call(new BinOp(".", new Ident(GUser + "main"), new Ident(GCall)));
     UMainCall->Args.push_back(new Ident("args"));
     MainBlock->Stmts.push_back(new ExprStmt(UMainCall));
 
@@ -546,7 +546,12 @@ void CCodeGen::visit(common::FloatExpr &Node) {
 }
 
 void CCodeGen::visit(common::CharExpr &Node) {
-    LastExpr = new Char("" + Node.Val);
+    stringstream ss;
+    string s;
+    ss << Node.Val;
+    ss >> s;
+
+    LastExpr = new Char(s);
 }
 
 void CCodeGen::visit(common::BoolExpr &Node) {
@@ -561,8 +566,8 @@ void CCodeGen::visit(common::ListExpr &Node) {
     auto Create = new Call(new Ident(GCreate + getName(Node.RetTy)));
     Create->Args.push_back(new Int(Node.Elements.size()));
 
-    for (auto &Expr: Node.Elements) {
-        Expr->accept(*this);
+    for (size_t i = Node.Elements.size(); i > 0; --i) {
+        Node.Elements[i - 1]->accept(*this);
         Create->Args.push_back(LastExpr);
     }
 
@@ -1082,7 +1087,7 @@ string CCodeGen::generateList(Type &Ty) {
      *         print_child(l->value);
      *         l = l->next;
      *
-     *         if (!l->length)
+     *         if (l->length)
      *         {
      *             print(", ");
      *         }
@@ -1129,10 +1134,10 @@ string CCodeGen::generateList(Type &Ty) {
     auto LNext = new BinOp("->", new Ident("l"), new Ident(GNext));
     WhileBlock->Stmts.push_back(new ExprStmt(new BinOp("=", new Ident("l"), LNext)));
 
-    // if (!l->length)
+    // if (l->length)
     IfBlock = new Block(WhileBlock);
     auto LLength = new BinOp("->", new Ident("l"), new Ident(GLength));
-    WhileBlock->Stmts.push_back(new IfElse(new UnOp("!", LLength) , IfBlock));
+    WhileBlock->Stmts.push_back(new IfElse(LLength , IfBlock));
 
     // print(", ");
     Print = new Call(new Ident(PrintFunc));

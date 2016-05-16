@@ -643,9 +643,11 @@ void CCodeGenOld::generateStd() {
             << "#include <stdint.h> " << endl
             << "#include <inttypes.h> " << endl;
 
+    /*
     if (GC) {
         *Header << "#include <gc.h> " << endl;
     }
+     */
 
     ToStrings[Type(TypeId::INT)] = GGenerated + GToString + "int";
     ToStrings[Type(TypeId::BOOL)] = GGenerated + GToString + "bool";

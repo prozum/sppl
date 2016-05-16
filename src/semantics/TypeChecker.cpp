@@ -757,11 +757,10 @@ void TypeChecker::visit(common::DoExpr &Node) {
     for (auto &Expr: Node.Exprs) {
         Expr->accept(*this);
     }
-    Node.ReturnExpr->accept(*this);
     if (checkNotSafe())
         return;
 
-    Node.RetTy = Node.ReturnExpr->RetTy;
+    Node.RetTy = Node.Exprs.back()->RetTy;
 }
 
 void TypeChecker::visit(IntExpr &Node) { }
