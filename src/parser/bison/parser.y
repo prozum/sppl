@@ -110,7 +110,6 @@ using namespace common;
 %token <LongDouble> FLOATLITERAL "Float"
 %token <Str> IDSMALL IDBIG STRINGLITERAL "String"
 
-%left DOLLAR
 %left OR
 %left AND
 %left EQUAL NOTEQUAL

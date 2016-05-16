@@ -15,6 +15,8 @@ void CCodeGenOld::visit(Program &Node) {
     Prog = &Node;
     Function *Main = nullptr;
 
+    *Output << "#define print printf" << endl;
+
     // Generate the standard functionality for every program
     generateStd();
 
@@ -95,7 +97,7 @@ void CCodeGenOld::visit(Function &Node) {
     // If a case is not realised in a function, a runtime error should occure.
     // There should be some checks earlier in the compiler phase that prevents
     // this error though.
-    *Output << "    printf(\"No cases realized in " << CurFunc->Id << " \\n\"); " << endl
+    *Output << "    print(\"No cases realized in " << CurFunc->Id << " \\n\"); " << endl
             << "    exit(1); " << endl
             << "} " << endl
             << endl;
@@ -304,7 +306,7 @@ string CCodeGenOld::generateList(Type &Ty) {
     *Header << Name << "* " << GGenerated << GAt << Name << "(" << Name << "* current, int index); " << endl;
     Buffer << Name << "* " << GGenerated << GAt << Name << "(" << Name << "* current, int index) { " << endl
            << "    if (current->" << GSize << " < index) { " << endl
-           << "        printf(\"Out of bound! " << Ty.str() << "\\n\"); " << endl
+           << "        print(\"Out of bound! " << Ty.str() << "\\n\"); " << endl
            << "        exit(1); " << endl
            << "    }" << endl
            << endl
@@ -397,16 +399,18 @@ string CCodeGenOld::generateList(Type &Ty) {
     // generate print
     Prints[Ty] = GGenerated + GPrint + Name;
 
-    *Header << "void " << Prints[Ty] << "(" << Name << "* value, int is_top); " << endl;
-    Buffer << "void " << Prints[Ty] << "(" << Name << "* value, int is_top) { " << endl
-            << "    printf(\"[\"); \n" << endl
+    *Header << Name << "* " << Prints[Ty] << "(" << Name << "* value, int is_top); " << endl;
+    Buffer << Name << "* " << Prints[Ty] << "(" << Name << "* value, int is_top) { " << endl
+            << "    " << Name << "* res = value;" << endl
+            << "    print(\"[\"); \n" << endl
             << "    while (!value->" << GEmpty << ") {" << endl
             << "        " << Prints[Ty.Subtypes.front()] << "(value->" << GValue << ", 0);" << endl
             << "        value = value->" << GNext << ";" << endl
             << "        if (!value->" << GEmpty << ")" << endl
-            << "            printf(\", \"); \n" << endl
+            << "            print(\", \"); \n" << endl
             << "    }" << endl
-            << "    printf(\"]\"); \n" << endl
+            << "    print(\"]\"); \n" << endl
+            << "    return res;" << endl
             << "} " << endl
             << endl;
 
@@ -446,9 +450,10 @@ string CCodeGenOld::generateEnvironment(Type &Ty) {
     // Generate print
     Prints[Ty] = GGenerated + GPrint + Name;
 
-    *Header << "void " << Prints[Ty] << "(" << Name << " value, int is_top); " << endl;
-    Buffer << "void " << Prints[Ty] << "(" << Name << " value, int is_top) { " << endl
-           << "    printf(\"" << Ty.str() << "\"); " << endl
+    *Header << Name << " " << Prints[Ty] << "(" << Name << " value, int is_top); " << endl;
+    Buffer << Name << " " << Prints[Ty] << "(" << Name << " value, int is_top) { " << endl
+           << "    print(\"" << Ty.str() << "\"); " << endl
+           << "    return value;" << endl
            << "} " << endl
            << endl;
 
@@ -603,18 +608,19 @@ string CCodeGenOld::generateTuple(Type &Ty) {
     // Generate print for tuple
     Prints[Ty] = GGenerated + GPrint + Name;
 
-    *Header << "void " << Prints[Ty] << "(" << Name << " value, int is_top); " << endl;
-    Buffer << "void " << Prints[Ty] << "(" << Name << " value, int is_top) { " << endl
-           << "    printf(\"(\");" << endl;
+    *Header << Name << " " << Prints[Ty] << "(" << Name << " value, int is_top); " << endl;
+    Buffer << Name << " " << Prints[Ty] << "(" << Name << " value, int is_top) { " << endl
+           << "    print(\"(\");" << endl;
 
     for (size_t i = 0; i < Ty.Subtypes.size(); i++) {
         Buffer << "    " << Prints[Ty.Subtypes[i]] << "(value." << GItem << i << ", 0);" << endl;
 
         if (i < Ty.Subtypes.size() - 1)
-            Buffer << "    printf(\", \");" << endl;
+            Buffer << "    print(\", \");" << endl;
     }
 
-    Buffer << "    printf(\")\");" << endl
+    Buffer << "    print(\")\");" << endl
+           << "    return value;" << endl
            << "} " << endl
            << endl;
 
@@ -735,35 +741,39 @@ void CCodeGenOld::generateStd() {
             << endl;
 
     // Generate default prints
-    *Header << "void " << Prints[Type(TypeId::INT)] << "(" << GInt << " value, int is_top); " << endl;
-    *Output << "void " << Prints[Type(TypeId::INT)] << "(" << GInt << " value, int is_top) { " << endl
-            << "    printf(\"%\" PRId64 \"\", value);" << endl
+    *Header << GInt << " " << Prints[Type(TypeId::INT)] << "(" << GInt << " value, int is_top); " << endl;
+    *Output << GInt << " " << Prints[Type(TypeId::INT)] << "(" << GInt << " value, int is_top) { " << endl
+            << "    print(\"%\" PRId64 \"\", value);" << endl
+            << "    return value;" << endl
             << "} " << endl
             << endl;
 
-    *Header << "void " << Prints[Type(TypeId::FLOAT)] << "(" << GFloat << " value, int is_top); " << endl;
-    *Output << "void " << Prints[Type(TypeId::FLOAT)] << "(" << GFloat << " value, int is_top) { " << endl
-            << "    printf(\"%lf\", value);" << endl
+    *Header << GFloat << " " << Prints[Type(TypeId::FLOAT)] << "(" << GFloat << " value, int is_top); " << endl;
+    *Output << GFloat << " " << Prints[Type(TypeId::FLOAT)] << "(" << GFloat << " value, int is_top) { " << endl
+            << "    print(\"%lf\", value);" << endl
+            << "    return value;" << endl
             << "} " << endl
             << endl;
 
-    *Header << "void " << Prints[Type(TypeId::CHAR)] << "(" << GChar << " value, int is_top); " << endl;
-    *Output << "void " << Prints[Type(TypeId::CHAR)] << "(" << GChar << " value, int is_top) { " << endl
+    *Header << GChar << " " << Prints[Type(TypeId::CHAR)] << "(" << GChar << " value, int is_top); " << endl;
+    *Output << GChar << " " << Prints[Type(TypeId::CHAR)] << "(" << GChar << " value, int is_top) { " << endl
             << "    if (is_top)" << endl
-            << "        printf(\"%c\", (char)value);" << endl
+            << "        print(\"%c\", (char)value);" << endl
             << "    else" << endl
-            << "        printf(\"'%c'\", (char)value);" << endl
+            << "        print(\"'%c'\", (char)value);" << endl
+            << "    return value;" << endl
             << "} " << endl
             << endl;
 
-    *Header << "void " << Prints[Type(TypeId::BOOL)] << "(" << GChar << " value, int is_top); " << endl;
-    *Output << "void " << Prints[Type(TypeId::BOOL)] << "(" << GChar << " value, int is_top) { " << endl
-            << "    printf(\"%s\", (value) ? \"True\" : \"False\");" << endl
+    *Header << GBool << " " << Prints[Type(TypeId::BOOL)] << "(" << GBool << " value, int is_top); " << endl;
+    *Output << GBool << " " << Prints[Type(TypeId::BOOL)] << "(" << GBool << " value, int is_top) { " << endl
+            << "    print(\"%s\", (value) ? \"True\" : \"False\");" << endl
+            << "    return value;" << endl
             << "} " << endl
             << endl;
 
-    *Header << "void " << Prints[FakeString] << "(" << StringTypeName << "* string, int is_top); " << endl;
-    *Output << "void " << Prints[FakeString] << "(" << StringTypeName << "* string, int is_top) { " << endl
+    *Header << StringTypeName << "* " << Prints[FakeString] << "(" << StringTypeName << "* string, int is_top); " << endl;
+    *Output << StringTypeName << "* " << Prints[FakeString] << "(" << StringTypeName << "* string, int is_top) { " << endl
             << "    char* buffer = " << allocString() << "(sizeof(char) * (string->"<< GSize << " + 1)); " << endl
             << "    int i; " << endl
             << endl
@@ -774,9 +784,10 @@ void CCodeGenOld::generateStd() {
             << "    buffer[i] = '\\0'; " << endl
             << endl
             << "    if (is_top)" << endl
-            << "        printf(\"%s\", buffer); " << endl
+            << "        print(\"%s\", buffer); " << endl
             << "    else" << endl
-            << "        printf(\"\\\"%s\\\"\", buffer); " << endl
+            << "        print(\"\\\"%s\\\"\", buffer); " << endl
+            << "    return string;" << endl
             << "} " << endl
             << endl;
 }

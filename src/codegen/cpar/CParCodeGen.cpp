@@ -120,7 +120,7 @@ void CParCodeGen::visit(Function &Node) {
     }
 
     // Generate error, for when program doesn't realize a case
-    *Output << "    printf(\"No cases realized in " << CurFunc->Id << " \\n\"); " << endl
+    *Output << "    print(\"No cases realized in " << CurFunc->Id << " \\n\"); " << endl
             << "    exit(1); " << endl
             << "} " << endl
             << endl;
@@ -143,7 +143,7 @@ void CParCodeGen::visit(Function &Node) {
     }
 
     // Generate error, for when program doesn't realize a case
-    *Output << "    printf(\"No cases realized in " << CurFunc->Id << " \\n\"); " << endl
+    *Output << "    print(\"No cases realized in " << CurFunc->Id << " \\n\"); " << endl
             << "    exit(1); " << endl
             << "} " << endl
             << endl;
