@@ -322,24 +322,5 @@ void CCodeGenOld::visit(common::Assosiate &Node) {
 }
 
 void CCodeGenOld::visit(common::DoExpr &Node) {
-    string Name = GTemp + to_string(TempCount++);
 
-    for (auto &Expr: Node.Exprs) {
-        ExprStack.push(stringstream());
-        Expr->accept(*this);
-
-        BeforeExpr[BeforeExprDepth] += "        " + ExprStack.top().str() + "; \n";
-
-        ExprStack.pop();
-    }
-
-    ExprStack.push(stringstream());
-
-    Node.ReturnExpr->accept(*this);
-
-    BeforeExpr[BeforeExprDepth] += "        " + getType(Node.RetTy) + " " + Name
-                                   + " = " + ExprStack.top().str() + "; \n";
-
-    ExprStack.pop();
-    ExprStack.top() << Name;
 }
