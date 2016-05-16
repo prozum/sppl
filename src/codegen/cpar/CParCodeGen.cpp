@@ -13,6 +13,8 @@ void CParCodeGen::visit(Program &Node) {
     Prog = &Node;
     Function *Main = nullptr;
 
+    *Output << "#define printfunc printf" << endl;
+
 #ifdef TESTS
     *Header << "#include \"task.h\" " << endl;
 #else
@@ -122,7 +124,7 @@ void CParCodeGen::visit(Function &Node) {
     }
 
     // Generate error, for when program doesn't realize a case
-    *Output << "    print(\"No cases realized in " << CurFunc->Id << " \\n\"); " << endl
+    *Output << "    printfunc(\"No cases realized in " << CurFunc->Id << " \\n\"); " << endl
             << "    exit(1); " << endl
             << "} " << endl
             << endl;
@@ -145,7 +147,7 @@ void CParCodeGen::visit(Function &Node) {
     }
 
     // Generate error, for when program doesn't realize a case
-    *Output << "    print(\"No cases realized in " << CurFunc->Id << " \\n\"); " << endl
+    *Output << "    printfunc(\"No cases realized in " << CurFunc->Id << " \\n\"); " << endl
             << "    exit(1); " << endl
             << "} " << endl
             << endl;
