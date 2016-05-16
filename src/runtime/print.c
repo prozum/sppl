@@ -213,6 +213,7 @@ vprint(char *fmt, va_list arg)
 int
 fprint(int fd, char *fmt, ...)
 {
+
 	int n;
 	va_list arg;
 
@@ -225,6 +226,10 @@ fprint(int fd, char *fmt, ...)
 int
 print(char *fmt, ...)
 {
+	va_list arg;
+	printf(fmt, arg);
+	return 0;
+	/*
 	int n;
 	va_list arg;
 
@@ -232,6 +237,7 @@ print(char *fmt, ...)
 	n = vprint(fmt, arg);
 	va_end(arg);
 	return n;
+	 */
 }
 
 char*
