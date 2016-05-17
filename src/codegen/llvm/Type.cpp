@@ -4,6 +4,33 @@ using namespace std;
 using namespace llvm;
 using namespace codegen;
 
+void LLVMCodeGen::initTypes() {
+    // Type constants
+    Int1 = llvm::Type::getInt1Ty(Ctx);
+    Int8 = llvm::Type::getInt8Ty(Ctx);
+    Int32 = llvm::Type::getInt32Ty(Ctx);
+    VoidPtr = PointerType::getUnqual(Int8);
+
+    Int = llvm::Type::getInt64Ty(Ctx);
+    Float = llvm::Type::getDoubleTy(Ctx);
+
+    // Union type used for easy bitcast
+    UnionType = StructType::create(Ctx, Int, "Union");
+
+    // Runtime type
+    RuntimeType = StructType::create(Ctx, "RuntimeType");
+    llvm::Type *Body[] = { Int, PointerType::getUnqual( ArrayType::get(RuntimeType, 0) ) };
+    RuntimeType->setBody(Body);
+
+    // Main type
+    MainType = FunctionType::get(Int32,
+                                 vector<Type *> {
+                                         Int32,
+                                         PointerType::getUnqual(VoidPtr)
+                                 },
+                                 false);
+}
+
 llvm::Type *LLVMCodeGen::getType(common::Type Ty) {
     switch (Ty.Id) {
     case common::TypeId::FLOAT:

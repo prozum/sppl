@@ -4,7 +4,7 @@ using namespace codegen;
 using namespace llvm;
 using namespace std;
 
-Value *LLVMCodeGen::CreateListNode(common::Type Type, Value *Data, Value *NextNode, BasicBlock *Block, bool Const)
+Value *LLVMCodeGen::createListNode(common::Type Type, Value *Data, Value *NextNode, BasicBlock *Block, bool Const)
 {
     auto ListType = getListType(Type);
     auto ListPtrType = getType(Type);
@@ -20,7 +20,7 @@ Value *LLVMCodeGen::CreateListNode(common::Type Type, Value *Data, Value *NextNo
     }
 
     // Non-const list
-    auto ListMalloc = CreateMalloc(ListType, Block);
+    auto ListMalloc = createMalloc(ListType, Block);
     auto List = Builder.CreateBitCast(ListMalloc, ListPtrType);
 
     // Set list data
@@ -34,14 +34,14 @@ Value *LLVMCodeGen::CreateListNode(common::Type Type, Value *Data, Value *NextNo
     return List;
 }
 
-Instruction *LLVMCodeGen::CreateMalloc(llvm::Type *Type, BasicBlock *Block)
+Instruction *LLVMCodeGen::createMalloc(llvm::Type *Type, BasicBlock *Block)
 {
     auto Size = DataLayout->getPointerTypeSize(Type);
     auto AllocSize = ConstantInt::get(Int, Size);
-    return CreateMalloc(AllocSize, Block);
+    return createMalloc(AllocSize, Block);
 }
 
-Instruction *LLVMCodeGen::CreateMalloc(Value *Size, BasicBlock *Block)
+Instruction *LLVMCodeGen::createMalloc(Value *Size, BasicBlock *Block)
 {
     auto Malloc = CallInst::CreateMalloc(Block,
                                          Int, Int, Size,
@@ -51,7 +51,7 @@ Instruction *LLVMCodeGen::CreateMalloc(Value *Size, BasicBlock *Block)
     return Malloc;
 }
 
-void LLVMCodeGen::CreatePrint(Value *Data, common::Type Ty) {
+void LLVMCodeGen::createPrint(Value *Data, common::Type Ty) {
     auto UnionAlloca = Builder.CreateAlloca(UnionType);
     auto UnionCast = Builder.CreateBitCast(UnionAlloca, PointerType::getUnqual(getType(Ty)));
     Builder.CreateStore(Data, UnionCast);

@@ -86,10 +86,10 @@ void LLVMCodeGen::visit(common::Function &Node) {
     delPrefix();
 
     // Verify function and get error
-    if (verifyFunction(*CurFunc, &RawOut)) {
+    if (verifyFunction(*CurFunc, &MsgOut)) {
         addError(Error("LLVM Error:\n" + ModuleString()));
         if (!Drv.Silent)
-            RawOut.flush();
+            MsgOut.flush();
     }
 }
 
@@ -168,8 +168,6 @@ void LLVMCodeGen::visit(common::Case &Node) {
     auto Ty1 = CurVal->getType();
     if (CurFunc->getReturnType()->getTypeID() != llvm::Type::TypeID::VoidTyID) {
         auto Ty2 = RetPhiNode->getType();
-        Ty1->dump();
-        Ty2->dump();
         assert(Ty1 == Ty2);
     }
 #endif

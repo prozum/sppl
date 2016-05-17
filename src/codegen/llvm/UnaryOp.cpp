@@ -26,5 +26,5 @@ void LLVMCodeGen::visit(common::Not &Node) {
 void LLVMCodeGen::visit(common::UnPrint &Node) {
     Node.Child->accept(*this);
 
-    CreatePrint(CurVal, Node.RetTy);
+    createPrint(CurVal, Node.RetTy);
 }

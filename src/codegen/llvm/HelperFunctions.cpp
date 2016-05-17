@@ -5,7 +5,14 @@ using namespace llvm;
 using namespace codegen;
 using namespace common;
 
-llvm::Function *LLVMCodeGen::CreateArgFunc()
+void LLVMCodeGen::initHelperFuncs() {
+    PrintF = llvm::Function::Create(FunctionType::get(Int32, VoidPtr, true), llvm::Function::LinkageTypes::ExternalLinkage, "printf", ModuleHeader.get());
+    createArgFunc();
+    createPrintFunc();
+
+}
+
+void LLVMCodeGen::createArgFunc()
 {
     // Input Type
     auto CharListType = common::Type(TypeId::STRING, vector<common::Type> { common::Type(TypeId::CHAR)});
@@ -16,7 +23,7 @@ llvm::Function *LLVMCodeGen::CreateArgFunc()
     vector<llvm::Type *> Types = {};
     auto CreateArg = llvm::Function::Create(FunctionType::get(getType(StrListType), vector<llvm::Type *> { Int32, PointerType::getUnqual(PointerType::getUnqual(Int)) }, false),
                                        llvm::Function::ExternalLinkage, "create_arg",
-                                       Module.get());
+                                       ModuleHeader.get());
 
     // System arguments
     auto ArgIter = CreateArg->args().begin();
@@ -29,7 +36,8 @@ llvm::Function *LLVMCodeGen::CreateArgFunc()
     auto Entry = BasicBlock::Create(Ctx, "entry", CreateArg);
     Builder.SetInsertPoint(Entry);
     Builder.CreateRet(ConstantPointerNull::get(static_cast<PointerType *>(getType(StrListType))));
-    return CreateArg;
+
+    ArgFunc = llvm::Function::Create(CreateArg->getFunctionType(), llvm::Function::LinkageTypes::ExternalLinkage, "_create_arg", Module.get());
 
     /*
     // Create blocks
@@ -124,11 +132,11 @@ llvm::Function *LLVMCodeGen::CreateArgFunc()
      */
 }
 
-llvm::Function *LLVMCodeGen::CreatePrintTupleFunc() {
+void LLVMCodeGen::createPrintTupleFunc() {
     auto PrintTupleTy = FunctionType::get(llvm::Type::getVoidTy(Ctx), vector<llvm::Type *> { Int, PointerType::getUnqual(RuntimeType) }, false);
     auto PrintTuple = llvm::Function::Create(PrintTupleTy,
                                         llvm::Function::ExternalLinkage, "_print_tuple",
-                                        Module.get());
+                                        ModuleHeader.get());
 
     // Arguments arguments
     auto ArgIter = PrintTuple->args().begin();
@@ -187,14 +195,14 @@ llvm::Function *LLVMCodeGen::CreatePrintTupleFunc() {
     //auto UnionArgCast = Builder.CreateBitCast()
 
 
-    return PrintTuple;
+    PrintTupleFunc = llvm::Function::Create(PrintTuple->getFunctionType(), llvm::Function::LinkageTypes::ExternalLinkage, "_print_tuple", Module.get());
 }
 
-llvm::Function *LLVMCodeGen::CreatePrintFunc() {
+void LLVMCodeGen::createPrintFunc() {
     auto PrintTy = FunctionType::get(llvm::Type::getVoidTy(Ctx), vector<llvm::Type *> { Int, PointerType::getUnqual(RuntimeType) }, false);
     auto Print = llvm::Function::Create(PrintTy,
                                         llvm::Function::ExternalLinkage, "_print",
-                                        Module.get());
+                                        ModuleHeader.get());
 
     // Arguments arguments
     auto ArgIter = Print->args().begin();
@@ -204,8 +212,6 @@ llvm::Function *LLVMCodeGen::CreatePrintFunc() {
     TypeArg->setName("type_arg");
 
     // Printf
-    auto PrintFType = FunctionType::get(Int32, VoidPtr, true);
-    auto PrintF = llvm::Function::Create(PrintFType, llvm::Function::LinkageTypes::ExternalLinkage, "printf", Module.get());
 
     // Standard blocks
     auto Entry = BasicBlock::Create(Ctx, "entry", Print);
@@ -289,7 +295,7 @@ llvm::Function *LLVMCodeGen::CreatePrintFunc() {
 
     // Setup print bool
     Builder.SetInsertPoint(PrintBool);
-    auto BoolCast  = Builder.CreateBitCast(UnionArgAlloca, PointerType::getUnqual(Int));
+    auto BoolCast  = Builder.CreateBitCast(UnionArgAlloca, PointerType::getUnqual(Int1));
     auto BoolLoad  = Builder.CreateLoad(BoolCast);
     Builder.CreateCondBr(BoolLoad, PrintTrue, PrintFalse);
 
@@ -305,5 +311,5 @@ llvm::Function *LLVMCodeGen::CreatePrintFunc() {
     Builder.CreateCall(PrintF, vector<Value *> { BoolFalse });
     Builder.CreateBr(Ret);
 
-    return Print;
+    PrintFunc = llvm::Function::Create(Print->getFunctionType(), llvm::Function::LinkageTypes::ExternalLinkage, "_print", Module.get());
 }

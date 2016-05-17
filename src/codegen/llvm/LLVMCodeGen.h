@@ -43,6 +43,7 @@ class LLVMCodeGen : public parser::CodeGenerator {
     // Module
     // Used to store functions and global variables
     std::unique_ptr<llvm::Module> Module;
+    std::unique_ptr<llvm::Module> ModuleHeader;
 
     // Pattern Values
     std::map<std::string, llvm::Value *> PatVals;
@@ -65,7 +66,7 @@ class LLVMCodeGen : public parser::CodeGenerator {
 
 private:
     // Stream to output LLVM errors
-    llvm::raw_os_ostream RawOut;
+    llvm::raw_os_ostream MsgOut;
 
     // Maps for type caching
     std::unordered_map<common::Type, llvm::StructType *> TupleTypes;
@@ -73,7 +74,7 @@ private:
     std::unordered_map<common::Type, llvm::FunctionType *> FuncTypes;
     std::unordered_map<common::Type, llvm::GlobalVariable *> RuntimeTypes;
 
-    // Type Constants
+    // Type constants
     llvm::IntegerType *Int1;
     llvm::IntegerType *Int8;
     llvm::IntegerType *Int32;
@@ -87,6 +88,7 @@ private:
     llvm::FunctionType *MainType;
 
     // Helper functions
+    llvm::Function *PrintF;
     llvm::Function *ArgFunc;
     llvm::Function *PrintFunc;
     llvm::Function *PrintTupleFunc;
@@ -115,7 +117,6 @@ private:
 
     // Prefixes
     std::vector<std::pair<std::string,int>> Prefixes;
-
 
     // Visit methods
     void visit(common::Program &node);
@@ -169,19 +170,22 @@ private:
     void visit(common::ParExpr &Node);
 
     // Create helper function methods
-    llvm::Function *CreateArgFunc();
-    llvm::Function *CreatePrintFunc();
-    llvm::Function *CreatePrintTupleFunc();
-    llvm::Function *CreatePrintListFunc();
-    llvm::Function *CreatePrintSignatureFunc();
+    void initHelperFuncs();
+    void createArgFunc();
+    void createPrintFunc();
+    void createPrintTupleFunc();
+    void CreatePrintListFunc();
+    void CreatePrintSignatureFunc();
 
-    // Util methods
-    llvm::Value *CreateListNode(common::Type Type, llvm::Value *Data, llvm::Value *NextNode, llvm::BasicBlock *Block, bool Const = false);
-    llvm::Instruction *CreateMalloc(llvm::Type *Type, llvm::BasicBlock *Block);
-    llvm::Instruction *CreateMalloc(llvm::Value *Size, llvm::BasicBlock *Block);
-    void CreatePrint(llvm::Value *Data, common::Type Ty);
+    // Utility methods
+    llvm::Value *createListNode(common::Type Type, llvm::Value *Data, llvm::Value *NextNode, llvm::BasicBlock *Block,
+                                bool Const = false);
+    llvm::Instruction *createMalloc(llvm::Type *Type, llvm::BasicBlock *Block);
+    llvm::Instruction *createMalloc(llvm::Value *Size, llvm::BasicBlock *Block);
+    void createPrint(llvm::Value *Data, common::Type Ty);
 
     // Type methods
+    void initTypes();
     llvm::Type *getType(common::Type Ty);
     llvm::StructType *getTupleType(common::Type Ty);
     llvm::StructType *getListType(common::Type Ty);
