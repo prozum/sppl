@@ -25,19 +25,38 @@ class LLVMCodeGen : public parser::CodeGenerator {
   public:
     LLVMCodeGen(parser::Driver &Drv);
 
+    // LLVM Context
+    // Only one context is used, as the LLVM code generator is single threaded
     llvm::LLVMContext &Ctx;
+
+    // LLVM IR Builder
     llvm::IRBuilder<> Builder;
 
+    // Target Machine
+    // Used to get information about the target machine
     std::unique_ptr<llvm::TargetMachine> Machine;
+
+    // Data Layout
+    // Stores information about data layout for the target machine
     std::unique_ptr<llvm::DataLayout> DataLayout;
+
+    // Module
+    // Used to store functions and global variables
     std::unique_ptr<llvm::Module> Module;
 
+    // Pattern Values
     std::map<std::string, llvm::Value *> PatVals;
+
+    // Tail recursion for CurFunc
     bool TailRec = false;
 
+    // Get data alignment for target machine
     unsigned getAlignment(common::Type Ty);
+
+    // Get IR string method
     std::string ModuleString();
 
+    // Initialize LLVM to target running machine
     static void initLLVM() {
         llvm::InitializeNativeTarget();
         llvm::InitializeNativeTargetAsmPrinter();
@@ -45,42 +64,55 @@ class LLVMCodeGen : public parser::CodeGenerator {
     }
 
 private:
+    // Stream to output LLVM errors
     llvm::raw_os_ostream RawOut;
 
+    // Maps for type caching
     std::unordered_map<common::Type, llvm::StructType *> TupleTypes;
     std::unordered_map<common::Type, llvm::StructType *> ListTypes;
     std::unordered_map<common::Type, llvm::FunctionType *> FuncTypes;
+    std::unordered_map<common::Type, llvm::GlobalVariable *> RuntimeTypes;
 
     // Type Constants
-    llvm::Type *Int1;
-    llvm::Type *Int8;
-    llvm::Type *Int32;
-    llvm::Type *Int64;
+    llvm::IntegerType *Int1;
+    llvm::IntegerType *Int8;
+    llvm::IntegerType *Int32;
+    llvm::IntegerType *Int64;
     llvm::Type *Double;
     llvm::PointerType *VoidPtr;
+    llvm::StructType *UnionType;
+    llvm::StructType *RuntimeType;
     llvm::FunctionType *MainType;
 
+    // Helper functions
+    llvm::Function *ArgFunc;
+    llvm::Function *PrintFunc;
+
+    // Current state variables
     llvm::Value *CurVal = nullptr;
     llvm::Function *CurFunc = nullptr;
-
-    llvm::BasicBlock *Entry = nullptr;
-    llvm::BasicBlock *ErrBlock = nullptr;
-    llvm::BasicBlock *RetBlock = nullptr;
-    llvm::PHINode *CasePhiNode = nullptr;
-    llvm::BasicBlock *NextBlock = nullptr;
-
     std::vector<llvm::Value *> Args;
     std::vector<llvm::Value *>::const_iterator CurArg;
-
     std::vector<std::unique_ptr<common::Case>>::const_iterator CurCase;
     std::vector<std::unique_ptr<common::Pattern>>::const_iterator CurPat;
     llvm::BasicBlock *CurCaseBlock;
     llvm::BasicBlock *CurPatBlock;
 
-    std::vector<std::pair<std::string,int>> Prefixes;
+    // Basic blocks
+    llvm::BasicBlock *Entry = nullptr;
+    llvm::BasicBlock *ErrBlock = nullptr;
+    llvm::BasicBlock *RetBlock = nullptr;
+    llvm::PHINode *RetPhiNode = nullptr;
+    llvm::BasicBlock *NextBlock = nullptr;
 
+    // Bool used to find first block in function
     bool FirstBlock;
 
+    // Prefixes
+    std::vector<std::pair<std::string,int>> Prefixes;
+
+
+    // Visit methods
     void visit(common::Program &node);
     void visit(common::Function &Node);
     void visit(common::Case &Node);
@@ -118,6 +150,7 @@ private:
 
     void visit(common::Negative &Node);
     void visit(common::Not &Node);
+    void visit(common::UnPrint &Node);
 
     void visit(common::IdExpr &Node);
     void visit(common::IntExpr &Node);
@@ -130,16 +163,24 @@ private:
     void visit(common::CallExpr &Node);
     void visit(common::ParExpr &Node);
 
+    // Create helper function methods
+    llvm::Function *CreateArgFunc();
+    llvm::Function *CreatePrintFunc();
+
+    // Util methods
     llvm::Value *CreateListNode(common::Type Type, llvm::Value *Data, llvm::Value *NextNode, llvm::BasicBlock *Block, bool Const = false);
     llvm::Instruction *CreateMalloc(llvm::Type *Type, llvm::BasicBlock *Block);
     llvm::Instruction *CreateMalloc(llvm::Value *Size, llvm::BasicBlock *Block);
-    llvm::Value *CreateMainArg();
+    void CreatePrint(llvm::Value *Data, common::Type Ty);
 
+    // Type methods
     llvm::Type *getType(common::Type Ty);
     llvm::StructType *getTupleType(common::Type Ty);
     llvm::StructType *getListType(common::Type Ty);
+    llvm::GlobalVariable *getRuntimeType(common::Type Ty);
     llvm::FunctionType *getFuncType(common::Type Ty);
 
+    // Prefix methods
     void addPrefix(std::string Prefix, bool Numbered = true);
     void delPrefix();
     std::string getPrefix();

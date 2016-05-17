@@ -51,6 +51,18 @@ Instruction *LLVMCodeGen::CreateMalloc(Value *Size, BasicBlock *Block)
     return Malloc;
 }
 
+void LLVMCodeGen::CreatePrint(Value *Data, common::Type Ty) {
+    auto UnionAlloca = Builder.CreateAlloca(UnionType);
+    auto UnionCast = Builder.CreateBitCast(UnionAlloca, PointerType::getUnqual(getType(Ty)));
+    Builder.CreateStore(Data, UnionCast);
+
+    auto UnionArgGEP = Builder.CreateStructGEP(UnionType, UnionAlloca, 0);
+    auto UnionArgCast = Builder.CreateBitCast(UnionArgGEP, PointerType::getUnqual(Int64));
+    auto UnionArgLoad = Builder.CreateLoad(Int64, UnionArgCast);
+
+    Builder.CreateCall(PrintFunc, vector<Value *> { UnionArgLoad, getRuntimeType(Ty) });
+}
+
 unsigned LLVMCodeGen::getAlignment(common::Type Ty) {
     return DataLayout->getPrefTypeAlignment(getType(Ty));
 }

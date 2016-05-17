@@ -144,7 +144,7 @@ using namespace common;
 %%
 
 program:	decls                                           { Drv.Prog = make_unique<Program>(move(* $1), @1); delete $1; }
-    |       expr                                            { Drv.Prog = make_unique<Program>(unique_ptr<Expression>($1), @1); }
+    |       as_exprs                                        { Drv.Prog = make_unique<Program>(make_unique<DoExpr>(move(* $1), @1), @1); delete $1; }
 decls:      decls decl                                      { $$ = $1; if ($2) $$->push_back(unique_ptr<Declaration>($2)); }
     |                                                       { $$ = new vector<unique_ptr<Declaration>>(); }
 decl:       func                                            { $$ = $1; }
