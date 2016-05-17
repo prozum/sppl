@@ -103,6 +103,7 @@ using namespace common;
 %token PIPE "|"
 %token COLONCOLON "::"
 %token COLON ":"
+%token UNKNOWN "Unknown token"
 %token <LongInt> INTLITERAL "Int"
 %token <Chr> CHARLITERAL "Char"
 %token <Boolean> BOOLLITERAL "Bool"
