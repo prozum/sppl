@@ -12,30 +12,10 @@ SpplJit::SpplJit()
 
     sys::DynamicLibrary::LoadLibraryPermanently(nullptr);
 
+    addModule(move(CodeGen.ModuleHeader));
+
     // Set Driver to JIT mode
     Drv.JIT = true;
-
-    // Create initial module
-    createModule();
-
-    // Print functions
-    Drv.addDecl("print", common::Type(TypeId::SIGNATURE,
-                                      vector<common::Type> {
-                                              common::Type(TypeId::STRING,
-                                                           vector<common::Type> {common::Type(TypeId::CHAR)}),
-                                              common::Type(TypeId::VOID)
-                                      }));
-    Drv.addDecl("printff", common::Type(TypeId::SIGNATURE,
-                                        vector<common::Type> {
-                                                common::Type(TypeId::FLOAT),
-                                                common::Type(TypeId::VOID)
-                                        }));
-    Drv.addDecl("printii", common::Type(TypeId::SIGNATURE,
-                                        vector<common::Type> {
-                                                common::Type(TypeId::INT),
-                                                common::Type(TypeId::VOID)
-                                        }));
-
 }
 
 SpplJit::ModuleHandleT SpplJit::addModule(unique_ptr<Module> M) {
@@ -84,25 +64,6 @@ string SpplJit::mangle(const string &Name) {
         Mangler::getNameWithPrefix(MangledNameStream, Name, *CodeGen.DataLayout);
     }
     return MangledName;
-}
-
-void SpplJit::createModule() {
-    // Open a new module
-    CodeGen.Module =
-        std::make_unique<Module>("SpplJit", CodeGen.Ctx);
-    CodeGen.Module->setDataLayout(CodeGen.Machine->createDataLayout());
-
-    // Create a new pass manager attached to it
-    PassMgr =
-        std::make_unique<legacy::FunctionPassManager>(CodeGen.Module.get());
-
-    // Add optimization passes
-    PassMgr->add(createTailCallEliminationPass());
-    PassMgr->add(createInstructionCombiningPass());
-    PassMgr->add(createReassociatePass());
-    PassMgr->add(createGVNPass());
-    PassMgr->add(createCFGSimplificationPass());
-    PassMgr->doInitialization();
 }
 
 string SpplJit::getOutput(OutputData Data, common::Type Ty) {
@@ -229,15 +190,6 @@ struct String {
     String *Next;
 };
 
-extern "C" void print(String *Str) {
-    auto Char = Str;
-
-    while (Char) {
-        fprintf(stderr, "%c", Char->Char);
-        Char = Char->Next;
-    }
-}
-
 int SpplJit::eval(string Str) {
     if (!Drv.parseString(Str))
         return 1;
@@ -258,38 +210,8 @@ int SpplJit::eval(string Str) {
     auto FuncNode = static_cast<common::Function *>(Drv.Prog->Decls.front().get());
     auto RetTy = FuncNode->Signature.Subtypes.back();
 
-// Optimize
-#if SPPLDEBUG
-    cout << "#-----------------------------------------------------------------"
-            "-------------#"
-         << endl;
-    cout << "|                                 Unoptimized                     "
-            "             |"
-         << endl;
-    cout << "#-----------------------------------------------------------------"
-            "-------------#"
-         << endl;
-    cout << CodeGen.ModuleString();
-#endif
-    auto FuncIR = CodeGen.Module->getFunction(FuncNode->Id);
-    assert(FuncIR && "Function generation failed.");
-    PassMgr->run(*FuncIR);
-#if SPPLDEBUG
-    cout << "#-----------------------------------------------------------------"
-            "-------------#"
-         << endl;
-    cout << "|                                  Optimized                      "
-            "             |"
-         << endl;
-    cout << "#-----------------------------------------------------------------"
-            "-------------#"
-         << endl;
-    cout << CodeGen.ModuleString();
-#endif
-
-    // Store function in seperate module
+    // Store function in separate module
     ModuleHandler = addModule(move(CodeGen.Module));
-    createModule();
 
     // Only run anonymous functions
     if (FuncNode->Anon) {

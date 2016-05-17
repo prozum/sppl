@@ -16,13 +16,10 @@
 
 #include <llvm/Support/DynamicLibrary.h>
 
-#include <llvm/Analysis/Passes.h>
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/LLVMContext.h>
-#include <llvm/IR/PassManager.h>
 #include <llvm/IR/Verifier.h>
 #include <llvm/Support/TargetSelect.h>
-#include <llvm/Transforms/Scalar.h>
 
 namespace jit {
 union OutputData {
@@ -44,7 +41,6 @@ private:
     typedef llvm::orc::IRCompileLayer<ObjLayerT> CompileLayerT;
     typedef CompileLayerT::ModuleSetHandleT ModuleHandleT;
 
-    void createModule();
     ModuleHandleT addModule(std::unique_ptr<llvm::Module> M);
     void removeModule(ModuleHandleT Handler);
 
@@ -68,7 +64,6 @@ private:
     ObjLayerT ObjectLayer;
     CompileLayerT CompileLayer;
 
-    std::unique_ptr<llvm::legacy::FunctionPassManager> PassMgr;
     std::vector<ModuleHandleT> ModuleHandles;
     ModuleHandleT ModuleHandler;
 

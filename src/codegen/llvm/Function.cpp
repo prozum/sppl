@@ -6,7 +6,6 @@ using namespace codegen;
 using namespace common;
 
 void LLVMCodeGen::visit(common::Function &Node) {
-
     // Create function and arguments
     Args.clear();
     if (Node.Id == string("main") && !Drv.JIT) {
@@ -29,11 +28,17 @@ void LLVMCodeGen::visit(common::Function &Node) {
         auto StrListType = common::Type(TypeId::LIST, vector<common::Type> { CharListType });
         CurVal = ConstantPointerNull::get(static_cast<PointerType *>(getType(StrListType)));
         Args.push_back(CurVal);
-    }
-    else {
-        CurFunc = llvm::Function::Create(getFuncType(Node.Signature),
-                                         llvm::Function::ExternalLinkage, Node.Id,
-                                         Module.get());
+    } else {
+        // Lookup forward decleration
+        CurFunc = Module->getFunction(Node.Id);
+
+        // Create new
+        if (!CurFunc) {
+            CurFunc = llvm::Function::Create(getFuncType(Node.Signature),
+                                             llvm::Function::ExternalLinkage, Node.Id,
+                                             Module.get());
+        }
+
         Entry = BasicBlock::Create(Ctx, "entry", CurFunc);
         // Setup names for arguments
         auto ArgId = 0;
@@ -41,7 +46,6 @@ void LLVMCodeGen::visit(common::Function &Node) {
             Arg.setName("_arg" + to_string(ArgId++));
             Args.push_back(&Arg);
         }
-
     }
 
     // Set call convention to fast to enable tail recursion optimizations

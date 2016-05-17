@@ -116,15 +116,22 @@ llvm::GlobalVariable *LLVMCodeGen::getRuntimeType(common::Type Ty) {
     for (auto Subtype : Ty.Subtypes) {
         ArrayElements.push_back(getRuntimeType(Subtype));
     }
-    ArrayElements.push_back(ConstantPointerNull::get(PointerType::getUnqual(RuntimeType)));
 
     // Create constant array with subtypes
-    auto ConstArray = ConstantArray::get(ArrayType::get(RuntimeType, 0), ArrayElements);
-    auto GlobalArray = new GlobalVariable(*Module.get(), ConstArray->getType(), true,
-                                          GlobalVariable::ExternalLinkage, ConstArray);
+    auto ArrayTy = ArrayType::get(RuntimeType, 0);
+    Constant *Array;
+    if (ArrayElements.size()) {
+        ArrayElements.push_back(ConstantPointerNull::get(PointerType::getUnqual(RuntimeType)));
+
+        auto ConstArray = ConstantArray::get(ArrayTy, ArrayElements);
+        Array = new GlobalVariable(*Module.get(), ConstArray->getType(), true,
+                                   GlobalVariable::ExternalLinkage, ConstArray);
+    } else {
+        Array = ConstantPointerNull::get(PointerType::getUnqual(ArrayTy));
+    }
 
     // Create runtime type
-    auto ConstVal = ConstantStruct::get(RuntimeType, { ConstantInt::get(Int, (uint64_t)Ty.Id), GlobalArray } );
+    auto ConstVal = ConstantStruct::get(RuntimeType, { ConstantInt::get(Int, (uint64_t)Ty.Id), Array } );
 
     return RuntimeTypes[Ty] = new GlobalVariable(*Module.get(), ConstVal->getType(), true,
                                 GlobalVariable::ExternalLinkage, ConstVal);

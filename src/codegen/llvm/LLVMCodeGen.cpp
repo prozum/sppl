@@ -14,21 +14,60 @@ LLVMCodeGen::LLVMCodeGen(parser::Driver &Drv)
     initLLVM();
     Machine = std::unique_ptr<TargetMachine>(EngineBuilder().selectTarget());
     DataLayout = std::make_unique<llvm::DataLayout>(Machine->createDataLayout());
-    Module = std::make_unique<llvm::Module>("Module", Ctx);
-    ModuleHeader = std::make_unique<llvm::Module>("ModuleHeader", Ctx);
 
+    // Add optimization passes
+    PassMgr = std::make_unique<legacy::PassManager>();
+    PassMgr->add(createTailCallEliminationPass());
+    PassMgr->add(createInstructionCombiningPass());
+    PassMgr->add(createReassociatePass());
+    PassMgr->add(createGVNPass());
+    PassMgr->add(createCFGSimplificationPass());
+
+    // Initialize types and standard library
     initTypes();
     initStdLib();
 }
 
-void LLVMCodeGen::visit(common::Program &node) {
-    // Clear declaration and runtime types from last run
+void LLVMCodeGen::createModule() {
+    Module = std::make_unique<llvm::Module>("Module", Ctx);
+    //Module->setDataLayout(Machine->createDataLayout());
+
     InternFuncDecls.clear();
     RuntimeTypes.clear();
+}
+
+void LLVMCodeGen::visit(common::Program &node) {
+    createModule();
 
     for (auto &func : node.Decls) {
         func->accept(*this);
     }
+
+#if SPPLDEBUG
+    *Drv.MOut << "#-----------------------------------------------------------------"
+            "-------------#"
+         << endl;
+    *Drv.MOut << "|                                 Unoptimized                     "
+            "             |"
+         << endl;
+    *Drv.MOut << "#-----------------------------------------------------------------"
+            "-------------#"
+         << endl;
+    *Drv.MOut << ModuleString();
+#endif
+    PassMgr->run(*Module);
+#if SPPLDEBUG
+    *Drv.MOut << "#-----------------------------------------------------------------"
+            "-------------#"
+         << endl;
+    *Drv.MOut << "|                                  Optimized                      "
+            "             |"
+         << endl;
+    *Drv.MOut << "#-----------------------------------------------------------------"
+            "-------------#"
+         << endl;
+    *Drv.MOut << ModuleString();
+#endif
 
     // Don't output anything with JIT
     if (Drv.JIT)

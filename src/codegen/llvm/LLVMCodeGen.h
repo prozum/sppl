@@ -16,6 +16,11 @@
 
 #include <llvm/ExecutionEngine/ExecutionEngine.h>
 
+#include <llvm/IR/LegacyPassManager.h>
+#include <llvm/Analysis/Passes.h>
+#include <llvm/IR/PassManager.h>
+#include <llvm/Transforms/Scalar.h>
+
 #include <iostream>
 #include <unordered_map>
 #include <ctype.h>
@@ -44,6 +49,10 @@ class LLVMCodeGen : public parser::CodeGenerator {
     // Used to store functions and global variables
     std::unique_ptr<llvm::Module> Module;
     std::unique_ptr<llvm::Module> ModuleHeader;
+
+    // PassManager
+    // Used to perform optimization on module
+    std::unique_ptr<llvm::legacy::PassManager> PassMgr;
 
     // Identifer Values
     std::map<std::string, llvm::Value *> IdVals;
@@ -165,7 +174,9 @@ private:
     void visit(common::CallExpr &Node);
     void visit(common::ParExpr &Node);
 
-    // Create helper function methods
+    void createModule();
+
+    // Standard library methods
     void initStdLib();
     void addInternFunc(std::string FuncName, llvm::FunctionType *Ty);
     llvm::Function *getInternFunc(std::string FuncName);

@@ -6,8 +6,14 @@ using namespace codegen;
 using namespace common;
 
 void LLVMCodeGen::initStdLib() {
+    // Add declaration to header module
+    Module = std::make_unique<llvm::Module>("HeaderModule", Ctx);
+
     // C function used by standard library
     addInternFunc("printf", FunctionType::get(Int32, VoidPtr, true));
+
+    // Forward declarations
+    // TODO
 
     // Internal library
     createArgFunc();
@@ -37,6 +43,9 @@ void LLVMCodeGen::initStdLib() {
 
     // Standard library
     // TODO
+
+    // Cleanup
+    ModuleHeader = move(Module);
 }
 
 void LLVMCodeGen::addInternFunc(string FuncName, FunctionType *Ty) {
@@ -51,7 +60,7 @@ llvm::Function *LLVMCodeGen::getInternFunc(string FuncName) {
 
     auto FuncType = InternFuncs[FuncName];
 
-    return InternFuncDecls[FuncName] = llvm::Function::Create(FuncType, llvm::Function::ExternalLinkage, FuncName, ModuleHeader.get());
+    return InternFuncDecls[FuncName] = llvm::Function::Create(FuncType, llvm::Function::ExternalLinkage, FuncName, Module.get());
 }
 
 void LLVMCodeGen::createArgFunc()
@@ -66,7 +75,7 @@ void LLVMCodeGen::createArgFunc()
     auto FuncTy = FunctionType::get(getType(StrListType), vector<llvm::Type *> { Int32, PointerType::getUnqual(VoidPtr) }, false);
     auto Func = llvm::Function::Create(FuncTy,
                                        llvm::Function::ExternalLinkage, "create_arg",
-                                       ModuleHeader.get());
+                                       Module.get());
 
     // Arguments
     auto ArgIter = Func->args().begin();
@@ -181,7 +190,7 @@ void LLVMCodeGen::createPrintTupleFunc() {
     auto FuncTy = FunctionType::get(llvm::Type::getVoidTy(Ctx), vector<llvm::Type *> { Int, PointerType::getUnqual(RuntimeType) }, false);
     auto Func = llvm::Function::Create(FuncTy,
                                         llvm::Function::ExternalLinkage, FuncName,
-                                        ModuleHeader.get());
+                                        Module.get());
 
     // Arguments arguments
     auto ArgIter = Func->args().begin();
@@ -235,8 +244,7 @@ void LLVMCodeGen::createPrintTupleFunc() {
     //Builder.CreateStore(DataArg, UnionArgCast);
     //auto UnionArgCast = Builder.CreateBitCast()
 
-    InternFuncs[FuncName] = FuncTy;
-    InternFuncDecls[FuncName] = Func;
+    addInternFunc(FuncName, FuncTy);
 }
 
 void LLVMCodeGen::createPrintFunc() {
@@ -244,7 +252,7 @@ void LLVMCodeGen::createPrintFunc() {
     auto FuncTy = FunctionType::get(llvm::Type::getVoidTy(Ctx), vector<llvm::Type *> { Int, PointerType::getUnqual(RuntimeType) }, false);
     auto Func = llvm::Function::Create(FuncTy,
                                         llvm::Function::ExternalLinkage, FuncName,
-                                        ModuleHeader.get());
+                                        Module.get());
 
     // Arguments arguments
     auto ArgIter = Func->args().begin();
