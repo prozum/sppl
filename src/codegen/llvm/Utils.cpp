@@ -60,7 +60,7 @@ void LLVMCodeGen::createPrint(Value *Data, common::Type Ty) {
     auto UnionArgCast = Builder.CreateBitCast(UnionArgGEP, PointerType::getUnqual(Int));
     auto UnionArgLoad = Builder.CreateLoad(Int, UnionArgCast);
 
-    Builder.CreateCall(PrintFunc, vector<Value *> { UnionArgLoad, getRuntimeType(Ty) });
+    Builder.CreateCall(getInternFunc("_print"), vector<Value *> { UnionArgLoad, getRuntimeType(Ty) });
 }
 
 unsigned LLVMCodeGen::getAlignment(common::Type Ty) {

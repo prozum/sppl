@@ -30,8 +30,8 @@ void LLVMCodeGen::visit(common::CharExpr &Node) {
 }
 
 void LLVMCodeGen::visit(common::IdExpr &Node) {
-    // Pattern value
-    CurVal = PatVals[Node.Val];
+    // Identifier value
+    CurVal = IdVals[Node.Val];
     if (CurVal)
         return;
 
@@ -138,5 +138,5 @@ void LLVMCodeGen::visit(common::DoExpr &Node) {
 void LLVMCodeGen::visit(common::Assosiate &Node) {
     Node.Child->accept(*this);
 
-    PatVals[Node.Id] = CurVal;
+    IdVals[Node.Id] = CurVal;
 }

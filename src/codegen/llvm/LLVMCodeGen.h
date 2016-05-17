@@ -45,8 +45,8 @@ class LLVMCodeGen : public parser::CodeGenerator {
     std::unique_ptr<llvm::Module> Module;
     std::unique_ptr<llvm::Module> ModuleHeader;
 
-    // Pattern Values
-    std::map<std::string, llvm::Value *> PatVals;
+    // Identifer Values
+    std::map<std::string, llvm::Value *> IdVals;
 
     // Tail recursion for CurFunc
     bool TailRec = false;
@@ -88,12 +88,8 @@ private:
     llvm::FunctionType *MainType;
 
     // Helper functions
-    llvm::Function *PrintF;
-    llvm::Function *ArgFunc;
-    llvm::Function *PrintFunc;
-    llvm::Function *PrintTupleFunc;
-    llvm::Function *PrintListFunc;
-    llvm::Function *PrintSignatureFunc;
+    std::unordered_map<std::string, llvm::FunctionType *> InternFuncs;
+    std::unordered_map<std::string, llvm::Function *> InternFuncDecls;
 
     // Current state variables
     llvm::Value *CurVal = nullptr;
@@ -170,7 +166,9 @@ private:
     void visit(common::ParExpr &Node);
 
     // Create helper function methods
-    void initHelperFuncs();
+    void initStdLib();
+    void addInternFunc(std::string FuncName, llvm::FunctionType *Ty);
+    llvm::Function *getInternFunc(std::string FuncName);
     void createArgFunc();
     void createPrintFunc();
     void createPrintTupleFunc();

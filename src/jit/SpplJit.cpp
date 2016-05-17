@@ -19,38 +19,23 @@ SpplJit::SpplJit()
     createModule();
 
     // Print functions
-    Drv.addExternFunc("print", common::Type(TypeId::SIGNATURE,
-                                     vector<common::Type> {
-                                             common::Type(TypeId::STRING, vector<common::Type> { common::Type(TypeId::CHAR) }),
-                                             common::Type(TypeId::VOID)
-                                     }));
-    Drv.addExternFunc("printff", common::Type(TypeId::SIGNATURE,
-                                             vector<common::Type> {
-                                                     common::Type(TypeId::FLOAT),
-                                                     common::Type(TypeId::VOID)
-                                             }));
-    Drv.addExternFunc("printii", common::Type(TypeId::SIGNATURE,
-                                         vector<common::Type> {
-                                                 common::Type(TypeId::INT),
-                                                 common::Type(TypeId::VOID)
-                                         }));
+    Drv.addDecl("print", common::Type(TypeId::SIGNATURE,
+                                      vector<common::Type> {
+                                              common::Type(TypeId::STRING,
+                                                           vector<common::Type> {common::Type(TypeId::CHAR)}),
+                                              common::Type(TypeId::VOID)
+                                      }));
+    Drv.addDecl("printff", common::Type(TypeId::SIGNATURE,
+                                        vector<common::Type> {
+                                                common::Type(TypeId::FLOAT),
+                                                common::Type(TypeId::VOID)
+                                        }));
+    Drv.addDecl("printii", common::Type(TypeId::SIGNATURE,
+                                        vector<common::Type> {
+                                                common::Type(TypeId::INT),
+                                                common::Type(TypeId::VOID)
+                                        }));
 
-    // Trigonometry function
-    Drv.addExternFunc("sin", common::Type(TypeId::SIGNATURE,
-                                         vector<common::Type> {
-                                                 common::Type(TypeId::FLOAT),
-                                                 common::Type(TypeId::FLOAT)
-                                         }));
-    Drv.addExternFunc("cos", common::Type(TypeId::SIGNATURE,
-                                         vector<common::Type> {
-                                                 common::Type(TypeId::FLOAT),
-                                                 common::Type(TypeId::FLOAT)
-                                         }));
-    Drv.addExternFunc("tan", common::Type(TypeId::SIGNATURE,
-                                         vector<common::Type> {
-                                                 common::Type(TypeId::FLOAT),
-                                                 common::Type(TypeId::FLOAT)
-                                         }));
 }
 
 SpplJit::ModuleHandleT SpplJit::addModule(unique_ptr<Module> M) {
@@ -237,14 +222,6 @@ string SpplJit::getOutputString(OutputData Addr, common::Type Ty)
     } while (Addr.Ptr);
 
     return Out + "\"";
-}
-
-extern "C" void printff(double Float) {
-    fprintf(stderr, "%f", Float);
-}
-
-extern "C" void printii(long Int) {
-    fprintf(stderr, "%li", Int);
 }
 
 struct String {

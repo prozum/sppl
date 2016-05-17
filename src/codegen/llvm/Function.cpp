@@ -101,7 +101,7 @@ void LLVMCodeGen::visit(common::Case &Node) {
     TailRec = Node.TailRec;
 
     // Clear pattern values
-    PatVals.clear();
+    IdVals.clear();
 
     // Set pattern prefix
     addPrefix("pat");
@@ -128,6 +128,9 @@ void LLVMCodeGen::visit(common::Case &Node) {
         CurVal = *CurArg;
         (*CurPat)->accept(*this);
 
+        // Convert to bool
+        CurVal = Builder.CreateTrunc(CurVal, Int1);
+
         if (next(CurPat) != Node.Patterns.cend()) {
             stepPrefix();
             CurPatBlock = BasicBlock::Create(Ctx, getPrefix(), CurFunc);
@@ -142,6 +145,10 @@ void LLVMCodeGen::visit(common::Case &Node) {
         Builder.CreateCondBr(CurVal, WhenBlock, NextBlock);
         Builder.SetInsertPoint(WhenBlock);
         Node.When->accept(*this);
+
+        // Convert to bool
+        assert(Node.When->RetTy == TypeId::BOOL);
+        CurVal = Builder.CreateTrunc(CurVal, Int1);
     }
 
     // Branch to next block

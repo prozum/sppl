@@ -18,11 +18,12 @@ LLVMCodeGen::LLVMCodeGen(parser::Driver &Drv)
     ModuleHeader = std::make_unique<llvm::Module>("ModuleHeader", Ctx);
 
     initTypes();
-    initHelperFuncs();
+    initStdLib();
 }
 
 void LLVMCodeGen::visit(common::Program &node) {
-    // Clear runtime types
+    // Clear declaration and runtime types from last run
+    InternFuncDecls.clear();
     RuntimeTypes.clear();
 
     for (auto &func : node.Decls) {

@@ -80,6 +80,6 @@ class Driver {
     void showError(common::Error Err);
 
     bool accept(common::Visitor &V);
-    void addExternFunc(std::string Name, common::Type Signature);
+    void addDecl(std::string Name, common::Type Signature);
 };
 }

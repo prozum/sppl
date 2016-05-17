@@ -25,7 +25,7 @@ void LLVMCodeGen::visit(common::CharPattern &Node) {
 }
 
 void LLVMCodeGen::visit(common::IdPattern &Node) {
-    PatVals[Node.Val] = CurVal;
+    IdVals[Node.Val] = CurVal;
     CurVal = ConstantInt::get(Int1, 1);
 }
 

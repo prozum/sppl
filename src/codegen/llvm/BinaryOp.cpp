@@ -95,7 +95,7 @@ void LLVMCodeGen::visit(And &Node) {
     CurVal = Builder.CreateAnd(Left, Right, "andtmp");
 
     // Convert to int
-    CurVal = Builder.CreateTrunc(CurVal, Int);
+    CurVal = Builder.CreateZExt(CurVal, Int);
 }
 
 void LLVMCodeGen::visit(Or &Node) {
@@ -110,7 +110,7 @@ void LLVMCodeGen::visit(Or &Node) {
     CurVal = Builder.CreateOr(Left, Right, "ortmp");
 
     // Convert to int
-    CurVal = Builder.CreateTrunc(CurVal, Int);
+    CurVal = Builder.CreateZExt(CurVal, Int);
 }
 
 void LLVMCodeGen::visit(Equal &Node) {
@@ -130,7 +130,7 @@ void LLVMCodeGen::visit(Equal &Node) {
     }
 
     // Convert to int
-    CurVal = Builder.CreateTrunc(CurVal, Int);
+    CurVal = Builder.CreateZExt(CurVal, Int);
 }
 
 void LLVMCodeGen::visit(NotEqual &Node) {
@@ -150,7 +150,7 @@ void LLVMCodeGen::visit(NotEqual &Node) {
     }
 
     // Convert to int
-    CurVal = Builder.CreateTrunc(CurVal, Int);
+    CurVal = Builder.CreateZExt(CurVal, Int);
 }
 
 void LLVMCodeGen::visit(Lesser &Node) {
@@ -169,7 +169,7 @@ void LLVMCodeGen::visit(Lesser &Node) {
     }
 
     // Convert to int
-    CurVal = Builder.CreateTrunc(CurVal, Int);
+    CurVal = Builder.CreateZExt(CurVal, Int);
 }
 
 void LLVMCodeGen::visit(Greater &Node) {
@@ -188,7 +188,7 @@ void LLVMCodeGen::visit(Greater &Node) {
     }
 
     // Convert to int
-    CurVal = Builder.CreateTrunc(CurVal, Int);
+    CurVal = Builder.CreateZExt(CurVal, Int);
 }
 
 void LLVMCodeGen::visit(LesserEq &Node) {
@@ -207,7 +207,7 @@ void LLVMCodeGen::visit(LesserEq &Node) {
     }
 
     // Convert to int
-    CurVal = Builder.CreateTrunc(CurVal, Int);
+    CurVal = Builder.CreateZExt(CurVal, Int);
 }
 
 void LLVMCodeGen::visit(GreaterEq &Node) {
@@ -226,7 +226,7 @@ void LLVMCodeGen::visit(GreaterEq &Node) {
     }
 
     // Convert to int
-    CurVal = Builder.CreateTrunc(CurVal, Int);
+    CurVal = Builder.CreateZExt(CurVal, Int);
 }
 
 void LLVMCodeGen::visit(To &Node) {
