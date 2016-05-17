@@ -158,7 +158,7 @@ void LLVMCodeGen::visit(common::Case &Node) {
     if (CurFunc->getName() == "main" && !Drv.JIT) {
         if (CurVal->getType()->isIntegerTy())
             CurVal = Builder.CreateTrunc(CurVal, Int32, "tmptrunc");
-        else if (CurVal->getType()->getFloatTy(Ctx))
+        else if (CurVal->getType()->isFloatTy())
             CurVal = Builder.CreateFPToSI(CurVal, Int32, "casttmp");
         else
             CurVal = ConstantInt::get(Int32, 0);
