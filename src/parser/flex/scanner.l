@@ -267,6 +267,10 @@ using namespace std;
     return token::PIPE;
 }
 
+. {
+    return token::UNKNOWN;
+}
+
 %%
 
 #include "Driver.h"
