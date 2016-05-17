@@ -17,8 +17,8 @@ void LLVMCodeGen::visit(common::Function &Node) {
 
         // System args
         auto ArgIter = CurFunc->args().begin();
-        Argument *Argc = &*(ArgIter++);
-        Argument *Argv = &*(ArgIter);
+        Argument *Argc = (ArgIter++);
+        Argument *Argv = (ArgIter);
         Argc->setName("argc");
         Argv->setName("argv");
 
@@ -168,6 +168,8 @@ void LLVMCodeGen::visit(common::Case &Node) {
     auto Ty1 = CurVal->getType();
     if (CurFunc->getReturnType()->getTypeID() != llvm::Type::TypeID::VoidTyID) {
         auto Ty2 = RetPhiNode->getType();
+        Ty1->dump();
+        Ty2->dump();
         assert(Ty1 == Ty2);
     }
 #endif

@@ -37,14 +37,14 @@ Value *LLVMCodeGen::CreateListNode(common::Type Type, Value *Data, Value *NextNo
 Instruction *LLVMCodeGen::CreateMalloc(llvm::Type *Type, BasicBlock *Block)
 {
     auto Size = DataLayout->getPointerTypeSize(Type);
-    auto AllocSize = ConstantInt::get(Int64, Size);
+    auto AllocSize = ConstantInt::get(Int, Size);
     return CreateMalloc(AllocSize, Block);
 }
 
 Instruction *LLVMCodeGen::CreateMalloc(Value *Size, BasicBlock *Block)
 {
     auto Malloc = CallInst::CreateMalloc(Block,
-                                         Int64, Int8, Size,
+                                         Int, Int, Size,
                                          nullptr, nullptr, "malloccall");
     Block->getInstList().push_back(Malloc);
 
@@ -57,8 +57,8 @@ void LLVMCodeGen::CreatePrint(Value *Data, common::Type Ty) {
     Builder.CreateStore(Data, UnionCast);
 
     auto UnionArgGEP = Builder.CreateStructGEP(UnionType, UnionAlloca, 0);
-    auto UnionArgCast = Builder.CreateBitCast(UnionArgGEP, PointerType::getUnqual(Int64));
-    auto UnionArgLoad = Builder.CreateLoad(Int64, UnionArgCast);
+    auto UnionArgCast = Builder.CreateBitCast(UnionArgGEP, PointerType::getUnqual(Int));
+    auto UnionArgLoad = Builder.CreateLoad(Int, UnionArgCast);
 
     Builder.CreateCall(PrintFunc, vector<Value *> { UnionArgLoad, getRuntimeType(Ty) });
 }

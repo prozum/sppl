@@ -14,14 +14,14 @@ llvm::Function *LLVMCodeGen::CreateArgFunc()
 
     // Create Function
     vector<llvm::Type *> Types = {};
-    auto CreateArg = llvm::Function::Create(FunctionType::get(getType(StrListType), vector<llvm::Type *> { Int32, PointerType::getUnqual(PointerType::getUnqual(Int8)) }, false),
+    auto CreateArg = llvm::Function::Create(FunctionType::get(getType(StrListType), vector<llvm::Type *> { Int32, PointerType::getUnqual(PointerType::getUnqual(Int)) }, false),
                                        llvm::Function::ExternalLinkage, "create_arg",
                                        Module.get());
 
     // System arguments
     auto ArgIter = CreateArg->args().begin();
-    Argument *Argc = &*(ArgIter++);
-    Argument *Argv = &*(ArgIter);
+    Argument *Argc = ArgIter++;
+    Argument *Argv = ArgIter;
     Argc->setName("argc");
     Argv->setName("argv");
 
@@ -124,16 +124,82 @@ llvm::Function *LLVMCodeGen::CreateArgFunc()
      */
 }
 
+llvm::Function *LLVMCodeGen::CreatePrintTupleFunc() {
+    auto PrintTupleTy = FunctionType::get(llvm::Type::getVoidTy(Ctx), vector<llvm::Type *> { Int, PointerType::getUnqual(RuntimeType) }, false);
+    auto PrintTuple = llvm::Function::Create(PrintTupleTy,
+                                        llvm::Function::ExternalLinkage, "_print_tuple",
+                                        Module.get());
+
+    // Arguments arguments
+    auto ArgIter = PrintTuple->args().begin();
+    Argument *DataArg = ArgIter++;
+    Argument *TypeArg = ArgIter;
+    DataArg->setName("data_arg");
+    TypeArg->setName("type_arg");
+
+    // Printf
+    auto PrintFType = FunctionType::get(Int32, VoidPtr, true);
+    auto PrintF = llvm::Function::Create(PrintFType, llvm::Function::LinkageTypes::ExternalLinkage, "printf", Module.get());
+
+    // Standard blocks
+    auto Entry = BasicBlock::Create(Ctx, "entry", PrintTuple);
+    auto Loop = BasicBlock::Create(Ctx, "loop", PrintTuple);
+    auto Ret = BasicBlock::Create(Ctx, "ret", PrintTuple);
+    auto Error = BasicBlock::Create(Ctx, "error", PrintTuple);
+
+    // Setup return
+    Builder.SetInsertPoint(Ret);
+    // Print tuple end
+    auto ParEnd = Builder.CreateGlobalStringPtr(")", "par_end");
+    Builder.CreateCall(PrintF, vector<Value *> { ParEnd });
+    Builder.CreateRetVoid();
+
+    // Setup error
+    Builder.SetInsertPoint(Error);
+    Builder.CreateRetVoid();
+
+    // Setup entry
+    Builder.SetInsertPoint(Entry);
+    auto DataAlloca = Builder.CreateAlloca(Int);
+    auto TypeAlloca = Builder.CreateAlloca(PointerType::getUnqual(RuntimeType));
+    // Initialize iterator
+    auto IterAlloca = Builder.CreateAlloca(Int);
+    Builder.CreateStore(ConstantInt::get(Int, 0), IterAlloca);
+    // Print tuple start
+    auto ParStart = Builder.CreateGlobalStringPtr("(", "par_start");
+    Builder.CreateCall(PrintF, vector<Value *> { ParStart });
+    Builder.CreateBr(Loop);
+
+    // Setup loop
+    Builder.SetInsertPoint(Loop);
+    auto Iter = Builder.CreateLoad(IterAlloca);
+    auto Data = Builder.CreateGEP(RuntimeType, DataArg, Iter);
+    auto Type = Builder.CreateGEP(RuntimeType, TypeArg, Iter);
+
+    Builder.CreateCall(PrintFunc, vector<Value *> { Data, Type });
+
+
+    // Increment iterator
+    CurVal = Builder.CreateAdd(Iter, ConstantInt::get(Int, 1));
+    Builder.CreateStore(CurVal, IterAlloca);
+
+    //Builder.CreateStore(DataArg, UnionArgCast);
+    //auto UnionArgCast = Builder.CreateBitCast()
+
+
+    return PrintTuple;
+}
+
 llvm::Function *LLVMCodeGen::CreatePrintFunc() {
-    auto PrintTy = FunctionType::get(llvm::Type::getVoidTy(Ctx), vector<llvm::Type *> { Int64, PointerType::getUnqual(RuntimeType) }, false);
+    auto PrintTy = FunctionType::get(llvm::Type::getVoidTy(Ctx), vector<llvm::Type *> { Int, PointerType::getUnqual(RuntimeType) }, false);
     auto Print = llvm::Function::Create(PrintTy,
                                         llvm::Function::ExternalLinkage, "_print",
                                         Module.get());
 
     // Arguments arguments
     auto ArgIter = Print->args().begin();
-    Argument *DataArg = &*(ArgIter++);
-    Argument *TypeArg = &*(ArgIter);
+    Argument *DataArg = ArgIter++;
+    Argument *TypeArg = ArgIter;
     DataArg->setName("data_arg");
     TypeArg->setName("type_arg");
 
@@ -176,17 +242,17 @@ llvm::Function *LLVMCodeGen::CreatePrintFunc() {
     Builder.SetInsertPoint(Entry);
     auto UnionArgAlloca = Builder.CreateAlloca(UnionType);
     auto UnionArgGEP = Builder.CreateStructGEP(UnionType, UnionArgAlloca, 0);
-    auto UnionArgCast = Builder.CreateBitCast(UnionArgGEP, PointerType::getUnqual(Int64));
+    auto UnionArgCast = Builder.CreateBitCast(UnionArgGEP, PointerType::getUnqual(Int));
     Builder.CreateStore(DataArg, UnionArgCast);
     //auto UnionArgCast = Builder.CreateBitCast()
 
     auto CurVal = Builder.CreateStructGEP(RuntimeType, TypeArg, 0);
-    CurVal = Builder.CreateLoad(Int64, CurVal);
+    CurVal = Builder.CreateLoad(Int, CurVal);
     auto Switch = Builder.CreateSwitch(CurVal, Error, (unsigned int)common::TypeId::TYPES);
-    Switch->addCase(ConstantInt::get(Int64, (uint64_t)common::TypeId::INT), PrintInt);
-    Switch->addCase(ConstantInt::get(Int64, (uint64_t)common::TypeId::FLOAT), PrintFloat);
-    Switch->addCase(ConstantInt::get(Int64, (uint64_t)common::TypeId::CHAR), PrintChar);
-    Switch->addCase(ConstantInt::get(Int64, (uint64_t)common::TypeId::BOOL), PrintBool); /*
+    Switch->addCase(ConstantInt::get(Int, (uint64_t)common::TypeId::INT), PrintInt);
+    Switch->addCase(ConstantInt::get(Int, (uint64_t)common::TypeId::FLOAT), PrintFloat);
+    Switch->addCase(ConstantInt::get(Int, (uint64_t)common::TypeId::CHAR), PrintChar);
+    Switch->addCase(ConstantInt::get(Int, (uint64_t)common::TypeId::BOOL), PrintBool); /*
     Switch->addCase(ConstantInt::get(Int64, (uint64_t)common::TypeId::STRING), PrintString);
     Switch->addCase(ConstantInt::get(Int64, (uint64_t)common::TypeId::LIST), PrintList);
     Switch->addCase(ConstantInt::get(Int64, (uint64_t)common::TypeId::TUPLE), PrintTuple);
@@ -200,7 +266,7 @@ llvm::Function *LLVMCodeGen::CreatePrintFunc() {
     // Setup print int
     Builder.SetInsertPoint(PrintInt);
     auto IntFormat = Builder.CreateGlobalStringPtr("%i", "print_format_int");
-    auto IntCast  = Builder.CreateBitCast(UnionArgAlloca, PointerType::getUnqual(Int64));
+    auto IntCast  = Builder.CreateBitCast(UnionArgAlloca, PointerType::getUnqual(Int));
     auto IntLoad  = Builder.CreateLoad(IntCast);
     Builder.CreateCall(PrintF, vector<Value *> { IntFormat, IntLoad });
     Builder.CreateBr(Ret);
@@ -208,7 +274,7 @@ llvm::Function *LLVMCodeGen::CreatePrintFunc() {
     // Setup print float
     Builder.SetInsertPoint(PrintFloat);
     auto FloatFormat = Builder.CreateGlobalStringPtr("%f", "print_format_float");
-    auto FloatCast  = Builder.CreateBitCast(UnionArgAlloca, PointerType::getUnqual(Double));
+    auto FloatCast  = Builder.CreateBitCast(UnionArgAlloca, PointerType::getUnqual(Float));
     auto FloatLoad  = Builder.CreateLoad(FloatCast);
     Builder.CreateCall(PrintF, vector<Value *> { FloatFormat, FloatLoad });
     Builder.CreateBr(Ret);
@@ -216,14 +282,14 @@ llvm::Function *LLVMCodeGen::CreatePrintFunc() {
     // Setup print char
     Builder.SetInsertPoint(PrintChar);
     auto CharFormat = Builder.CreateGlobalStringPtr("%c", "print_format_char");
-    auto CharCast  = Builder.CreateBitCast(UnionArgAlloca, PointerType::getUnqual(Int8));
+    auto CharCast  = Builder.CreateBitCast(UnionArgAlloca, PointerType::getUnqual(Int));
     auto CharLoad  = Builder.CreateLoad(CharCast);
     Builder.CreateCall(PrintF, vector<Value *> { CharFormat, CharLoad });
     Builder.CreateBr(Ret);
 
     // Setup print bool
     Builder.SetInsertPoint(PrintBool);
-    auto BoolCast  = Builder.CreateBitCast(UnionArgAlloca, PointerType::getUnqual(Int1));
+    auto BoolCast  = Builder.CreateBitCast(UnionArgAlloca, PointerType::getUnqual(Int));
     auto BoolLoad  = Builder.CreateLoad(BoolCast);
     Builder.CreateCondBr(BoolLoad, PrintTrue, PrintFalse);
 

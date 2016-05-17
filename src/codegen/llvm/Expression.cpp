@@ -19,7 +19,7 @@ void LLVMCodeGen::visit(common::BoolExpr &Node) {
 void LLVMCodeGen::visit(common::StringExpr &Node) {
     Value *ListNode = nullptr;
     for (auto Char = Node.Val.rbegin(); Char < Node.Val.rend(); ++Char) {
-        CurVal = ConstantInt::get(Int8, (uint64_t)*Char);
+        CurVal = ConstantInt::get(Int, (uint64_t)*Char);
         ListNode = CreateListNode(Node.RetTy, CurVal, ListNode, Builder.GetInsertBlock(), true);
     }
     CurVal = ListNode;

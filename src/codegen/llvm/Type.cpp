@@ -7,13 +7,13 @@ using namespace codegen;
 llvm::Type *LLVMCodeGen::getType(common::Type Ty) {
     switch (Ty.Id) {
     case common::TypeId::FLOAT:
-        return Double;
+        return Float;
     case common::TypeId::INT:
-        return Int64;
+        return Int;
     case common::TypeId::BOOL:
-        return Int1;
+        return Int;
     case common::TypeId::CHAR:
-        return Int8;
+        return Int;
     case common::TypeId::TUPLE:
         return PointerType::getUnqual(getTupleType(Ty));
     case common::TypeId::LIST:
@@ -97,7 +97,7 @@ llvm::GlobalVariable *LLVMCodeGen::getRuntimeType(common::Type Ty) {
                                           GlobalVariable::ExternalLinkage, ConstArray);
 
     // Create runtime type
-    auto ConstVal = ConstantStruct::get(RuntimeType, { ConstantInt::get(Int64, (uint64_t)Ty.Id), GlobalArray } );
+    auto ConstVal = ConstantStruct::get(RuntimeType, { ConstantInt::get(Int, (uint64_t)Ty.Id), GlobalArray } );
 
     return RuntimeTypes[Ty] = new GlobalVariable(*Module.get(), ConstVal->getType(), true,
                                 GlobalVariable::ExternalLinkage, ConstVal);

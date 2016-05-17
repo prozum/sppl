@@ -77,9 +77,11 @@ private:
     llvm::IntegerType *Int1;
     llvm::IntegerType *Int8;
     llvm::IntegerType *Int32;
-    llvm::IntegerType *Int64;
-    llvm::Type *Double;
     llvm::PointerType *VoidPtr;
+
+    llvm::IntegerType *Int;
+    llvm::Type *Float;
+
     llvm::StructType *UnionType;
     llvm::StructType *RuntimeType;
     llvm::FunctionType *MainType;
@@ -87,6 +89,9 @@ private:
     // Helper functions
     llvm::Function *ArgFunc;
     llvm::Function *PrintFunc;
+    llvm::Function *PrintTupleFunc;
+    llvm::Function *PrintListFunc;
+    llvm::Function *PrintSignatureFunc;
 
     // Current state variables
     llvm::Value *CurVal = nullptr;
@@ -166,6 +171,9 @@ private:
     // Create helper function methods
     llvm::Function *CreateArgFunc();
     llvm::Function *CreatePrintFunc();
+    llvm::Function *CreatePrintTupleFunc();
+    llvm::Function *CreatePrintListFunc();
+    llvm::Function *CreatePrintSignatureFunc();
 
     // Util methods
     llvm::Value *CreateListNode(common::Type Type, llvm::Value *Data, llvm::Value *NextNode, llvm::BasicBlock *Block, bool Const = false);

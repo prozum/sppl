@@ -93,6 +93,9 @@ void LLVMCodeGen::visit(And &Node) {
     auto Right = CurVal;
 
     CurVal = Builder.CreateAnd(Left, Right, "andtmp");
+
+    // Convert to int
+    CurVal = Builder.CreateTrunc(CurVal, Int);
 }
 
 void LLVMCodeGen::visit(Or &Node) {
@@ -105,6 +108,9 @@ void LLVMCodeGen::visit(Or &Node) {
     auto Right = CurVal;
 
     CurVal = Builder.CreateOr(Left, Right, "ortmp");
+
+    // Convert to int
+    CurVal = Builder.CreateTrunc(CurVal, Int);
 }
 
 void LLVMCodeGen::visit(Equal &Node) {
@@ -122,6 +128,9 @@ void LLVMCodeGen::visit(Equal &Node) {
     } else {
         CurVal = Builder.CreateICmpEQ(Left, Right, "eqtmp");
     }
+
+    // Convert to int
+    CurVal = Builder.CreateTrunc(CurVal, Int);
 }
 
 void LLVMCodeGen::visit(NotEqual &Node) {
@@ -139,6 +148,9 @@ void LLVMCodeGen::visit(NotEqual &Node) {
     } else {
         CurVal = Builder.CreateICmpNE(Left, Right, "neqtmp");
     }
+
+    // Convert to int
+    CurVal = Builder.CreateTrunc(CurVal, Int);
 }
 
 void LLVMCodeGen::visit(Lesser &Node) {
@@ -155,6 +167,9 @@ void LLVMCodeGen::visit(Lesser &Node) {
     } else {
         CurVal = Builder.CreateICmpSLT(Left, Right, "lttmp");
     }
+
+    // Convert to int
+    CurVal = Builder.CreateTrunc(CurVal, Int);
 }
 
 void LLVMCodeGen::visit(Greater &Node) {
@@ -171,6 +186,9 @@ void LLVMCodeGen::visit(Greater &Node) {
     } else {
         CurVal = Builder.CreateICmpSGT(Left, Right, "lttmp");
     }
+
+    // Convert to int
+    CurVal = Builder.CreateTrunc(CurVal, Int);
 }
 
 void LLVMCodeGen::visit(LesserEq &Node) {
@@ -187,6 +205,9 @@ void LLVMCodeGen::visit(LesserEq &Node) {
     } else {
         CurVal = Builder.CreateICmpSLE(Left, Right, "lttmp");
     }
+
+    // Convert to int
+    CurVal = Builder.CreateTrunc(CurVal, Int);
 }
 
 void LLVMCodeGen::visit(GreaterEq &Node) {
@@ -203,6 +224,9 @@ void LLVMCodeGen::visit(GreaterEq &Node) {
     } else {
         CurVal = Builder.CreateICmpSGE(Left, Right, "lttmp");
     }
+
+    // Convert to int
+    CurVal = Builder.CreateTrunc(CurVal, Int);
 }
 
 void LLVMCodeGen::visit(To &Node) {
@@ -211,28 +235,22 @@ void LLVMCodeGen::visit(To &Node) {
     switch (Node.TypeCast.Id) {
         case TypeId::FLOAT:
             if (Node.Child->RetTy == TypeId::BOOL)
-                CurVal = Builder.CreateUIToFP(CurVal, Double, "casttmp");
+                CurVal = Builder.CreateUIToFP(CurVal, Float, "casttmp");
             else if (Node.Child->RetTy == TypeId::INT ||
                      Node.Child->RetTy == TypeId::CHAR)
-                CurVal = Builder.CreateSIToFP(CurVal, Double, "casttmp");
+                CurVal = Builder.CreateSIToFP(CurVal, Float, "casttmp");
             break;
         case TypeId::INT:
             if (Node.Child->RetTy == TypeId::FLOAT)
-                CurVal = Builder.CreateFPToSI(CurVal, Int64, "casttmp");
-            else
-                CurVal = Builder.CreateTrunc(CurVal, Int64, "trunctmp");
+                CurVal = Builder.CreateFPToSI(CurVal, Int, "casttmp");
             break;
         case TypeId::CHAR:
             if (Node.Child->RetTy == TypeId::FLOAT)
-                CurVal = Builder.CreateFPToSI(CurVal, Int8, "casttmp");
-            else
-                CurVal = Builder.CreateTrunc(CurVal, Int8, "trunctmp");
+                CurVal = Builder.CreateFPToSI(CurVal, Int, "casttmp");
             break;
         case TypeId::BOOL:
             if (Node.Child->RetTy == TypeId::FLOAT)
-                CurVal = Builder.CreateFPToSI(CurVal, Int1, "casttmp");
-            else
-                CurVal = Builder.CreateTrunc(CurVal, Int1, "trunctmp");
+                CurVal = Builder.CreateFPToSI(CurVal, Int, "casttmp");
             break;
         default:
             addError(Error::NotImplemented(Node.Loc));

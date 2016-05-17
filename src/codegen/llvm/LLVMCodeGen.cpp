@@ -18,28 +18,28 @@ LLVMCodeGen::LLVMCodeGen(parser::Driver &Drv)
 
     // Type constants
     Int1 = llvm::Type::getInt1Ty(Ctx);
-    Int8 = llvm::Type::getInt8Ty(Ctx);
+    Int8 = llvm::Type::getInt1Ty(Ctx);
     Int32 = llvm::Type::getInt32Ty(Ctx);
-    Int64 = llvm::Type::getInt64Ty(Ctx);
-    Double = llvm::Type::getDoubleTy(Ctx);
     VoidPtr = PointerType::getUnqual(Int8);
 
+    Int = llvm::Type::getInt64Ty(Ctx);
+    Float = llvm::Type::getDoubleTy(Ctx);
+
     // Union type used for easy bitcast
-    UnionType = StructType::create(Ctx, Int64, "union");
+    UnionType = StructType::create(Ctx, Int, "union");
 
     // Runtime type
     RuntimeType = StructType::create(Ctx, "runtime_type");
-    llvm::Type *Body[] = { Int64, PointerType::getUnqual( ArrayType::get(RuntimeType, 0) ) };
+    llvm::Type *Body[] = { Int, PointerType::getUnqual( ArrayType::get(RuntimeType, 0) ) };
     RuntimeType->setBody(Body);
 
     // Main type
     MainType = FunctionType::get(Int32,
                                  vector<Type *> {
                                          Int32,
-                                         PointerType::getUnqual(PointerType::getUnqual(Int8))
+                                         PointerType::getUnqual(PointerType::getUnqual(Int))
                                  },
                                  false);
-
 }
 
 void LLVMCodeGen::visit(common::Program &node) {

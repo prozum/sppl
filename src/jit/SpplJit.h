@@ -28,8 +28,8 @@ namespace jit {
 union OutputData {
     int64_t Int;
     double *Float;
-    char Char;
-    bool Bool;
+    int64_t Char;
+    int64_t Bool;
     size_t Size;
     OutputData *Ptr;
 };
