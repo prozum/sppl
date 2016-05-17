@@ -72,20 +72,22 @@ void LLVMCodeGen::visit(common::Function &Node) {
 
     // Visit cases
     addPrefix("case");
-    if (!Node.Cases.front()->Patterns.empty())
-        CurPatBlock = BasicBlock::Create(Ctx, "", CurFunc);
-    FirstBlock = true;
-    for (CurCase = Node.Cases.cbegin(); CurCase != Node.Cases.cend(); ++CurCase) {
-        if (next(CurCase) != Node.Cases.cend()) {
-            if (!(*CurCase)->Patterns.empty())
-                NextBlock = BasicBlock::Create(Ctx, "", CurFunc);
-        } else {
-            NextBlock = ErrBlock;
-        }
-
+    if (Node.Cases.front()->Patterns.empty()) {
         (*CurCase)->accept(*this);
-        stepPrefix();
-        CurPatBlock = NextBlock;
+    } else {
+        CurPatBlock = BasicBlock::Create(Ctx, "", CurFunc);
+        FirstBlock = true;
+        for (CurCase = Node.Cases.cbegin(); CurCase != Node.Cases.cend(); ++CurCase) {
+            if (next(CurCase) != Node.Cases.cend()) {
+                NextBlock = BasicBlock::Create(Ctx, "", CurFunc);
+            } else {
+                NextBlock = ErrBlock;
+            }
+
+            (*CurCase)->accept(*this);
+            stepPrefix();
+            CurPatBlock = NextBlock;
+        }
     }
     delPrefix();
 
@@ -107,59 +109,56 @@ void LLVMCodeGen::visit(common::Case &Node) {
     // Clear pattern values
     IdVals.clear();
 
-    // Set pattern prefix
-    addPrefix("pat");
-    if (!Node.Patterns.empty()) {
-        CurPatBlock->setName(getPrefix());
-    }
-
-    // Set first block after entry
-    Builder.SetInsertPoint(Entry);
-    if (FirstBlock) {
-        if (!Node.Patterns.empty()) {
-            Builder.CreateBr(CurPatBlock);
-        }
-        FirstBlock = false;
-    }
-
-    // Visit patterns
-    for (CurPat = Node.Patterns.cbegin(), CurArg = Args.cbegin();
-         CurPat != Node.Patterns.cend();
-         ++CurPat, ++CurArg) {
-
-        // Visit pattern with current argument
-        Builder.SetInsertPoint(CurPatBlock);
-        CurVal = *CurArg;
-        (*CurPat)->accept(*this);
-
-        // Convert to bool
-        CurVal = Builder.CreateTrunc(CurVal, Int1);
-
-        if (next(CurPat) != Node.Patterns.cend()) {
-            stepPrefix();
-            CurPatBlock = BasicBlock::Create(Ctx, getPrefix(), CurFunc);
-            Builder.CreateCondBr(CurVal, CurPatBlock, NextBlock);
-        }
-    }
-    delPrefix();
-
-    // Create when block
-    if (Node.When) {
-        auto WhenBlock = BasicBlock::Create(Ctx, getPrefix() + "_when", CurFunc);
-        Builder.CreateCondBr(CurVal, WhenBlock, NextBlock);
-        Builder.SetInsertPoint(WhenBlock);
-        Node.When->accept(*this);
-
-        // Convert to bool
-        assert(Node.When->RetTy == TypeId::BOOL);
-        CurVal = Builder.CreateTrunc(CurVal, Int1);
-    }
-
-    // Branch to next block
-    if (!Node.Patterns.empty())
-        Builder.CreateCondBr(CurVal, CurCaseBlock, NextBlock);
-    else
+    // Generate patterns
+    if (Node.Patterns.empty()) {
         Builder.CreateBr(CurCaseBlock);
+    } else {
+        addPrefix("pat");
+        CurPatBlock->setName(getPrefix());
+
+        // Set first block after entry
+        Builder.SetInsertPoint(Entry);
+        if (FirstBlock) {
+            Builder.CreateBr(CurPatBlock);
+            FirstBlock = false;
+        }
+
+        // Visit patterns
+        for (CurPat = Node.Patterns.cbegin(), CurArg = Args.cbegin();
+             CurPat != Node.Patterns.cend();
+             ++CurPat, ++CurArg) {
+
+            // Visit pattern with current argument
+            Builder.SetInsertPoint(CurPatBlock);
+            CurVal = *CurArg;
+            (*CurPat)->accept(*this);
+
+            // Convert to bool
+            CurVal = Builder.CreateTrunc(CurVal, Int1);
+
+            if (next(CurPat) != Node.Patterns.cend()) {
+                stepPrefix();
+                CurPatBlock = BasicBlock::Create(Ctx, getPrefix(), CurFunc);
+                Builder.CreateCondBr(CurVal, CurPatBlock, NextBlock);
+            }
+        }
+        delPrefix();
+
+        // Create when block
+        if (Node.When) {
+            auto WhenBlock = BasicBlock::Create(Ctx, getPrefix() + "_when", CurFunc);
+            Builder.CreateCondBr(CurVal, WhenBlock, NextBlock);
+            Builder.SetInsertPoint(WhenBlock);
+            Node.When->accept(*this);
+
+            // Convert to bool
+            assert(Node.When->RetTy == TypeId::BOOL);
+            CurVal = Builder.CreateTrunc(CurVal, Int1);
+        }
+
+        // Branch to next block
+        Builder.CreateCondBr(CurVal, CurCaseBlock, NextBlock);
+    }
 
     // Generate expression in case block
     Builder.SetInsertPoint(CurCaseBlock);
