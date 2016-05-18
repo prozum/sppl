@@ -43,31 +43,34 @@ void LLVMCodeGen::visit(common::Program &node) {
         func->accept(*this);
     }
 
-#if SPPLDEBUG
-    *Drv.MOut << "#-----------------------------------------------------------------"
-            "-------------#"
-         << endl;
-    *Drv.MOut << "|                                 Unoptimized                     "
-            "             |"
-         << endl;
-    *Drv.MOut << "#-----------------------------------------------------------------"
-            "-------------#"
-         << endl;
-    *Drv.MOut << ModuleString();
-#endif
+    if (!Drv.Silent) {
+        *Drv.MOut << "#-----------------------------------------------------------------"
+                "-------------#"
+        << endl;
+        *Drv.MOut << "|                                 Unoptimized                     "
+                "             |"
+        << endl;
+        *Drv.MOut << "#-----------------------------------------------------------------"
+                "-------------#"
+        << endl;
+        *Drv.MOut << ModuleString();
+    }
+
+    // Run optimizations
     PassMgr->run(*Module);
-#if SPPLDEBUG
-    *Drv.MOut << "#-----------------------------------------------------------------"
-            "-------------#"
-         << endl;
-    *Drv.MOut << "|                                  Optimized                      "
-            "             |"
-         << endl;
-    *Drv.MOut << "#-----------------------------------------------------------------"
-            "-------------#"
-         << endl;
-    *Drv.MOut << ModuleString();
-#endif
+
+    if (!Drv.Silent) {
+        *Drv.MOut << "#-----------------------------------------------------------------"
+                "-------------#"
+        << endl;
+        *Drv.MOut << "|                                  Optimized                      "
+                "             |"
+        << endl;
+        *Drv.MOut << "#-----------------------------------------------------------------"
+                "-------------#"
+        << endl;
+        *Drv.MOut << ModuleString();
+    }
 
     // Don't output anything with JIT
     if (Drv.JIT)

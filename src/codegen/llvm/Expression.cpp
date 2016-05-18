@@ -35,12 +35,12 @@ void LLVMCodeGen::visit(common::IdExpr &Node) {
     if (CurVal)
         return;
 
-    // Internal module
+    // Internal function
     CurVal = Module->getFunction(Node.Val);
     if (CurVal)
         return;
 
-    // External module
+    // External function
     if (Drv.Global.Decls.count(Node.Val))
         CurVal = llvm::Function::Create(getFuncType(Drv.Global.Decls[Node.Val]),
                                         llvm::Function::ExternalLinkage,
@@ -126,7 +126,7 @@ void LLVMCodeGen::visit(common::ListAdd &Node) {
     Node.Right->accept(*this);
     auto List = CurVal;
 
-    CurVal = createListNode(Node.RetTy, Element, List, Builder.GetInsertBlock());
+    CurVal = createListNode(Node.RetTy, Element, List, Builder.GetInsertBlock(), Node.Left->Const && Node.Right->Const);
 }
 
 void LLVMCodeGen::visit(common::DoExpr &Node) {
