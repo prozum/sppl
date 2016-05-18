@@ -203,7 +203,7 @@ void codegen::CParCodeGen::visit(common::Function &Node) {
     CurrBlock->Stmts.push_back(new ExprStmt(Exit));
 }
 
-void codegen::CParCodeGen::visit(common::Case &Node) {
+void codegen::CParCodeGen::visit(Case &Node) {
     vector<ctree::Expression*> Patterns;
 
     CurrBlock = new Block(CurrBlock);
@@ -301,7 +301,7 @@ void codegen::CParCodeGen::visit(common::Case &Node) {
     CurrBlock = CurrBlock->Parent;
 }
 
-void codegen::CParCodeGen::visit(common::CallExpr &Node) {
+void codegen::CParCodeGen::visit(CallExpr &Node) {
     string TaskName = GTask + to_string(TaskCount++);
 
     if (GenerateParallel) {
@@ -362,7 +362,7 @@ void codegen::CParCodeGen::visit(common::CallExpr &Node) {
     }
 }
 
-std::string codegen::CParCodeGen::generateSignature(common::Type &Ty) {
+string codegen::CParCodeGen::generateSignature(Type &Ty) {
     auto &SubTypes = Ty.Subtypes;
     string Name = GSignature + to_string(SigCount++);
     string Type = Name;
@@ -478,11 +478,11 @@ void codegen::CParCodeGen::generateStd() {
     CCodeGen::generateStd();
 }
 
-std::string codegen::CParCodeGen::getArgType(common::Type &Ty) {
+string codegen::CParCodeGen::getArgType(Type &Ty) {
     return getArgName(Ty) + "*";
 }
 
-std::string codegen::CParCodeGen::getArgName(common::Type &Ty) {
+string codegen::CParCodeGen::getArgName(Type &Ty) {
     return getName(Ty) + GArg;
 }
 
