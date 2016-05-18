@@ -1,37 +1,35 @@
-
 #pragma once
-#include "CCodeGenOld.h"
+#include "CCodeGen.h"
+
 
 namespace codegen {
-class CParCodeGen : public CCodeGenOld {
-    public:
-        CParCodeGen(parser::Driver &Drv);
-        void visit(common::Program &Node);
+class CParCodeGen : public CCodeGen {
+public:
+    CParCodeGen(parser::Driver &Drv);
+    void visit(common::Program &Node);
 
-    private:
-        void visit(common::Function &Node);
-        void visit(common::Case &Node);
-        void visit(common::CallExpr &Node);
+private:
+    void visit(common::Function &Node);
+    void visit(common::Case &Node);
+    void visit(common::CallExpr &Node);
 
-        std::string generateEnvironment(common::Type &Ty);
+    const std::string GPar = "par";
+    const std::string GSeq = "call";
+    const std::string GTask = GGenerated + "task";
 
-        const std::string GTask = "task";
-        const std::string GRes = "res";
-        const std::string GParallel = "par";
-        const std::string GSequential = "seq";
+    unsigned int TaskCount = 0;
 
-        std::string CurrentArg;
+    std::string CurrentArg;
+    bool GenerateParallel;
 
-        std::vector<std::string> TaskDeallocs;
+    unsigned int CallDepth;
+    std::vector<std::vector<ctree::Statement*>> ParallelCalls;
+    std::vector<ctree::Statement*> SequentialCall;
 
-        std::vector<std::string> SequentialCall;
-        std::vector<size_t> CallStackCount;
-        std::vector<std::string> CurrentTasks;
-
-        bool GenerateParallel;
-
-        size_t TaskCount = 0;
-
-        void outputBeforeExpr();
+    std::string generateSignature(common::Type &Ty);
+    std::string getArgType(common::Type &Ty);
+    std::string getArgName(common::Type &Ty);
+    void outputParallel();
+    void generateStd();
 };
 }

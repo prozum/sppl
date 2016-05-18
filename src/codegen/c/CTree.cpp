@@ -238,7 +238,7 @@ void UnOp::outputCode(std::ostream &Output, int TapCount = 0) {
     }
 
     if (!Child->IsLeaf) {
-        Output << " (";
+        Output << "(";
         Child->outputCode(Output, TapCount);
         Output << ")";
     } else {

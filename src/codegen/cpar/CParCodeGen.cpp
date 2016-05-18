@@ -1,33 +1,25 @@
-#include <assert.h>
 #include "CParCodeGen.h"
 
-using namespace common;
+using namespace ctree;
 using namespace std;
-using namespace codegen;
+using namespace common;
 
-CParCodeGen::CParCodeGen(parser::Driver &Drv)
-    : CCodeGenOld(Drv) {}
+codegen::CParCodeGen::CParCodeGen(parser::Driver &Drv)
+        : CCodeGen(Drv) { }
 
+void codegen::CParCodeGen::visit(common::Program &Node) {
+    common::Function *Main = nullptr;
 
-void CParCodeGen::visit(Program &Node) {
-    Prog = &Node;
-    Function *Main = nullptr;
+    CProg = new ctree::Program();
 
-    *Output << "#define printfunc printf" << endl;
-
-#ifdef TESTS
-    *Header << "#include \"task.h\" " << endl;
-#else
-    *Header << "#include \"src/runtime/task.h\" " << endl;
-#endif
-    // Generate the standard functionality for every program
     generateStd();
+    CProg->Directives.push_back(new Define("printfunc", "printf"));
 
     // Find the main function
     for (auto &Decl : Node.Decls) {
-        if (typeid(*Decl.get()) == typeid(Function) &&
-            ((Function *)Decl.get())->Id == "main") {
-            Main = (Function *)Decl.get();
+        if (typeid(*Decl.get()) == typeid(common::Function) &&
+            ((common::Function *)Decl.get())->Id == "main") {
+            Main = (common::Function *)Decl.get();
             break;
         }
     }
@@ -37,404 +29,480 @@ void CParCodeGen::visit(Program &Node) {
         return;
     }
 
-    // Get the type of main, so that return type of main is generated
-    string MainSig = getType(Main->Signature);
+    /* The main function of the C program will be build below.
+     * For readablity, the code that the C tree will generate,
+     * can be seen below.
+     *
+     * int main(int argc, char** argv)
+     * {
+     *     strlist* args = gcreate_strlist(0);
+     *     int i;
+     *
+     *     for (i = argc - 1; i >= 0; i--)
+     *     {
+     *         args = gadd_strlist(args, gctr_str(argv[i]));
+     *     }
+     *
+     *     sig_arg* main_args = malloc(sizeof(sig_arg));
+     *     main_args->arg0 = args;
+     *     task_t* main_task = taskcreate((void (*)(void*))umain.par, (void*)main_args);
+     *
+     *     rmain(4, main_task);
+     *
+     *     taskdealloc(main_task);
+     *     return 0;
+     */
 
-    // Generate real main function, that calls the users main
-    string StrListName = getList(StringList);
+    string StrListName = getName(StringList);
+    string StrListType = getType(StringList);
 
-    *Output << "int main(int argc, char** argv) { " << endl
-            << "    " << StrListName << " *args = " << GGenerated << GCreate << StrListName << "(0); " << endl
-            << "    int i; " << endl
-            << " " << endl
-            << "    for(i = argc - 1; i >= 0; i--) { " << endl
-            << "        args = " << GGenerated << GAdd << StrListName << "(args, " << GGenerated
-                                            << GCreate << GString << "(argv[i])); " << endl
-            << "    } " << endl
-            << " " << endl
-            << "    " << MainSig << GArg << "* main_args = malloc(sizeof(" << MainSig << GArg << ")); " << endl
-            << "    main_args->" << GGenerated << GArg << "0 = args; " << endl
-            << "    task_t *main_task = taskcreate((void (*)(void*))" << GUser << GMain << "."
-                                    << GParallel << ", (void *)main_args); " << endl
-            << "    rmain(4, main_task); " << endl
-            << endl
-            << "    taskdealloc(main_task); " << endl
-            << "    return 0; " << endl
-            << "} " << endl
-            << " " << endl;
+    // int main(int argc, char** argv)
+    auto MainBlock = new Block();
+    auto MainFunc = new ctree::Function("int", "main", MainBlock);
+    MainFunc->Args.push_back({ "int", "argc" });
+    MainFunc->Args.push_back({ "char**", "argv" });
+    CProg->Functions.push_back(MainFunc);
 
+    // strlist args = gcreate_strlist(0);
+    // int i;
+    auto StrListCreate = new Call(new Ident(GCreate + StrListName));
+    StrListCreate->Args.push_back(new Int(0));
+    MainBlock->Stmts.push_back(new Decl(StrListType, new BinOp("=", new Ident("args"), StrListCreate)));
+    MainBlock->Stmts.push_back(new Decl(GIntType, new Ident("i")));
 
+    // for (i = argc - 1; i >= 0; --i)
+    auto Expr1 = new BinOp("=", new Ident("i"), new BinOp("-", new Ident("argc"), new Int(1)));
+    auto Expr2 = new BinOp(">=", new Ident("i"), new Int(0));
+    auto Expr3 = new UnOp("--", new Ident("i"));
+    auto ForBlock = new Block();
+    MainBlock->Stmts.push_back(new For(Expr1, Expr2, Expr3, ForBlock));
+
+    // args = gadd_strlist(args, gctr_str(argv[i]));
+    auto StrCreate = new Call(new Ident(GCreate + GString));
+    StrCreate->Args.push_back(new UnOp("[i]", new Ident("argv"), false));
+    auto AddFunc = new Call(new Ident(GAdd + StrListName));
+    AddFunc->Args.push_back(new Ident("args"));
+    AddFunc->Args.push_back(StrCreate);
+    ForBlock->Stmts.push_back(new ExprStmt(new BinOp("=", new Ident("args"), AddFunc)));
+
+    // sig_arg main_args;
+    MainBlock->Stmts.push_back(new Decl(getArgName(Main->Signature), new Ident("main_args")));
+
+    // main_args.arg0 = args;
+    auto MainArgs = new BinOp(".", new Ident("main_args"), new Ident(GArg + to_string(0)));
+    MainBlock->Stmts.push_back(new ExprStmt(new BinOp("=", MainArgs, new Ident("args"))));
+
+    // task_t* main_task = taskcreate((void (*)(void*))umain.par, (void*)main_args);
+    auto TaskCrt = new Call(new Ident("taskcreate"));
+    auto UMainPar = new BinOp(".", new Ident(GUser + Main->Id), new Ident(GPar));
+    TaskCrt->Args.push_back(new UnOp("(void (*)(void*))", UMainPar));
+    TaskCrt->Args.push_back(new UnOp("(void*)", new UnOp("&", new Ident("main_args"))));
+    MainBlock->Stmts.push_back(new Decl("task_t*", new BinOp("=", new Ident("main_task"), TaskCrt)));
+
+    // rmain(4, main_task);
+    auto RMain = new Call(new Ident("rmain"));
+    RMain->Args.push_back(new Int(4));
+    RMain->Args.push_back(new Ident("main_task"));
+    MainBlock->Stmts.push_back(new ExprStmt(RMain));
+
+    // taskdealloc(main_task);
+    auto TaskDealloc = new Call(new Ident("taskdealloc"));
+    TaskDealloc->Args.push_back(new Ident("main_task"));
+    MainBlock->Stmts.push_back(new ExprStmt(TaskDealloc));
+
+    // return 0;
+    MainBlock->Stmts.push_back(new Return(new Int(0)));
+
+    // Visit Functions
     for (auto &Func : Node.Decls) {
         Func->accept(*this);
-        *Output << endl;
-        outputBuffer();
     }
+
+    CProg->outputCode(*Drv.Out, 0);
 }
 
-void CParCodeGen::visit(Function &Node) {
-    string ParFunc;
-    string SeqFunc;
-    string ArgType;
-    string Signature = getEnvironment(Node.Signature);
+void codegen::CParCodeGen::visit(common::Function &Node) {
+    auto &Signature = Node.Signature;
 
-    CurrentArg = Signature + GArg;
+    string SigType = getType(Signature);
+    string ParFuncName = GGenerated + GPar + Node.Id;
+    string SeqFuncName = GGenerated + GSeq + Node.Id;
 
-    CurFunc = &Node;
+    CurrFunc = &Node;
+    CurrentArg = getArgType(Signature);
 
-    ParFunc = "void " + GGenerated + GParallel + Node.Id + "(task_t *t)";
-    SeqFunc = getType(Node.Signature.Subtypes.back()) + " " + GGenerated + GSequential + Node.Id + "(";
+    // sig ufuncname = { gparfuncname, gseqfuncname };
+    auto Val = new ArrayLiteral();
+    Val->Exprs.push_back(new Ident(ParFuncName));
+    Val->Exprs.push_back(new Ident(SeqFuncName));
+    CProg->Globals.push_back(new Decl(SigType, new BinOp("=", new Ident(GUser + Node.Id), Val)));
 
-    for (size_t i = 0; i < Node.Signature.Subtypes.size() - 1; ++i) {
-        SeqFunc += getType(Node.Signature.Subtypes[i]) + " " + GGenerated + GArg + to_string(i);
-
-        if (i < Node.Signature.Subtypes.size() - 2)
-            SeqFunc += ", ";
-    }
-
-    SeqFunc += ")";
-
-    *Header << ParFunc << ";" << endl;
-    *Header << SeqFunc << ";" << endl;
-    *Header << Signature << " " << GUser << Node.Id  << " = { " << GGenerated << GParallel << Node.Id << ", "
-                                                                << GGenerated << GSequential << Node.Id << " };" << endl;
+    // ---------------------------------------
 
     GenerateParallel = true;
-    *Output << ParFunc << " { " << endl;
+    CurrBlock = new Block();
+    auto ParFunc = new ctree::Function("void", ParFuncName, CurrBlock);
+    ParFunc->Args.push_back({ "task_t*", GTask });
+    CProg->Functions.push_back(ParFunc);
 
-    for (size_t i = 0; i < Node.Signature.Subtypes.size() - 1; ++i) {
-        string ArgName = GGenerated + GArg + to_string(i);
+    for (size_t i = 0; i < Signature.Subtypes.size() - 1; ++i) {
+        string ArgName = GArg + to_string(i);
+        string ArgType = getType(Signature.Subtypes[i]);
 
-        ArgType = getType(Node.Signature.Subtypes[i]);
-
-        *Output << "    " << ArgType << " " << ArgName << " = "
-                    << "(" << ArgType << ")" << "(" << "(" << CurrentArg << "*)" << "t->startarg)->"
-                    << ArgName << ";" << endl;
+        auto TaskArgs = new BinOp("->", new Ident(GTask), new Ident("startarg"));
+        auto CastArgs = new UnOp("(" + CurrentArg + ")", TaskArgs);
+        auto GetArg = new BinOp("->", CastArgs, new Ident(GArg + to_string(i)));
+        auto CastArg = new UnOp("(" + getType(Signature.Subtypes[i]) + ")", GetArg);
+        CurrBlock->Stmts.push_back(new Decl(ArgType, new BinOp("=", new Ident(ArgName), CastArg)));
     }
 
-    *Output << "Start: " << endl
-            << endl;
+    // Entry:
+    CurrBlock->Stmts.push_back(new Label("Entry"));
 
-    // Generate cases
     for (auto &Case: Node.Cases) {
         Case->accept(*this);
-        *Output << endl;
-
-        // Clear assigments specific for current case
-        Assignments.clear();
     }
 
-    // Generate error, for when program doesn't realize a case
-    *Output << "    printfunc(\"No cases realized in " << CurFunc->Id << " \\n\"); " << endl
-            << "    exit(1); " << endl
-            << "} " << endl
-            << endl;
+    // print("No cases realized in funcname\n");
+    auto Print = new Call(new Ident(PrintFunc));
+    Print->Args.push_back(new String("No cases realized in " + Node.Id + "\\n"));
+    CurrBlock->Stmts.push_back(new ExprStmt(Print));
 
+    // exit(1);
+    auto Exit = new Call(new Ident("exit"));
+    Exit->Args.push_back(new Int(1));
+    CurrBlock->Stmts.push_back(new ExprStmt(Exit));
 
-
+    // ---------------------------------------
 
     GenerateParallel = false;
-    *Output << SeqFunc << " { " << endl;
-    *Output << "Start: " << endl
-            << endl;
+    CurrBlock = new Block();
+    auto SeqFunc = new ctree::Function(getType(Signature.Subtypes.back()), SeqFuncName, CurrBlock);
+    CProg->Functions.push_back(SeqFunc);
 
-    // Generate cases
+    for (size_t i = 0; i < Signature.Subtypes.size() - 1; ++i) {
+        SeqFunc->Args.push_back({ getType(Signature.Subtypes[i]), GArg + to_string(i) });
+    }
+
+    // Entry:
+    CurrBlock->Stmts.push_back(new Label("Entry"));
+
+    // Visit Cases
     for (auto &Case: Node.Cases) {
         Case->accept(*this);
-        *Output << endl;
-
-        // Clear assigments specific for current case
-        Assignments.clear();
     }
 
-    // Generate error, for when program doesn't realize a case
-    *Output << "    printfunc(\"No cases realized in " << CurFunc->Id << " \\n\"); " << endl
-            << "    exit(1); " << endl
-            << "} " << endl
-            << endl;
+    // print("No cases realized in funcname\n");
+    Print = new Call(new Ident(PrintFunc));
+    Print->Args.push_back(new String("No cases realized in " + Node.Id + "\\n"));
+    CurrBlock->Stmts.push_back(new ExprStmt(Print));
+
+    // exit(1);
+    Exit = new Call(new Ident("exit"));
+    Exit->Args.push_back(new Int(1));
+    CurrBlock->Stmts.push_back(new ExprStmt(Exit));
 }
 
-void CParCodeGen::visit(Case &Node) {
-    stringstream Pattern;
-    string WhenDealloc;
-    bool Empty = true;
+void codegen::CParCodeGen::visit(common::Case &Node) {
+    vector<ctree::Expression*> Patterns;
 
-    // Generate if-statement for matching
-    Pattern << "    if (";
+    CurrBlock = new Block(CurrBlock);
 
+    // Visit patterns and get all none null expressions
+    // generated from visiting them.
     for (size_t i = 0; i < Node.Patterns.size(); ++i) {
-        // Push arg_name on get_value_builder. get_value_builder is used for
-        // generate assignments in a case
-        PatternBuilder.push_back(GGenerated + GArg + to_string(i));
+        PatternBuilder = new Ident(GArg + to_string(i));
 
-        // Generate pattern
         Node.Patterns[i]->accept(*this);
 
-        // Cleanup
-        PatternBuilder.pop_back();
-
-        // Only add pattern, if pattern is not "1"
-        if (!LastPattern.empty()) {
-
-            if (!Empty)
-                Pattern << " && ";
-
-            Empty = false;
-            Pattern << LastPattern;
+        if (LastExpr) {
+            Patterns.push_back(LastExpr);
         }
+
+        delete PatternBuilder;
     }
 
-    Pattern << ")";
+    auto Compare = generateAndChain(Patterns);
 
-    // Only generate if statement, if the pattern wasn't empty
-    if (!Empty) {
-        *Output << Pattern.str() << endl;
-    }
-
-    *Output << "    { " << endl;
-
-    // Generate all nessesary assigments
-    for (auto &Assign : Assignments) {
-        *Output << "        " << Assign << endl;
-
-        if (Assign == Assignments.back())
-            *Output << endl;
+    // if (pattern_1 && (pattern_2 && (... && pattern_n ...))
+    if (Compare) {
+        auto If = new IfElse(Compare, CurrBlock);
+        CurrBlock->Parent->Stmts.push_back(If);
+    } else {
+        CurrBlock->Parent->Stmts.push_back(CurrBlock);
     }
 
     if (Node.When) {
-        // Generate return expression
-        ExprStack.push(stringstream());
-        SequentialCall.push_back(string());
-        BeforeExpr.push_back(string());
-        CallStackCount.push_back(0);
+        CurrBlock = new Block(CurrBlock);
 
         Node.When->accept(*this);
 
         if (GenerateParallel) {
-            outputBeforeExpr();
-
-            for (auto &Dealloc: TaskDeallocs){
-                WhenDealloc += "        " + Dealloc + "\n";
-            }
-
-            TaskDeallocs.clear();
+            outputParallel();
         }
 
-        *Output << "        if (" << ExprStack.top().str() << ") " << endl
-                << "        { " << endl
-                << WhenDealloc << endl
-                ;
-        ExprStack.pop();
+        // if (when_expr)
+        auto If = new IfElse(LastExpr, CurrBlock);
+        CurrBlock->Parent->Stmts.push_back(If);
     }
 
-    // Generate return expression
-    ExprStack.push(stringstream());
-    SequentialCall.push_back(string());
-    BeforeExpr.push_back(string());
-    CallStackCount.push_back(0);
-
     if (Node.TailRec) {
-        string Deallocs;
-        auto C = (CallExpr *)Node.Expr.get();
+        // We know, that if a case is tail recursive, then the expression
+        // of that case is a call.
+        auto Call = static_cast<CallExpr*>(Node.Expr.get());
 
-        for (size_t i = 0; i < CurFunc->Signature.Subtypes.size() - 1; ++i) {
-            ExprStack.push(stringstream());
-            C->Args[i]->accept(*this);
+        // Reset all the arguments to the arguments of the call.
+        for (size_t i = 0; i < Call->Args.size(); ++i) {
+            Call->Args[i]->accept(*this);
 
             if (GenerateParallel) {
-                outputBeforeExpr();
-
-                for (auto &Dealloc: TaskDeallocs){
-                    Deallocs += "        " + Dealloc + "\n";
-                }
-
-                TaskDeallocs.clear();
+                outputParallel();
             }
 
-            *Output << "        " << GGenerated << GArg << i << " = "
-                                  << ExprStack.top().str() << "; " << endl;
-            ExprStack.pop();
+            // arg_i = callarg_i
+            auto Assign = new BinOp("=", new Ident(GArg + to_string(i)), LastExpr);
+            CurrBlock->Stmts.push_back(new ExprStmt(Assign));
         }
 
-        *Output << endl
-                << Deallocs << endl
-                << endl
-                << "        goto Start; " << endl;
+        // goto Entry;
+        CurrBlock->Stmts.push_back(new Goto("Entry"));
     } else {
-        string Deallocs;
-        ExprStack.push(stringstream());
+        string RetType = getType(CurrFunc->Signature.Subtypes.back());
 
         Node.Expr->accept(*this);
 
         if (GenerateParallel) {
-            outputBeforeExpr();
+            outputParallel();
 
-            for (auto &Dealloc: TaskDeallocs){
-                Deallocs += "        " + Dealloc + "\n";
-            }
+            auto GetArgs = new BinOp("->", new Ident(GTask), new Ident("startarg"));
+            auto CastArgs = new UnOp("(" + CurrentArg + ")", GetArgs);
+            auto GetRes = new BinOp("->", CastArgs, new Ident(GRes));
+            auto Assign = new BinOp("=", GetRes, LastExpr);
+            CurrBlock->Stmts.push_back(new ExprStmt(Assign));
 
-            TaskDeallocs.clear();
-
-            *Output << "        ((" << CurrentArg << "*)t->startarg)->" << GGenerated << GRes << " = "
-                                    << ExprStack.top().str() << "; " << endl
-                                    << endl
-                                    << Deallocs << endl
-                                    << endl
-                                    << "        taskexit(t); " << endl;
+            auto TaskExit = new Call(new Ident("taskexit"));
+            TaskExit->Args.push_back(new Ident(GTask));
+            CurrBlock->Stmts.push_back(new ExprStmt(TaskExit));
         } else {
-            *Output << "        return " << ExprStack.top().str() << ";" << endl;
+            // rettype res = expr;
+            auto Assign = new BinOp("=", new Ident(GRes), LastExpr);
+            CurrBlock->Stmts.push_back(new Decl(RetType, Assign));
+
+            // return res;
+            CurrBlock->Stmts.push_back(new Return(new Ident(GRes)));
         }
-
-        ExprStack.pop();
     }
 
+    // Reset back to the old CurrBlock
     if (Node.When) {
-        *Output << "        } " << endl;
-        *Output << WhenDealloc;
+        CurrBlock = CurrBlock->Parent;
     }
 
-    *Output << "    } " << endl
-            << endl;
+    CurrBlock = CurrBlock->Parent;
 }
 
-void CParCodeGen::visit(common::CallExpr &Node) {
+void codegen::CParCodeGen::visit(common::CallExpr &Node) {
+    string TaskName = GTask + to_string(TaskCount++);
+
     if (GenerateParallel) {
-        stringstream GeneratedCall;
-        string Name = GTask + to_string(TaskCount++);
-        string Signature = getEnvironment(Node.Callee->RetTy);
-
-        CurrentTasks.push_back(Name);
-
-        if (BeforeExpr.size() == BeforeExprDepth) {
-            SequentialCall.push_back(string());
-            BeforeExpr.push_back(string());
-            CallStackCount.push_back(0);
+        if (ParallelCalls.size() == CallDepth) {
+            SequentialCall.push_back(nullptr);
+            ParallelCalls.push_back(vector<Statement*>());
         }
-
-        BeforeExprDepth++;
 
         if (Node.DoParallel) {
-            GeneratedCall << "        " << Signature << GArg << "* " << Name << GArg << " = malloc(sizeof("
-                                        << Signature << GArg << "));" << endl;
+            string TaskArgsName = TaskName + GArg;
+            string ArgsName = getArgName(Node.Callee->RetTy);
+
+            ParallelCalls[CallDepth].push_back(new Decl(ArgsName, new Ident(TaskArgsName)));
+
+
+            CallDepth++;
 
             for (size_t i = 0; i < Node.Args.size(); ++i) {
-                ExprStack.push(stringstream());
                 Node.Args[i]->accept(*this);
 
-                GeneratedCall << "        " << Name << GArg << "->" << GGenerated << GArg << i << " = "
-                                            << ExprStack.top().str() << "; " << endl;
-
-                ExprStack.pop();
+                auto GetArg = new BinOp(".", new Ident(TaskArgsName), new Ident(GArg + to_string(i)));
+                ParallelCalls[CallDepth - 1].push_back(new ExprStmt(new BinOp("=", GetArg, LastExpr)));
             }
 
-            ExprStack.push(stringstream());
             Node.Callee->accept(*this);
+            CallDepth--;
 
-            GeneratedCall << "        task_t *" << Name << " = taskcreate((void (*)(void*))" << ExprStack.top().str()
-                                                << "." << GParallel << ", (void *)" << Name << GArg << ");" << endl
-                                                << "        subtaskadd(t, " << Name << "); " << endl
-                                                << endl;
+            auto TaskCrt = new Call(new Ident("taskcreate"));
+            TaskCrt->Args.push_back(new UnOp("(void (*)(void*))", new BinOp(".", LastExpr, new Ident(GPar))));
+            TaskCrt->Args.push_back(new UnOp("(void*)", new UnOp("&", new Ident(TaskArgsName))));
+            ParallelCalls[CallDepth].push_back(new Decl("task_t*", new BinOp("=", new Ident(TaskName), TaskCrt)));
 
-            ExprStack.pop();
-            ExprStack.top() << "((" << Signature << GArg << "*)" << Name << "->startarg" << ")->" << GGenerated << GRes;
+            auto SubTaskAdd = new Call(new Ident("subtaskadd"));
+            SubTaskAdd->Args.push_back(new Ident(GTask));
+            SubTaskAdd->Args.push_back(new Ident(TaskName));
+            ParallelCalls[CallDepth].push_back(new ExprStmt(SubTaskAdd));
 
-            TaskDeallocs.push_back("taskdealloc(" + Name + ");");
-
-            BeforeExprDepth--;
-            BeforeExpr[BeforeExprDepth] += GeneratedCall.str();
-            CallStackCount[BeforeExprDepth]++;
+            LastExpr = new BinOp(".", new Ident(TaskArgsName), new Ident(GRes));
         } else {
+            string TaskRes = TaskName + GRes;
 
-            ExprStack.push(stringstream());
-            Node.Callee->accept(*this);
+            CallDepth++;
+            CCodeGen::visit(Node);
+            CallDepth--;
 
-            GeneratedCall << "        " << getType(Node.RetTy) << " " << Name << GRes << " = " << ExprStack.top().str()
-                                        << "." << GSequential << "(";
-            ExprStack.pop();
-
-            for (size_t i = 0; i < Node.Args.size(); ++i) {
-                ExprStack.push(stringstream());
-                Node.Args[i]->accept(*this);
-
-                GeneratedCall << ExprStack.top().str();
-
-                if (i < Node.Args.size() - 1)
-                    GeneratedCall << ", ";
-
-                ExprStack.pop();
+            if (SequentialCall[CallDepth] != nullptr) {
+                addError(Error("The C Parallel Code Generator failed for unknown reasons"));
+                return;
             }
 
-            GeneratedCall << ");" << endl
-                          << endl;
+            auto Res = new BinOp("=", new Ident(TaskRes), LastExpr);
+            SequentialCall[CallDepth] = new Decl(getType(Node.RetTy), Res);
 
-            ExprStack.top() << Name << GRes;
-            SequentialCall[--BeforeExprDepth] = GeneratedCall.str();
+            LastExpr = new Ident(TaskRes);
         }
     } else {
-        Node.Callee->accept(*this);
-
-        ExprStack.top() << "." << GSequential << "(";
-        for (auto &Expr: Node.Args) {
-            Expr->accept(*this);
-
-            if (Expr != Node.Args.back())
-                ExprStack.top() << ", ";
-        }
-        ExprStack.top() << ")";
+        CCodeGen::visit(Node);
     }
 }
 
-std::string CParCodeGen::generateEnvironment(common::Type &Ty) {
-    string Name = GGenerated + GSignature + to_string(++SigCount);
-    stringstream Res;
+std::string codegen::CParCodeGen::generateSignature(common::Type &Ty) {
+    auto &SubTypes = Ty.Subtypes;
+    string Name = GSignature + to_string(SigCount++);
+    string Type = Name;
 
-    Res << endl
-        << "typedef struct " << Name << GArg << " {" << endl;
+    GenTypes[Ty] = Name;
 
-    for (size_t i = 0; i < Ty.Subtypes.size()  - 1; ++i) {
-        Res << "    " << getType(Ty.Subtypes[i]) << " " << GGenerated << GArg << i << ";" << endl;
-    }
+    /* struct sig
+     * {
+     *     void (*par)(task_t*);
+     *     type_n (*call)(type_1, type_2, ... , type_n-1);
+     * };
+     * */
 
-    Res << "    " << getType(Ty.Subtypes.back()) << " " << GGenerated << GRes << "; " << endl;
-    Res << "} " << Name << GArg << "; " << endl
-        << endl;
+    string Args = "(";
 
-    Res << "typedef struct " << Name << "{" << endl
-        << "    void (*" << GParallel << ")(task_t*);" << endl
-        << "    " << getType(Ty.Subtypes.back()) << "(*" << GSequential << ")" << "(";
-
-    for (size_t i = 0; i < Ty.Subtypes.size() - 1; ++i) {
-        Res << getType(Ty.Subtypes[i]);
+    for (size_t i = 0; i < SubTypes.size() - 1; ++i) {
+        Args += getType(SubTypes[i]);
 
         if (i < Ty.Subtypes.size() - 2)
-            Res << ", ";
+            Args += ", ";
     }
 
-    Res << ");" << endl
-        << "} " << Name << ";" << endl
-        << endl;
+    Args += ")";
 
-    *Header << Res.str();
+    auto SigStrcut = new Struct(Name);
+    SigStrcut->Fields.push_back({ "void (*" + GPar + ")", "(task_t*)" });
+    SigStrcut->Fields.push_back({ getType(SubTypes.back()) + " (*" + GCall + ")", Args });
+    CProg->Structs.push_back(SigStrcut);
 
-    Closures[Ty] = Name;
+    //----------------------------------------------
+
+    /* struct sig_arg
+     * {
+     *     type_1 arg_1;
+     *     type_2 arg_2;
+     *     ...
+     *     type_n arg_n;
+     *     type_ret = res;
+     * };
+     * */
+
+    auto SigArgStrcut = new Struct(Name + GArg);
+
+    for (size_t i = 0; i < SubTypes.size() - 1; ++i) {
+        SigArgStrcut->Fields.push_back({ getType(SubTypes[i]), GArg + to_string(i) });
+    }
+
+    SigArgStrcut->Fields.push_back({ getType(SubTypes.back()), GRes });
+
+    CProg->Structs.push_back(SigArgStrcut);
+
+    //----------------------------------------------
+
+    /* signature gprint_signature(signature s, int is_top)
+     * {
+     *     print("(Type_1 -> Type_2 -> ... -> Type_n)");
+     *     return s;
+     * }
+     * */
+
+    // signature gprint_signature(signature s, int is_top)
+    auto FuncBlock = new Block();
+    auto Func = new ctree::Function(Type, GPrint + Name, FuncBlock);
+    Func->Args.push_back({ Type, "s" });
+    Func->Args.push_back({ GBoolType, "is_top" });
+    CProg->Functions.push_back(Func);
+
+    // "(Type_1 -> Type_2 -> ... -> Type_n)"
+    string PrintString = "(";
+
+    for (size_t i = 0; i < SubTypes.size(); ++i) {
+        PrintString += SubTypes[i].str();
+
+        if (i < SubTypes.size() - 1)
+            PrintString += " -> ";
+    }
+    PrintString += ")";
+
+    // print("(Type_1 -> Type_2 -> ... -> Type_n)");
+    auto Print = new Call(new Ident(PrintFunc));
+    Print->Args.push_back(new String(PrintString));
+    FuncBlock->Stmts.push_back(new ExprStmt(Print));
+
+    // return s;
+    FuncBlock->Stmts.push_back(new Return(new Ident("s")));
+
     return Name;
 }
 
-void CParCodeGen::outputBeforeExpr() {
-    while (BeforeExpr.size()) {
-        *Output << BeforeExpr.back();
+void codegen::CParCodeGen::outputParallel() {
+    while (ParallelCalls.size() > 0) {
+        for (auto Stmt: ParallelCalls.back()) {
+            CurrBlock->Stmts.push_back(Stmt);
+        }
 
-        if (!SequentialCall.back().empty())
-            *Output << SequentialCall.back();
+        if (SequentialCall.back() != nullptr) {
+            CurrBlock->Stmts.push_back(SequentialCall.back());
+        }
 
-        if (CallStackCount.back() != 0)
-            *Output << "        taskyield(t);" << endl
-                    << endl;
+        if (ParallelCalls.back().size() != 0) {
+            auto Yield = new Call(new Ident("taskyield"));
+            Yield->Args.push_back(new Ident(GTask));
+            CurrBlock->Stmts.push_back(new ExprStmt(Yield));
+        }
 
+        ParallelCalls.pop_back();
         SequentialCall.pop_back();
-        BeforeExpr.pop_back();
-        CallStackCount.pop_back();
     }
-
-    BeforeExprDepth = 0;
 }
+
+void codegen::CParCodeGen::generateStd() {
+    CProg->Directives.push_back(new Include("task.h", false));
+    CCodeGen::generateStd();
+}
+
+std::string codegen::CParCodeGen::getArgType(common::Type &Ty) {
+    return getArgName(Ty) + "*";
+}
+
+std::string codegen::CParCodeGen::getArgName(common::Type &Ty) {
+    return getName(Ty) + GArg;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

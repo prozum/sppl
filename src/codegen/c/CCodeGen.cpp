@@ -15,16 +15,10 @@ CCodeGen::CCodeGen(parser::Driver &Drv)
 }
 
 void CCodeGen::visit(common::Program &Node) {
-    Prog = &Node;
     CProg = new ctree::Program();
 
-    CProg->Directives.push_back(new Define("print", "printf"));
-
-    if (GCed) {
-        CProg->Directives.push_back(new Include("gc.h"));
-    }
-
     generateStd();
+    CProg->Directives.push_back(new Define("printfunc", "printf"));
 
     /* The main function of the C program will be build below.
      * For readablity, the code that the C tree will generate,
@@ -40,7 +34,7 @@ void CCodeGen::visit(common::Program &Node) {
      *         args = gadd_strlist(args, gctr_str(argv[i]));
      *     }
      *
-     *     umain(args);
+     *     umain.call(args);
      *     return 0;
      */
 
@@ -76,7 +70,7 @@ void CCodeGen::visit(common::Program &Node) {
     AddFunc->Args.push_back(StrCreate);
     ForBlock->Stmts.push_back(new ExprStmt(new BinOp("=", new Ident("args"), AddFunc)));
 
-    // umain(args);
+    // umain.call(args);
     auto UMainCall = new Call(new BinOp(".", new Ident(GUser + "main"), new Ident(GCall)));
     UMainCall->Args.push_back(new Ident("args"));
     MainBlock->Stmts.push_back(new ExprStmt(UMainCall));
@@ -98,11 +92,12 @@ void CCodeGen::visit(common::Function &Node) {
 
     CurrFunc = &Node;
 
+    // sig ufuncname = { gfuncname };
     auto Val = new ArrayLiteral();
     Val->Exprs.push_back(new Ident(GFunc + Node.Id));
     CProg->Globals.push_back(new Decl(getType(Node.Signature), new BinOp("=", new Ident(GUser + Node.Id), Val)));
 
-    // retype funcname(type_1 arg_1, type_2 arg_2, ... , type_n arg_n)
+    // retype gfuncname(type_1 arg_1, type_2 arg_2, ... , type_n arg_n)
     CurrBlock = new Block();
     auto Func = new ctree::Function(RetType, GFunc + Node.Id, CurrBlock);
     CProg->Functions.push_back(Func);
@@ -358,7 +353,7 @@ void CCodeGen::visit(common::IdPattern &Node) {
 
     if ((Node.RetTy.Id == TypeId::LIST ||
         Node.RetTy.Id == TypeId::STRING) &&
-        ListOffsets.back() == 0) {
+        ListOffsets.back() > 0) {
 
         auto Call = new ctree::Call(new Ident(GAt + getName(Node.RetTy)));
         Call->Args.push_back(PatternBuilder->clone());
@@ -796,7 +791,7 @@ string CCodeGen::generateList(Type &Ty) {
     FuncBlock->Stmts.push_back(new Decl(Type, new BinOp("=", new Ident("res"), AllocRes)));
 
     // res->length = 0;
-    auto GetLengthRes = new BinOp("->", new Ident("res"), new Ident(GNext));
+    auto GetLengthRes = new BinOp("->", new Ident("res"), new Ident(GLength));
     FuncBlock->Stmts.push_back(new ExprStmt(new BinOp("=", GetLengthRes, new Int(0))));
 
     // res->next = NULL;
@@ -1095,7 +1090,7 @@ string CCodeGen::generateList(Type &Ty) {
      *     }
      *
      *     print("]");
-     *     retrun res;
+     *     return res;
      * }
      * */
 
@@ -1151,7 +1146,7 @@ string CCodeGen::generateList(Type &Ty) {
     FuncBlock->Stmts.push_back(new ExprStmt(Print));
 
     // list* res = l;
-    FuncBlock->Stmts.push_back(new Return(new Ident("l")));
+    FuncBlock->Stmts.push_back(new Return(new Ident("res")));
 
     return Name;
 }
