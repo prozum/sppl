@@ -16,8 +16,8 @@ void LLVMCodeGen::visit(common::Function &Node) {
 
         // System args
         auto ArgIter = CurFunc->args().begin();
-        Argument *Argc = (ArgIter++);
-        Argument *Argv = (ArgIter);
+        Argument *Argc = &*(ArgIter++);
+        Argument *Argv = &*(ArgIter);
         Argc->setName("argc");
         Argv->setName("argv");
 

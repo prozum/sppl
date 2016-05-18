@@ -79,8 +79,8 @@ void LLVMCodeGen::createArgFunc()
 
     // Arguments
     auto ArgIter = Func->args().begin();
-    Argument *Argc = ArgIter++;
-    Argument *Argv = ArgIter;
+    Argument *Argc = &*(ArgIter++);
+    Argument *Argv = &*(ArgIter);
     Argc->setName("argc");
     Argv->setName("argv");
 
@@ -194,8 +194,8 @@ void LLVMCodeGen::createPrintTupleFunc() {
 
     // Arguments arguments
     auto ArgIter = Func->args().begin();
-    Argument *DataArg = ArgIter++;
-    Argument *TypeArg = ArgIter;
+    Argument *DataArg = &*(ArgIter++);
+    Argument *TypeArg = &*(ArgIter);
     DataArg->setName("data_arg");
     TypeArg->setName("type_arg");
 
@@ -256,8 +256,8 @@ void LLVMCodeGen::createPrintFunc() {
 
     // Arguments arguments
     auto ArgIter = Func->args().begin();
-    Argument *DataArg = ArgIter++;
-    Argument *TypeArg = ArgIter;
+    Argument *DataArg = &*(ArgIter++);
+    Argument *TypeArg = &*(ArgIter);
     DataArg->setName("data_arg");
     TypeArg->setName("type_arg");
 
