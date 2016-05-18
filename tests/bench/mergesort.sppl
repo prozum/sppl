@@ -1,5 +1,5 @@
 def num : Int
-    | = 700000
+    | = 2000000
 
 def main : [String] -> [Int]
     | _ = mergesort(generate(0, num(), []))

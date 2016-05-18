@@ -1,5 +1,5 @@
 def main : [String] -> Int
-     | _ = fibonacci(100)
+     | _ = fibonacci(42)
 
 def fibonacci : Int -> Int
     | 0 = 0

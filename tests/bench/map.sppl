@@ -1,5 +1,5 @@
 def num : Int
-    | = 8000
+    | = 5000
 
 def main : [String] -> [Int]
      | _ = map(add2, generate(num(), []))
