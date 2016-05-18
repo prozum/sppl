@@ -546,10 +546,8 @@ void CCodeGen::visit(common::FloatExpr &Node) {
 }
 
 void CCodeGen::visit(common::CharExpr &Node) {
-    stringstream ss;
-    string s;
-    ss << Node.Val;
-    ss >> s;
+    char Chars[] = { Node.Val, '\0' };
+    string s = string(Chars);
 
     LastExpr = new Char(s);
 }
