@@ -270,7 +270,7 @@ void Int::outputCode(std::ostream &Output, int TapCount = 0) {
 }
 
 void Float::outputCode(std::ostream &Output, int TapCount = 0) {
-    Output << Value;
+    Output << to_string(Value);
 }
 
 void Char::outputCode(std::ostream &Output, int TapCount = 0) {
