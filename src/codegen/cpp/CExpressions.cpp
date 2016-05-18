@@ -143,8 +143,9 @@ void CCodeGenOld::visit(Not &Node) {
 }
 
 void CCodeGenOld::visit(To &Node) {
-    // TODO
-    addError(Error::NotImplemented(Node.Loc));
+    ExprStack.top() << "((" << getType(Node.RetTy) << ")";
+    Node.Child->accept(*this);
+    ExprStack.top() << ")";
 }
 
 void CCodeGenOld::visit(Negative &Node) {
