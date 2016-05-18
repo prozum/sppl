@@ -73,7 +73,7 @@ void LLVMCodeGen::visit(common::Function &Node) {
     // Visit cases
     addPrefix("case");
     if (Node.Cases.front()->Patterns.empty()) {
-        (*CurCase)->accept(*this);
+        Node.Cases.front()->accept(*this);
     } else {
         CurPatBlock = BasicBlock::Create(Ctx, "", CurFunc);
         FirstBlock = true;
@@ -110,6 +110,7 @@ void LLVMCodeGen::visit(common::Case &Node) {
     IdVals.clear();
 
     // Generate patterns
+    Builder.SetInsertPoint(Entry);
     if (Node.Patterns.empty()) {
         Builder.CreateBr(CurCaseBlock);
     } else {
@@ -117,7 +118,6 @@ void LLVMCodeGen::visit(common::Case &Node) {
         CurPatBlock->setName(getPrefix());
 
         // Set first block after entry
-        Builder.SetInsertPoint(Entry);
         if (FirstBlock) {
             Builder.CreateBr(CurPatBlock);
             FirstBlock = false;
@@ -146,7 +146,7 @@ void LLVMCodeGen::visit(common::Case &Node) {
 
         // Create when block
         if (Node.When) {
-            auto WhenBlock = BasicBlock::Create(Ctx, getPrefix() + "_when", CurFunc);
+            auto WhenBlock = BasicBlock::Create(Ctx, getPrefix("when"), CurFunc);
             Builder.CreateCondBr(CurVal, WhenBlock, NextBlock);
             Builder.SetInsertPoint(WhenBlock);
             Node.When->accept(*this);
