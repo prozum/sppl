@@ -4,6 +4,10 @@ using namespace codegen;
 using namespace llvm;
 using namespace std;
 
+void LLVMCodeGen::splitCaseBlock(string Name) {
+    CurCaseBlock = BasicBlock::Create(Ctx, getPrefix(Name), CurFunc);
+}
+
 Value *LLVMCodeGen::createListNode(common::Type Type, Value *Data, Value *NextNode, BasicBlock *Block, bool Const)
 {
     auto ListType = getListType(Type);

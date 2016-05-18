@@ -187,6 +187,7 @@ private:
     void CreatePrintSignatureFunc();
 
     // Utility methods
+    void splitCaseBlock(std::string Name);
     llvm::Value *createListNode(common::Type Type, llvm::Value *Data, llvm::Value *NextNode, llvm::BasicBlock *Block,
                                 bool Const = false);
     llvm::Instruction *createMalloc(llvm::Type *Type, llvm::BasicBlock *Block);
