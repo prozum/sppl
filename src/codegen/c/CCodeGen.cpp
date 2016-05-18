@@ -559,7 +559,10 @@ void CCodeGen::visit(common::BoolExpr &Node) {
 }
 
 void CCodeGen::visit(common::StringExpr &Node) {
-    LastExpr = new String(Node.Val);
+    auto Create = new Call(new Ident(GCreate + GString));
+    Create->Args.push_back(new String(Node.Val));
+
+    LastExpr = Create;
 }
 
 void CCodeGen::visit(common::ListExpr &Node) {
@@ -780,7 +783,7 @@ string CCodeGen::generateList(Type &Ty) {
     // list* gcrt_list(int count, ...)
     auto FuncBlock = new Block();
     auto Func = new ctree::Function(Type, GCreate + Name, FuncBlock);
-    Func->Args.push_back({ "int", "count" });
+    Func->Args.push_back({ GIntType, "count" });
     Func->Args.push_back({ "...", "" });
     CProg->Functions.push_back(Func);
 
@@ -1035,7 +1038,7 @@ string CCodeGen::generateList(Type &Ty) {
 
     // int i;
     // list** elements = alloc(sizeof(list*) * l1->length);
-    FuncBlock->Stmts.push_back(new Decl("int", new Ident("i")));
+    FuncBlock->Stmts.push_back(new Decl(GIntType, new Ident("i")));
     auto SizeOf = new Call(new Ident("sizeof"));
     SizeOf->Args.push_back(new Ident(Type));
     L1Length = new BinOp("->", new Ident("l1"), new Ident(GLength));
@@ -1310,7 +1313,7 @@ string CCodeGen::generateTuple(Type &Ty) {
 
     // int gcompare_tuple(tuple* t1, tuple* t2)
     FuncBlock = new Block();
-    Func = new ctree::Function(Type, GCompare + Name, FuncBlock);
+    Func = new ctree::Function(GBoolType, GCompare + Name, FuncBlock);
     Func->Args.push_back({ Type, "t1" });
     Func->Args.push_back({ Type, "t2" });
     CProg->Functions.push_back(Func);
@@ -1770,7 +1773,7 @@ void CCodeGen::generateStd() {
     auto BufAlloc = new Call(new Ident(Alloc));
     BufAlloc->Args.push_back(Size);
     FuncBlock->Stmts.push_back(new Decl("char*", new BinOp("=", new Ident("buffer"), BufAlloc)));
-    FuncBlock->Stmts.push_back(new Decl("int", new Ident("i")));
+    FuncBlock->Stmts.push_back(new Decl(GIntType, new Ident("i")));
 
     // for (i = 0; s->length, ++i)
     ForBlock = new Block(FuncBlock);

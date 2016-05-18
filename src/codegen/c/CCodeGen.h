@@ -84,8 +84,8 @@ protected:
     const std::string GTuple = GGenerated + "tuple";
     const std::string GFloatType = "double";
     const std::string GIntType = "int64_t";
-    const std::string GCharType = "int";
-    const std::string GBoolType = "int";
+    const std::string GCharType = "int64_t";
+    const std::string GBoolType = "int64_t";
     const std::string GFloatName = "float";
     const std::string GIntName = "int";
     const std::string GCharName = "char";
