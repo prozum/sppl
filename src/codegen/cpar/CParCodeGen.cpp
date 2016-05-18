@@ -24,7 +24,7 @@ void codegen::CParCodeGen::visit(common::Program &Node) {
         }
     }
 
-    if (!Main) {
+    if (Main == nullptr) {
         addError(Error("No main function"));
         return;
     }
@@ -215,7 +215,7 @@ void codegen::CParCodeGen::visit(Case &Node) {
 
         Node.Patterns[i]->accept(*this);
 
-        if (LastExpr) {
+        if (LastExpr != nullptr) {
             Patterns.push_back(LastExpr);
         }
 
@@ -225,14 +225,14 @@ void codegen::CParCodeGen::visit(Case &Node) {
     auto Compare = generateAndChain(Patterns);
 
     // if (pattern_1 && (pattern_2 && (... && pattern_n ...))
-    if (Compare) {
+    if (Compare != nullptr) {
         auto If = new IfElse(Compare, CurrBlock);
         CurrBlock->Parent->Stmts.push_back(If);
     } else {
         CurrBlock->Parent->Stmts.push_back(CurrBlock);
     }
 
-    if (Node.When) {
+    if (Node.When != nullptr) {
         Node.When->accept(*this);
 
         if (GenerateParallel) {
@@ -294,7 +294,7 @@ void codegen::CParCodeGen::visit(Case &Node) {
     }
 
     // Reset back to the old CurrBlock
-    if (Node.When) {
+    if (Node.When != nullptr) {
         CurrBlock = CurrBlock->Parent;
     }
 
