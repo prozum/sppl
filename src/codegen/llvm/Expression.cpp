@@ -19,8 +19,8 @@ void LLVMCodeGen::visit(common::BoolExpr &Node) {
 void LLVMCodeGen::visit(common::StringExpr &Node) {
     Value *ListNode = nullptr;
     for (auto Char = Node.Val.rbegin(); Char < Node.Val.rend(); ++Char) {
-        CurVal = ConstantInt::get(Int8, (uint64_t)*Char);
-        ListNode = CreateListNode(Node.RetTy, CurVal, ListNode, Builder.GetInsertBlock(), true);
+        CurVal = ConstantInt::get(Int, (uint64_t)*Char);
+        ListNode = createListNode(Node.RetTy, CurVal, ListNode, Builder.GetInsertBlock(), true);
     }
     CurVal = ListNode;
 }
@@ -30,8 +30,8 @@ void LLVMCodeGen::visit(common::CharExpr &Node) {
 }
 
 void LLVMCodeGen::visit(common::IdExpr &Node) {
-    // Pattern value
-    CurVal = PatVals[Node.Val];
+    // Identifier value
+    CurVal = IdVals[Node.Val];
     if (CurVal)
         return;
 
@@ -72,7 +72,7 @@ void LLVMCodeGen::visit(common::TupleExpr &Node) {
         return;
     }
 
-    auto TupleMalloc = CreateMalloc(TupleType, CurCaseBlock);
+    auto TupleMalloc = createMalloc(TupleType, CurCaseBlock);
     auto Tuple = Builder.CreateBitCast(TupleMalloc, TuplePtrType);
 
     for (size_t i = 0; i < Node.Elements.size(); ++i) {
@@ -89,7 +89,7 @@ void LLVMCodeGen::visit(common::ListExpr &Node) {
     Value *ListNode = nullptr;
     for (auto Element = Node.Elements.rbegin(); Element < Node.Elements.rend(); ++Element) {
         (*Element)->accept(*this);
-        ListNode = CreateListNode(Node.RetTy, CurVal, ListNode, Builder.GetInsertBlock(), Node.Const);
+        ListNode = createListNode(Node.RetTy, CurVal, ListNode, Builder.GetInsertBlock(), Node.Const);
     }
 
     if (!ListNode)
@@ -126,7 +126,7 @@ void LLVMCodeGen::visit(common::ListAdd &Node) {
     Node.Right->accept(*this);
     auto List = CurVal;
 
-    CurVal = CreateListNode(Node.RetTy, Element, List, Builder.GetInsertBlock());
+    CurVal = createListNode(Node.RetTy, Element, List, Builder.GetInsertBlock());
 }
 
 void LLVMCodeGen::visit(common::DoExpr &Node) {
@@ -138,5 +138,5 @@ void LLVMCodeGen::visit(common::DoExpr &Node) {
 void LLVMCodeGen::visit(common::Assosiate &Node) {
     Node.Child->accept(*this);
 
-    PatVals[Node.Id] = CurVal;
+    IdVals[Node.Id] = CurVal;
 }

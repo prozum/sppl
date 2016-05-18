@@ -4,7 +4,7 @@ using namespace codegen;
 using namespace llvm;
 using namespace std;
 
-Value *LLVMCodeGen::CreateListNode(common::Type Type, Value *Data, Value *NextNode, BasicBlock *Block, bool Const)
+Value *LLVMCodeGen::createListNode(common::Type Type, Value *Data, Value *NextNode, BasicBlock *Block, bool Const)
 {
     auto ListType = getListType(Type);
     auto ListPtrType = getType(Type);
@@ -20,7 +20,7 @@ Value *LLVMCodeGen::CreateListNode(common::Type Type, Value *Data, Value *NextNo
     }
 
     // Non-const list
-    auto ListMalloc = CreateMalloc(ListType, Block);
+    auto ListMalloc = createMalloc(ListType, Block);
     auto List = Builder.CreateBitCast(ListMalloc, ListPtrType);
 
     // Set list data
@@ -34,33 +34,33 @@ Value *LLVMCodeGen::CreateListNode(common::Type Type, Value *Data, Value *NextNo
     return List;
 }
 
-Instruction *LLVMCodeGen::CreateMalloc(llvm::Type *Type, BasicBlock *Block)
+Instruction *LLVMCodeGen::createMalloc(llvm::Type *Type, BasicBlock *Block)
 {
     auto Size = DataLayout->getPointerTypeSize(Type);
-    auto AllocSize = ConstantInt::get(Int64, Size);
-    return CreateMalloc(AllocSize, Block);
+    auto AllocSize = ConstantInt::get(Int, Size);
+    return createMalloc(AllocSize, Block);
 }
 
-Instruction *LLVMCodeGen::CreateMalloc(Value *Size, BasicBlock *Block)
+Instruction *LLVMCodeGen::createMalloc(Value *Size, BasicBlock *Block)
 {
     auto Malloc = CallInst::CreateMalloc(Block,
-                                         Int64, Int8, Size,
+                                         Int, Int, Size,
                                          nullptr, nullptr, "malloccall");
     Block->getInstList().push_back(Malloc);
 
     return Malloc;
 }
 
-void LLVMCodeGen::CreatePrint(Value *Data, common::Type Ty) {
+void LLVMCodeGen::createPrint(Value *Data, common::Type Ty) {
     auto UnionAlloca = Builder.CreateAlloca(UnionType);
     auto UnionCast = Builder.CreateBitCast(UnionAlloca, PointerType::getUnqual(getType(Ty)));
     Builder.CreateStore(Data, UnionCast);
 
     auto UnionArgGEP = Builder.CreateStructGEP(UnionType, UnionAlloca, 0);
-    auto UnionArgCast = Builder.CreateBitCast(UnionArgGEP, PointerType::getUnqual(Int64));
-    auto UnionArgLoad = Builder.CreateLoad(Int64, UnionArgCast);
+    auto UnionArgCast = Builder.CreateBitCast(UnionArgGEP, PointerType::getUnqual(Int));
+    auto UnionArgLoad = Builder.CreateLoad(Int, UnionArgCast);
 
-    Builder.CreateCall(PrintFunc, vector<Value *> { UnionArgLoad, getRuntimeType(Ty) });
+    Builder.CreateCall(getInternFunc("_print"), vector<Value *> { UnionArgLoad, getRuntimeType(Ty) });
 }
 
 unsigned LLVMCodeGen::getAlignment(common::Type Ty) {

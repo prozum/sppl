@@ -6,7 +6,6 @@ using namespace codegen;
 using namespace common;
 
 void LLVMCodeGen::visit(common::Function &Node) {
-
     // Create function and arguments
     Args.clear();
     if (Node.Id == string("main") && !Drv.JIT) {
@@ -17,8 +16,8 @@ void LLVMCodeGen::visit(common::Function &Node) {
 
         // System args
         auto ArgIter = CurFunc->args().begin();
-        Argument *Argc = &*(ArgIter++);
-        Argument *Argv = &*(ArgIter);
+        Argument *Argc = (ArgIter++);
+        Argument *Argv = (ArgIter);
         Argc->setName("argc");
         Argv->setName("argv");
 
@@ -29,11 +28,17 @@ void LLVMCodeGen::visit(common::Function &Node) {
         auto StrListType = common::Type(TypeId::LIST, vector<common::Type> { CharListType });
         CurVal = ConstantPointerNull::get(static_cast<PointerType *>(getType(StrListType)));
         Args.push_back(CurVal);
-    }
-    else {
-        CurFunc = llvm::Function::Create(getFuncType(Node.Signature),
-                                         llvm::Function::ExternalLinkage, Node.Id,
-                                         Module.get());
+    } else {
+        // Lookup forward decleration
+        CurFunc = Module->getFunction(Node.Id);
+
+        // Create new
+        if (!CurFunc) {
+            CurFunc = llvm::Function::Create(getFuncType(Node.Signature),
+                                             llvm::Function::ExternalLinkage, Node.Id,
+                                             Module.get());
+        }
+
         Entry = BasicBlock::Create(Ctx, "entry", CurFunc);
         // Setup names for arguments
         auto ArgId = 0;
@@ -41,7 +46,6 @@ void LLVMCodeGen::visit(common::Function &Node) {
             Arg.setName("_arg" + to_string(ArgId++));
             Args.push_back(&Arg);
         }
-
     }
 
     // Set call convention to fast to enable tail recursion optimizations
@@ -68,28 +72,30 @@ void LLVMCodeGen::visit(common::Function &Node) {
 
     // Visit cases
     addPrefix("case");
-    if (!Node.Cases.front()->Patterns.empty())
+    if (Node.Cases.front()->Patterns.empty()) {
+        Node.Cases.front()->accept(*this);
+    } else {
         CurPatBlock = BasicBlock::Create(Ctx, "", CurFunc);
-    FirstBlock = true;
-    for (CurCase = Node.Cases.cbegin(); CurCase != Node.Cases.cend(); ++CurCase) {
-        if (next(CurCase) != Node.Cases.cend()) {
-            if (!(*CurCase)->Patterns.empty())
+        FirstBlock = true;
+        for (CurCase = Node.Cases.cbegin(); CurCase != Node.Cases.cend(); ++CurCase) {
+            if (next(CurCase) != Node.Cases.cend()) {
                 NextBlock = BasicBlock::Create(Ctx, "", CurFunc);
-        } else {
-            NextBlock = ErrBlock;
-        }
+            } else {
+                NextBlock = ErrBlock;
+            }
 
-        (*CurCase)->accept(*this);
-        stepPrefix();
-        CurPatBlock = NextBlock;
+            (*CurCase)->accept(*this);
+            stepPrefix();
+            CurPatBlock = NextBlock;
+        }
     }
     delPrefix();
 
     // Verify function and get error
-    if (verifyFunction(*CurFunc, &RawOut)) {
+    if (verifyFunction(*CurFunc, &MsgOut)) {
         addError(Error("LLVM Error:\n" + ModuleString()));
         if (!Drv.Silent)
-            RawOut.flush();
+            MsgOut.flush();
     }
 }
 
@@ -101,54 +107,58 @@ void LLVMCodeGen::visit(common::Case &Node) {
     TailRec = Node.TailRec;
 
     // Clear pattern values
-    PatVals.clear();
+    IdVals.clear();
 
-    // Set pattern prefix
-    addPrefix("pat");
-    if (!Node.Patterns.empty()) {
-        CurPatBlock->setName(getPrefix());
-    }
-
-    // Set first block after entry
+    // Generate patterns
     Builder.SetInsertPoint(Entry);
-    if (FirstBlock) {
-        if (!Node.Patterns.empty()) {
-            Builder.CreateBr(CurPatBlock);
-        }
-        FirstBlock = false;
-    }
-
-    // Visit patterns
-    for (CurPat = Node.Patterns.cbegin(), CurArg = Args.cbegin();
-         CurPat != Node.Patterns.cend();
-         ++CurPat, ++CurArg) {
-
-        // Visit pattern with current argument
-        Builder.SetInsertPoint(CurPatBlock);
-        CurVal = *CurArg;
-        (*CurPat)->accept(*this);
-
-        if (next(CurPat) != Node.Patterns.cend()) {
-            stepPrefix();
-            CurPatBlock = BasicBlock::Create(Ctx, getPrefix(), CurFunc);
-            Builder.CreateCondBr(CurVal, CurPatBlock, NextBlock);
-        }
-    }
-    delPrefix();
-
-    // Create when block
-    if (Node.When) {
-        auto WhenBlock = BasicBlock::Create(Ctx, getPrefix() + "_when", CurFunc);
-        Builder.CreateCondBr(CurVal, WhenBlock, NextBlock);
-        Builder.SetInsertPoint(WhenBlock);
-        Node.When->accept(*this);
-    }
-
-    // Branch to next block
-    if (!Node.Patterns.empty())
-        Builder.CreateCondBr(CurVal, CurCaseBlock, NextBlock);
-    else
+    if (Node.Patterns.empty()) {
         Builder.CreateBr(CurCaseBlock);
+    } else {
+        addPrefix("pat");
+        CurPatBlock->setName(getPrefix());
+
+        // Set first block after entry
+        if (FirstBlock) {
+            Builder.CreateBr(CurPatBlock);
+            FirstBlock = false;
+        }
+
+        // Visit patterns
+        for (CurPat = Node.Patterns.cbegin(), CurArg = Args.cbegin();
+             CurPat != Node.Patterns.cend();
+             ++CurPat, ++CurArg) {
+
+            // Visit pattern with current argument
+            Builder.SetInsertPoint(CurPatBlock);
+            CurVal = *CurArg;
+            (*CurPat)->accept(*this);
+
+            // Convert to bool
+            CurVal = Builder.CreateTrunc(CurVal, Int1);
+
+            if (next(CurPat) != Node.Patterns.cend()) {
+                stepPrefix();
+                CurPatBlock = BasicBlock::Create(Ctx, getPrefix(), CurFunc);
+                Builder.CreateCondBr(CurVal, CurPatBlock, NextBlock);
+            }
+        }
+        delPrefix();
+
+        // Create when block
+        if (Node.When) {
+            auto WhenBlock = BasicBlock::Create(Ctx, getPrefix("when"), CurFunc);
+            Builder.CreateCondBr(CurVal, WhenBlock, NextBlock);
+            Builder.SetInsertPoint(WhenBlock);
+            Node.When->accept(*this);
+
+            // Convert to bool
+            assert(Node.When->RetTy == TypeId::BOOL);
+            CurVal = Builder.CreateTrunc(CurVal, Int1);
+        }
+
+        // Branch to next block
+        Builder.CreateCondBr(CurVal, CurCaseBlock, NextBlock);
+    }
 
     // Generate expression in case block
     Builder.SetInsertPoint(CurCaseBlock);
@@ -158,7 +168,7 @@ void LLVMCodeGen::visit(common::Case &Node) {
     if (CurFunc->getName() == "main" && !Drv.JIT) {
         if (CurVal->getType()->isIntegerTy())
             CurVal = Builder.CreateTrunc(CurVal, Int32, "tmptrunc");
-        else if (CurVal->getType()->getFloatTy(Ctx))
+        else if (CurVal->getType()->isFloatTy())
             CurVal = Builder.CreateFPToSI(CurVal, Int32, "casttmp");
         else
             CurVal = ConstantInt::get(Int32, 0);

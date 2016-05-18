@@ -16,6 +16,11 @@
 
 #include <llvm/ExecutionEngine/ExecutionEngine.h>
 
+#include <llvm/IR/LegacyPassManager.h>
+#include <llvm/Analysis/Passes.h>
+#include <llvm/IR/PassManager.h>
+#include <llvm/Transforms/Scalar.h>
+
 #include <iostream>
 #include <unordered_map>
 #include <ctype.h>
@@ -43,9 +48,14 @@ class LLVMCodeGen : public parser::CodeGenerator {
     // Module
     // Used to store functions and global variables
     std::unique_ptr<llvm::Module> Module;
+    std::unique_ptr<llvm::Module> ModuleHeader;
 
-    // Pattern Values
-    std::map<std::string, llvm::Value *> PatVals;
+    // PassManager
+    // Used to perform optimization on module
+    std::unique_ptr<llvm::legacy::PassManager> PassMgr;
+
+    // Identifer Values
+    std::map<std::string, llvm::Value *> IdVals;
 
     // Tail recursion for CurFunc
     bool TailRec = false;
@@ -65,7 +75,7 @@ class LLVMCodeGen : public parser::CodeGenerator {
 
 private:
     // Stream to output LLVM errors
-    llvm::raw_os_ostream RawOut;
+    llvm::raw_os_ostream MsgOut;
 
     // Maps for type caching
     std::unordered_map<common::Type, llvm::StructType *> TupleTypes;
@@ -73,20 +83,22 @@ private:
     std::unordered_map<common::Type, llvm::FunctionType *> FuncTypes;
     std::unordered_map<common::Type, llvm::GlobalVariable *> RuntimeTypes;
 
-    // Type Constants
+    // Type constants
     llvm::IntegerType *Int1;
     llvm::IntegerType *Int8;
     llvm::IntegerType *Int32;
-    llvm::IntegerType *Int64;
-    llvm::Type *Double;
     llvm::PointerType *VoidPtr;
+
+    llvm::IntegerType *Int;
+    llvm::Type *Float;
+
     llvm::StructType *UnionType;
     llvm::StructType *RuntimeType;
     llvm::FunctionType *MainType;
 
     // Helper functions
-    llvm::Function *ArgFunc;
-    llvm::Function *PrintFunc;
+    std::unordered_map<std::string, llvm::FunctionType *> InternFuncs;
+    std::unordered_map<std::string, llvm::Function *> InternFuncDecls;
 
     // Current state variables
     llvm::Value *CurVal = nullptr;
@@ -110,7 +122,6 @@ private:
 
     // Prefixes
     std::vector<std::pair<std::string,int>> Prefixes;
-
 
     // Visit methods
     void visit(common::Program &node);
@@ -163,17 +174,27 @@ private:
     void visit(common::CallExpr &Node);
     void visit(common::ParExpr &Node);
 
-    // Create helper function methods
-    llvm::Function *CreateArgFunc();
-    llvm::Function *CreatePrintFunc();
+    void createModule();
 
-    // Util methods
-    llvm::Value *CreateListNode(common::Type Type, llvm::Value *Data, llvm::Value *NextNode, llvm::BasicBlock *Block, bool Const = false);
-    llvm::Instruction *CreateMalloc(llvm::Type *Type, llvm::BasicBlock *Block);
-    llvm::Instruction *CreateMalloc(llvm::Value *Size, llvm::BasicBlock *Block);
-    void CreatePrint(llvm::Value *Data, common::Type Ty);
+    // Standard library methods
+    void initStdLib();
+    void addInternFunc(std::string FuncName, llvm::FunctionType *Ty);
+    llvm::Function *getInternFunc(std::string FuncName);
+    void createArgFunc();
+    void createPrintFunc();
+    void createPrintTupleFunc();
+    void CreatePrintListFunc();
+    void CreatePrintSignatureFunc();
+
+    // Utility methods
+    llvm::Value *createListNode(common::Type Type, llvm::Value *Data, llvm::Value *NextNode, llvm::BasicBlock *Block,
+                                bool Const = false);
+    llvm::Instruction *createMalloc(llvm::Type *Type, llvm::BasicBlock *Block);
+    llvm::Instruction *createMalloc(llvm::Value *Size, llvm::BasicBlock *Block);
+    void createPrint(llvm::Value *Data, common::Type Ty);
 
     // Type methods
+    void initTypes();
     llvm::Type *getType(common::Type Ty);
     llvm::StructType *getTupleType(common::Type Ty);
     llvm::StructType *getListType(common::Type Ty);
