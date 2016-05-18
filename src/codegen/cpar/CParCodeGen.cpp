@@ -233,13 +233,13 @@ void codegen::CParCodeGen::visit(common::Case &Node) {
     }
 
     if (Node.When) {
-        CurrBlock = new Block(CurrBlock);
-
         Node.When->accept(*this);
 
         if (GenerateParallel) {
             outputParallel();
         }
+
+        CurrBlock = new Block(CurrBlock);
 
         // if (when_expr)
         auto If = new IfElse(LastExpr, CurrBlock);
