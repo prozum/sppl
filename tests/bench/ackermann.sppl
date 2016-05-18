@@ -1,0 +1,7 @@
+def main : [String] -> Int
+    | _ = @ackermann(4, 1)
+
+def ackermann : Int -> Int -> Int
+    | 0 n = n + 1
+    | m 0 = ackermann(m - 1, 1)
+    | m n = ackermann(m - 1, ackermann(m, n - 1))
