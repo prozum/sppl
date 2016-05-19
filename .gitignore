@@ -27,10 +27,14 @@
 *.out
 *.app
 
+# Build files
 build
 .idea
 CMakeLists.txt.user
 
+# LLVM files
+*.bc
+*.ll
 
 # Ignore flex/bison generated files
 Parser.cpp

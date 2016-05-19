@@ -26,7 +26,7 @@ void LLVMCodeGen::visit(common::Function &Node) {
         //CurVal = Builder.CreateCall(ArgFunc, vector<Value *> { Argc, Argv } );
         auto CharListType = common::Type(TypeId::STRING, vector<common::Type> { common::Type(TypeId::CHAR)});
         auto StrListType = common::Type(TypeId::LIST, vector<common::Type> { CharListType });
-        CurVal = ConstantPointerNull::get(static_cast<PointerType *>(getType(StrListType)));
+        CurVal = ConstantPointerNull::get(static_cast<PointerType *>(getLLVMType(StrListType)));
         Args.push_back(CurVal);
     } else {
         // Lookup forward decleration
@@ -34,7 +34,7 @@ void LLVMCodeGen::visit(common::Function &Node) {
 
         // Create new
         if (!CurFunc) {
-            CurFunc = llvm::Function::Create(getFuncType(Node.Signature),
+            CurFunc = llvm::Function::Create(getLLVMFuncType(Node.Signature),
                                              llvm::Function::ExternalLinkage, Node.Id,
                                              Module.get());
         }

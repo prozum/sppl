@@ -2,23 +2,26 @@
 #include "CodeGenerator.h"
 #include "Driver.h"
 
+#include <llvm/IRReader/IRReader.h>
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/Module.h>
 #include <llvm/IR/Verifier.h>
+#include <llvm/IR/LegacyPassManager.h>
+#include <llvm/IR/PassManager.h>
 
 #include <llvm/IR/DerivedTypes.h>
 #include <llvm/IR/TypeBuilder.h>
 #include <llvm/IR/TypeFinder.h>
 
+#include <llvm/Support/SourceMgr.h>
 #include <llvm/Support/raw_os_ostream.h>
 #include <llvm/Support/TargetSelect.h>
+
 #include <llvm/Bitcode/ReaderWriter.h>
 
 #include <llvm/ExecutionEngine/ExecutionEngine.h>
 
-#include <llvm/IR/LegacyPassManager.h>
 #include <llvm/Analysis/Passes.h>
-#include <llvm/IR/PassManager.h>
 #include <llvm/Transforms/Scalar.h>
 
 #include <iostream>
@@ -48,7 +51,7 @@ class LLVMCodeGen : public parser::CodeGenerator {
     // Module
     // Used to store functions and global variables
     std::unique_ptr<llvm::Module> Module;
-    std::unique_ptr<llvm::Module> ModuleHeader;
+    std::unique_ptr<llvm::Module> ModuleStd;
 
     // PassManager
     // Used to perform optimization on module
@@ -93,12 +96,12 @@ private:
     llvm::Type *Float;
 
     llvm::StructType *UnionType;
-    llvm::StructType *RuntimeType;
+    llvm::StructType *RunType;
     llvm::FunctionType *MainType;
 
-    // Helper functions
-    std::unordered_map<std::string, llvm::FunctionType *> InternFuncs;
-    std::unordered_map<std::string, llvm::Function *> InternFuncDecls;
+    // Standard functions
+    std::unordered_map<std::string, llvm::FunctionType *> StdFuncs;
+    std::unordered_map<std::string, llvm::Function *> StdFuncDecls;
 
     // Current state variables
     llvm::Value *CurVal = nullptr;
@@ -178,8 +181,9 @@ private:
 
     // Standard library methods
     void initStdLib();
-    void addInternFunc(std::string FuncName, llvm::FunctionType *Ty);
-    llvm::Function *getInternFunc(std::string FuncName);
+    void addStdFunc(std::string FuncName, common::Type Ty, bool Decl = false);
+    void addStdFunc(std::string FuncName, llvm::FunctionType *Ty, bool Decl = false);
+    llvm::Function *getStdFunc(std::string FuncName);
     void createArgFunc();
     void createPrintFunc();
     void createPrintTupleFunc();
@@ -196,11 +200,14 @@ private:
 
     // Type methods
     void initTypes();
-    llvm::Type *getType(common::Type Ty);
-    llvm::StructType *getTupleType(common::Type Ty);
-    llvm::StructType *getListType(common::Type Ty);
+    llvm::Type *getLLVMType(common::Type Ty);
+    llvm::StructType *getLLVMTupleType(common::Type Ty);
+    llvm::StructType *getLLVMListType(common::Type Ty);
     llvm::GlobalVariable *getRuntimeType(common::Type Ty);
-    llvm::FunctionType *getFuncType(common::Type Ty);
+    llvm::FunctionType *getLLVMFuncType(common::Type Ty);
+
+    common::Type getType(llvm::Type *Ty);
+    common::Type getFuncType(llvm::FunctionType *FuncTy);
 
     // Prefix methods
     void addPrefix(std::string Prefix, bool Numbered = true);

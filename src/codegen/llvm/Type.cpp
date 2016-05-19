@@ -3,6 +3,7 @@
 using namespace std;
 using namespace llvm;
 using namespace codegen;
+using namespace common;
 
 void LLVMCodeGen::initTypes() {
     // Type constants
@@ -15,23 +16,25 @@ void LLVMCodeGen::initTypes() {
     Float = llvm::Type::getDoubleTy(Ctx);
 
     // Union type used for easy bitcast
+    /*
     UnionType = StructType::create(Ctx, Int, "Union");
 
     // Runtime type
-    RuntimeType = StructType::create(Ctx, "RuntimeType");
-    llvm::Type *Body[] = { Int, PointerType::getUnqual( ArrayType::get(RuntimeType, 0) ) };
+    RuntimeType = StructType::create(Ctx);
+    llvm::Type *Body[] = { Int, PointerType::getUnqual(RuntimeType) };
     RuntimeType->setBody(Body);
+     */
 
     // Main type
     MainType = FunctionType::get(Int32,
-                                 vector<Type *> {
+                                 vector<llvm::Type *> {
                                          Int32,
                                          PointerType::getUnqual(VoidPtr)
                                  },
                                  false);
 }
 
-llvm::Type *LLVMCodeGen::getType(common::Type Ty) {
+llvm::Type *LLVMCodeGen::getLLVMType(common::Type Ty) {
     switch (Ty.Id) {
     case common::TypeId::FLOAT:
         return Float;
@@ -42,13 +45,13 @@ llvm::Type *LLVMCodeGen::getType(common::Type Ty) {
     case common::TypeId::CHAR:
         return Int;
     case common::TypeId::TUPLE:
-        return PointerType::getUnqual(getTupleType(Ty));
+        return PointerType::getUnqual(getLLVMTupleType(Ty));
     case common::TypeId::LIST:
     case common::TypeId::EMPTYLIST:
     case common::TypeId::STRING:
-        return PointerType::getUnqual(getListType(Ty));
+        return PointerType::getUnqual(getLLVMListType(Ty));
     case common::TypeId::SIGNATURE:
-        return PointerType::getUnqual(getFuncType(Ty));
+        return PointerType::getUnqual(getLLVMFuncType(Ty));
     case common::TypeId::VOID:
         return llvm::Type::getVoidTy(Ctx);
     default:
@@ -56,7 +59,7 @@ llvm::Type *LLVMCodeGen::getType(common::Type Ty) {
     }
 }
 
-llvm::StructType *LLVMCodeGen::getTupleType(common::Type Ty) {
+llvm::StructType *LLVMCodeGen::getLLVMTupleType(common::Type Ty) {
     auto CacheTy = TupleTypes.find(Ty);
 
     if (CacheTy != TupleTypes.end())
@@ -64,12 +67,12 @@ llvm::StructType *LLVMCodeGen::getTupleType(common::Type Ty) {
 
     std::vector<llvm::Type *> Subtypes;
     for (auto &Subtype : Ty.Subtypes)
-        Subtypes.push_back(getType(Subtype));
+        Subtypes.push_back(getLLVMType(Subtype));
 
     return TupleTypes[Ty] = StructType::create(Ctx, Subtypes, Ty.str());
 }
 
-llvm::StructType *LLVMCodeGen::getListType(common::Type Ty) {
+llvm::StructType *LLVMCodeGen::getLLVMListType(common::Type Ty) {
     auto CacheTy = ListTypes.find(Ty);
 
     if (CacheTy != ListTypes.end())
@@ -78,7 +81,7 @@ llvm::StructType *LLVMCodeGen::getListType(common::Type Ty) {
     llvm::Type *ElementTy;
     StructType *ListTy;
     if (!Ty.Subtypes.empty()) {
-        ElementTy = getType(Ty.Subtypes.front());
+        ElementTy = getLLVMType(Ty.Subtypes.front());
         ListTy = StructType::create(Ctx, Ty.str());
     } else {
         ElementTy = VoidPtr;
@@ -91,16 +94,16 @@ llvm::StructType *LLVMCodeGen::getListType(common::Type Ty) {
     return ListTypes[Ty] = ListTy;
 }
 
-llvm::FunctionType *LLVMCodeGen::getFuncType(common::Type Ty) {
+llvm::FunctionType *LLVMCodeGen::getLLVMFuncType(common::Type Ty) {
     auto CacheType = FuncTypes.find(Ty);
 
     if (CacheType != FuncTypes.end())
         return CacheType->second;
 
-    auto OutputType = getType(Ty.Subtypes.back());
+    auto OutputType = getLLVMType(Ty.Subtypes.back());
     std::vector<llvm::Type *> InputTypes;
     for (size_t i = 0; i < Ty.Subtypes.size() - 1; ++i) {
-        InputTypes.push_back(getType(Ty.Subtypes[i]));
+        InputTypes.push_back(getLLVMType(Ty.Subtypes[i]));
     }
 
     return FuncTypes[Ty] = FunctionType::get(OutputType, InputTypes, false);
@@ -112,31 +115,55 @@ llvm::GlobalVariable *LLVMCodeGen::getRuntimeType(common::Type Ty) {
     if (CacheType != RuntimeTypes.end())
         return CacheType->second;
 
+    auto ElementTy = PointerType::getUnqual(RunType);
+    auto ArrayTy = ArrayType::get(ElementTy, Ty.Subtypes.size() + 1);
+
     vector<Constant *> ArrayElements;
     for (auto Subtype : Ty.Subtypes) {
-        ArrayElements.push_back(getRuntimeType(Subtype));
+        auto Element = getRuntimeType(Subtype);
+        ArrayElements.push_back(static_cast<Constant *>(Builder.CreateBitCast(Element, ElementTy)));
     }
+    ArrayElements.push_back(ConstantPointerNull::get(ElementTy));
 
     // Create constant array with subtypes
-    auto ArrayTy = ArrayType::get(RuntimeType, 0);
-    Constant *Array;
-    if (ArrayElements.size()) {
-        ArrayElements.push_back(ConstantPointerNull::get(PointerType::getUnqual(RuntimeType)));
+    //auto ArrayPtrTy = PointerType::getUnqual(ArrayType::get(RuntimeType, 0));
+    //Constant *Array;
 
-        auto ConstArray = ConstantArray::get(ArrayTy, ArrayElements);
-        Array = new GlobalVariable(*Module.get(), ConstArray->getType(), true,
-                                   GlobalVariable::ExternalLinkage, ConstArray);
-    } else {
-        Array = ConstantPointerNull::get(PointerType::getUnqual(ArrayTy));
-    }
+    auto Array = ConstantArray::get(ArrayTy, ArrayElements);
 
     // Create runtime type
-    auto ConstVal = ConstantStruct::get(RuntimeType, { ConstantInt::get(Int, (uint64_t)Ty.Id), Array } );
+    //auto ArrayPtr = static_cast<Constant *>(Builder.CreateGEP(ElementTy, Array, ConstantInt::get(Int32, 0)));
+    auto StructTy = StructType::get(Ctx, { Int, ArrayTy });
+    auto ConstVal = ConstantStruct::get(StructTy, { ConstantInt::get(Int, (uint64_t)Ty.Id), Array } );
 
-    return RuntimeTypes[Ty] = new GlobalVariable(*Module.get(), ConstVal->getType(), true,
+    return RuntimeTypes[Ty] = new GlobalVariable(*Module, ConstVal->getType(), true,
                                 GlobalVariable::ExternalLinkage, ConstVal);
 }
 
+common::Type LLVMCodeGen::getType(llvm::Type *Ty) {
+    if (Ty == Int)
+        return common::Type(TypeId::INT);
+    if (Ty == Float)
+        return common::Type(TypeId::FLOAT);
+    if (Ty == VoidPtr)
+        return common::Type(TypeId::STRING, vector<common::Type> { common::Type(TypeId::CHAR) });
+    if (Ty->isVoidTy())
+        return common::Type(TypeId::VOID);
+    if (Ty->isFunctionTy())
+        return getFuncType(static_cast<FunctionType *>(Ty));
 
+    assert(0);
+}
+
+common::Type LLVMCodeGen::getFuncType(FunctionType *FuncTy)
+{
+    common::Type Res(TypeId::SIGNATURE);
+
+    for (auto &Ty : FuncTy->subtypes() ) {
+        Res.Subtypes.push_back(getType(Ty));
+    }
+
+    return Res;
+}
 
 

@@ -10,8 +10,8 @@ void LLVMCodeGen::splitCaseBlock(string Name) {
 
 Value *LLVMCodeGen::createListNode(common::Type Type, Value *Data, Value *NextNode, BasicBlock *Block, bool Const)
 {
-    auto ListType = getListType(Type);
-    auto ListPtrType = getType(Type);
+    auto ListType = getLLVMListType(Type);
+    auto ListPtrType = getLLVMType(Type);
 
     // Null indicates list end
     if (!NextNode)
@@ -57,18 +57,21 @@ Instruction *LLVMCodeGen::createMalloc(Value *Size, BasicBlock *Block)
 
 void LLVMCodeGen::createPrint(Value *Data, common::Type Ty) {
     auto UnionAlloca = Builder.CreateAlloca(UnionType);
-    auto UnionCast = Builder.CreateBitCast(UnionAlloca, PointerType::getUnqual(getType(Ty)));
+    auto UnionCast = Builder.CreateBitCast(UnionAlloca, PointerType::getUnqual(getLLVMType(Ty)));
     Builder.CreateStore(Data, UnionCast);
 
     auto UnionArgGEP = Builder.CreateStructGEP(UnionType, UnionAlloca, 0);
-    auto UnionArgCast = Builder.CreateBitCast(UnionArgGEP, PointerType::getUnqual(Int));
-    auto UnionArgLoad = Builder.CreateLoad(Int, UnionArgCast);
+    auto UnionArgCast = Builder.CreateBitCast(UnionArgGEP, PointerType::getUnqual(UnionType));
+    //auto UnionArgLoad = Builder.CreateLoad(UnionType, UnionArgCast);
 
-    Builder.CreateCall(getInternFunc("_print"), vector<Value *> { UnionArgLoad, getRuntimeType(Ty) });
+    auto TyArg = getRuntimeType(Ty);
+    auto TyArgCast = Builder.CreateBitCast(TyArg, PointerType::getUnqual(RunType));
+
+    Builder.CreateCall(getStdFunc("_print"), vector<Value *> { UnionArgCast, TyArgCast });
 }
 
 unsigned LLVMCodeGen::getAlignment(common::Type Ty) {
-    return DataLayout->getPrefTypeAlignment(getType(Ty));
+    return DataLayout->getPrefTypeAlignment(getLLVMType(Ty));
 }
 
 

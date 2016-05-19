@@ -12,7 +12,8 @@ SpplJit::SpplJit()
 
     sys::DynamicLibrary::LoadLibraryPermanently(nullptr);
 
-    addModule(move(CodeGen.ModuleHeader));
+    // Add standard library to JIT
+    addModule(move(CodeGen.ModuleStd));
 
     // Set Driver to JIT mode
     Drv.JIT = true;
@@ -71,7 +72,7 @@ string SpplJit::getOutput(OutputData Data, common::Type Ty) {
     case TypeId::INT:
         return to_string(Data.Int);
     case TypeId::FLOAT:
-        return to_string(*Data.Float);
+        return to_string(Data.Float);
     case TypeId::CHAR:
         return "'" + string(1, Data.Char) + "'";
     case TypeId::STRING:
@@ -222,10 +223,10 @@ int SpplJit::eval(string Str) {
 
         OutputData Res = FuncJIT();
         string Output = getOutput(Res, RetTy);
-        cout << Output
-             << endl
-             << "type: " << RetTy.str()
-             << endl;
+        //cout << Output
+        //     << endl
+        //     << "type: " << RetTy.str()
+        //     << endl;
 
         // Remove module
         removeModule(ModuleHandler);

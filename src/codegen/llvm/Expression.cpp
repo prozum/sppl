@@ -5,15 +5,15 @@ using namespace codegen;
 using namespace llvm;
 
 void LLVMCodeGen::visit(common::FloatExpr &Node) {
-    CurVal = ConstantFP::get(getType(Node.RetTy), Node.Val);
+    CurVal = ConstantFP::get(getLLVMType(Node.RetTy), Node.Val);
 }
 
 void LLVMCodeGen::visit(common::IntExpr &Node) {
-    CurVal = ConstantInt::get(getType(Node.RetTy), (uint64_t)Node.Val);
+    CurVal = ConstantInt::get(getLLVMType(Node.RetTy), (uint64_t)Node.Val);
 }
 
 void LLVMCodeGen::visit(common::BoolExpr &Node) {
-    CurVal = ConstantInt::get(getType(Node.RetTy), (uint64_t)Node.Val);
+    CurVal = ConstantInt::get(getLLVMType(Node.RetTy), (uint64_t)Node.Val);
 }
 
 void LLVMCodeGen::visit(common::StringExpr &Node) {
@@ -26,7 +26,7 @@ void LLVMCodeGen::visit(common::StringExpr &Node) {
 }
 
 void LLVMCodeGen::visit(common::CharExpr &Node) {
-    CurVal = ConstantInt::get(getType(Node.RetTy), (uint64_t)Node.Val);
+    CurVal = ConstantInt::get(getLLVMType(Node.RetTy), (uint64_t)Node.Val);
 }
 
 void LLVMCodeGen::visit(common::IdExpr &Node) {
@@ -42,7 +42,7 @@ void LLVMCodeGen::visit(common::IdExpr &Node) {
 
     // External function
     if (Drv.Global.Decls.count(Node.Val))
-        CurVal = llvm::Function::Create(getFuncType(Drv.Global.Decls[Node.Val]),
+        CurVal = llvm::Function::Create(getLLVMFuncType(Drv.Global.Decls[Node.Val]),
                                         llvm::Function::ExternalLinkage,
                                         Node.Val, Module.get());
     if (CurVal)
@@ -56,8 +56,8 @@ void LLVMCodeGen::visit(common::ParExpr &Node) {
 }
 
 void LLVMCodeGen::visit(common::TupleExpr &Node) {
-    auto TupleType = getTupleType(Node.RetTy);
-    auto TuplePtrType = getType(Node.RetTy);
+    auto TupleType = getLLVMTupleType(Node.RetTy);
+    auto TuplePtrType = getLLVMType(Node.RetTy);
 
     if (Node.Const) {
         std::vector<llvm::Constant *> TupleVal;
@@ -93,12 +93,10 @@ void LLVMCodeGen::visit(common::ListExpr &Node) {
     }
 
     if (!ListNode)
-        ListNode = ConstantPointerNull::get(static_cast<PointerType *>(getType(Node.RetTy)));
+        ListNode = ConstantPointerNull::get(static_cast<PointerType *>(getLLVMType(Node.RetTy)));
 
     CurVal = ListNode;
 }
-
-
 
 void LLVMCodeGen::visit(common::CallExpr &Node) {
     Node.Callee->accept(*this);

@@ -1,5 +1,6 @@
 #include "LLVMCodeGen.h"
 
+using namespace llvm;
 using namespace codegen;
 using namespace common;
 
@@ -138,10 +139,21 @@ void LLVMCodeGen::visit(NotEqual &Node) {
     //assert((Node.Left->RetTy.Id == TypeId::FLOAT && Node.Right->RetTy.Id == TypeId::FLOAT) ||
     //       (Node.Left->RetTy.Id == TypeId::INT && Node.Right->RetTy.Id == TypeId::INT));
 
+    if (Node.Left->Const && Node.Right->Const) {
+
+        /*
+        Node.Left->accept(*this);
+        auto Left = static_cast<Constant *>(CurVal);
+        Node.Right->accept(*this);
+        auto Right = static_cast<Constant *>(CurVal);
+         */
+    }
+
     Node.Left->accept(*this);
     auto Left = CurVal;
     Node.Right->accept(*this);
     auto Right = CurVal;
+
 
     if (Node.Right->RetTy.Id == TypeId::FLOAT) {
         CurVal = Builder.CreateFCmpONE(Left, Right, "neqtmp");
@@ -256,3 +268,16 @@ void LLVMCodeGen::visit(To &Node) {
             addError(Error::NotImplemented(Node.Loc));
     }
 }
+/*
+void LLVMCodeGen::visit(common::Concat &Node) {
+    Node.Right->accept(*this);
+    auto Right = CurVal;
+
+    if (Node.Left->Const && Node.Right->Const) {
+        Node.Left->accept(*this);
+        auto Left = CurVal;
+
+    }
+}
+ */
+

@@ -32,7 +32,7 @@ void LLVMCodeGen::createModule() {
     Module = std::make_unique<llvm::Module>("Module", Ctx);
     //Module->setDataLayout(Machine->createDataLayout());
 
-    InternFuncDecls.clear();
+    StdFuncDecls.clear();
     RuntimeTypes.clear();
 }
 
@@ -81,10 +81,10 @@ void LLVMCodeGen::visit(common::Program &node) {
     raw_os_ostream RawHOut(*Drv.HOut);
     if (Drv.Binary) {
         WriteBitcodeToFile(Module.get(), RawOut);
-        WriteBitcodeToFile(ModuleHeader.get(), RawHOut);
+        WriteBitcodeToFile(ModuleStd.get(), RawHOut);
     } else {
         RawOut << *Module;
-        RawHOut << *ModuleHeader;
+        RawHOut << *ModuleStd;
     }
 }
 

@@ -134,8 +134,10 @@ bool Test::compileChecker(std::string name) {
                 compiler.setHeaderOutput("test.h");
                 break;
             case compiler::Backend::LLVM:
-                compiler.setOutput("out.ll");
+                compiler.setOutput("out.bc");
+                compiler.setHeaderOutput("std.bc");
                 compiler.Silent = true;
+                compiler.Binary = true;
                 break;
             default:
                 break;
@@ -243,7 +245,13 @@ bool Test::executeCPP(std::string args, std::string expectedOutput) {
 }
 
 bool Test::executeLLVM(std::string Args, std::string ExpectedOutput) {
-    std::shared_ptr<FILE> Pipe(popen((string("lli out.ll ") + Args).c_str(), "r"), pclose);
+    auto status = system("clang std.bc out.bc -o main");
+
+    if (status != 0) {
+        CPPUNIT_ASSERT_MESSAGE("Bitcode Compilation Error", false);
+    }
+
+    std::shared_ptr<FILE> Pipe(popen((string("./main") + Args).c_str(), "r"), pclose);
     if (!Pipe) {
         CPPUNIT_ASSERT_MESSAGE("could not open pipe", false);
         return false;
@@ -266,10 +274,14 @@ bool Test::executeLLVM(std::string Args, std::string ExpectedOutput) {
 
         CPPUNIT_ASSERT_MESSAGE(Msg, false);
 
-        remove("out.ll");
+        remove("out.bc");
+        remove("std.bc");
+        remove("main");
         return false;
     } else {
-        remove("out.ll");
+        remove("out.bc");
+        remove("std.bc");
+        remove("main");
         return true;
     }
 }
