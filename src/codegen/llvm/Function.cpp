@@ -12,7 +12,6 @@ void LLVMCodeGen::visit(common::Function &Node) {
         CurFunc = llvm::Function::Create(MainType,
                                          llvm::Function::ExternalLinkage, Node.Id,
                                          Module.get());
-        Entry = BasicBlock::Create(Ctx, "entry", CurFunc);
 
         // System args
         auto ArgIter = CurFunc->args().begin();
@@ -21,26 +20,24 @@ void LLVMCodeGen::visit(common::Function &Node) {
         Argc->setName("argc");
         Argv->setName("argv");
 
-        // Call create arg function
-        // TODO
-        //CurVal = Builder.CreateCall(ArgFunc, vector<Value *> { Argc, Argv } );
-        auto CharListType = common::Type(TypeId::STRING, vector<common::Type> { common::Type(TypeId::CHAR)});
-        auto StrListType = common::Type(TypeId::LIST, vector<common::Type> { CharListType });
-        CurVal = ConstantPointerNull::get(static_cast<PointerType *>(getLLVMType(StrListType)));
+        Entry = BasicBlock::Create(Ctx, "entry", CurFunc);
+        Builder.SetInsertPoint(Entry);
+        CurVal = Builder.CreateCall(getStdFunc("_make_args"), vector<Value *> { Argc, Argv } );
+        CurVal = Builder.CreateBitCast(CurVal, getLLVMType(Node.Signature.Subtypes.front()));
         Args.push_back(CurVal);
     } else {
         // Lookup forward decleration
         CurFunc = Module->getFunction(Node.Id);
 
         // Create new
-        if (!CurFunc) {
+        if (!CurFunc)
             CurFunc = llvm::Function::Create(getLLVMFuncType(Node.Signature),
                                              llvm::Function::ExternalLinkage, Node.Id,
                                              Module.get());
-        }
 
         Entry = BasicBlock::Create(Ctx, "entry", CurFunc);
-        // Setup names for arguments
+
+        // Setup args
         auto ArgId = 0;
         for (auto &Arg : CurFunc->args()) {
             Arg.setName("_arg" + to_string(ArgId++));
@@ -51,22 +48,20 @@ void LLVMCodeGen::visit(common::Function &Node) {
     // Set call convention to fast to enable tail recursion optimizations
     CurFunc->setCallingConv(CallingConv::Fast);
 
-    // Create error block
+    // Create error and ret block
     ErrBlock = BasicBlock::Create(Ctx, "error", CurFunc);
-    Builder.SetInsertPoint(ErrBlock);
-    if (!CurFunc->getReturnType()->isVoidTy())
-        Builder.CreateRet(UndefValue::get(CurFunc->getReturnType()));
-    else
-        Builder.CreateRetVoid();
-
-    // Create return block and setup phi node
     RetBlock = BasicBlock::Create(Ctx, "ret", CurFunc);
-    Builder.SetInsertPoint(RetBlock);
     if (!CurFunc->getReturnType()->isVoidTy()) {
-        RetPhiNode = Builder.CreatePHI(CurFunc->getReturnType(),
-                                       (unsigned) Node.Cases.size(), "rettmp");
-        Builder.CreateRet(RetPhiNode);
+        Builder.SetInsertPoint(ErrBlock);
+        Builder.CreateRet(UndefValue::get(CurFunc->getReturnType()));
+        Builder.SetInsertPoint(RetBlock);
+        RetPhi = Builder.CreatePHI(CurFunc->getReturnType(),
+                                   (unsigned) Node.Cases.size(), "rettmp");
+        Builder.CreateRet(RetPhi);
     } else {
+        Builder.SetInsertPoint(ErrBlock);
+        Builder.CreateRetVoid();
+        Builder.SetInsertPoint(RetBlock);
         Builder.CreateRetVoid();
     }
 
@@ -78,11 +73,11 @@ void LLVMCodeGen::visit(common::Function &Node) {
         CurPatBlock = BasicBlock::Create(Ctx, "", CurFunc);
         FirstBlock = true;
         for (CurCase = Node.Cases.cbegin(); CurCase != Node.Cases.cend(); ++CurCase) {
-            if (next(CurCase) != Node.Cases.cend()) {
+            if (next(CurCase) != Node.Cases.cend())
                 NextBlock = BasicBlock::Create(Ctx, "", CurFunc);
-            } else {
+            else
                 NextBlock = ErrBlock;
-            }
+
 
             (*CurCase)->accept(*this);
             stepPrefix();
@@ -176,14 +171,16 @@ void LLVMCodeGen::visit(common::Case &Node) {
 
 #ifdef SPPLDEBUG
     auto Ty1 = CurVal->getType();
-    if (CurFunc->getReturnType()->getTypeID() != llvm::Type::TypeID::VoidTyID) {
-        auto Ty2 = RetPhiNode->getType();
+    if (!CurFunc->getReturnType()->isVoidTy()) {
+        auto Ty2 = RetPhi->getType();
         assert(Ty1 == Ty2);
     }
 #endif
 
     // Add return value to phi node
-    RetPhiNode->addIncoming(CurVal, CurCaseBlock);
+    if (!CurFunc->getReturnType()->isVoidTy())
+        RetPhi->addIncoming(CurVal, CurCaseBlock);
+
     Builder.CreateBr(RetBlock);
 }
 

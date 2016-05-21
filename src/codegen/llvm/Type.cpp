@@ -110,9 +110,9 @@ llvm::FunctionType *LLVMCodeGen::getLLVMFuncType(common::Type Ty) {
 }
 
 llvm::GlobalVariable *LLVMCodeGen::getRuntimeType(common::Type Ty) {
-    auto CacheType = RuntimeTypes.find(Ty);
+    auto CacheType = RunTypes.find(Ty);
 
-    if (CacheType != RuntimeTypes.end())
+    if (CacheType != RunTypes.end())
         return CacheType->second;
 
     auto ElementTy = PointerType::getUnqual(RunType);
@@ -136,7 +136,7 @@ llvm::GlobalVariable *LLVMCodeGen::getRuntimeType(common::Type Ty) {
     auto StructTy = StructType::get(Ctx, { Int, ArrayTy });
     auto ConstVal = ConstantStruct::get(StructTy, { ConstantInt::get(Int, (uint64_t)Ty.Id), Array } );
 
-    return RuntimeTypes[Ty] = new GlobalVariable(*Module, ConstVal->getType(), true,
+    return RunTypes[Ty] = new GlobalVariable(*Module, ConstVal->getType(), true,
                                 GlobalVariable::ExternalLinkage, ConstVal);
 }
 
@@ -152,6 +152,7 @@ common::Type LLVMCodeGen::getType(llvm::Type *Ty) {
     if (Ty->isFunctionTy())
         return getFuncType(static_cast<FunctionType *>(Ty));
 
+    Ty->dump();
     assert(0);
 }
 
@@ -159,9 +160,11 @@ common::Type LLVMCodeGen::getFuncType(FunctionType *FuncTy)
 {
     common::Type Res(TypeId::SIGNATURE);
 
-    for (auto &Ty : FuncTy->subtypes() ) {
-        Res.Subtypes.push_back(getType(Ty));
+    auto Subtypes = FuncTy->subtypes();
+    for (size_t i = 1; i != Subtypes.size(); ++i) {
+        Res.Subtypes.push_back(getType(Subtypes[i]));
     }
+    Res.Subtypes.push_back(getType(FuncTy->getReturnType()));
 
     return Res;
 }

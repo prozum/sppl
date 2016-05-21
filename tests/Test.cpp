@@ -137,7 +137,7 @@ bool Test::compileChecker(std::string name) {
                 compiler.setOutput("out.bc");
                 compiler.setHeaderOutput("std.bc");
                 compiler.Silent = true;
-                compiler.Binary = true;
+                compiler.Binary = false;
                 break;
             default:
                 break;

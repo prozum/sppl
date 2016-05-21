@@ -3,6 +3,7 @@
 using namespace llvm;
 using namespace codegen;
 using namespace common;
+using namespace std;
 
 void LLVMCodeGen::visit(Add &Node) {
     assert((Node.Left->RetTy.Id == TypeId::FLOAT && Node.Right->RetTy.Id == TypeId::FLOAT) ||
@@ -268,16 +269,34 @@ void LLVMCodeGen::visit(To &Node) {
             addError(Error::NotImplemented(Node.Loc));
     }
 }
-/*
-void LLVMCodeGen::visit(common::Concat &Node) {
+
+void LLVMCodeGen::visit(common::ListAdd &Node) {
+    Node.Left->accept(*this);
+    auto Element = CurVal;
+
     Node.Right->accept(*this);
-    auto Right = CurVal;
+    auto List = CurVal;
 
-    if (Node.Left->Const && Node.Right->Const) {
-        Node.Left->accept(*this);
-        auto Left = CurVal;
-
-    }
+    CurVal = createListNode(Node.RetTy, Element, List, Builder.GetInsertBlock(), Node.Left->Const && Node.Right->Const);
 }
- */
+
+void LLVMCodeGen::visit(common::Concat &Node) {
+    if (Node.Left->Const && Node.Right->Const) {
+        Node.Right->accept(*this);
+        Concat = true;
+        Node.Left->accept(*this);
+        return;
+    }
+
+    auto ListPtrTy = PointerType::getUnqual(ListType);
+
+    Node.Right->accept(*this);
+    auto RightCast = Builder.CreateBitCast(CurVal, ListPtrTy);
+
+    Node.Left->accept(*this);
+    auto LeftCast = Builder.CreateBitCast(CurVal, ListPtrTy);
+
+    CurVal = Builder.CreateCall(getStdFunc("_concat_list"), vector<Value *> { LeftCast, RightCast });
+    CurVal = Builder.CreateBitCast(CurVal, getLLVMType(Node.RetTy));
+}
 

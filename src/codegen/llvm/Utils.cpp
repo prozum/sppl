@@ -4,18 +4,14 @@ using namespace codegen;
 using namespace llvm;
 using namespace std;
 
-void LLVMCodeGen::splitCaseBlock(string Name) {
-    CurCaseBlock = BasicBlock::Create(Ctx, getPrefix(Name), CurFunc);
-}
-
 Value *LLVMCodeGen::createListNode(common::Type Type, Value *Data, Value *NextNode, BasicBlock *Block, bool Const)
 {
     auto ListType = getLLVMListType(Type);
-    auto ListPtrType = getLLVMType(Type);
+    auto ListPtrType = PointerType::getUnqual(ListType);
 
     // Null indicates list end
     if (!NextNode)
-        NextNode = ConstantPointerNull::get(static_cast<PointerType *>(ListPtrType));
+        NextNode = ConstantPointerNull::get(ListPtrType);
 
     // Const list
     if (Const) {
@@ -67,7 +63,7 @@ void LLVMCodeGen::createPrint(Value *Data, common::Type Ty) {
     auto TyArg = getRuntimeType(Ty);
     auto TyArgCast = Builder.CreateBitCast(TyArg, PointerType::getUnqual(RunType));
 
-    Builder.CreateCall(getStdFunc("_print"), vector<Value *> { UnionArgCast, TyArgCast });
+    Builder.CreateCall(getStdFunc("_print"), vector<Value *> { UnionArgCast, TyArgCast, ConstantInt::get(Int32, 1) });
 }
 
 unsigned LLVMCodeGen::getAlignment(common::Type Ty) {

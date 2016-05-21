@@ -1,8 +1,7 @@
-#include "std.h"
-
+#include "print.h"
 #include "stdio.h"
 
-void _print(value_t *val, type_t *type) {
+void _print(value_t *val, type_t *type, int top) {
     switch (type->id) {
         case INT:
             printf("%ld", val->int_v);
@@ -11,7 +10,11 @@ void _print(value_t *val, type_t *type) {
             printf("%f", val->float_v);
             break;
         case CHAR:
-            printf("%c", (char)val->char_v);
+            if (top)
+                printf("%c", (char)val->char_v);
+            else
+                printf("'%c'", (char)val->char_v);
+
             break;
         case BOOL:
             if (val->bool_v)
@@ -26,7 +29,7 @@ void _print(value_t *val, type_t *type) {
             printf("[]");
             break;
         case STRING:
-            _print_string((*val).list_v);
+            _print_string((*val).list_v, top);
             break;
         case TUPLE:
             _print_tuple(val, type);
@@ -43,7 +46,7 @@ void _print(value_t *val, type_t *type) {
 void _print_list(list_t *val, type_t *type) {
     printf("[");
     while (val) {
-        _print(&val->data, type->subtypes[0]);
+        _print(&val->data, type->subtypes[0], 0);
 
         val = val->next;
         if (val)
@@ -52,22 +55,23 @@ void _print_list(list_t *val, type_t *type) {
     printf("]");
 }
 
-void _print_string(list_t *val) {
-    printf("\"");
+void _print_string(list_t *val, int top) {
+    if (!top)
+        printf("\"");
     while (val) {
         printf("%c", (char)val->data.char_v);
 
         val = val->next;
     }
-    printf("\"");
+    if (!top)
+        printf("\"");
 }
-
 
 void _print_tuple(value_t *val, type_t *type) {
     printf("(");
     int i = 0;
     while (type->subtypes[i]) {
-        _print(&val->tuple_v[i], type->subtypes[i]);
+        _print(&val->tuple_v[i], type->subtypes[i], 0);
         if (type->subtypes[++i])
             printf(", ");
     }

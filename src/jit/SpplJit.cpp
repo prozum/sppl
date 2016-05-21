@@ -13,10 +13,11 @@ SpplJit::SpplJit()
     sys::DynamicLibrary::LoadLibraryPermanently(nullptr);
 
     // Add standard library to JIT
-    addModule(move(CodeGen.ModuleStd));
+    addModule(CodeGen.getStdModule());
 
     // Set Driver to JIT mode
     Drv.JIT = true;
+    Drv.Silent = false;
 }
 
 SpplJit::ModuleHandleT SpplJit::addModule(unique_ptr<Module> M) {
@@ -223,10 +224,10 @@ int SpplJit::eval(string Str) {
 
         OutputData Res = FuncJIT();
         string Output = getOutput(Res, RetTy);
-        //cout << Output
-        //     << endl
-        //     << "type: " << RetTy.str()
-        //     << endl;
+        cout << Output
+             << endl
+             << "type: " << RetTy.str()
+             << endl;
 
         // Remove module
         removeModule(ModuleHandler);

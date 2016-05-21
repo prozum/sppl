@@ -102,7 +102,7 @@ void Driver::error(const common::Location &Loc, const std::string &Msg) {
 void Driver::error(const std::string &Msg) { showError(Error(Msg)); }
 
 void Driver::showError(Error Err) {
-    if (!Silent)
+    if (!Silent or JIT)
         *MOut << Err << endl;
 }
 

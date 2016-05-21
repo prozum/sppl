@@ -12,6 +12,7 @@
 #include <llvm/IR/DerivedTypes.h>
 #include <llvm/IR/TypeBuilder.h>
 #include <llvm/IR/TypeFinder.h>
+#include <llvm/IR/ModuleSlotTracker.h>
 
 #include <llvm/Support/SourceMgr.h>
 #include <llvm/Support/raw_os_ostream.h>
@@ -29,6 +30,8 @@
 #include <ctype.h>
 
 namespace codegen {
+
+
 class LLVMCodeGen : public parser::CodeGenerator {
   public:
     LLVMCodeGen(parser::Driver &Drv);
@@ -51,20 +54,20 @@ class LLVMCodeGen : public parser::CodeGenerator {
     // Module
     // Used to store functions and global variables
     std::unique_ptr<llvm::Module> Module;
-    std::unique_ptr<llvm::Module> ModuleStd;
 
     // PassManager
     // Used to perform optimization on module
     std::unique_ptr<llvm::legacy::PassManager> PassMgr;
 
-    // Identifer Values
+    // Identifier Values
     std::map<std::string, llvm::Value *> IdVals;
 
     // Tail recursion for CurFunc
     bool TailRec = false;
 
-    // Get data alignment for target machine
+    // Methods used for JIT
     unsigned getAlignment(common::Type Ty);
+    std::unique_ptr<llvm::Module> getStdModule();
 
     // Get IR string method
     std::string ModuleString();
@@ -84,7 +87,7 @@ private:
     std::unordered_map<common::Type, llvm::StructType *> TupleTypes;
     std::unordered_map<common::Type, llvm::StructType *> ListTypes;
     std::unordered_map<common::Type, llvm::FunctionType *> FuncTypes;
-    std::unordered_map<common::Type, llvm::GlobalVariable *> RuntimeTypes;
+    std::unordered_map<common::Type, llvm::GlobalVariable *> RunTypes;
 
     // Type constants
     llvm::IntegerType *Int1;
@@ -95,9 +98,10 @@ private:
     llvm::IntegerType *Int;
     llvm::Type *Float;
 
-    llvm::StructType *UnionType;
-    llvm::StructType *RunType;
     llvm::FunctionType *MainType;
+    llvm::StructType *RunType;
+    llvm::StructType *UnionType;
+    llvm::StructType *ListType;
 
     // Standard functions
     std::unordered_map<std::string, llvm::FunctionType *> StdFuncs;
@@ -117,11 +121,13 @@ private:
     llvm::BasicBlock *Entry = nullptr;
     llvm::BasicBlock *ErrBlock = nullptr;
     llvm::BasicBlock *RetBlock = nullptr;
-    llvm::PHINode *RetPhiNode = nullptr;
+    llvm::PHINode *RetPhi = nullptr;
     llvm::BasicBlock *NextBlock = nullptr;
 
     // Bool used to find first block in function
-    bool FirstBlock;
+    bool FirstBlock = false;
+    // Bool used to indicate concat to lists
+    bool Concat = false;
 
     // Prefixes
     std::vector<std::pair<std::string,int>> Prefixes;
@@ -161,6 +167,7 @@ private:
     void visit(common::ListAdd &Node);
     void visit(common::DoExpr &Node);
     void visit(common::Assosiate &Node);
+    void visit(common::Concat &Node);
 
     void visit(common::Negative &Node);
     void visit(common::Not &Node);
@@ -181,24 +188,22 @@ private:
 
     // Standard library methods
     void initStdLib();
+    llvm::Module *getStdLib();
+    void setTriple();
     void addStdFunc(std::string FuncName, common::Type Ty, bool Decl = false);
     void addStdFunc(std::string FuncName, llvm::FunctionType *Ty, bool Decl = false);
     llvm::Function *getStdFunc(std::string FuncName);
     void createArgFunc();
     void createPrintFunc();
-    void createPrintTupleFunc();
-    void CreatePrintListFunc();
-    void CreatePrintSignatureFunc();
 
     // Utility methods
-    void splitCaseBlock(std::string Name);
     llvm::Value *createListNode(common::Type Type, llvm::Value *Data, llvm::Value *NextNode, llvm::BasicBlock *Block,
                                 bool Const = false);
     llvm::Instruction *createMalloc(llvm::Type *Type, llvm::BasicBlock *Block);
     llvm::Instruction *createMalloc(llvm::Value *Size, llvm::BasicBlock *Block);
     void createPrint(llvm::Value *Data, common::Type Ty);
 
-    // Type methods
+    // LLVM type methods
     void initTypes();
     llvm::Type *getLLVMType(common::Type Ty);
     llvm::StructType *getLLVMTupleType(common::Type Ty);
@@ -206,6 +211,7 @@ private:
     llvm::GlobalVariable *getRuntimeType(common::Type Ty);
     llvm::FunctionType *getLLVMFuncType(common::Type Ty);
 
+    // SPPL type methods
     common::Type getType(llvm::Type *Ty);
     common::Type getFuncType(llvm::FunctionType *FuncTy);
 

@@ -1,10 +1,14 @@
-#ifndef STD_H
-#define STD_H
+#ifndef SPPL_STD_H
+#define SPPL_STD_H
+
+#include "stdlib.h"
 #include "stdint.h"
 
 //#define PUBLIC __attribute__((visibility("default")))
 //#define PRIVATE __attribute__((visibility("hidden")))
 #define SPPL_DECL __attribute__((annotate("sppl_decl")))
+
+#define ALLOC malloc
 
 typedef enum type_enum {
     UNKNOWN,
@@ -20,7 +24,7 @@ typedef enum type_enum {
     EMPTYLIST,
     CUSTOM,
     VOID,
-    NOT_USE = UINT64_MAX
+    DONT_USE = UINT64_MAX
 } type_id;
 
 typedef struct type {
@@ -45,12 +49,6 @@ typedef struct list {
     struct list *next;
 } list_t;
 
-// Print
-SPPL_DECL void _print(value_t *val, type_t *type);
-void _print_tuple(value_t *val, type_t *type);
-void _print_list(list_t *val, type_t *type);
-void _print_string(list_t *val);
-void _print_type(type_t *type);
-void _print_signature(type_t *type);
+
 
 #endif

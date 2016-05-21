@@ -5,22 +5,34 @@ using namespace std;
 using namespace llvm;
 using namespace codegen;
 using namespace common;
+static std::unique_ptr<llvm::Module> ModuleStd;
+
+llvm::Module *LLVMCodeGen::getStdLib() {
+    return ModuleStd.get();
+}
+
+std::unique_ptr<llvm::Module> LLVMCodeGen::getStdModule() {
+    return move(ModuleStd);
+}
+
+void LLVMCodeGen::setTriple() {
+    // Set triple from target machine
+    Module->setTargetTriple(Machine->getTargetTriple().getTriple());
+}
 
 void LLVMCodeGen::initStdLib() {
     // Load standard library implemented in C
-    SMDiagnostic Dia;
-    auto MemBuf = MemoryBuffer::getMemBuffer(StringRef((char *)std_bc, std_bc_len));
-    ModuleStd = parseIR(MemBuf->getMemBufferRef(), Dia, Ctx);
+    if (!ModuleStd) {
+        SMDiagnostic Dia;
+        auto MemBuf = MemoryBuffer::getMemBuffer(StringRef((char *) std_bc, std_bc_len));
+        ModuleStd = parseIR(MemBuf->getMemBufferRef(), Dia, Ctx);
+        ModuleStd->setTargetTriple(Machine->getTargetTriple().getTriple());
 
-    //ModuleStd->dump();
-    assert(ModuleStd && "Standard Library could not be parsed");
+        //ModuleStd->dump();
+        assert(ModuleStd && "Standard Library could not be parsed");
 
-    // Load standard library types
-    RunType = ModuleStd->getTypeByName("struct.type");
-    UnionType = ModuleStd->getTypeByName("union.value");
 
-    // Get annotations
-    if (ModuleStd) {
+        // Get annotations
         auto Annos = ModuleStd->getNamedGlobal("llvm.global.annotations");
         if (Annos) {
             auto Struct1 = static_cast<ConstantArray *>(Annos->getOperand(0));
@@ -39,6 +51,11 @@ void LLVMCodeGen::initStdLib() {
     for (auto &Func: ModuleStd->functions()) {
         addStdFunc(Func.getName(), Func.getFunctionType(), Func.hasFnAttribute("sppl_decl"));
     }
+
+    // Load standard library types
+    RunType = ModuleStd->getTypeByName("struct.type");
+    UnionType = ModuleStd->getTypeByName("union.value");
+    ListType = ModuleStd->getTypeByName("struct.list");
 
     // Load standard library implemented in IR
     //createArgFunc();
@@ -66,7 +83,7 @@ void LLVMCodeGen::initStdLib() {
 void LLVMCodeGen::addStdFunc(std::string FuncName, common::Type Ty, bool Decl) {
     assert(Ty.Id == TypeId::SIGNATURE);
 
-    addStdFunc(FuncName, getLLVMFuncType(Ty), Decl);
+    StdFuncs[FuncName] = getLLVMFuncType(Ty);
 
     if (Decl)
         Drv.addDecl(FuncName, Ty);
@@ -77,6 +94,8 @@ void LLVMCodeGen::addStdFunc(std::string FuncName, common::Type Ty, bool Decl) {
 void LLVMCodeGen::addStdFunc(string FuncName, FunctionType *Ty, bool Decl) {
     StdFuncs[FuncName] = Ty;
 
+    if (Decl)
+        Drv.addDecl(FuncName, getFuncType(Ty));
 }
 
 llvm::Function *LLVMCodeGen::getStdFunc(string FuncName) {
@@ -210,68 +229,6 @@ void LLVMCodeGen::createArgFunc()
 
     return Builder.CreateCall(CreateArg, { MainArgc, MainArgv }, "_arg0");
      */
-}
-
-void LLVMCodeGen::createPrintTupleFunc() {
-    auto FuncName = "_print_tuple";
-    auto FuncTy = FunctionType::get(llvm::Type::getVoidTy(Ctx), vector<llvm::Type *> { Int, PointerType::getUnqual(RunType) }, false);
-    auto Func = llvm::Function::Create(FuncTy,
-                                        llvm::Function::ExternalLinkage, FuncName,
-                                        Module.get());
-
-    // Arguments arguments
-    auto ArgIter = Func->args().begin();
-    Argument *DataArg = &*(ArgIter++);
-    Argument *TypeArg = &*(ArgIter);
-    DataArg->setName("data_arg");
-    TypeArg->setName("type_arg");
-
-
-    // Standard blocks
-    auto Entry = BasicBlock::Create(Ctx, "entry", Func);
-    auto Loop = BasicBlock::Create(Ctx, "loop", Func);
-    auto Ret = BasicBlock::Create(Ctx, "ret", Func);
-    auto Error = BasicBlock::Create(Ctx, "error", Func);
-
-    // Setup return
-    Builder.SetInsertPoint(Ret);
-    // Print tuple end
-    auto ParEnd = Builder.CreateGlobalStringPtr(")", "par_end");
-    Builder.CreateCall(getStdFunc("printf"), vector<Value *> { ParEnd });
-    Builder.CreateRetVoid();
-
-    // Setup error
-    Builder.SetInsertPoint(Error);
-    Builder.CreateRetVoid();
-
-    // Setup entry
-    Builder.SetInsertPoint(Entry);
-    //auto DataAlloca = Builder.CreateAlloca(Int);
-    //auto TypeAlloca = Builder.CreateAlloca(PointerType::getUnqual(RuntimeType));
-    // Initialize iterator
-    auto IterAlloca = Builder.CreateAlloca(Int);
-    Builder.CreateStore(ConstantInt::get(Int, 0), IterAlloca);
-    // Print tuple start
-    auto ParStart = Builder.CreateGlobalStringPtr("(", "par_start");
-    Builder.CreateCall(getStdFunc("printf"), vector<Value *> { ParStart });
-    Builder.CreateBr(Loop);
-
-    // Setup loop
-    Builder.SetInsertPoint(Loop);
-    auto Iter = Builder.CreateLoad(IterAlloca);
-    auto Data = Builder.CreateGEP(RunType, DataArg, Iter);
-    auto Type = Builder.CreateGEP(RunType, TypeArg, Iter);
-
-    Builder.CreateCall(StdFuncDecls["_print"], vector<Value *> { Data, Type });
-
-    // Increment iterator
-    CurVal = Builder.CreateAdd(Iter, ConstantInt::get(Int, 1));
-    Builder.CreateStore(CurVal, IterAlloca);
-
-    //Builder.CreateStore(DataArg, UnionArgCast);
-    //auto UnionArgCast = Builder.CreateBitCast()
-
-    addStdFunc(FuncName, FuncTy);
 }
 
 void LLVMCodeGen::createPrintFunc() {
