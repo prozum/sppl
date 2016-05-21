@@ -65,7 +65,7 @@ protected:
     virtual void visit(common::CallExpr &Node);
     virtual void visit(common::AlgebraicExpr &Node);
 
-    const std::string PrintFunc = "print";
+    const std::string PrintFunc = "printfunc";
     const std::string Alloc = "malloc";
 
     const std::string GGenerated = "g";
@@ -99,11 +99,7 @@ protected:
     const std::string GArg = GGenerated + "arg";
     const std::string GRes = GGenerated + "res";
 
-    const bool GCed = false;
-
     std::unordered_map<common::Type, std::string> GenTypes;
-    std::unordered_map<common::Type, std::string> ToStrings;
-    std::unordered_map<common::Type, std::string> Prints;
 
     std::vector<int> ListOffsets;
     common::Type StringList;
@@ -113,11 +109,10 @@ protected:
     std::string StringName;
     std::string StringType;
 
-    int ListCount = 0;
-    int TupleCount = 0;
-    int SigCount = 0;
+    unsigned int ListCount = 0;
+    unsigned int TupleCount = 0;
+    unsigned int SigCount = 0;
 
-    common::Program* Prog = nullptr;
     common::Function* CurrFunc = nullptr;
 
     // Data assosiated with the C tree
@@ -131,11 +126,11 @@ protected:
     virtual std::string getOrGen(common::Type &Ty);
     virtual ctree::Expression* visitBinOp(common::BinaryOp& Op, std::string OpStr);
     virtual ctree::Expression* generateAndChain(std::vector<ctree::Expression*>& Exprs);
-    ctree::Expression* visitEqual(common::BinaryOp& Equal);
+    virtual ctree::Expression* visitEqual(common::BinaryOp& Equal);
 
-    std::string generateList(common::Type &Ty);
-    std::string generateSignature(common::Type &Ty);
-    std::string generateTuple(common::Type &Ty);
-    void generateStd();
+    virtual std::string generateList(common::Type &Ty);
+    virtual std::string generateSignature(common::Type &Ty);
+    virtual std::string generateTuple(common::Type &Ty);
+    virtual void generateStd();
 };
 }

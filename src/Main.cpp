@@ -14,7 +14,6 @@ void print_help(char *program_name)
     cout << "  --header-output  -ho <file>  Set header output file" << endl << endl;
 #ifdef CCPP
     cout << "  --c                          C backend" << endl;
-    cout << "  --cpp                        C++ backend" << endl;
     cout << "  --cpar                       Parallel C backend" << endl;
 #endif
 #ifdef CGNUASM
@@ -48,8 +47,6 @@ int main(int argc, char *argv[])
             return 0;
         }
 #ifdef CCPP
-        else if (Arg.compare("--cpp") == 0)
-            BE = Backend::CPP;
         else if (Arg.compare("--cpar") == 0)
             BE = Backend::CPAR;
         else if (Arg.compare("--c") == 0)

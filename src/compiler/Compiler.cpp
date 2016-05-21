@@ -10,9 +10,6 @@ Compiler::Compiler()
 void Compiler::setBackend(Backend BE) {
     switch (BE) {
 #ifdef CCPP
-    case Backend::CPP:
-        CodeGen = std::make_unique<codegen::CCodeGenOld>(*this);
-        break;
     case Backend::CPAR:
         CodeGen = std::make_unique<codegen::CParCodeGen>(*this);
         break;

@@ -22,18 +22,10 @@ compiler::Backend backend = compiler::Backend::PPRINTER;    // Standard compiler
 int main(int argc, char* argv[]){
 
     // Set the target compiler
-    if (strcmp(argv[1], "cnew") == 0) {    // Set compiler to c
+    if (strcmp(argv[1], "c") == 0) {    // Set compiler to c
 #ifdef CCPP
         cout << "Backend: C" << endl;
         backend = compiler::Backend::C;
-#else
-        cout << "Unsupported: C - Defaulting to Pretty Printer" << endl;
-#endif
-        // Set the target compiler
-    } else if (strcmp(argv[1], "c") == 0) {    // Set compiler to c
-#ifdef CCPP
-        cout << "Backend: C" << endl;
-        backend = compiler::Backend::CPP;
 #else
         cout << "Unsupported: C - Defaulting to Pretty Printer" << endl;
 #endif

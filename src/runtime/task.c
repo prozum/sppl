@@ -42,7 +42,6 @@ taskdealloc(task_t *t)
     if (t->sub_tasks_alloc) {
         free(t->sub_tasks);
     }
-	free(t->startarg);
 	free(t);
 }
 
@@ -100,6 +99,12 @@ taskyield(task_t *t)
 void
 taskexit(task_t *t)
 {
+	int i;
+
+	for (i = 0; i < t->sub_task_len; ++i) {
+		taskdealloc(t->sub_tasks[i]);
+	}
+
     t->state = DONE;
 	taskswitch(t);
 }

@@ -15,16 +15,10 @@ CCodeGen::CCodeGen(parser::Driver &Drv)
 }
 
 void CCodeGen::visit(common::Program &Node) {
-    Prog = &Node;
     CProg = new ctree::Program();
 
-    CProg->Directives.push_back(new Define("print", "printf"));
-
-    if (GCed) {
-        CProg->Directives.push_back(new Include("gc.h"));
-    }
-
     generateStd();
+    CProg->Directives.push_back(new Define("printfunc", "printf"));
 
     /* The main function of the C program will be build below.
      * For readablity, the code that the C tree will generate,
@@ -40,7 +34,7 @@ void CCodeGen::visit(common::Program &Node) {
      *         args = gadd_strlist(args, gctr_str(argv[i]));
      *     }
      *
-     *     umain(args);
+     *     umain.call(args);
      *     return 0;
      */
 
@@ -76,7 +70,7 @@ void CCodeGen::visit(common::Program &Node) {
     AddFunc->Args.push_back(StrCreate);
     ForBlock->Stmts.push_back(new ExprStmt(new BinOp("=", new Ident("args"), AddFunc)));
 
-    // umain(args);
+    // umain.call(args);
     auto UMainCall = new Call(new BinOp(".", new Ident(GUser + "main"), new Ident(GCall)));
     UMainCall->Args.push_back(new Ident("args"));
     MainBlock->Stmts.push_back(new ExprStmt(UMainCall));
@@ -98,11 +92,12 @@ void CCodeGen::visit(common::Function &Node) {
 
     CurrFunc = &Node;
 
+    // sig ufuncname = { gfuncname };
     auto Val = new ArrayLiteral();
     Val->Exprs.push_back(new Ident(GFunc + Node.Id));
     CProg->Globals.push_back(new Decl(getType(Node.Signature), new BinOp("=", new Ident(GUser + Node.Id), Val)));
 
-    // retype funcname(type_1 arg_1, type_2 arg_2, ... , type_n arg_n)
+    // retype gfuncname(type_1 arg_1, type_2 arg_2, ... , type_n arg_n)
     CurrBlock = new Block();
     auto Func = new ctree::Function(RetType, GFunc + Node.Id, CurrBlock);
     CProg->Functions.push_back(Func);
@@ -130,7 +125,7 @@ void CCodeGen::visit(common::Function &Node) {
     CurrBlock->Stmts.push_back(new ExprStmt(Exit));
 }
 
-void CCodeGen::visit(common::Case &Node) {
+void CCodeGen::visit(Case &Node) {
     vector<ctree::Expression*> Patterns;
 
     CurrBlock = new Block(CurrBlock);
@@ -142,7 +137,7 @@ void CCodeGen::visit(common::Case &Node) {
 
         Node.Patterns[i]->accept(*this);
 
-        if (LastExpr) {
+        if (LastExpr != nullptr) {
             Patterns.push_back(LastExpr);
         }
 
@@ -152,14 +147,14 @@ void CCodeGen::visit(common::Case &Node) {
     auto Compare = generateAndChain(Patterns);
 
     // if (pattern_1 && (pattern_2 && (... && pattern_n ...))
-    if (Compare) {
+    if (Compare != nullptr) {
         auto If = new IfElse(Compare, CurrBlock);
         CurrBlock->Parent->Stmts.push_back(If);
     } else {
         CurrBlock->Parent->Stmts.push_back(CurrBlock);
     }
 
-    if (Node.When) {
+    if (Node.When != nullptr) {
         CurrBlock = new Block(CurrBlock);
 
         Node.When->accept(*this);
@@ -203,78 +198,78 @@ void CCodeGen::visit(common::Case &Node) {
     }
 
     // Reset back to the old CurrBlock
-    if (Node.When) {
+    if (Node.When != nullptr) {
         CurrBlock = CurrBlock->Parent;
     }
 
     CurrBlock = CurrBlock->Parent;
 }
 
-void CCodeGen::visit(common::AlgebraicDT &Node) {
+void CCodeGen::visit(AlgebraicDT &Node) {
     throw runtime_error("Not implemented!");
 }
 
-void CCodeGen::visit(common::Product &Node) {
+void CCodeGen::visit(Product &Node) {
     throw runtime_error("Not implemented!");
 }
 
-void CCodeGen::visit(common::LambdaArg &Node) {
+void CCodeGen::visit(LambdaArg &Node) {
     throw runtime_error("Not implemented!");
 }
 
-void CCodeGen::visit(common::Or &Node) {
+void CCodeGen::visit(Or &Node) {
     LastExpr = visitBinOp(Node, "||");
 }
 
-void CCodeGen::visit(common::And &Node) {
+void CCodeGen::visit(And &Node) {
     LastExpr = visitBinOp(Node, "&&");
 }
 
-void CCodeGen::visit(common::Equal &Node) {
+void CCodeGen::visit(Equal &Node) {
     LastExpr = visitEqual(Node);
 }
 
-void CCodeGen::visit(common::NotEqual &Node) {
+void CCodeGen::visit(NotEqual &Node) {
     LastExpr = new UnOp("!", visitEqual(Node));
 }
 
-void CCodeGen::visit(common::Lesser &Node) {
+void CCodeGen::visit(Lesser &Node) {
     LastExpr = visitBinOp(Node, "<");
 }
 
-void CCodeGen::visit(common::Greater &Node) {
+void CCodeGen::visit(Greater &Node) {
     LastExpr = visitBinOp(Node, ">");
 }
 
-void CCodeGen::visit(common::LesserEq &Node) {
+void CCodeGen::visit(LesserEq &Node) {
     LastExpr = visitBinOp(Node, "<=");
 }
 
-void CCodeGen::visit(common::GreaterEq &Node) {
+void CCodeGen::visit(GreaterEq &Node) {
     LastExpr = visitBinOp(Node, ">=");
 }
 
-void CCodeGen::visit(common::Add &Node) {
+void CCodeGen::visit(Add &Node) {
     LastExpr = visitBinOp(Node, "+");
 }
 
-void CCodeGen::visit(common::Sub &Node) {
+void CCodeGen::visit(Sub &Node) {
     LastExpr = visitBinOp(Node, "-");
 }
 
-void CCodeGen::visit(common::Mul &Node) {
+void CCodeGen::visit(Mul &Node) {
     LastExpr = visitBinOp(Node, "*");
 }
 
-void CCodeGen::visit(common::Div &Node) {
+void CCodeGen::visit(Div &Node) {
     LastExpr = visitBinOp(Node, "/");
 }
 
-void CCodeGen::visit(common::Mod &Node) {
+void CCodeGen::visit(Mod &Node) {
     LastExpr = visitBinOp(Node, "%");
 }
 
-void CCodeGen::visit(common::ListAdd &Node) {
+void CCodeGen::visit(ListAdd &Node) {
     // gadd_list(right, left)
     auto Add = new Call(new Ident(GAdd + getName(Node.RetTy)));
 
@@ -286,11 +281,11 @@ void CCodeGen::visit(common::ListAdd &Node) {
     LastExpr = Add;
 }
 
-void CCodeGen::visit(common::ProducerConsumer &Node) {
+void CCodeGen::visit(ProducerConsumer &Node) {
     throw runtime_error("Not implemented!");
 }
 
-void CCodeGen::visit(common::Concat &Node) {
+void CCodeGen::visit(Concat &Node) {
     // gconcat_list(left, right)
     auto Concat = new Call(new Ident(GConcat + getName(Node.RetTy)));
 
@@ -302,11 +297,11 @@ void CCodeGen::visit(common::Concat &Node) {
     LastExpr = Concat;
 }
 
-void CCodeGen::visit(common::To &Node) {
+void CCodeGen::visit(To &Node) {
     throw runtime_error("Not implemented!");
 }
 
-void CCodeGen::visit(common::UnPrint &Node) {
+void CCodeGen::visit(UnPrint &Node) {
     Node.Child->accept(*this);
 
     Call* Print;
@@ -327,44 +322,44 @@ void CCodeGen::visit(common::UnPrint &Node) {
     LastExpr = Print;
 }
 
-void CCodeGen::visit(common::ParExpr &Node) {
+void CCodeGen::visit(ParExpr &Node) {
     Node.Child->accept(*this);
 }
 
-void CCodeGen::visit(common::Not &Node) {
+void CCodeGen::visit(Not &Node) {
     Node.Child->accept(*this);
     LastExpr = new UnOp("!", LastExpr);
 }
 
-void CCodeGen::visit(common::Negative &Node) {
+void CCodeGen::visit(Negative &Node) {
     Node.Child->accept(*this);
     LastExpr = new UnOp("-", LastExpr);
 }
 
-void CCodeGen::visit(common::DoExpr &Node) {
+void CCodeGen::visit(DoExpr &Node) {
     throw runtime_error("Not implemented!");
 }
 
-void CCodeGen::visit(common::Assosiate &Node) {
+void CCodeGen::visit(Assosiate &Node) {
     throw runtime_error("Not implemented!");
 }
 
-void CCodeGen::visit(common::LambdaFunction &Node) {
+void CCodeGen::visit(LambdaFunction &Node) {
     throw runtime_error("Not implemented!");
 }
 
-void CCodeGen::visit(common::IdPattern &Node) {
+void CCodeGen::visit(IdPattern &Node) {
     ctree::Expression* Right;
 
     if ((Node.RetTy.Id == TypeId::LIST ||
         Node.RetTy.Id == TypeId::STRING) &&
-        ListOffsets.back() == 0) {
+        ListOffsets.back() > 0) {
 
-        auto Call = new ctree::Call(new Ident(GAt + getName(Node.RetTy)));
-        Call->Args.push_back(PatternBuilder->clone());
-        Call->Args.push_back(new Int(ListOffsets.back()));
+        auto At = new Call(new Ident(GAt + getName(Node.RetTy)));
+        At->Args.push_back(PatternBuilder->clone());
+        At->Args.push_back(new Int(ListOffsets.back()));
 
-        Right = Call;
+        Right = At;
     } else {
         Right = PatternBuilder->clone();
     }
@@ -374,32 +369,32 @@ void CCodeGen::visit(common::IdPattern &Node) {
     LastExpr = nullptr;
 }
 
-void CCodeGen::visit(common::IntPattern &Node) {
+void CCodeGen::visit(IntPattern &Node) {
     LastExpr = new BinOp("==", PatternBuilder->clone(), new Int(Node.Val));
 }
 
-void CCodeGen::visit(common::FloatPattern &Node) {
+void CCodeGen::visit(FloatPattern &Node) {
     LastExpr = new BinOp("==", PatternBuilder->clone(), new Float(Node.Val));
 }
 
-void CCodeGen::visit(common::CharPattern &Node) {
+void CCodeGen::visit(CharPattern &Node) {
     LastExpr = new BinOp("==", PatternBuilder->clone(), new Char("" + Node.Val));
 }
 
-void CCodeGen::visit(common::BoolPattern &Node) {
+void CCodeGen::visit(BoolPattern &Node) {
     LastExpr = new BinOp("==", PatternBuilder->clone(), new Int(Node.Val));
 }
 
-void CCodeGen::visit(common::StringPattern &Node) {
-    auto Call = new ctree::Call(new Ident(GCompare + GString));
-    Call->Args.push_back(PatternBuilder->clone());
-    Call->Args.push_back(new String(Node.str()));
-    Call->Args.push_back(new Int(ListOffsets.back()));
+void CCodeGen::visit(StringPattern &Node) {
+    auto Compare = new Call(new Ident(GCompare + GString));
+    Compare->Args.push_back(PatternBuilder->clone());
+    Compare->Args.push_back(new String(Node.str()));
+    Compare->Args.push_back(new Int(ListOffsets.back()));
 
-    LastExpr = Call;
+    LastExpr = Compare;
 }
 
-void CCodeGen::visit(common::ListPattern &Node) {
+void CCodeGen::visit(ListPattern &Node) {
     vector<ctree::Expression*> Patterns;
     string TypeName = getName(Node.RetTy);
 
@@ -440,7 +435,7 @@ void CCodeGen::visit(common::ListPattern &Node) {
         delete PatternBuilder;
         PatternBuilder = OldPatternBuilder;
 
-        if (LastExpr) {
+        if (LastExpr != nullptr) {
             Patterns.push_back(LastExpr);
         }
     }
@@ -448,7 +443,7 @@ void CCodeGen::visit(common::ListPattern &Node) {
     LastExpr = generateAndChain(Patterns);
 }
 
-void CCodeGen::visit(common::TuplePattern &Node) {
+void CCodeGen::visit(TuplePattern &Node) {
     vector<ctree::Expression*> Patterns;
 
     for (size_t i = 0; i < Node.Patterns.size(); ++i) {
@@ -464,7 +459,7 @@ void CCodeGen::visit(common::TuplePattern &Node) {
         delete PatternBuilder;
         PatternBuilder = OldPatternBuilder;
 
-        if (LastExpr) {
+        if (LastExpr != nullptr) {
             Patterns.push_back(LastExpr);
         }
     }
@@ -472,7 +467,7 @@ void CCodeGen::visit(common::TuplePattern &Node) {
     LastExpr = generateAndChain(Patterns);
 }
 
-void CCodeGen::visit(common::ListSplit &Node) {
+void CCodeGen::visit(ListSplit &Node) {
     vector<ctree::Expression*> Patterns;
     string TypeName = getName(Node.RetTy);
     auto OldPatternBuilder = PatternBuilder;
@@ -500,7 +495,7 @@ void CCodeGen::visit(common::ListSplit &Node) {
     delete PatternBuilder;
     PatternBuilder = OldPatternBuilder;
 
-    if (LastExpr) {
+    if (LastExpr != nullptr) {
         Patterns.push_back(LastExpr);
     }
 
@@ -508,7 +503,7 @@ void CCodeGen::visit(common::ListSplit &Node) {
     Node.Right->accept(*this);
     ListOffsets.back()--;
 
-    if (LastExpr) {
+    if (LastExpr != nullptr) {
         Patterns.push_back(LastExpr);
     }
 
@@ -521,51 +516,49 @@ void CCodeGen::visit(common::ListSplit &Node) {
     }
 }
 
-void CCodeGen::visit(common::WildPattern &Node) {
+void CCodeGen::visit(WildPattern &Node) {
     LastExpr = nullptr;
 }
 
-void CCodeGen::visit(common::AlgebraicPattern &Node) {
+void CCodeGen::visit(AlgebraicPattern &Node) {
     throw runtime_error("Not implemented!");
 }
 
-void CCodeGen::visit(common::ParPattern &Node) {
+void CCodeGen::visit(ParPattern &Node) {
     Node.Pat->accept(*this);
 }
 
-void CCodeGen::visit(common::IdExpr &Node) {
+void CCodeGen::visit(IdExpr &Node) {
     LastExpr = new Ident(GUser + Node.Val);
 }
 
-void CCodeGen::visit(common::IntExpr &Node) {
+void CCodeGen::visit(IntExpr &Node) {
     LastExpr = new Int(Node.Val);
 }
 
-void CCodeGen::visit(common::FloatExpr &Node) {
+void CCodeGen::visit(FloatExpr &Node) {
     LastExpr = new Float(Node.Val);
 }
 
-void CCodeGen::visit(common::CharExpr &Node) {
-    stringstream ss;
-    string s;
-    ss << Node.Val;
-    ss >> s;
+void CCodeGen::visit(CharExpr &Node) {
+    char Chars[] = { Node.Val, '\0' };
+    string s = string(Chars);
 
     LastExpr = new Char(s);
 }
 
-void CCodeGen::visit(common::BoolExpr &Node) {
+void CCodeGen::visit(BoolExpr &Node) {
     LastExpr = new Int(Node.Val);
 }
 
-void CCodeGen::visit(common::StringExpr &Node) {
+void CCodeGen::visit(StringExpr &Node) {
     auto Create = new Call(new Ident(GCreate + GString));
     Create->Args.push_back(new String(Node.Val));
 
     LastExpr = Create;
 }
 
-void CCodeGen::visit(common::ListExpr &Node) {
+void CCodeGen::visit(ListExpr &Node) {
     auto Create = new Call(new Ident(GCreate + getName(Node.RetTy)));
     Create->Args.push_back(new Int(Node.Elements.size()));
 
@@ -577,7 +570,7 @@ void CCodeGen::visit(common::ListExpr &Node) {
     LastExpr = Create;
 }
 
-void CCodeGen::visit(common::TupleExpr &Node) {
+void CCodeGen::visit(TupleExpr &Node) {
     auto Create = new Call(new Ident(GCreate + getName(Node.RetTy)));
 
     for (auto &Expr: Node.Elements) {
@@ -588,23 +581,23 @@ void CCodeGen::visit(common::TupleExpr &Node) {
     LastExpr = Create;
 }
 
-void CCodeGen::visit(common::CallExpr &Node) {
+void CCodeGen::visit(CallExpr &Node) {
     Node.Callee->accept(*this);
-    auto Call = new ctree::Call(new BinOp(".", LastExpr, new Ident(GCall)));
+    auto CallFunc = new Call(new BinOp(".", LastExpr, new Ident(GCall)));
 
     for (auto &Expr: Node.Args) {
         Expr->accept(*this);
-        Call->Args.push_back(LastExpr);
+        CallFunc->Args.push_back(LastExpr);
     }
 
-    LastExpr = Call;
+    LastExpr = CallFunc;
 }
 
-void CCodeGen::visit(common::AlgebraicExpr &Node) {
+void CCodeGen::visit(AlgebraicExpr &Node) {
     throw runtime_error("Not implemented!");
 }
 
-ctree::Expression* CCodeGen::visitBinOp(common::BinaryOp& Op, std::string OpStr) {
+ctree::Expression* CCodeGen::visitBinOp(BinaryOp& Op, string OpStr) {
     ctree::Expression* Left;
     ctree::Expression* Right;
 
@@ -616,20 +609,20 @@ ctree::Expression* CCodeGen::visitBinOp(common::BinaryOp& Op, std::string OpStr)
     return new BinOp(OpStr, Left, Right);
 }
 
-ctree::Expression* CCodeGen::visitEqual(common::BinaryOp& Equal) {
+ctree::Expression* CCodeGen::visitEqual(BinaryOp& Equal) {
     auto &Ty = Equal.Left->RetTy;
 
     switch (Ty.Id) {
         case TypeId::TUPLE:
         case TypeId::LIST:
         case TypeId::STRING: {
-            auto Call = new ctree::Call(new Ident(GCompare + getName(Ty)));
+            auto Compare = new Call(new Ident(GCompare + getName(Ty)));
             Equal.Left->accept(*this);
-            Call->Args.push_back(LastExpr);
+            Compare->Args.push_back(LastExpr);
             Equal.Right->accept(*this);
-            Call->Args.push_back(LastExpr);
+            Compare->Args.push_back(LastExpr);
 
-            return Call;
+            return Compare;
         }
         default: {
             ctree::Expression* CLeft;
@@ -645,7 +638,7 @@ ctree::Expression* CCodeGen::visitEqual(common::BinaryOp& Equal) {
     }
 }
 
-ctree::Expression* CCodeGen::generateAndChain(std::vector<ctree::Expression*>& Exprs) {
+ctree::Expression* CCodeGen::generateAndChain(vector<ctree::Expression*>& Exprs) {
     if (Exprs.size() == 0) {
         return nullptr;
     } else if (Exprs.size() == 1) {
@@ -671,7 +664,7 @@ ctree::Expression* CCodeGen::generateAndChain(std::vector<ctree::Expression*>& E
     }
 }
 
-std::string CCodeGen::getType(common::Type &Ty) {
+string CCodeGen::getType(Type &Ty) {
     switch (Ty.Id) {
         case TypeId::FLOAT:
             return GFloatType;
@@ -695,7 +688,7 @@ std::string CCodeGen::getType(common::Type &Ty) {
     }
 }
 
-std::string CCodeGen::getName(common::Type &Ty) {
+string CCodeGen::getName(Type &Ty) {
     switch (Ty.Id) {
         case TypeId::FLOAT:
             return GFloatName;
@@ -718,7 +711,7 @@ std::string CCodeGen::getName(common::Type &Ty) {
     }
 }
 
-std::string CCodeGen::getOrGen(common::Type &Ty) {
+string CCodeGen::getOrGen(Type &Ty) {
     auto Got = GenTypes.find(Ty);
 
     if (Got != GenTypes.end()) {
@@ -798,7 +791,7 @@ string CCodeGen::generateList(Type &Ty) {
     FuncBlock->Stmts.push_back(new Decl(Type, new BinOp("=", new Ident("res"), AllocRes)));
 
     // res->length = 0;
-    auto GetLengthRes = new BinOp("->", new Ident("res"), new Ident(GNext));
+    auto GetLengthRes = new BinOp("->", new Ident("res"), new Ident(GLength));
     FuncBlock->Stmts.push_back(new ExprStmt(new BinOp("=", GetLengthRes, new Int(0))));
 
     // res->next = NULL;
@@ -1097,7 +1090,7 @@ string CCodeGen::generateList(Type &Ty) {
      *     }
      *
      *     print("]");
-     *     retrun res;
+     *     return res;
      * }
      * */
 
@@ -1153,7 +1146,7 @@ string CCodeGen::generateList(Type &Ty) {
     FuncBlock->Stmts.push_back(new ExprStmt(Print));
 
     // list* res = l;
-    FuncBlock->Stmts.push_back(new Return(new Ident("l")));
+    FuncBlock->Stmts.push_back(new Return(new Ident("res")));
 
     return Name;
 }
