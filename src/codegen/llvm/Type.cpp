@@ -169,4 +169,17 @@ common::Type LLVMCodeGen::getFuncType(FunctionType *FuncTy)
     return Res;
 }
 
+common::Type LLVMCodeGen::getFuncType(GlobalVariable *FuncRunTy)
+{
+    common::Type Res(TypeId::SIGNATURE);
 
+    /*
+    auto Subtypes = FuncRunTy->subtypes();
+    for (size_t i = 1; i != Subtypes.size(); ++i) {
+        Res.Subtypes.push_back(getType(Subtypes[i]));
+    }
+    Res.Subtypes.push_back(getType(FuncTy->getReturnType()));
+
+    return Res;
+     */
+}

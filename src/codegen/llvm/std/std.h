@@ -4,9 +4,7 @@
 #include "stdlib.h"
 #include "stdint.h"
 
-//#define PUBLIC __attribute__((visibility("default")))
-//#define PRIVATE __attribute__((visibility("hidden")))
-#define SPPL_DECL __attribute__((annotate("sppl_decl")))
+#define SPPL_DECL(type) __attribute__((annotate(#type)))
 
 #define ALLOC malloc
 

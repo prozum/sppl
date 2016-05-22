@@ -32,7 +32,7 @@ void LLVMCodeGen::initStdLib() {
         assert(ModuleStd && "Standard Library could not be parsed");
 
 
-        // Get annotations
+        // Get SPPL_DECL annotations
         auto Annos = ModuleStd->getNamedGlobal("llvm.global.annotations");
         if (Annos) {
             auto Struct1 = static_cast<ConstantArray *>(Annos->getOperand(0));
@@ -41,7 +41,9 @@ void LLVMCodeGen::initStdLib() {
                 if (auto Func = static_cast<llvm::Function *>(Struct2->getOperand(0)->getOperand(0))) {
                     auto Anno = cast<ConstantDataArray>(
                             cast<GlobalVariable>(Struct2->getOperand(1)->getOperand(0))->getOperand(0))->getAsCString();
-                    Func->addFnAttr(Anno);
+                    Func->addFnAttr(SPPL_DECL);
+                    auto FuncRunType = ModuleStd->getNamedValue(Anno);
+                    //StdFuncs[Func->getName()] = getFuncType(FuncRunType);
                 }
             }
         }
@@ -49,7 +51,7 @@ void LLVMCodeGen::initStdLib() {
 
     // Load standard library function signatures
     for (auto &Func: ModuleStd->functions()) {
-        addStdFunc(Func.getName(), Func.getFunctionType(), Func.hasFnAttribute("sppl_decl"));
+        addStdFunc(Func.getName(), Func.getFunctionType(), Func.hasFnAttribute(SPPL_DECL));
     }
 
     // Load standard library types

@@ -31,6 +31,7 @@
 
 namespace codegen {
 
+#define SPPL_DECL "sppl_decl"
 
 class LLVMCodeGen : public parser::CodeGenerator {
   public:
@@ -214,6 +215,7 @@ private:
     // SPPL type methods
     common::Type getType(llvm::Type *Ty);
     common::Type getFuncType(llvm::FunctionType *FuncTy);
+    common::Type getFuncType(llvm::GlobalVariable *FuncRunTy);
 
     // Prefix methods
     void addPrefix(std::string Prefix, bool Numbered = true);
