@@ -88,7 +88,7 @@ void LLVMCodeGen::visit(common::Function &Node) {
 
     // Verify function and get error
     if (verifyFunction(*CurFunc, &MsgOut)) {
-        addError(Error("LLVM Error:\n" + ModuleString()));
+        addError(Error("LLVM Error:\n" + moduleString()));
         if (!Drv.Silent)
             MsgOut.flush();
     }

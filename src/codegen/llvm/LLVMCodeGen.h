@@ -71,7 +71,7 @@ class LLVMCodeGen : public parser::CodeGenerator {
     std::unique_ptr<llvm::Module> getStdModule();
 
     // Get IR string method
-    std::string ModuleString();
+    std::string moduleString();
 
     // Initialize LLVM to target running machine
     static void initLLVM() {
@@ -185,6 +185,7 @@ private:
     void visit(common::CallExpr &Node);
     void visit(common::ParExpr &Node);
 
+    void setupOptimization();
     void createModule();
 
     // Standard library methods

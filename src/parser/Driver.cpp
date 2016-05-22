@@ -28,7 +28,7 @@ bool Driver::nextInput() {
 }
 
 void Driver::setOptimizationLevel(int OL) {
-    OptimizationLevel = OL;
+    OptLevel = OL;
 }
 
 void Driver::setOutput(string Filename) {
