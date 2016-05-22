@@ -27,6 +27,10 @@ bool Driver::nextInput() {
     return false;
 }
 
+void Driver::setOptimizationLevel(int OL) {
+    OptimizationLevel = OL;
+}
+
 void Driver::setOutput(string Filename) {
     FOut = ofstream(Filename);
     OutFile = Filename;

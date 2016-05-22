@@ -34,6 +34,7 @@ int main(int argc, char *argv[])
     vector<string> Inputs;
     string Output("a.out");
     string HeaderOutput("a.h");
+    int OptimizationLevel = 0;
 
     if (argc == 1) {
         print_help(argv[0]);
@@ -80,10 +81,17 @@ int main(int argc, char *argv[])
                 cerr << "No output header specified" << endl;
                 return 3;
             }
+        else if (Arg.compare("--optimizaton-level") == 0 || Arg.compare(0, 3,"-ol") == 0)
+            if (i < argc - 1 && strlen(argv[i+1]) == 1 && isdigit(argv[i+1][0])) {
+                OptimizationLevel = stoi(argv[++i]);
+            } else {
+                cerr << "No valid optimization level specified" << endl;
+                return 4;
+            }
         else if (Arg.compare(0, 2, "--") == 0) {
             cerr << "No such option: " << Arg << endl;
             cerr << "For help use --help" << endl;
-            return 4;
+            return 5;
         }
         else {
             Inputs.push_back(Arg);
@@ -100,6 +108,7 @@ int main(int argc, char *argv[])
     compiler.setOutput(Output);
     compiler.setHeaderOutput(HeaderOutput);
     compiler.setBackend(BE);
+    compiler.setOptimizationLevel(OptimizationLevel);
 
     return compiler.compile(Inputs);
 }
