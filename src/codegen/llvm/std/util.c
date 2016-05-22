@@ -1,4 +1,5 @@
 #include "util.h"
+#include "string.h"
 
 list_t *_str_to_list(char *str) {
     list_t *snode = 0;
