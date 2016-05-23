@@ -24,7 +24,7 @@ void codegen::CParCodeGen::visit(common::Program &Node) {
         }
     }
 
-    if (!Main) {
+    if (Main == nullptr) {
         addError(Error("No main function"));
         return;
     }
@@ -203,7 +203,7 @@ void codegen::CParCodeGen::visit(common::Function &Node) {
     CurrBlock->Stmts.push_back(new ExprStmt(Exit));
 }
 
-void codegen::CParCodeGen::visit(common::Case &Node) {
+void codegen::CParCodeGen::visit(Case &Node) {
     vector<ctree::Expression*> Patterns;
 
     CurrBlock = new Block(CurrBlock);
@@ -215,7 +215,7 @@ void codegen::CParCodeGen::visit(common::Case &Node) {
 
         Node.Patterns[i]->accept(*this);
 
-        if (LastExpr) {
+        if (LastExpr != nullptr) {
             Patterns.push_back(LastExpr);
         }
 
@@ -225,14 +225,14 @@ void codegen::CParCodeGen::visit(common::Case &Node) {
     auto Compare = generateAndChain(Patterns);
 
     // if (pattern_1 && (pattern_2 && (... && pattern_n ...))
-    if (Compare) {
+    if (Compare != nullptr) {
         auto If = new IfElse(Compare, CurrBlock);
         CurrBlock->Parent->Stmts.push_back(If);
     } else {
         CurrBlock->Parent->Stmts.push_back(CurrBlock);
     }
 
-    if (Node.When) {
+    if (Node.When != nullptr) {
         Node.When->accept(*this);
 
         if (GenerateParallel) {
@@ -294,14 +294,14 @@ void codegen::CParCodeGen::visit(common::Case &Node) {
     }
 
     // Reset back to the old CurrBlock
-    if (Node.When) {
+    if (Node.When != nullptr) {
         CurrBlock = CurrBlock->Parent;
     }
 
     CurrBlock = CurrBlock->Parent;
 }
 
-void codegen::CParCodeGen::visit(common::CallExpr &Node) {
+void codegen::CParCodeGen::visit(CallExpr &Node) {
     string TaskName = GTask + to_string(TaskCount++);
 
     if (GenerateParallel) {
@@ -362,7 +362,7 @@ void codegen::CParCodeGen::visit(common::CallExpr &Node) {
     }
 }
 
-std::string codegen::CParCodeGen::generateSignature(common::Type &Ty) {
+string codegen::CParCodeGen::generateSignature(Type &Ty) {
     auto &SubTypes = Ty.Subtypes;
     string Name = GSignature + to_string(SigCount++);
     string Type = Name;
@@ -478,11 +478,11 @@ void codegen::CParCodeGen::generateStd() {
     CCodeGen::generateStd();
 }
 
-std::string codegen::CParCodeGen::getArgType(common::Type &Ty) {
+string codegen::CParCodeGen::getArgType(Type &Ty) {
     return getArgName(Ty) + "*";
 }
 
-std::string codegen::CParCodeGen::getArgName(common::Type &Ty) {
+string codegen::CParCodeGen::getArgName(Type &Ty) {
     return getName(Ty) + GArg;
 }
 

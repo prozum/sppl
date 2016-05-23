@@ -15,25 +15,28 @@ LLVMCodeGen::LLVMCodeGen(parser::Driver &Drv)
     Machine = std::unique_ptr<TargetMachine>(EngineBuilder().selectTarget());
     DataLayout = std::make_unique<llvm::DataLayout>(Machine->createDataLayout());
 
-    // Add optimization passes
-    PassMgr = std::make_unique<legacy::PassManager>();
-    PassMgr->add(createTailCallEliminationPass());
-    PassMgr->add(createInstructionCombiningPass());
-    PassMgr->add(createReassociatePass());
-    PassMgr->add(createGVNPass());
-    PassMgr->add(createCFGSimplificationPass());
-
     // Initialize types and standard library
     initTypes();
     initStdLib();
 }
 
+void LLVMCodeGen::setupOptimization() {
+    PassMgr = std::make_unique<legacy::PassManager>();
+    if (Drv.OptLevel >= 1) {
+        PassMgr->add(createTailCallEliminationPass());
+        PassMgr->add(createInstructionCombiningPass());
+        PassMgr->add(createReassociatePass());
+        PassMgr->add(createGVNPass());
+        PassMgr->add(createCFGSimplificationPass());
+    }
+}
+
 void LLVMCodeGen::createModule() {
     Module = std::make_unique<llvm::Module>("Module", Ctx);
-    //Module->setDataLayout(Machine->createDataLayout());
+    setTriple();
 
-    InternFuncDecls.clear();
-    RuntimeTypes.clear();
+    StdFuncDecls.clear();
+    RunTypes.clear();
 }
 
 void LLVMCodeGen::visit(common::Program &node) {
@@ -53,13 +56,14 @@ void LLVMCodeGen::visit(common::Program &node) {
         *Drv.MOut << "#-----------------------------------------------------------------"
                 "-------------#"
         << endl;
-        *Drv.MOut << ModuleString();
+        *Drv.MOut << moduleString();
     }
 
     // Run optimizations
+    setupOptimization();
     PassMgr->run(*Module);
 
-    if (!Drv.Silent) {
+    if (!Drv.Silent && Drv.OptLevel > 0) {
         *Drv.MOut << "#-----------------------------------------------------------------"
                 "-------------#"
         << endl;
@@ -69,7 +73,7 @@ void LLVMCodeGen::visit(common::Program &node) {
         *Drv.MOut << "#-----------------------------------------------------------------"
                 "-------------#"
         << endl;
-        *Drv.MOut << ModuleString();
+        *Drv.MOut << moduleString();
     }
 
     // Don't output anything with JIT
@@ -81,14 +85,14 @@ void LLVMCodeGen::visit(common::Program &node) {
     raw_os_ostream RawHOut(*Drv.HOut);
     if (Drv.Binary) {
         WriteBitcodeToFile(Module.get(), RawOut);
-        WriteBitcodeToFile(ModuleHeader.get(), RawHOut);
+        WriteBitcodeToFile(getStdLib(), RawHOut);
     } else {
         RawOut << *Module;
-        RawHOut << *ModuleHeader;
+        RawHOut << *getStdLib();
     }
 }
 
-string LLVMCodeGen::ModuleString() {
+string LLVMCodeGen::moduleString() {
     string ModuleStr;
     raw_string_ostream Out(ModuleStr);
     Out << *Module.get();

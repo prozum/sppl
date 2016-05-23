@@ -5,22 +5,22 @@ using namespace codegen;
 using namespace std;
 
 void LLVMCodeGen::visit(common::FloatPattern &Node) {
-    auto PatVal = ConstantFP::get(getType(Node.RetTy), Node.Val);
+    auto PatVal = ConstantFP::get(getLLVMType(Node.RetTy), Node.Val);
     CurVal = Builder.CreateFCmpONE(PatVal, CurVal, "cmptmp");
 }
 
 void LLVMCodeGen::visit(common::IntPattern &Node) {
-    auto PatVal = ConstantInt::get(getType(Node.RetTy), (uint64_t)Node.Val);
+    auto PatVal = ConstantInt::get(getLLVMType(Node.RetTy), (uint64_t)Node.Val);
     CurVal = Builder.CreateICmpEQ(PatVal, CurVal, "cmptmp");
 }
 
 void LLVMCodeGen::visit(common::BoolPattern &Node) {
-    auto PatVal = ConstantInt::get(getType(Node.RetTy), (uint64_t)Node.Val);
+    auto PatVal = ConstantInt::get(getLLVMType(Node.RetTy), (uint64_t)Node.Val);
     CurVal = Builder.CreateICmpEQ(PatVal, CurVal, "cmptmp");
 }
 
 void LLVMCodeGen::visit(common::CharPattern &Node) {
-    auto PatVal = ConstantInt::get(getType(Node.RetTy), (uint64_t)Node.Val);
+    auto PatVal = ConstantInt::get(getLLVMType(Node.RetTy), (uint64_t)Node.Val);
     CurVal = Builder.CreateICmpEQ(PatVal, CurVal, "cmptmp");
 }
 

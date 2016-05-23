@@ -5,28 +5,35 @@ using namespace codegen;
 using namespace llvm;
 
 void LLVMCodeGen::visit(common::FloatExpr &Node) {
-    CurVal = ConstantFP::get(getType(Node.RetTy), Node.Val);
+    CurVal = ConstantFP::get(getLLVMType(Node.RetTy), Node.Val);
 }
 
 void LLVMCodeGen::visit(common::IntExpr &Node) {
-    CurVal = ConstantInt::get(getType(Node.RetTy), (uint64_t)Node.Val);
+    CurVal = ConstantInt::get(getLLVMType(Node.RetTy), (uint64_t)Node.Val);
 }
 
 void LLVMCodeGen::visit(common::BoolExpr &Node) {
-    CurVal = ConstantInt::get(getType(Node.RetTy), (uint64_t)Node.Val);
+    CurVal = ConstantInt::get(getLLVMType(Node.RetTy), (uint64_t)Node.Val);
 }
 
 void LLVMCodeGen::visit(common::StringExpr &Node) {
-    Value *ListNode = nullptr;
+    Value *NextListNode = nullptr;
+
+    if (Concat) {
+        NextListNode = CurVal;
+        Concat = false;
+    }
+
     for (auto Char = Node.Val.rbegin(); Char < Node.Val.rend(); ++Char) {
         CurVal = ConstantInt::get(Int, (uint64_t)*Char);
-        ListNode = createListNode(Node.RetTy, CurVal, ListNode, Builder.GetInsertBlock(), true);
+        NextListNode = createListNode(Node.RetTy, CurVal, NextListNode, Builder.GetInsertBlock(), true);
     }
-    CurVal = ListNode;
+
+    CurVal = NextListNode;
 }
 
 void LLVMCodeGen::visit(common::CharExpr &Node) {
-    CurVal = ConstantInt::get(getType(Node.RetTy), (uint64_t)Node.Val);
+    CurVal = ConstantInt::get(getLLVMType(Node.RetTy), (uint64_t)Node.Val);
 }
 
 void LLVMCodeGen::visit(common::IdExpr &Node) {
@@ -42,7 +49,7 @@ void LLVMCodeGen::visit(common::IdExpr &Node) {
 
     // External function
     if (Drv.Global.Decls.count(Node.Val))
-        CurVal = llvm::Function::Create(getFuncType(Drv.Global.Decls[Node.Val]),
+        CurVal = llvm::Function::Create(getLLVMFuncType(Drv.Global.Decls[Node.Val]),
                                         llvm::Function::ExternalLinkage,
                                         Node.Val, Module.get());
     if (CurVal)
@@ -56,8 +63,8 @@ void LLVMCodeGen::visit(common::ParExpr &Node) {
 }
 
 void LLVMCodeGen::visit(common::TupleExpr &Node) {
-    auto TupleType = getTupleType(Node.RetTy);
-    auto TuplePtrType = getType(Node.RetTy);
+    auto TupleType = getLLVMTupleType(Node.RetTy);
+    auto TuplePtrType = getLLVMType(Node.RetTy);
 
     if (Node.Const) {
         std::vector<llvm::Constant *> TupleVal;
@@ -86,19 +93,24 @@ void LLVMCodeGen::visit(common::TupleExpr &Node) {
 }
 
 void LLVMCodeGen::visit(common::ListExpr &Node) {
-    Value *ListNode = nullptr;
-    for (auto Element = Node.Elements.rbegin(); Element < Node.Elements.rend(); ++Element) {
-        (*Element)->accept(*this);
-        ListNode = createListNode(Node.RetTy, CurVal, ListNode, Builder.GetInsertBlock(), Node.Const);
+    Value *NextListNode = nullptr;
+
+    if (Concat) {
+        NextListNode = CurVal;
+        Concat = false;
     }
 
-    if (!ListNode)
-        ListNode = ConstantPointerNull::get(static_cast<PointerType *>(getType(Node.RetTy)));
+    for (auto Element = Node.Elements.rbegin(); Element < Node.Elements.rend(); ++Element) {
+        (*Element)->accept(*this);
+        NextListNode = createListNode(Node.RetTy, CurVal, NextListNode, Builder.GetInsertBlock(), Node.Const);
+    }
 
-    CurVal = ListNode;
+    // Empty list
+    if (!NextListNode)
+        NextListNode = ConstantPointerNull::get(PointerType::getUnqual(getLLVMListType(Node.RetTy)));
+
+    CurVal = NextListNode;
 }
-
-
 
 void LLVMCodeGen::visit(common::CallExpr &Node) {
     Node.Callee->accept(*this);
@@ -119,15 +131,7 @@ void LLVMCodeGen::visit(common::CallExpr &Node) {
     CurVal = Call;
 }
 
-void LLVMCodeGen::visit(common::ListAdd &Node) {
-    Node.Left->accept(*this);
-    auto Element = CurVal;
 
-    Node.Right->accept(*this);
-    auto List = CurVal;
-
-    CurVal = createListNode(Node.RetTy, Element, List, Builder.GetInsertBlock(), Node.Left->Const && Node.Right->Const);
-}
 
 void LLVMCodeGen::visit(common::DoExpr &Node) {
     for (auto &Expr : Node.Exprs) {

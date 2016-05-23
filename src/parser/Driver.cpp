@@ -27,6 +27,10 @@ bool Driver::nextInput() {
     return false;
 }
 
+void Driver::setOptimizationLevel(int OL) {
+    OptLevel = OL;
+}
+
 void Driver::setOutput(string Filename) {
     FOut = ofstream(Filename);
     OutFile = Filename;
@@ -102,7 +106,7 @@ void Driver::error(const common::Location &Loc, const std::string &Msg) {
 void Driver::error(const std::string &Msg) { showError(Error(Msg)); }
 
 void Driver::showError(Error Err) {
-    if (!Silent)
+    if (!Silent or JIT)
         *MOut << Err << endl;
 }
 

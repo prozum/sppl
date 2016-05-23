@@ -12,10 +12,12 @@ SpplJit::SpplJit()
 
     sys::DynamicLibrary::LoadLibraryPermanently(nullptr);
 
-    addModule(move(CodeGen.ModuleHeader));
+    // Add standard library to JIT
+    addModule(CodeGen.getStdModule());
 
     // Set Driver to JIT mode
     Drv.JIT = true;
+    Drv.Silent = false;
 }
 
 SpplJit::ModuleHandleT SpplJit::addModule(unique_ptr<Module> M) {
@@ -71,7 +73,7 @@ string SpplJit::getOutput(OutputData Data, common::Type Ty) {
     case TypeId::INT:
         return to_string(Data.Int);
     case TypeId::FLOAT:
-        return to_string(*Data.Float);
+        return to_string(Data.Float);
     case TypeId::CHAR:
         return "'" + string(1, Data.Char) + "'";
     case TypeId::STRING:

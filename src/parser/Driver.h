@@ -44,6 +44,7 @@ class Driver {
     bool Binary = false;
     bool JIT = false;
     bool Silent = false;
+    int OptLevel = 0;
     std::string OutFile;
     std::string HOutFile;
 
@@ -58,7 +59,6 @@ class Driver {
     std::ofstream FOut;
     std::ofstream FHOut;
 
-
     // Trace options
     bool TraceScanning = false;
     bool TraceParsing = false;
@@ -67,6 +67,9 @@ class Driver {
     void setOutput(std::string Filename);
     void setHeaderOutput(std::string Filename);
     bool nextInput();
+
+    // Optimization support
+    void setOptimizationLevel(int OL);
 
     // Parse methods
     bool parseStream(std::istream &In, const std::string &Src = "stream");
