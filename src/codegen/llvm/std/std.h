@@ -4,7 +4,7 @@
 #include "stdlib.h"
 #include "stdint.h"
 
-#define SPPL_DECL(type) __attribute__((annotate(#type)))
+#define SPPL_DECL __attribute__((annotate("sppl_decl")))
 
 #define ALLOC malloc
 

@@ -116,9 +116,9 @@ void LLVMCodeGen::visit(Or &Node) {
 }
 
 void LLVMCodeGen::visit(Equal &Node) {
-    // TODO
-    //assert((Node.Left->RetTy.Id == TypeId::FLOAT && Node.Right->RetTy.Id == TypeId::FLOAT) ||
-    //       (Node.Left->RetTy.Id == TypeId::INT && Node.Right->RetTy.Id == TypeId::INT));
+    // TODO: Const
+    if (Node.Left->Const && Node.Right->Const) {
+    }
 
     Node.Left->accept(*this);
     auto Left = CurVal;
@@ -136,18 +136,8 @@ void LLVMCodeGen::visit(Equal &Node) {
 }
 
 void LLVMCodeGen::visit(NotEqual &Node) {
-    // TODO
-    //assert((Node.Left->RetTy.Id == TypeId::FLOAT && Node.Right->RetTy.Id == TypeId::FLOAT) ||
-    //       (Node.Left->RetTy.Id == TypeId::INT && Node.Right->RetTy.Id == TypeId::INT));
-
+    // TODO: Const
     if (Node.Left->Const && Node.Right->Const) {
-
-        /*
-        Node.Left->accept(*this);
-        auto Left = static_cast<Constant *>(CurVal);
-        Node.Right->accept(*this);
-        auto Right = static_cast<Constant *>(CurVal);
-         */
     }
 
     Node.Left->accept(*this);
