@@ -43,7 +43,7 @@ class Driver {
     // Out options
     bool Binary = false;
     bool JIT = false;
-    bool Silent = false;
+    bool Silent = true;
     int OptLevel = 0;
     std::string OutFile;
     std::string HOutFile;

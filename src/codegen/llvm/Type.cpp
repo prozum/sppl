@@ -152,7 +152,6 @@ common::Type LLVMCodeGen::getType(llvm::Type *Ty) {
     if (Ty->isFunctionTy())
         return getFuncType(static_cast<FunctionType *>(Ty));
 
-    Ty->dump();
     assert(0);
 }
 
