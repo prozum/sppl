@@ -58,7 +58,6 @@ void LLVMCodeGen::createPrint(Value *Data, common::Type Ty) {
 
     auto UnionArgGEP = Builder.CreateStructGEP(UnionType, UnionAlloca, 0);
     auto UnionArgCast = Builder.CreateBitCast(UnionArgGEP, PointerType::getUnqual(UnionType));
-    //auto UnionArgLoad = Builder.CreateLoad(UnionType, UnionArgCast);
 
     auto TyArg = getRuntimeType(Ty);
     auto TyArgCast = Builder.CreateBitCast(TyArg, PointerType::getUnqual(RunType));

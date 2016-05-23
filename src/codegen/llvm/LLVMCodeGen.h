@@ -195,8 +195,6 @@ private:
     void addStdFunc(std::string FuncName, common::Type Ty, bool Decl = false);
     void addStdFunc(std::string FuncName, llvm::FunctionType *Ty, bool Decl = false);
     llvm::Function *getStdFunc(std::string FuncName);
-    void createArgFunc();
-    void createPrintFunc();
 
     // Utility methods
     llvm::Value *createListNode(common::Type Type, llvm::Value *Data, llvm::Value *NextNode, llvm::BasicBlock *Block,

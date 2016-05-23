@@ -125,14 +125,8 @@ llvm::GlobalVariable *LLVMCodeGen::getRuntimeType(common::Type Ty) {
     }
     ArrayElements.push_back(ConstantPointerNull::get(ElementTy));
 
-    // Create constant array with subtypes
-    //auto ArrayPtrTy = PointerType::getUnqual(ArrayType::get(RuntimeType, 0));
-    //Constant *Array;
-
-    auto Array = ConstantArray::get(ArrayTy, ArrayElements);
-
     // Create runtime type
-    //auto ArrayPtr = static_cast<Constant *>(Builder.CreateGEP(ElementTy, Array, ConstantInt::get(Int32, 0)));
+    auto Array = ConstantArray::get(ArrayTy, ArrayElements);
     auto StructTy = StructType::get(Ctx, { Int, ArrayTy });
     auto ConstVal = ConstantStruct::get(StructTy, { ConstantInt::get(Int, (uint64_t)Ty.Id), Array } );
 
@@ -170,15 +164,6 @@ common::Type LLVMCodeGen::getFuncType(FunctionType *FuncTy)
 
 common::Type LLVMCodeGen::getFuncType(GlobalVariable *FuncRunTy)
 {
-    common::Type Res(TypeId::SIGNATURE);
-
-    /*
-    auto Subtypes = FuncRunTy->subtypes();
-    for (size_t i = 1; i != Subtypes.size(); ++i) {
-        Res.Subtypes.push_back(getType(Subtypes[i]));
-    }
-    Res.Subtypes.push_back(getType(FuncTy->getReturnType()));
-
-    return Res;
-     */
+    // TODO: SPPL_DECL support for any type
+    return common::Type(TypeId::SIGNATURE);
 }
