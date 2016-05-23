@@ -9,7 +9,7 @@ Dependencies
 - CMake		≥ 3.1
 - flex	≥ 2.5
 - bison	≥ 3.0
-- 
+
 Compile Instructions
 --------------------
 SPPL uses CMake as the build system.
