@@ -22,8 +22,12 @@ LLVMCodeGen::LLVMCodeGen(parser::Driver &Drv)
 
 void LLVMCodeGen::setupOptimization() {
     PassMgr = std::make_unique<legacy::PassManager>();
+
+    // Level 0
+    PassMgr->add(createTailCallEliminationPass());
+
+    // Level 1
     if (Drv.OptLevel >= 1) {
-        PassMgr->add(createTailCallEliminationPass());
         PassMgr->add(createInstructionCombiningPass());
         PassMgr->add(createReassociatePass());
         PassMgr->add(createGVNPass());
