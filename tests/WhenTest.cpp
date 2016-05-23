@@ -79,17 +79,17 @@ void Test::whenMultiple() {
 
 void Test::whenNotScope() {
     bool compStatus = compileChecker("when/whenNotScope.sppl");
-    CPPUNIT_ASSERT_MESSAGE(compMsgFail, !compStatus);
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, !compStatus);
 }
 
 void Test::whenEmpty() {
     bool compStatus = compileChecker("when/whenEmpty.sppl");
-    CPPUNIT_ASSERT_MESSAGE(compMsgFail, !compStatus);
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, !compStatus);
 }
 
 void Test::whenWhen() {
     bool compStatus = compileChecker("when/whenWhen.sppl");
-    CPPUNIT_ASSERT_MESSAGE(compMsgFail, !compStatus);
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, !compStatus);
 }
 
 void Test::whenFuncBool() {
@@ -101,5 +101,5 @@ void Test::whenFuncBool() {
 
 void Test::whenFuncNotBool() {
     bool compStatus = compileChecker("when/whenFuncNotBool.sppl");
-    CPPUNIT_ASSERT_MESSAGE(compMsgFail, !compStatus);
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, !compStatus);
 }

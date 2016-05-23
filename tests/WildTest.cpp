@@ -65,5 +65,5 @@ void Test::wildMain() {
 
 void Test::wildWrong() {
     bool compStatus = compileChecker("wild/wildWrong.sppl");
-    CPPUNIT_ASSERT_MESSAGE(compMsgFail, !compStatus);
+    CPPUNIT_ASSERT_MESSAGE(compMsgSucc, !compStatus);
 }
