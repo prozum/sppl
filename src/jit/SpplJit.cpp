@@ -73,7 +73,7 @@ string SpplJit::getOutput(OutputData Data, common::Type Ty) {
     case TypeId::INT:
         return to_string(Data.Int);
     case TypeId::FLOAT:
-        return to_string(Data.Float);
+        return to_string((*Data.Ptr).Float);
     case TypeId::CHAR:
         return "'" + string(1, Data.Char) + "'";
     case TypeId::STRING:
