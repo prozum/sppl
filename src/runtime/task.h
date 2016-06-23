@@ -55,9 +55,10 @@ typedef struct task_s
     context_t	 context;   // the context of the task
     task_state_t state;     // which state the task is in (waiting, running, new, etc)
     uint 	scheduler_id;   // the id of the scheduler executing the task right now
-	uint 	sub_tasks_alloc;	// how many subtasks there are allocated for
-    uint    sub_task_len;   // number of sub tasks
-    struct  task_s  **sub_tasks; // array of subtask references
+    uint 	sub_tasks_alloc;	// how many subtasks there are allocated for
+    char        initial;
+    uint        sub_task_len;   // number of sub tasks
+    struct      task_s  **sub_tasks; // array of subtask references
     uchar	*stk;                // legacy shit for checking if task is running out of stack
     void	(*startfn)(void*);   // the function that the task should run
     void	*startarg;           // arguments for the task's function
@@ -88,11 +89,8 @@ typedef struct runtime_s {
     uint64_t os_thread_count;   // allocated os threads for the runtime
     pthread_t *thread_pool;     // array of pthreads
     scheduler_t *scheduler_pool;// array of the schedulers, each one runs on their own pthread
-
+    char initial_status;
     queue_root *queue;          // queue with tasks
-
-    pthread_mutex_t scheduler_status_lock;  // lock for making sure that only one scheduler can check scheduler states
-    scheduler_state_t *scheduler_status;    // array for checking the state of schedulers
 } runtime_t;
 
 runtime_t   runtime;    // instantiating a global runtime
@@ -103,10 +101,6 @@ runtime_t   runtime;    // instantiating a global runtime
 void rmain(uint64_t os_thread_count, task_t *initial);
 // the procedure that each pthread will run
 void start_scheduler(void *sched_ptr);
-// set the state of a scheduler
-void set_active_worker(uint64_t id, scheduler_state_t state);
-// check if all schedulers are inactive
-uint64_t get_active_workers();
 // check if subtasks for a given task are done
 int get_subtasks_done(task_t *t);
 

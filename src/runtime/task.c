@@ -7,15 +7,16 @@ taskalloc(void (*fn)(void*), void *arg, uint stack)
 {
 	task_t *t;
 
-    t = malloc(sizeof(*t));
+        t = malloc(sizeof(*t));
 
 	t->stk = (uchar*)(t+1);
 	t->startfn = fn;
 	t->startarg = arg;
 	t->sub_task_len = 0;
 	t->sub_tasks_alloc = 0;
-    //t->sub_tasks = malloc(sizeof(task_t *) * sub_tasks);
-    t->state = NEW;
+        t->initial = 0;
+        //t->sub_tasks = malloc(sizeof(task_t *) * sub_tasks);
+        t->state = NEW;
 
 	if(getcontext(&t->context.uc) < 0){
 		fprint(2, "getcontext: %r\n");
@@ -105,7 +106,11 @@ taskexit(task_t *t)
 		taskdealloc(t->sub_tasks[i]);
 	}
 
-    t->state = DONE;
+        if (t->initial) {
+            runtime.initial_status = 1;
+        }
+
+        t->state = DONE;
 	taskswitch(t);
 }
 
