@@ -12,9 +12,9 @@ Dependencies
 
 Compile Instructions
 --------------------
-SPPL uses CMake as the build system.
+SPPL uses CMake for build-generation.
 
-Here is a description of SPPL's CMake flags:
+Description of SPPL's CMake flags:
 
 CMake Flags     | Default Value | Meaning
 -------------   | ------------- | -------------
