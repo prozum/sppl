@@ -34,6 +34,7 @@ enum Backend { GNUASM, HASKELL, LLVM, PPRINTER, CPAR, C };
 class Compiler : public parser::Driver {
   public:
     Compiler();
+    virtual ~Compiler() = default;
 
     std::unique_ptr<parser::CodeGenerator> CodeGen;
     semantics::ScopeGenerator ScopeGen;

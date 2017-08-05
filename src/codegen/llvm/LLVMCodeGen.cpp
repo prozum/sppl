@@ -6,7 +6,6 @@ using namespace codegen;
 
 LLVMCodeGen::LLVMCodeGen(parser::Driver &Drv)
         : CodeGenerator(Drv),
-          Ctx(getGlobalContext()),
           Builder(Ctx),
           MsgOut(*Drv.MOut) {
 

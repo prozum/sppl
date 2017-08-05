@@ -17,18 +17,22 @@ SpplJit::SpplJit()
 
     // Set Driver to JIT mode
     Drv.JIT = true;
-    Drv.Silent = false;
+    Drv.Silent = true;
 }
 
 SpplJit::ModuleHandleT SpplJit::addModule(unique_ptr<Module> M) {
     auto Resolver = createLambdaResolver(
-        [&](const string &Name) {
-            if (auto Sym = findMangledSymbol(Name))
-                return RuntimeDyld::SymbolInfo(Sym.getAddress(),
-                                               Sym.getFlags());
-            return RuntimeDyld::SymbolInfo(nullptr);
+        [&](const std::string &Name) {
+            if (auto Sym = CompileLayer.findSymbol(Name, false))
+                return Sym;
+            return JITSymbol(nullptr);
         },
-        [](const string &S) { return nullptr; });
+        [](const std::string &Name) {
+            if (auto SymAddr = RTDyldMemoryManager::getSymbolAddressInProcess(Name))
+                return JITSymbol(SymAddr, JITSymbolFlags::Exported);
+            return JITSymbol(nullptr);
+        });
+
     auto Handler = CompileLayer.addModuleSet(
         singletonSet(move(M)), std::make_unique<SectionMemoryManager>(),
         move(Resolver));
@@ -73,7 +77,7 @@ string SpplJit::getOutput(OutputData Data, common::Type Ty) {
     case TypeId::INT:
         return to_string(Data.Int);
     case TypeId::FLOAT:
-        return to_string((*Data.Ptr).Float);
+        return to_string(Data.Float);
     case TypeId::CHAR:
         return "'" + string(1, Data.Char) + "'";
     case TypeId::STRING:
@@ -209,6 +213,10 @@ int SpplJit::eval(string Str) {
 
     if (!Drv.accept(CodeGen))
         return 5;
+
+    if (!Drv.Prog->Decls.size())
+        return 0;
+
     auto FuncNode = static_cast<common::Function *>(Drv.Prog->Decls.front().get());
     auto RetTy = FuncNode->Signature.Subtypes.back();
 
@@ -223,6 +231,7 @@ int SpplJit::eval(string Str) {
         assert(FuncJIT);
 
         OutputData Res = FuncJIT();
+        
         string Output = getOutput(Res, RetTy);
         cout << Output
              << endl

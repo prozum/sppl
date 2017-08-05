@@ -12,6 +12,7 @@ class BinaryOp : public Expression {
 
     BinaryOp(std::unique_ptr<Expression> Left, std::unique_ptr<Expression> Right,
              Location Loc);
+    virtual ~BinaryOp() = default;
 
     virtual void accept(Visitor &V) = 0;
 

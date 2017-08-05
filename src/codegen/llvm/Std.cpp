@@ -24,7 +24,7 @@ void LLVMCodeGen::initStdLib() {
     // Load standard library implemented in C
     if (!ModuleStd) {
         SMDiagnostic Dia;
-        auto MemBuf = MemoryBuffer::getMemBuffer(StringRef((char *) std_bc, std_bc_len));
+        auto MemBuf = MemoryBuffer::getMemBuffer(StringRef((char *) src_codegen_llvm_std_std_bc, src_codegen_llvm_std_std_bc_len));
         ModuleStd = parseIR(MemBuf->getMemBufferRef(), Dia, Ctx);
         ModuleStd->setTargetTriple(Machine->getTargetTriple().getTriple());
 

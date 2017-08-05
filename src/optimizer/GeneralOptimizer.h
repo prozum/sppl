@@ -11,6 +11,8 @@ namespace optimizer {
 
 class GeneralOptimizer : public common::Visitor {
   public:
+    virtual ~GeneralOptimizer() = default;
+
     void visit(common::Program &Node);
 
   private:

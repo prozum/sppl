@@ -131,7 +131,7 @@ class Node {
 
     Node(Location Loc);
     Node(const Node &Other);
-    ~Node() = default;
+    virtual ~Node() = default;
 
     std::unique_ptr<Node> clone() const;
 
@@ -148,6 +148,7 @@ class Program : public Node {
 
     Program(std::vector<std::unique_ptr<Declaration>> Decls, Location Loc);
     Program(std::unique_ptr<Expression> AnonFunc, Location Loc);
+    virtual ~Program() = default;
 
     void accept(Visitor &V);
     std::string str();

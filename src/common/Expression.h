@@ -10,6 +10,7 @@ class Expression : public Node {
 
     Expression(Location Loc, bool Const = false);
     Expression(Type Ty, Location Loc, bool Const = false);
+    virtual ~Expression() = default;
 
     virtual void accept(Visitor &V) = 0;
 
@@ -24,6 +25,7 @@ class IdExpr : public Expression {
     std::string Val;
 
     IdExpr(std::string Val, Location Loc);
+    virtual ~IdExpr() = default;
 
     virtual void accept(Visitor &V);
     std::string str();
@@ -37,6 +39,7 @@ class IntExpr : public Expression {
     long Val;
 
     IntExpr(long Val, Location Loc);
+    virtual ~IntExpr() = default;
 
     virtual void accept(Visitor &V);
     std::string str();
@@ -50,6 +53,7 @@ class FloatExpr : public Expression {
     double Val;
 
     FloatExpr(double Val, Location Loc);
+    virtual ~FloatExpr() = default;
 
     virtual void accept(Visitor &V);
     std::string str();
@@ -63,6 +67,7 @@ class CharExpr : public Expression {
     char Val;
 
     CharExpr(char Val, Location Loc);
+    virtual ~CharExpr() = default;
 
     virtual void accept(Visitor &V);
     std::string str();
@@ -76,6 +81,7 @@ class BoolExpr : public Expression {
     bool Val;
 
     BoolExpr(bool Val, Location Loc);
+    virtual ~BoolExpr() = default;
 
     virtual void accept(Visitor &V);
     std::string str();
@@ -89,6 +95,7 @@ class StringExpr : public Expression {
     std::string Val;
 
     StringExpr(std::string Val, Location Loc);
+    virtual ~StringExpr() = default;
 
     virtual void accept(Visitor &V);
     std::string str();
@@ -103,6 +110,7 @@ class ListExpr : public Expression {
     std::vector<std::unique_ptr<Expression>> Elements;
 
     ListExpr(std::vector<std::unique_ptr<Expression>> Elements, Location Loc);
+    virtual ~ListExpr() = default;
 
     virtual void accept(Visitor &V);
     std::string str();
@@ -116,6 +124,7 @@ class TupleExpr : public Expression {
     std::vector<std::unique_ptr<Expression>> Elements;
 
     TupleExpr(std::vector<std::unique_ptr<Expression>> Elements, Location Loc);
+    virtual ~TupleExpr() = default;
 
     virtual void accept(Visitor &V);
     std::string str();
@@ -133,6 +142,7 @@ class CallExpr : public Expression {
 
     CallExpr(std::unique_ptr<Expression> Callee, std::vector<std::unique_ptr<Expression>> Args,
              Location Loc);
+    virtual ~CallExpr() = default;
 
     virtual void accept(Visitor &V);
     std::string str();
@@ -148,6 +158,7 @@ class LambdaFunction : public Expression {
 
     LambdaFunction(std::unique_ptr<Expression> Expr,
                    std::vector<std::unique_ptr<LambdaArg>> Args, Location Loc);
+    virtual ~LambdaFunction() = default;
 
     virtual void accept(Visitor &V);
     std::string str();
@@ -163,6 +174,7 @@ class AlgebraicExpr : public Expression {
 
     AlgebraicExpr(std::string Constructor, std::vector<std::unique_ptr<Expression>> Exprs,
                   Location Loc);
+    virtual ~AlgebraicExpr() = default;
 
     virtual void accept(Visitor &V);
     std::string str();
@@ -177,6 +189,7 @@ public:
 
     DoExpr(std::vector<std::unique_ptr<Expression>> Exprs,
            Location Loc);
+    virtual ~DoExpr() = default;
 
     virtual void accept(Visitor &V);
     std::string str();
