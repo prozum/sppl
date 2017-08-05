@@ -11,6 +11,8 @@ class Visitor {
     friend class Node;
 
   public:
+    virtual ~Visitor() = default;
+
     void addError(Error Err);
     void clearErrors();
     bool checkNotSafe();

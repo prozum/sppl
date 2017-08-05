@@ -44,8 +44,8 @@ private:
     ModuleHandleT addModule(std::unique_ptr<llvm::Module> M);
     void removeModule(ModuleHandleT Handler);
 
-    llvm::orc::JITSymbol findSymbol(const std::string Name);
-    llvm::orc::JITSymbol findMangledSymbol(const std::string &Name);
+    llvm::JITSymbol findSymbol(const std::string Name);
+    llvm::JITSymbol findMangledSymbol(const std::string &Name);
     std::string mangle(const std::string &Name);
 
     std::string getOutput(OutputData Data, common::Type Ty);

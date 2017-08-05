@@ -18,12 +18,14 @@
 #include <llvm/Support/raw_os_ostream.h>
 #include <llvm/Support/TargetSelect.h>
 
-#include <llvm/Bitcode/ReaderWriter.h>
+#include <llvm/Bitcode/BitcodeReader.h>
+#include <llvm/Bitcode/BitcodeWriter.h>
 
 #include <llvm/ExecutionEngine/ExecutionEngine.h>
 
 #include <llvm/Analysis/Passes.h>
 #include <llvm/Transforms/Scalar.h>
+#include <llvm/Transforms/Scalar/GVN.h>
 
 #include <iostream>
 #include <unordered_map>
@@ -39,7 +41,7 @@ class LLVMCodeGen : public parser::CodeGenerator {
 
     // LLVM Context
     // Only one context is used, as the LLVM code generator is single threaded
-    llvm::LLVMContext &Ctx;
+    llvm::LLVMContext Ctx;
 
     // LLVM IR Builder
     llvm::IRBuilder<> Builder;

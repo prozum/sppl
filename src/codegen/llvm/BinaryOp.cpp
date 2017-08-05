@@ -256,7 +256,7 @@ void LLVMCodeGen::visit(To &Node) {
                 CurVal = Builder.CreateFPToSI(CurVal, Int, "casttmp");
             break;
         default:
-            addError(Error::NotImplemented(Node.Loc));
+            addError(common::Error::NotImplemented(Node.Loc));
     }
 }
 

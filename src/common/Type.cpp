@@ -100,6 +100,8 @@ std::string Type::str(bool isTop) {
         return "Void";
     case TypeId::UNKNOWN:
         return "_Unknown_";
+    default:
+        throw runtime_error("Something went wrong!");
     }
 }
 

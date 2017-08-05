@@ -1,0 +1,1 @@
+tests += files(['bug.sppl', 'fac.sppl', 'fizzbuzz.sppl', 'isprime.sppl', 'literals.sppl', 'main.sppl', 'mapisprime.sppl', 'maptest.sppl', 'mergesort.sppl', 'operators.sppl', 'patterns.sppl', 'planets.sppl', 'power.sppl', 'signatures.sppl', 'stringlib.sppl', 'structures.sppl', 'superadd.sppl', ])

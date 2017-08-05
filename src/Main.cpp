@@ -55,11 +55,11 @@ int main(int argc, char *argv[])
 #endif
 #ifdef CGNUASM
         else if (Arg.compare("--gnuasm") == 0)
-            backend = Backend::GNUASM;
+            BE = Backend::GNUASM;
 #endif
 #ifdef CHASKELL
         else if (Arg.compare("--haskell") == 0)
-            backend = Backend::GNUASM;
+            BE = Backend::GNUASM;
 #endif
 #ifdef CLLVM
         else if (Arg.compare("--llvm") == 0)

@@ -12,18 +12,18 @@ Dependencies
 
 Compile Instructions
 --------------------
-SPPL uses CMake for build-generation.
+SPPL uses Meson as build system.
 
-Description of SPPL's CMake flags:
+Description of SPPL's Meson flags:
 
-CMake Flags     | Default Value | Meaning
+Meson Flags     | Default Value | Meaning
 -------------   | ------------- | -------------
--DDEBUG         |       1       | Build in Debug Mode
--DCCPP          |       1       | Build C Code Generators
--DCLLVM         |       0       | Build LLVM Code Generator
--DCHASKELL      |       0       | Build Haskell Code Generator
--DCGNUASM       |       0       | Build GNU Assembly Code Generator
--DINTERPRETER   |       0       | Build LLVM-based Interpreter
+-Dccpp          |     true      | Build C Code Generators
+-Dcllvm         |     false     | Build LLVM Code Generator
+-Dchaskell      |     false     | Build Haskell Code Generator
+-Dcgnuasm       |     false     | Build GNU Assembly Code Generator
+-Dinterpreter   |     false     | Build LLVM-based Interpreter
+-Dtest          |     false     | Build unit tests
 
 
 C++ Style
