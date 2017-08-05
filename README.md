@@ -16,7 +16,7 @@ SPPL uses Meson as the build system.
 
 Description of SPPL's Meson options:
 
-Meson Flags     | Default Value | Meaning
+Meson Option    | Default Value | Meaning
 ----------------| ------------- | -------------
 ccpp            |     true      | Build C Code Generators
 cllvm           |     false     | Build LLVM Code Generator
