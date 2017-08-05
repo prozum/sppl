@@ -6,24 +6,24 @@ Simple Parallel Programming Language
 
 Dependencies
 --------------------
-- CMake		≥ 3.1
+- Meson		≥ 0.41.0
 - flex	≥ 2.5
 - bison	≥ 3.0
 
 Compile Instructions
 --------------------
-SPPL uses Meson as build system.
+SPPL uses Meson as the build system.
 
-Description of SPPL's Meson flags:
+Description of SPPL's Meson options:
 
 Meson Flags     | Default Value | Meaning
--------------   | ------------- | -------------
--Dccpp          |     true      | Build C Code Generators
--Dcllvm         |     false     | Build LLVM Code Generator
--Dchaskell      |     false     | Build Haskell Code Generator
--Dcgnuasm       |     false     | Build GNU Assembly Code Generator
--Dinterpreter   |     false     | Build LLVM-based Interpreter
--Dtest          |     false     | Build unit tests
+----------------| ------------- | -------------
+ccpp            |     true      | Build C Code Generators
+cllvm           |     false     | Build LLVM Code Generator
+chaskell        |     false     | Build Haskell Code Generator
+cgnuasm         |     false     | Build GNU Assembly Code Generator
+interpreter     |     false     | Build LLVM-based Interpreter
+test            |     false     | Build unit tests
 
 
 C++ Style
