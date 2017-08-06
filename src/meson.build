@@ -16,6 +16,12 @@ if jit_enabled or interpreter_enabled
   subdir('jit')
 endif
 
+libs = [common_lib, parser_lib, semantics_lib, compiler_lib]
+libs += optimizer_enabled ? optimizer_lib : []
+
+deps = cllvm_enabled ? llvm_dep : []
+
 scc_exe = executable('scc', 'Main.cpp', 
-                     dependencies: compiler_dep,
+                     link_with: libs,
+                     dependencies: deps,
                      include_directories: incdir)
