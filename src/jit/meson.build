@@ -1,16 +1,14 @@
-deps = [cllvm_dep, parser_dep]
+libs = [common_lib, parser_lib, semantics_lib, cllvm_lib]
 
 if optimizer_enabled
-  deps += optimizer_dep
+  libs += optimizer_lib
 endif
 if runtime_enabled
-  deps += runtime_dep
+  libs += runtime_lib
 endif
 
 jit_lib = library('jit', 
                   'SpplJit.cpp',
-                  dependencies: deps)
-
-jit_dep = declare_dependency(
-    link_with: jit_lib,
-    dependencies: deps)
+                  link_with: libs,
+                  dependencies: llvm_dep,
+                  include_directories: incdir)

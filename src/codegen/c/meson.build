@@ -1,7 +1,4 @@
 cc_lib = library('cc', 
                  'CCodeGen.cpp', 'CTree.cpp',
-                 dependencies: [parser_dep, semantics_dep],
+                 link_with: [common_lib, parser_lib, semantics_lib],
                  include_directories: incdir)
-
-cc_dep = declare_dependency(
-    link_with: cc_lib)

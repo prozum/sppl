@@ -1,7 +1,4 @@
 semantics_lib = library('semantics', 
                         'TypeChecker.cpp', 'ScopeGenerator.cpp',
-                        dependencies: [common_dep, parser_dep],
+                        link_with: [common_lib, parser_lib],
                         include_directories: incdir)
-
-semantics_dep = declare_dependency(
-    link_with: semantics_lib)

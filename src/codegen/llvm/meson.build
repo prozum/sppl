@@ -7,8 +7,6 @@ cllvm_lib = library('cllvm',
                     'LLVMCodeGen.cpp', 'Pattern.cpp', 'Expression.cpp', 
                     'BinaryOp.cpp', 'Type.cpp', 'Function.cpp', 'UnaryOp.cpp', 
                     'Utils.cpp', 'Prefix.cpp', 'Std.cpp', stdlib_bin,
-                    dependencies: [llvm_dep, semantics_dep, parser_dep])
-
-cllvm_dep = declare_dependency(
-    link_with: cllvm_lib,
-    dependencies: [llvm_dep, semantics_dep])
+                    dependencies: [llvm_dep],
+                    link_with: [common_lib, parser_lib, semantics_lib],
+                    include_directories: incdir)
